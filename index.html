@@ -13,6 +13,8 @@
   <link rel="stylesheet" href="styles.css">
   <script defer src="content.js"></script>
   <script defer src="app.js"></script>
+  <script defer src="antraege-data.js"></script>
+  <script defer src="antraege.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Zum Hauptinhalt springen</a>
@@ -32,6 +34,7 @@
           <span class="eyebrow"><span class="tiny-dot"></span> Orientierung für Deutschland</span>
           <h1>Dein Wegweiser<br><em>rund um Asthma.</em></h1>
           <p>Welche Hilfsmittel kommen infrage? Welche Rechte gelten am Arbeitsplatz? Und was ändert sich mit deinem Grad der Behinderung? Hier findest du verständliche Antworten – mit überprüfbaren Quellen.</p>
+          <a class="btn btn-primary hero-apply" href="#antraege">Hilfen und Anträge entdecken →</a>
           <div class="hero-meta"><span>Offizielle Rechtsgrundlagen</span><span>Individuell filterbar</span><span>Ohne Anmeldung</span></div>
         </div>
         <div class="hero-illustration" aria-hidden="true">
@@ -54,6 +57,33 @@
         <div class="mini-fact"><span class="fact-num">20</span><span>Ab hier wird ein GdB behördlich festgestellt</span></div>
         <div class="mini-fact"><span class="fact-num">30/40</span><span>Gleichstellung für den Arbeitsplatz möglich</span></div>
         <div class="mini-fact"><span class="fact-num">50+</span><span>Gesetzlich schwerbehindert</span></div>
+      </section>
+
+
+      <section class="applications panel" id="antraege" aria-labelledby="antraege-title">
+        <div class="section-heading"><div><p class="section-kicker">03 · Hilfen & direkte Antragswege</p><h2 id="antraege-title">Hilfsmittel, Physiotherapie und Anträge</h2><p>Wähle ein Thema. Du siehst die zuständige Stelle, den offiziellen Weg und eine eigene ausfüllbare Mustervorlage. Die App verschickt nichts automatisch.</p></div><span class="version-chip">29 Wege</span></div>
+        <div class="application-note" role="note"><strong>Wichtiger Unterschied:</strong> Ärztliche Verordnungen (z. B. Atemphysiotherapie) darf nur die behandelnde Praxis ausstellen. Die Mustervorlage ist eine Anfrage, kein ärztliches Rezept und kein amtlicher Antrag. GdB allein begründet keine Leistung.</div>
+        <div class="application-tools">
+          <label class="field">Thema suchen<input id="apply-search" type="search" placeholder="z. B. Atemphysio, Lungensport, Reha, BEM"></label>
+          <label class="field">Bereich<select id="apply-category"><option value="all">Alle Leistungen</option><option>Hilfsmittel</option><option>Physio & Therapie</option><option>Therapie & Schulung</option><option>Reha</option><option>Arbeitsplatz</option><option>Behinderung & Finanzen</option><option>Pflege</option></select></label>
+        </div>
+        <p class="muted application-count" id="apply-count" aria-live="polite"></p>
+        <div class="application-list" id="apply-list"></div>
+        <button id="apply-more" class="btn btn-outline app-more" type="button" hidden>Weitere Leistungen anzeigen</button>
+        <div id="apply-editor" class="application-editor" hidden>
+          <div class="section-heading"><div><p class="section-kicker">Unverbindliche Mustervorlage</p><h3 id="apply-edit-title">Antragsentwurf erstellen</h3><p>Bitte prüfe den Text vor dem Versand. Die Felder werden nicht dauerhaft gespeichert.</p></div><button type="button" class="btn btn-outline" id="apply-close">Schließen</button></div>
+          <div class="application-form">
+            <label>Dein Name <input id="apply-name" autocomplete="name" placeholder="Vor- und Nachname"></label>
+            <label>Deine Anschrift (optional) <input id="apply-address" autocomplete="street-address" placeholder="Straße, PLZ und Ort"></label>
+            <label>Empfänger / Institution <input id="apply-recipient" placeholder="z. B. Krankenkasse, Arztpraxis oder Arbeitgeber"></label>
+            <label>Aktenzeichen (optional) <input id="apply-ref" placeholder="z. B. Antrags- oder Versicherungszeichen"></label>
+            <label class="wide">Deine persönliche Begründung <textarea id="apply-reason" rows="3" placeholder="Beschreibe nur belegbare Einschränkungen und deinen konkreten Bedarf. Keine Diagnosen nötig, wenn nicht erforderlich."></textarea></label>
+          </div>
+          <p class="application-disclaimer">Keine elektronische Übermittlung: „Kopieren“ und „Drucken / als PDF sichern“ erstellen nur einen Text auf deinem Gerät. Du musst ihn selbst bei der zuständigen Stelle einreichen.</p>
+          <div class="application-preview" id="apply-preview" aria-live="polite"></div>
+          <div class="application-buttons"><button type="button" class="btn btn-primary" id="apply-copy">Text kopieren</button><button type="button" class="btn btn-outline" id="apply-print">Drucken / PDF sichern</button></div>
+          <p class="muted" id="apply-action-msg" role="status" aria-live="polite"></p>
+        </div>
       </section>
 
       <section class="explore" aria-labelledby="explore-title">
@@ -79,10 +109,11 @@
 
       <section class="sources panel" id="quellen" aria-labelledby="sources-title"><div class="section-heading"><div><p class="section-kicker">04 · Transparenz</p><h2 id="sources-title">Quellen & Aktualität</h2><p>Gesetzestexte vom Bundesrecht-Portal sowie Informationen öffentlicher Stellen. Die App überprüft Gesetzesänderungen nicht automatisch.</p></div></div><div id="source-list" class="source-list"></div><p class="muted note">Rechtsstand der eingebauten Erläuterungen: Recherche am 15.10.2026. Spätere Gesetzesänderungen können Abweichungen verursachen. Prüfe vor wichtigen Entscheidungen stets den verlinkten aktuellen Originaltext.</p></section>
 
-      <section class="app-settings panel" id="app-settings" aria-labelledby="settings-title"><div class="section-heading"><div><p class="section-kicker">05 · App-Einstellungen</p><h2 id="settings-title">Version & Updates</h2></div><span class="version-chip" id="version-chip">v1.0.2</span></div><div class="settings-row"><div><strong>Asthma</strong><p>Updateprüfung auf dem Server, auf dem diese App veröffentlicht ist (z. B. GitHub Pages). Kein App-Store und kein externer Update-Dienst erforderlich.</p><p class="muted">Installationshinweis für iPhone: In Safari „Teilen“ → „Zum Home-Bildschirm“.</p></div><button type="button" id="check-update" class="btn btn-primary">Nach Updates suchen</button></div><p class="update-status" id="update-status" role="status" aria-live="polite">Installierte Version: 1.0.2</p><div class="settings-actions"><button type="button" id="reload-app" class="btn btn-outline" hidden>Neue Version laden</button><button type="button" id="forget" class="btn btn-text">Gespeichertes Profil und Merkliste löschen</button></div><p class="muted privacy">Datenschutz: GdB-Auswahl, Gleichstellungsstatus und Merkliste werden ausschließlich im lokalen Browserspeicher abgelegt. Die App verwendet keine Trackingdienste und sendet keine Profildaten an einen Server. Externe Quellen werden erst geöffnet, wenn du den Link anklickst. Die Updateprüfung fordert nur die Versionsdatei vom Hosting-Server an.</p></section>
+      <section class="app-settings panel" id="app-settings" aria-labelledby="settings-title"><div class="section-heading"><div><p class="section-kicker">05 · App-Einstellungen</p><h2 id="settings-title">Version & Updates</h2></div><span class="version-chip" id="version-chip">v1.1.0</span></div><div class="settings-row"><div><strong>Asthma</strong><p>Updateprüfung auf dem Server, auf dem diese App veröffentlicht ist (z. B. GitHub Pages). Kein App-Store und kein externer Update-Dienst erforderlich.</p><p class="muted">Installationshinweis für iPhone: In Safari „Teilen“ → „Zum Home-Bildschirm“.</p></div><button type="button" id="check-update" class="btn btn-primary">Nach Updates suchen</button></div><p class="update-status" id="update-status" role="status" aria-live="polite">Installierte Version: 1.1.0</p><div class="settings-actions"><button type="button" id="reload-app" class="btn btn-outline" hidden>Neue Version laden</button><button type="button" id="forget" class="btn btn-text">Gespeichertes Profil und Merkliste löschen</button></div><p class="muted privacy">Datenschutz: GdB-Auswahl, Gleichstellungsstatus und Merkliste werden ausschließlich im lokalen Browserspeicher abgelegt. Die App verwendet keine Trackingdienste und sendet keine Profildaten an einen Server. Externe Quellen werden erst geöffnet, wenn du den Link anklickst. Die Updateprüfung fordert nur die Versionsdatei vom Hosting-Server an.</p></section>
     </div>
   </main>
-  <footer><div class="shell footer-inner"><div><strong>Asthma</strong><p>Informationsangebot – keine medizinische Diagnostik und keine individuelle Rechtsberatung. Bei schwerer akuter Atemnot: 112.</p></div><div><a href="#quellen">Quellen</a><a href="#app-settings">Updates</a><span>Version <span id="footer-version">1.0.2</span></span></div></div></footer>
+  <footer><div class="shell footer-inner"><div><strong>Asthma</strong><p>Informationsangebot – keine medizinische Diagnostik und keine individuelle Rechtsberatung. Bei schwerer akuter Atemnot: 112.</p></div><div><a href="#antraege">Anträge</a><a href="#quellen">Quellen</a><a href="#app-settings">Updates</a><span>Version <span id="footer-version">1.1.0</span></span></div></div></footer>
+  <section id="antrag-print" aria-label="Druckansicht Mustervorlage" hidden></section>
   <template id="card-template"><article class="card"><div class="card-top"><span class="category-tag"></span><button class="save-btn" type="button" aria-label="Zur Merkliste hinzufügen" title="Merkliste">☆</button></div><h3 class="card-title"></h3><p class="card-summary"></p><span class="status"></span><details class="card-detail"><summary>Details und Voraussetzungen <span aria-hidden="true">⌄</span></summary><div class="details-body"><p class="card-body"></p><div class="card-sources"><strong>Quellen</strong><div class="links"></div></div></div></details></article></template>
 </body>
 </html>

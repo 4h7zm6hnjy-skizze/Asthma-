@@ -2,7 +2,7 @@
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
-root=Path(__file__).resolve().parents[1]
+root=Path(__file__).resolve().parent
 html=(root/'index.html').read_text()
 html=html.replace('<link rel="stylesheet" href="styles.css">','<style>'+(root/'styles.css').read_text()+'</style>')
 html=html.replace('<script defer src="content.js"></script>','').replace('<script defer src="app.js"></script>','')
@@ -55,13 +55,13 @@ with sync_playwright() as p:
     assert page.locator('#source-list a').count()>=20
     assert page.locator('a[target="_blank"]').count()>10
     assert not errors,errors
-    page.screenshot(path='/mnt/data/AsthmaKompass_desktop.png',full_page=True)
+    page.screenshot(path='/mnt/data/Asthma_v1.0.2_desktop.png',full_page=True)
     mobile=browser.new_page(viewport={'width':390,'height':844},device_scale_factor=1,is_mobile=True,has_touch=True)
     mobile.on('pageerror',lambda e:errors.append(str(e)))
     mobile.set_content(html,wait_until='load')
     assert mobile.locator('#gdb').is_visible()
     assert mobile.evaluate('document.documentElement.scrollWidth <= window.innerWidth+1'), 'Horizontales Scrollen'
-    mobile.screenshot(path='/mnt/data/AsthmaKompass_mobil.png',full_page=True)
+    mobile.screenshot(path='/mnt/data/Asthma_v1.0.2_mobil.png',full_page=True)
     assert not errors,errors
     print(f'OK: Browser-UI im isolierten HTML-Test, Desktop, Mobil, {len(page.locator("#source-list a").all())} Quellen, GdB 10/30/40/50, Gleichstellung, Suche, Merkliste, Update, JS-Fehlerfreiheit')
     browser.close()

@@ -1,29 +1,15 @@
-# Technischer Prüfbericht – Asthma 1.0.1
+# Asthma 1.1.0 – Prüfbericht
 
-Prüfung am 15.10.2026.
+Recherche amtlicher Quellen: 15.10.2026.
 
-## Erfolgreiche Tests
+Bestandteile: 29 Antrags- und Informationswege, 18 Links zu offiziellen Stellen/Fachregelwerken, lokale Mustervorlagen, Suche, Fachfilter und schrittweise Anzeige. Der medizinische Bedarf wird nicht automatisch beurteilt. Der Antrag wird nicht automatisch verschickt. Ärztliche Verordnungen müssen von Arztpraxen erstellt werden.
 
-- JavaScript-Syntaxkontrolle für `content.js`, `app.js`, `sw.js` via Node.
-- Datenkonsistenz: 30 Themen, 24 Quellen, keine doppelten IDs, keine unbekannten Quellenreferenzen.
-- Browser-Bedienung in isolierter Chromium/Playwright-Umgebung (Desktop 1365 px / Mobile 390 px).
-- GdB 10, 30, 40 und 50, Gleichstellungsstatus, kein Zusatzurlaub bei alleiniger Gleichstellung, besondere Schutzrechte nach Auswahl.
-- Suche, Kategorieauswahl, Merkliste, steuerliche Kennzeichnung, Hauptnavigation.
-- Updateprüfung: Offline-/Lokal-Hinweis und angezeigte neuere Version (mit simuliertem Serverantwortwert).
-- Keine unbehandelten JavaScript-Laufzeitfehler im Browser-Test. Mobile Breite ohne horizontales Seiten-Scrolling.
+## Automatisierte Tests
 
-## Nicht geprüft
+Desktop und Mobil in einer isolierten Chromium-Browserumgebung mit eingebetteten HTML/CSS/JS-Dateien:
+- Alte GdB-Auswahl und Gleichstellung bestehen fort.
+- 29 Themen, Suche, Filter, schrittweise Anzeige, Antragsentwürfe und Textvorschau.
+- Version 1.1.0 im UI und der veröffentlichten Manifest-/Versions-Konfiguration.
+- Keine JavaScript-Exceptions und kein horizontales Überlaufen auf 390px Breite.
 
-- Tatsächliche GitHub-Pages-Veröffentlichung / HTTPS-Installation auf dem iPhone.
-- Aktive Service-Worker-Cache-Erneuerung nach einem veröffentlichten Release: dazu muss die App gehostet sein; im Browser-Test wurde der Inhalt bewusst isoliert geladen.
-- Erreichbarkeit jeder einzelnen externen Quellenwebseite zum Zeitpunkt der späteren Verwendung.
-- Medizinischer oder juristischer Einzelfallanspruch; dies ist keine behördliche Entscheidung.
-
-Der Test benutzt im Container absichtlich `page.set_content`, da der dortige Chromium-Browser lokale URLs aus Sicherheitsrichtlinien nicht direkt aufrufen durfte. Dies ist keine Einschränkung der fertig heruntergeladenen App.
-
-Test erneut ausführen: `python tests/browser_smoke.py` (Python Playwright und Chromium benötigt).
-
-
-## Zusatzprüfung Version 1.0.2
-
-App-Symbol-Pfade auf `icon.svg` im Hauptverzeichnis vereinheitlicht, Service-Worker-Offline-Cache und Versionsdatei angepasst; lokale Funktionstests ergänzt. GitHub Pages selbst konnte nicht live aufgerufen werden.
+Nicht geprüft: echter GitHub-Pages-Rollout, Browser-Update mit aktiver Service-Worker-Installation, tatsächliche Zustellung von Anträgen oder Prüfung jeder externen amtlichen Unterseite durch Browser-Navigation (die angegebenen URLs wurden anhand offizieller Suchergebnisse verifiziert). Zwischenzeitliche Änderungen bei Behördenformularen sind möglich.
