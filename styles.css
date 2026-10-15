@@ -194,31 +194,63 @@ img,svg,video,canvas{max-width:100%}
 @media(max-width:440px){.shell{padding-left:12px;padding-right:12px}.scan-panel{padding:12px}.scan-picked{padding:10px}.scan-photo-toolbar{min-height:54px}.scan-photo-stage{height:calc(100dvh - 134px)}.bottom-dock button{min-width:0;overflow:hidden}.bottom-dock button span{font-size:clamp(.58rem,2.4vw,.72rem)}.scan-zoom-controls{gap:4px}.scan-zoom-controls button{min-width:36px;padding:4px 7px}}
 
 
-/* 1.9 – professionelle mobile Breitenbegrenzung, Bildvorschau und Zoom */
-:root{--app-max-width:1160px}
-html{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;touch-action:pan-x pan-y pinch-zoom}
-body{width:100%;min-width:0;max-width:100%;overflow-x:clip}
-*,*::before,*::after{box-sizing:border-box}
-#secure-application,.shell,.main-layout,.panel,.suite-page,.scan-panel,.scan-picked,.scan-picked>div,.suite-form,.scan-actions{min-width:0;max-width:100%}
-img,svg,video,canvas{max-width:100%}
-.scan-picked{display:flex;flex-direction:column;align-items:stretch;width:100%;gap:10px;padding:12px}
-.scan-picked .scan-photo-box{width:100%;min-width:0;display:grid;gap:9px;justify-items:stretch}
-.scan-picked #scan-preview{display:block;width:100%;height:auto;max-width:100%;max-height:min(66dvh,660px);object-fit:contain;object-position:center;cursor:zoom-in;margin:auto;background:#f4f8f9;border:1px solid #dce6e8;border-radius:9px}
-.scan-photo-box small{font-size:12px;color:#4e6975;line-height:1.5}
-.scan-photo-box .btn{width:100%;white-space:normal}
-#scan-panel .scan-actions .btn{max-width:100%;white-space:normal}
-.lung-quick-actions{display:flex;gap:9px;flex-wrap:wrap;margin:16px 0}
-.lung-quick-actions .btn{flex:1 1 190px;white-space:normal}
-.scan-native-tip{padding:12px;border-radius:9px;border:1px solid #cbe1e7;background:#f0f9fa;font-size:13px;line-height:1.5;margin:8px 0 13px}
-#scan-native-text{max-width:100%;white-space:normal;margin-bottom:12px}
-/* Keep content fitted to width; retain OS pinch zoom for accessibility. */
-.scan-photo-dialog{box-sizing:border-box;position:fixed;inset:0;margin:0;padding:0;width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;border:0;background:#101e26;color:white;overscroll-behavior:contain}
-.scan-photo-dialog::backdrop{background:rgba(6,14,20,.92)}
-.scan-photo-toolbar{min-height:62px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;background:#152e3a;padding:9px 12px}
-.scan-zoom-controls{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
-.scan-zoom-controls button{border:1px solid #68808e;border-radius:9px;background:#244454;color:white;min-width:40px;min-height:42px;padding:6px 10px;font-weight:bold;touch-action:manipulation}
-.scan-zoom-controls button:disabled{opacity:.35}
-.scan-photo-stage{height:calc(100dvh - 126px);width:100%;display:grid;place-items:center;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
-.scan-photo-stage img{display:block;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;transform-origin:center center;will-change:transform;pointer-events:none}
-.scan-photo-help{font-size:12px;line-height:1.4;text-align:center;margin:7px 8px 0;color:#c5d8e0}
-@media(max-width:440px){.shell{padding-left:12px;padding-right:12px}.scan-panel{padding:12px}.scan-picked{padding:10px}.scan-photo-toolbar{min-height:54px}.scan-photo-stage{height:calc(100dvh - 134px)}.bottom-dock button{min-width:0;overflow:hidden}.bottom-dock button span{font-size:clamp(.58rem,2.4vw,.72rem)}.scan-zoom-controls{gap:4px}.scan-zoom-controls button{min-width:36px;padding:4px 7px}}
+/* Version 1.9.1: iPhone Safari Schriftzoom und abgeschnittene Scanner-Karten */
+:root { --app-mobile-gutter:12px }
+@media (max-width: 850px) {
+  /* iOS Safari zooms the entire page when focusing form fields below 16px. */
+  input:not([type="checkbox"]):not([type="radio"]), textarea, select {
+    font-size:16px!important;
+  }
+  .panel, .suite-subpanel, .scan-panel, .scan-picked, .scan-photo-box,
+  .scan-text, .scan-review, .scan-full-report, #scan-enhance,
+  .scan-metric-row, #scan-extended-rows { min-width:0; max-width:100%; }
+  #scan-panel, #scan-panel *, #labor, #labor * { overflow-wrap:anywhere; }
+  #scan-panel .scan-actions, #labor .scan-actions {
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    align-items:stretch;
+    width:100%;
+    gap:9px;
+  }
+  #scan-panel .scan-actions > *, #labor .scan-actions > * {
+    min-width:0;
+    max-width:100%;
+    width:100%;
+    margin:0;
+    white-space:normal;
+    text-align:center;
+    overflow-wrap:anywhere;
+  }
+  #scan-panel .scan-actions .btn, #labor .scan-actions .btn,
+  #scan-native-text, #scan-reparse, #scan-photo-open,
+  #scan-picked #scan-start, #scan-picked #scan-clear {
+    max-width:100%;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    line-height:1.35;
+    min-height:44px;
+  }
+  #scan-picked { display:grid;grid-template-columns:minmax(0,1fr);width:100%; }
+  #scan-picked > div { min-width:0;width:100%;max-width:100%; }
+  #scan-picked > div:not(.scan-photo-box) { display:grid;grid-template-columns:minmax(0,1fr);gap:8px; }
+  #scan-picked #scan-preview {
+    width:100%;max-width:100%;height:auto;max-height:65dvh;
+    object-fit:contain;object-position:center;border-radius:10px;
+  }
+  #scan-filename {overflow-wrap:anywhere;word-break:break-word}
+  #scan-raw, #lab-ocr-text {width:100%;max-width:100%;min-width:0;resize:vertical;}
+  .bottom-dock {
+    left:0;right:0;width:100%;max-width:100%;min-width:0;
+    grid-template-columns:repeat(6,minmax(0,1fr));overflow:hidden;
+  }
+  .bottom-dock button {min-width:0;max-width:100%;padding:4px 1px;}
+  .bottom-dock button span {max-width:100%;white-space:normal;text-align:center;line-height:1.1;}
+}
+@media (max-width: 380px) {
+  .shell{padding-left:10px;padding-right:10px}
+  .panel{padding-left:13px;padding-right:13px}
+  #scan-panel{padding:10px}
+  .scan-picked{padding:10px}
+  .scan-metric-grid{gap:5px}
+  .scan-metric-grid input{padding:9px 3px}
+}

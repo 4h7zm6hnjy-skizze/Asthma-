@@ -1,3 +1,9 @@
+# Version 1.9.1: mobile Layout-Korrektur
+
+Die Funktionen wurden in einer isolierten Chromium-Mobilansicht mit 320, 375, 390, 430, 600 und 768 CSS-Pixeln geprüft. Ergebnis: kein seitlicher Überlauf der Seite, Foto innerhalb der Breite, untere Schnellnavigation vollständig sichtbar, aktive mobile Scanner-Eingaben mindestens 16px Schriftgröße. Die Bilddialogöffnung und -vergrößerung sowie Schließen wurden getestet. Auf iPhone-Safari selbst nicht geprüft; bestehender manueller Seitenzoom muss ggf. vom Nutzer einmalig zurückgestellt werden. Weitere ältere Testhinweise folgen.
+
+---
+
 # Prüfbericht: Asthma 1.8.0 – Befundtabellen und Laborakte
 
 Stand: 15.10.2026

@@ -1,3 +1,22 @@
+# Asthma 1.9.1 – Korrektur der mobilen Scanneransicht
+
+Dieses Paket enthält sämtliche vorhandenen App-Dateien von 1.9.0 einschließlich Scanner, Blutwerten, Kalender, verschlüsseltem Tresor und regionaler Suche.
+
+## Neu in 1.9.1
+- iPhone-Safari: Mobile Eingabefelder mindestens 16px Schriftgröße, um automatisches Seitenvergrößern beim Fokussieren zu vermeiden.
+- Scanner-Aktionen stehen auf schmalen Bildschirmen untereinander; lange Button-Texte werden umgebrochen.
+- Befundbild bleibt im Container und wird vollständig eingepasst; die Vollbild-Zoomfunktion bleibt für die Bildbetrachtung verfügbar.
+- Feste untere Navigation auf maximal 100% Bildschirmbreite begrenzt.
+- Fehlende Versionsangabe in Einstellungen auf aktuellen Stand gebracht.
+- Versions-/Service-Worker-Cache auf 1.9.1 geändert.
+
+**Wichtig:** Bereits manuell vergrößerte Seiten müssen auf dem iPhone einmal wieder auf normale Größe zurückgestellt bzw. neu geöffnet werden. Die App sperrt die Betriebssystem-Vergrößerung nicht aus Gründen der Barrierefreiheit.
+
+**OCR:** iPhone Safari unterstützt bisher keine automatische Fotoerkennung im Browser über TextDetector. Ein auf iPhone nicht unterstützter Foto-OCR-Button wird ausgeblendet. Die lokale Erkennung muss weiterhin über iOS Live Text (Text kopieren und einfügen / Text scannen) erfolgen. Keine externen OCR-Dienste.
+
+**Datenschutz:** Die Verschlüsselungslogik von 1.9.0 ist unverändert. Bitte vor dem Upload ein verschlüsseltes Backup anlegen und erst danach die Dateien in GitHub `main` hochladen. Nach der Veröffentlichung die geänderte Version und Fotoansicht auf dem iPhone prüfen.
+
+## Vorherige Funktionen
 # Asthma Webapp – Version 1.9.0
 
 ## Neu: Spirometrie-Befunde und Laborwerte

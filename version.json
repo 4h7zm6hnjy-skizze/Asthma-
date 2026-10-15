@@ -1,5 +1,5 @@
 {
-  "version": "1.9.0",
+  "version": "1.9.1",
   "released": "2026-10-15",
-  "notes": "Direktzugriff Lungenfunktion in fester unterer Navigation, responsive Bildvorschau mit Vollbildzoom/Pan, iPhone-Live-Text-Eingabehilfe, alle persönlichen Daten weiterhin lokal verschlüsselt; keine externe OCR-Übertragung."
+  "notes": "Mobile Layoutkorrektur: verhindert automatischen iPhone-Safari-Eingabezoom bei kleinen Eingabefeldern, stapelt Scannerbuttons, passt Fotos und untere Schnellnavigation an die Bildschirmbreite an. Lokale OCR auf iPhone-Safari weiterhin nicht verfügbar."
 }

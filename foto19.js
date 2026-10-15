@@ -1,5 +1,5 @@
 'use strict';
-/* Asthma 1.9.0 – lokale Bildanzeige und iOS-Eingabehilfe. Keine Datenübertragung. */
+/* Asthma 1.9.1 – lokale Bildanzeige und iOS-Eingabehilfe. Keine Datenübertragung. */
 (()=>{
   const $=id=>document.getElementById(id);
   const preview=$('scan-preview'),picker=$('scan-picked'),dialog=$('scan-photo-dialog');
@@ -45,7 +45,10 @@
   ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>stage.addEventListener(ev,end));
   stage.addEventListener('wheel',e=>{if(!dialog.open)return;e.preventDefault();setZoom(zoom*(e.deltaY>0?0.85:1.15))},{passive:false});
   // Safari has no TextDetector: do not show a button that will inevitably fail.
-  const ocrButton=$('scan-start');if(ocrButton&&!('TextDetector' in window)){ocrButton.hidden=true;}
+  const ocrButton=$('scan-start');
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const detectorAvailable=!isIOS&&typeof window.TextDetector==='function';
+  if(ocrButton&&!detectorAvailable){ocrButton.hidden=true;}
   // Progressive enhancement: iOS can offer its own camera-based 'Scan Text' text input action.
   const focusNative=()=>{
     document.querySelector('.scan-text')?.setAttribute('open','');
