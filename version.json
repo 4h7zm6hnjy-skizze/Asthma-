@@ -1,5 +1,5 @@
 {
-  "version": "1.9.2",
+  "version": "2.0.0",
   "released": "2026-10-15",
-  "notes": "Seitenanpassung fixiert: iPhone-Viewport auf Bildschirmbreite, Seitengesten-Zoom standardmäßig eingeschränkt, Bildzoom separat, Schaltfläche Ansicht einpassen, Zoomfreigabe in Einstellungen, responsive Layoutschutz."
+  "notes": "Neu geordnete Bereiche, FEV1/FVC-Karten mit Prozent und Litern zusammen, direkter Dokumentenassistent für iPhone Live Text und Text-PDF, lokale Suche in verschlüsselter Akte, korrigierter Passwortwechsel und Funktionstests. Für automatische Foto-OCR auf iPhone-Safari wird weiterhin eine lokal gebündelte OCR-Engine benötigt."
 }

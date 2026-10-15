@@ -1,6 +1,6 @@
 
 'use strict';
-/* Asthma 1.9.2: local UI-only viewport lock. No medical data stored or transmitted. */
+/* Asthma 2.0.0: local UI-only viewport lock. No medical data stored or transmitted. */
 (()=>{
   const viewport=document.querySelector('meta[name="viewport"]');
   if(!viewport)return;
