@@ -1,4 +1,4 @@
-# Asthma 2.4.0 – WebApp
+# Asthma 2.4.1 – WebApp
 
 Privater verschlüsselter Gesundheitsmanager mit PEF-/FEV₁-Diagrammen, ärztlichen Spirometrie-Verläufen, Laborwerten, Befundscanner, Medikamentenplan, Kalender, Anträgen, regionaler Suche und GdB-Orientierung.
 
@@ -8,6 +8,10 @@ Privater verschlüsselter Gesundheitsmanager mit PEF-/FEV₁-Diagrammen, ärztli
 
 **GdB:** Profil. Unverbindliche Informationen nach VersMedV; kein automatischer GdB-Bescheid. NRW-Anträge über ELSA, bundesweit die zuständige Stelle im Bundesportal suchen.
 
-**Installation:** Alle entpackten Dateien in das Hauptverzeichnis von GitHub Pages hochladen; `version.json` zeigt 2.4.0. Bestehende Daten vor Aktualisierung sichern.
+**Installation:** Alle entpackten Dateien in das Hauptverzeichnis von GitHub Pages hochladen; `version.json` zeigt 2.4.1. Bestehende Daten vor Aktualisierung sichern.
 
-**Grenzen:** Der lokale Tresor und die Wiederherstellung wurden im Update nicht auf einem echten iPhone-Safari-Endgerät getestet. Neue Software wird per GitHub Pages geladen, was bei kompromittierten App-Dateien den lokalen Datenschutz gefährden kann. Kein Versand von persönlichen Daten durch den Anwendungscode vorgesehen. Aktueller Prüfbericht: `PRUEFBERICHT_2.4.0.md`.
+**Grenzen:** Der lokale Tresor und die Wiederherstellung wurden im Update nicht auf einem echten iPhone-Safari-Endgerät getestet. Neue Software wird per GitHub Pages geladen, was bei kompromittierten App-Dateien den lokalen Datenschutz gefährden kann. Kein Versand von persönlichen Daten durch den Anwendungscode vorgesehen. Aktueller Prüfbericht: `PRUEFBERICHT_2.4.1.md`.
+
+
+## Anmeldung 2.4.1
+Die Anmeldung mit bestehendem Passwort ist ein eigener Einstieg. Wird kein lokaler Tresor gefunden, erfolgt **keine** Tresor-Neuanlage und keine Passwortpruefung. Safari, Home-Bildschirm-App und privates Browserfenster koennen getrennte lokale Daten haben. Bitte dieselbe Installation verwenden oder eine `.asthma17`-Sicherung wiederherstellen. Backup-Passwort und neues Tresor-Passwort werden im Wiederherstellungsformular getrennt eingegeben.

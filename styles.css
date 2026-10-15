@@ -445,3 +445,19 @@ body :is(input,select,textarea){font-size:max(16px,1rem)}
 @media print{body.med24-print .secure-application,body.med24-print #secure-application{display:block!important}body.med24-print #med24-overview{position:fixed;z-index:99999;inset:0;background:white;overflow:visible}body.med24-print #med24-overview .med24-table{width:100%;}body.med24-print .bottom-dock{display:none!important}}
 
 @media print{body.med24-print *{visibility:hidden!important}body.med24-print #med24-overview,body.med24-print #med24-overview *{visibility:visible!important}body.med24-print #med24-overview{position:fixed!important;inset:0!important;padding:1rem;max-width:100%!important;background:#fff!important;overflow:visible!important}}
+
+/* 2.4.1: existing-password sign-in remains separate from first-time vault setup */
+.secure-entry-choice{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:17px 0 9px}
+.secure-card .secure-entry-choice button{font:inherit;line-height:1.35;padding:11px 10px;min-height:52px;border:1px solid #abc9d0;border-radius:12px;background:#f5fafb;color:#174354;font-size:.94rem;cursor:pointer}
+.secure-card .secure-entry-choice button.active{background:#12475b;color:#fff;border-color:#12475b}
+.secure-card .secure-entry-choice button[disabled]{opacity:.5;cursor:not-allowed}
+.secure-login-info{font-size:.9rem;color:#4b6470;line-height:1.45}
+.secure-create-warning{font-size:.9rem;padding:.8rem;border:1px solid #dbc89d;border-radius:10px;background:#fff6e6;color:#563e1b}
+.secure-card [hidden],.secure-recovery-note[hidden]{display:none!important}
+.secure-card input{min-width:0;box-sizing:border-box}
+@media(max-width:370px){.secure-entry-choice{grid-template-columns:1fr}}
+/* iPhone Safari: grid's min-content sizing must not widen the authentication gate. */
+.secure-gate{grid-template-columns:minmax(0,1fr);max-width:100%;overflow-x:clip}
+.secure-card{width:min(100%,460px);max-width:100%;min-width:0;justify-self:center;overflow-wrap:anywhere}
+.secure-entry-choice{min-width:0;max-width:100%}
+.secure-card .secure-entry-choice button{min-width:0;white-space:normal;overflow-wrap:anywhere}

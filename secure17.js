@@ -100,9 +100,92 @@
     $('secure-import-form').addEventListener('submit',async e=>{e.preventDefault();try{const f=$('secure-import-file').files?.[0];if(!f||f.size>80*1024*1024)throw Error('Datei fehlt oder über 80 MB');const pack=JSON.parse(await f.text());if(!confirm('Vollständige Wiederherstellung: Alle jetzigen Tresor-Daten werden ersetzt. Vorher Backup erstellen?'))return;status.textContent='Sicherung wird validiert …';await importVault(pack,$('secure-import-pass').value)}catch(err){status.textContent='Wiederherstellung fehlgeschlagen: '+err.message}});
   }
 
-  async function ready(){try{if(!crypto?.subtle)throw Error('Verschlüsselung wird in diesem Browser nicht unterstützt');db=await dbOpen();const existing=await getMeta();const orphaned=!existing&&await orphanRows();$('secure-intro').textContent=existing?'Bitte dein Passwort eingeben. Deine Daten bleiben auf diesem Gerät verschlüsselt.':'Richte ein Passwort ein. Vorhandene Daten werden verschlüsselt übernommen. Sichere wichtige Daten vor dem Update.';$('secure-repeat-wrap').hidden=Boolean(existing);$('secure-old-wrap').hidden=Boolean(existing);$('secure-submit').textContent=existing?'Tresor entsperren':'Tresor einrichten';$('secure-gate').hidden=false;$('secure-recovery-note').hidden=Boolean(existing);if(orphaned){$('secure-error').textContent='Lokale verschlüsselte Datensätze ohne Entsperrmetadaten entdeckt. Aus Sicherheitsgründen ist eine Neueinrichtung hier gesperrt. Bestehenden Browser/Sicherung prüfen.';$('secure-submit').disabled=true;$('secure-restore-submit').disabled=true;}
-      $('secure-restore-form').addEventListener('submit',async e=>{e.preventDefault();if(busy)return;busy=true;const b=$('secure-restore-submit');b.disabled=true;$('secure-error').textContent='Verschlüsseltes Backup wird geprüft …';try{if(await getMeta())throw Error('Hier ist bereits ein Tresor vorhanden; öffne ihn mit deinem bisherigen Passwort.');const pass=$('secure-password').value;if(pass!==$('secure-repeat').value)throw Error('Neues Passwort und Bestätigung stimmen nicht überein');const count=await restoreFresh(pass,$('secure-restore-file').files?.[0],$('secure-restore-pass').value);$('secure-error').textContent=count+' Datensätze aus Backup wiederhergestellt.';await startApp()}catch(err){$('secure-error').textContent='Wiederherstellung fehlgeschlagen: '+(err.message||err)}finally{busy=false;b.disabled=false}});
-      $('secure-form').addEventListener('submit',async e=>{e.preventDefault();if(busy)return;busy=true;$('secure-submit').disabled=true;$('secure-error').textContent='Daten werden geschützt verarbeitet …';try{const pass=$('secure-password').value;if(existing){await unlock(pass);}else{if(pass!==$('secure-repeat').value)throw Error('Passwörter stimmen nicht überein');const outcome=await create(pass,$('secure-old').value);if(!outcome.cleanup){window.__asthmaCleanupWarning='Alte unverschlüsselte Speicherreste konnten nicht vollständig entfernt werden: '+outcome.cleanupError+'. Bitte alle älteren App-Tabs schließen.';}}$('secure-form').reset();await startApp();}catch(err){$('secure-error').textContent=err.message||'Entsperren nicht möglich';}finally{busy=false;$('secure-submit').disabled=false;}});
-    }catch(e){$('secure-error').textContent='Sicherer Speicher nicht verfügbar: '+e.message;$('secure-submit').disabled=true;}}
+  // 2.4.1: Authentication and new-vault creation are separate, explicit actions.
+  // A password is never interpreted as permission to create a replacement vault.
+  let gateMode='login';
+  function setGateMode(mode,hasVault){
+    gateMode=mode;
+    const login=mode==='login',create=!login;
+    $('secure-login-choice').classList.toggle('active',login);
+    $('secure-create-choice').classList.toggle('active',create);
+    $('secure-login-choice').setAttribute('aria-pressed',String(login));
+    $('secure-create-choice').setAttribute('aria-pressed',String(create));
+    $('secure-login-info').hidden=!login;
+    $('secure-repeat-wrap').hidden=login;
+    $('secure-old-wrap').hidden=login;
+    $('secure-create-warning').hidden=login;
+    $('secure-password-label').textContent=login?'Dein vorhandenes Passwort':'Neues Passwort (mindestens 12 Zeichen)';
+    $('secure-password').minLength=login?1:12;
+    $('secure-password').setAttribute('autocomplete',login?'current-password':'new-password');
+    $('secure-repeat').required=create;
+    $('secure-submit').textContent=login?'Mit Passwort anmelden':'Neuen Tresor einrichten';
+    $('secure-intro').textContent=login?
+      (hasVault?'Bitte dein vorhandenes Passwort eingeben.':'Melde dich mit deinem vorhandenen Passwort an. Falls dieser Browser deinen alten Tresor nicht findet, erhältst du sichere Wiederherstellungshinweise.'):
+      'Neuen Tresor nur einrichten, wenn du noch keinen hast. Alte Tresore in anderen Safari-/App-Installationen sind dadurch nicht zugänglich.';
+    $('secure-error').textContent='';
+    $('secure-password').value='';
+    $('secure-repeat').value='';
+    $('secure-old').value='';
+  }
+  async function ready(){
+    try{
+      if(!crypto?.subtle)throw Error('Verschlüsselung wird in diesem Browser nicht unterstützt');
+      db=await dbOpen();
+      const existing=await getMeta(),orphaned=!existing&&await orphanRows();
+      $('secure-gate').hidden=false;
+      $('secure-recovery-note').hidden=Boolean(existing);
+      $('secure-create-choice').disabled=Boolean(existing)||orphaned;
+      $('secure-entry-choice').hidden=Boolean(existing);
+      setGateMode('login',Boolean(existing));
+      if(orphaned){
+        $('secure-error').textContent='Verschlüsselte Datensätze ohne Entsperrmetadaten gefunden. Kein neuer Tresor möglich. Bitte Browserinstallation oder Sicherung prüfen.';
+        $('secure-restore-submit').disabled=true;
+      }
+      $('secure-login-choice').addEventListener('click',()=>setGateMode('login',Boolean(existing)));
+      $('secure-create-choice').addEventListener('click',()=>{
+        if(existing||orphaned)return;
+        setGateMode('create',false);
+      });
+      $('secure-restore-form').addEventListener('submit',async e=>{
+        e.preventDefault();if(busy)return;busy=true;
+        const button=$('secure-restore-submit');button.disabled=true;
+        $('secure-error').textContent='Verschlüsseltes Backup wird geprüft …';
+        try{
+          if(await getMeta())throw Error('Hier ist bereits ein Tresor vorhanden; bitte regulär anmelden.');
+          const pass=$('secure-restore-new-password').value;
+          if(pass!==$('secure-restore-new-repeat').value)throw Error('Die beiden neuen Passwörter stimmen nicht überein.');
+          const count=await restoreFresh(pass,$('secure-restore-file').files?.[0],$('secure-restore-pass').value);
+          $('secure-error').textContent=count+' Datensätze aus Backup wiederhergestellt.';
+          await startApp();
+        }catch(err){$('secure-error').textContent='Wiederherstellung fehlgeschlagen: '+(err.message||err)}
+        finally{busy=false;button.disabled=false;}
+      });
+      $('secure-form').addEventListener('submit',async e=>{
+        e.preventDefault();if(busy)return;busy=true;
+        const button=$('secure-submit');button.disabled=true;
+        $('secure-error').textContent='Lokalen Tresor wird geprüft …';
+        try{
+          const pass=$('secure-password').value;
+          const meta=await getMeta(); // never rely on a stale detection from first page load
+          if(gateMode==='login'){
+            if(!meta){
+              $('secure-recovery-note').hidden=false;
+              throw Error('Dein bisheriger Tresor ist in dieser Browser-Installation nicht vorhanden. Dein Passwort ist nicht falsch – es kann hier nicht überprüft werden. Bitte die zuvor verwendete Safari-/Home-Bildschirm-App öffnen oder unten eine verschlüsselte Sicherung wiederherstellen. Es wurde nichts verändert.');
+            }
+            await unlock(pass);
+          }else{
+            if(meta)throw Error('Hier existiert bereits ein Tresor. Bitte mit dem bestehenden Passwort anmelden.');
+            if(await orphanRows())throw Error('Verschlüsselte Datensätze gefunden. Aus Sicherheitsgründen wird kein neuer Tresor erstellt.');
+            if(pass!==$('secure-repeat').value)throw Error('Passwörter stimmen nicht überein');
+            if(!confirm('Neuen Tresor einrichten? Falls du früher Daten in einer anderen Safari-/Home-Bildschirm-Installation hattest, werden diese NICHT automatisch übernommen. Nur fortfahren, wenn du das geprüft hast.'))return;
+            const outcome=await create(pass,$('secure-old').value);
+            if(!outcome.cleanup){window.__asthmaCleanupWarning='Alte unverschlüsselte Speicherreste konnten nicht vollständig entfernt werden: '+outcome.cleanupError+'. Bitte alle älteren App-Tabs schließen.';}
+          }
+          $('secure-form').reset();await startApp();
+        }catch(err){$('secure-error').textContent=err.message||'Anmeldung nicht möglich';}
+        finally{busy=false;button.disabled=false;}
+      });
+    }catch(e){$('secure-gate').hidden=false;$('secure-error').textContent='Sicherer Speicher nicht verfügbar: '+e.message;$('secure-submit').disabled=true;}
+  }
   ready();
 })();
