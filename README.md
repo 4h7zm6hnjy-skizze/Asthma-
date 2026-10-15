@@ -1,25 +1,13 @@
-# Asthma 2.3.0 – Spirometrie-Verlauf
+# Asthma 2.4.0 – WebApp
 
-Neu: Diagramm echter Lungenfunktionstests auf der Startseite und Detailansicht unter Lunge. Eigener Datenbestand getrennt von ePEF. Prozent-/Literkurven, FEV₁/FVC, Zeit- und Phasenfilter, Notizen und vorsichtiger Zahlenvergleich. Details: `README_LUFU_2.3.0.md`; Testgrenzen: `PRUEFBERICHT_2.3.0.md`.
+Privater verschlüsselter Gesundheitsmanager mit PEF-/FEV₁-Diagrammen, ärztlichen Spirometrie-Verläufen, Laborwerten, Befundscanner, Medikamentenplan, Kalender, Anträgen, regionaler Suche und GdB-Orientierung.
 
-# Asthma 2.2.0 – Peak-Flow-Diagramme auf der Startseite
+**Wichtig:** Wenn „Tresor einrichten“ erscheint, obwohl zuvor ein Passwort bestand, bitte **keinen neuen Tresor anlegen**. Der Browser kann die alte lokale Datenbank in dieser Installation nicht erkennen. Zuerst im bisherigen Safari-/Homescreen-Kontext prüfen; nur mit vollständiger verschlüsselter `.asthma17`-Sicherung eine Wiederherstellung auf dem Anmeldebildschirm durchführen. Kein automatischer Cloud-Speicher.
 
-Die Startseite zeigt unter den Gesundheitskennzahlen zwei Diagramme für PEF (l/min) und FEV₁ (Liter). Sie verwenden die bereits in `ASTHMA_SECURITY` lokal verschlüsselt gespeicherten ePEF-Messungen. Ein erneuter Import ist nicht nötig. Auf dem iPhone müssen die Daten im selben Browser/App-Speicher und mit demselben Passwort geöffnet werden.
+**Medikamente:** Bereich Therapie. Dosis, Zeitfenster und Termine nur nach ärztlichem Plan. Als PDF gedruckte Pläne sind nicht verschlüsselt.
 
-**Farbregel:** Vor 13:00 Grün, 13:00–16:59 Blau, ab 17:00 Rot. Die Linienfarben bedeuten ausschließlich Uhrzeiten und keinerlei medizinische Risiko-Einstufung.
+**GdB:** Profil. Unverbindliche Informationen nach VersMedV; kein automatischer GdB-Bescheid. NRW-Anträge über ELSA, bundesweit die zuständige Stelle im Bundesportal suchen.
 
-Der Startseitenfilter zeigt standardmäßig die letzten 30 vorhandenen Messungen (unabhängig von deren Alter), daneben 7, 30, 90 Tage oder alle. Diagrammpunkte zeigen beim Antippen die Datums-/Uhrzeit-/Wertekombination. Ein Link führt direkt zum Import-Tagebuch.
+**Installation:** Alle entpackten Dateien in das Hauptverzeichnis von GitHub Pages hochladen; `version.json` zeigt 2.4.0. Bestehende Daten vor Aktualisierung sichern.
 
-**Doppelte Messungen:** Datum, Uhrzeit, PEF und FEV₁ werden zum eindeutigen Vergleich normalisiert. Exakt identische Einträge werden beim Vorschauen, Speichern und erneuten Import nicht neu eingefügt. Mehrere Messungen in derselben Minute mit unterschiedlichen PEF/FEV₁ bleiben bestehen. Wenn von früheren Versionen bereits identische Duplikate vorhanden sind, kann man diese nach gesonderter Bestätigung gezielt entfernen. Das Löschen ist niemals automatisch und betrifft nur exakte Duplikate.
-
-**Sicherung:** Vor dem Update mit bestehender App ein verschlüsseltes Backup erstellen. Alle bestehenden Datenbanken und ihre Passwörter bleiben erhalten; die neue Version verschiebt oder löscht die gespeicherten Messungen nicht automatisch.
-
-**Datenschutz:** Excel wird im Browser ohne Netzübertragung verarbeitet. Daten werden aus der verschlüsselten lokalen Akte gelesen. Andere iPhones/Browserspeicher haben diese Daten nicht automatisch.
-
-**Einrichten:** Entpackte Dateien (nicht die ZIP selbst) ins GitHub-Repository-Hauptverzeichnis laden; alte Dateien ersetzen und die GitHub-Pages-Veröffentlichung abwarten.
-
-Die Dokumentation der bisherigen Funktionen ist weiterhin in den älteren README- und Quellen-Dateien sowie im Code enthalten.
-
-
-## Korrektur 2.2.1 – ePEF-Export mit Datum/Uhrzeit in einer Spalte
-Die ePEF-Excel-Datei aus der gezeigten App hat Spalten `date | pef | fev-1 | note`. Die Spalte `date` enthält zusätzlich Uhrzeit und AM/PM, beispielsweise `2026/10/15 7:31 AM`. Diese kombinierte Angabe wird nun automatisch erkannt. Werte aus älteren Imports bleiben unverändert; identische Datensätze werden nicht erneut gespeichert. Vor dem Update die lokale Akte verschlüsselt sichern.
+**Grenzen:** Der lokale Tresor und die Wiederherstellung wurden im Update nicht auf einem echten iPhone-Safari-Endgerät getestet. Neue Software wird per GitHub Pages geladen, was bei kompromittierten App-Dateien den lokalen Datenschutz gefährden kann. Kein Versand von persönlichen Daten durch den Anwendungscode vorgesehen. Aktueller Prüfbericht: `PRUEFBERICHT_2.4.0.md`.

@@ -1,5 +1,5 @@
 {
-  "version": "2.3.0",
+  "version": "2.4.0",
   "released": "2026-10-16",
-  "notes": "Ärztliche Lungenfunktion getrennt vom ePEF-Tagebuch: Startseiten- und Detaildiagramme für FEV1/FVC in % Soll, Litern und FEV1/FVC-Verhältnis, Phasen-/Zeitraumfilter, antippbare Messwerte und vorsichtige Trend-/Ampelhinweise. Bestehender verschlüsselter Datenbestand unverändert."
+  "notes": "Tresor-Anmeldediagnose und sichere Backup-Wiederherstellung bei fehlendem lokalen Tresor; Medikationsplan erweitert; GdB-Änderungsantrag-Orientierung nach VersMedV (ohne automatische Einstufung)."
 }

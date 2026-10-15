@@ -434,3 +434,14 @@ body :is(input,select,textarea){font-size:max(16px,1rem)}
 .lufu23-record-list h4{grid-column:1/-1;margin:.2rem 0;color:#214e60;font-size:.94rem}
 .lufu23-record-btn{text-align:left;cursor:pointer;border:1px solid #cddfe2;border-radius:11px;padding:10px 12px;background:#fff;color:#1e4a5b;font:inherit;font-size:.86rem;line-height:1.4;overflow-wrap:anywhere}
 .lufu23-record-btn:focus-visible,.lufu23-record-btn:hover{border-color:#126b80;outline:2px solid #126b80;outline-offset:1px}
+
+/* 2.4 – sicherer Tresor-Einstieg, Medikation und GdB */
+.secure-recovery-note{margin:1rem 0;padding:1rem;background:#fff3df;border:1px solid #d5bb8b;border-radius:14px;color:#42341f;font-size:.94rem;line-height:1.5}
+.secure-recovery-note p{margin:.5rem 0}.secure-recovery-note details{margin-top:1rem}.secure-recovery-note summary{cursor:pointer;font-weight:700}.secure-recovery-note label{display:block;margin:.7rem 0}.secure-recovery-note input{display:block;width:100%;max-width:100%;min-height:44px;font-size:16px}
+.recovery24-shortcut{display:flex;flex-wrap:wrap;gap:.6rem;margin:1rem 0}.recovery24-shortcut>*{flex:1 1 175px}
+.med24-overview{overflow-x:auto}.med24-table{width:100%;border-collapse:collapse;min-width:0;table-layout:fixed}.med24-table th,.med24-table td{text-align:left;padding:.7rem .5rem;border-bottom:1px solid #d9e5e8;overflow-wrap:anywhere;font-size:.9rem;vertical-align:top}.med24-table th{background:#eef6f7}.med24-times{border:1px solid #d9e5e8;border-radius:12px;padding:12px;display:flex;flex-wrap:wrap;gap:1rem}.med24-times legend{font-weight:650}.med24-times label{display:flex;align-items:center;gap:.25rem}
+.gdb24-result{padding:1rem;background:#eef6f7;border-radius:12px;margin-top:1rem;line-height:1.5}.gdb24-result p{margin:.7rem 0}.gdb24-panel{margin-bottom:1.5rem}
+@media(max-width:520px){.med24-table th,.med24-table td{font-size:.78rem;padding:.55rem .25rem}.recovery24-shortcut{display:grid;grid-template-columns:1fr}.med24-times{gap:.5rem}}
+@media print{body.med24-print .secure-application,body.med24-print #secure-application{display:block!important}body.med24-print #med24-overview{position:fixed;z-index:99999;inset:0;background:white;overflow:visible}body.med24-print #med24-overview .med24-table{width:100%;}body.med24-print .bottom-dock{display:none!important}}
+
+@media print{body.med24-print *{visibility:hidden!important}body.med24-print #med24-overview,body.med24-print #med24-overview *{visibility:visible!important}body.med24-print #med24-overview{position:fixed!important;inset:0!important;padding:1rem;max-width:100%!important;background:#fff!important;overflow:visible!important}}
