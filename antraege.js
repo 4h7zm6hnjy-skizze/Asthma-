@@ -36,7 +36,7 @@
      d.append(help);card.append(d);
      const actions=txt('div','app-buttons','');
      const a=txt('a','btn btn-outline','Offizielle Stelle öffnen ↗');a.target='_blank';a.rel='noopener noreferrer';a.href=safeUrl(x.url)||'#';a.title='Offizielle Informations-, Formular- oder Antragsseite – nicht immer ein direkter Onlineantrag';actions.append(a);
-     const btn=txt('button','btn btn-primary','Eigene Vorlage erstellen');btn.type='button';btn.addEventListener('click',()=>openEditor(x));actions.append(btn);const track=txt('button','btn btn-outline','In meine Antragsakte übernehmen');track.type='button';track.addEventListener('click',()=>{window.dispatchEvent(new CustomEvent('asthma:create-case',{detail:{title:x.title,authority:x.who,category:x.cat}}));document.getElementById('mein-bereich')?.scrollIntoView({behavior:'smooth'});});actions.append(track);card.append(actions);frag.append(card);
+     const btn=txt('button','btn btn-primary','Eigene Vorlage erstellen');btn.type='button';btn.addEventListener('click',()=>openEditor(x));actions.append(btn);const track=txt('button','btn btn-outline','In meine Antragsakte übernehmen');track.type='button';track.addEventListener('click',()=>{window.ASTHMA_NAV?.go('akte');window.dispatchEvent(new CustomEvent('asthma:create-case',{detail:{title:x.title,authority:x.who,category:x.cat}}));document.getElementById('mein-bereich')?.scrollIntoView({behavior:'smooth'});});actions.append(track);card.append(actions);frag.append(card);
    });list.replaceChildren(frag);
  }
  function letter(){

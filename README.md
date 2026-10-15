@@ -1,58 +1,49 @@
-# Asthma – Version 1.4.0
+# Asthma 1.5.0 – Webapp für Asthma, Lungenwerte und Hilfen
 
-Webapp für Asthma, Hilfsmittel, Antragswege, GdB und Arbeitsrecht, ergänzt um einen privaten, lokalen Bereich für Anträge, Unterlagen und einen Symptomverlauf.
+Installierbare, responsive Webapp für iPhone, Android und Desktop. Quelle: bestehendes Repository `4h7zm6hnjy-skizze/Asthma-`; alle bereits vorhandenen Module aus 1.4.0 bleiben im Paket.
 
-## Neu in 1.3.0
+## NEU: aufgeräumte Navigation
 
-- **Meine Antragsakte:** Vorgänge aus dem Antragszentrum übernehmen oder selbst erstellen; Status (geplant, eingereicht, Nachforderung, bewilligt, abgelehnt, Widerspruch, abgeschlossen), zuständige Stelle, Aktenzeichen, Einreichdatum, Bescheid-Datum, Notizen und selbst geprüftes Fristdatum. Filter und Fristübersicht beim Öffnen der App.
-- **Dokumente:** Lokal PDF, Bilder und einige Office-/Textformate bis 12 MB je Datei hinterlegen und einem Antrag zuordnen; Einzeldateien öffnen/exportieren oder löschen. Das Dokumentenarchiv selbst macht keine Texterkennung; der neue Befundscanner kann zusätzlich OCR aus Bildern ausführen.
-- **Asthma-Tagebuch:** Datum/Uhrzeit, Peak-Flow (L/min), subjektive Beschwerden, Anzahl Bedarfsanwendungen, nächtliche Beschwerden und Auslöser. Lokales Trenddiagramm, Bearbeiten/Löschen und CSV-Export. Keine Diagnose oder medikamentöse Therapieanweisung.
-- **Passwortgeschützte Sicherung:** Export/Wiederherstellung sämtlicher persönlicher Akten, Dokumente, Tagebuchwerte und der gespeicherten GdB-Einstellungen. Die exportierte Datei wird mit PBKDF2-SHA256 (250.000 Durchläufe) und AES-GCM-256 verschlüsselt. Passwort selbst sicher verwahren, es gibt keine Wiederherstellung des Passworts.
-- Direktzugriff **„Meine Antragsakte öffnen“** und **„In meine Antragsakte übernehmen“** bei Hilfsmitteln und Anträgen.
+Die bisherige sehr lange Startseite ist in einzelne Ansichten aufgeteilt: Übersicht, Mein Profil, Lungenwerte, Befunde, Therapie, Hilfsmittel, Anträge, Meine Akte, Arbeit, Arztbericht, Wissen und Einstellungen. Die Startseite zeigt wenige Kennzahlen und sechs Schnellzugriffe. Auf schmalen Bildschirmen kann die Navigationsleiste horizontal gewischt werden. Frühere interne `#`-Links führen weiterhin in den passenden Bereich.
 
-## Erhaltene Funktionen
+## Die zwölf Weiterentwicklungen
 
-- GdB-Auswahl 10 bis 100 in Zehnerschritten (GdB 10 als reiner Vergleichswert), gesonderte Auswahl für bewilligte Gleichstellung bei GdB 30/40.
-- 29 Antrags- und Informationswege zu Hilfsmitteln, Atemphysiotherapie, Lungensport, Reha, Arbeitsrecht, Finanzen und GdB sowie zugehörige Mustervorlagen.
-- Fachartikel zu Rechten und Leistungen mit Quellen, Suchfunktion, Merkliste, Versionsanzeige und Updateprüfung.
-- Service Worker für statische App-Dateien und Offline-Nutzung nach der ersten erfolgreichen Einrichtung.
+1. **Befunde**: Fotos per Kamera/Bibliothek wie bisher; zusätzlich PDF-Seite (Auswahl), Bild um 90° drehen, per Ziehen zuschneiden, Originalbild separat in die ältere Dokumentenablage übernehmen. OCR erfolgt weiterhin erst nach explizitem Start und mit manueller Überprüfung.
+2. **Lungenverlauf**: persönlich bestätigte FEV₁- und FVC-Sollwertprozente sowie Literwerte mit Datum, Bronchodilatationsphase und Diagramm speichern, ohne frühere Untersuchungen zu überschreiben. Berechnetes FEV₁/FVC-Verhältnis nur aus Litern.
+3. **Arztbericht**: ausgewählte bestätigte Untersuchungen, Medikamente, altes Tagebuch, Selbstbeobachtung und Arbeitsplatzprotokoll zusammenstellen und über den Browser drucken oder als PDF speichern.
+4. **Therapie**: persönliche Liste von Medikamenten, ärztlicher Dosisangabe, Behandlungsterminen, Rezeptterminen und Notizen. ICS-Kalenderexport. Keine Vorschläge für Dosierungen.
+5. **Hilfen**: verbesserter Einstieg nach Atemnot, Sekretproblemen, Arbeitsplatz und Rehabilitation, direkt verbunden mit den bestehenden 29 Antrags-/Informationswegen und amtlichen Quellen.
+6. **Selbstbeobachtung**: vier einfache Fragen zu Tag-/Nachtsymptomen, Aktivitäten und Bedarfsmedikation mit Verlauf. **Kein** lizenzierter ACT und keine Diagnose.
+7. **Ärztlicher Aktionsplan**: Felder für ausschließlich ärztlich vorgegebene Maßnahmen und persönlichen PEF-Bestwert. Keine automatisch erzeugten Notfall-Schwellen oder Dosierungen.
+8. **Arbeitsbelastungen**: Schicht, Hitze, Staub, Dämpfe, Beschwerden und Notizen dokumentieren und als CSV exportieren.
+9. **Anträge**: persönliche Profildaten nach ausdrücklicher Bestätigung in einen Entwurf übernehmen; Einreichung ist weiterhin manuell und erfolgt nicht automatisch.
+10. **Datenschutz**: optionale AES-GCM-Verschlüsselung mit abgeleitetem Schlüssel für die **neue Zusatzdatenbank**; passwortgeschützte getrennte Exporte für neue und ältere Datensätze.
+11. **Plausibilitätsprüfung**: Zahlen, Einheiten und Lungenvolumen vor Übernahme prüfen, identische Messungen nicht doppelt speichern, bei großen Änderungen Rückfrage. Medizinische Interpretation bleibt ärztliche Aufgabe.
+12. **Wartung**: v1.5.0 auf Versionsanzeige, Update-Datei, Service Worker und Diagnosefunktion abgestimmt. Auf Updates prüfen und Cache aktualisieren bleibt vorhanden.
 
-## Datenschutz und Grenzen
+## Datenschutz – vor Verwendung lesen
 
-**Lokale Datensätze in IndexedDB und LocalStorage sind standardmäßig NICHT verschlüsselt.** Andere Personen mit Zugriff auf das Gerät oder Browserprofil können sie gegebenenfalls lesen. Die Webseite sendet diese Datensätze nicht an einen Server und verwendet keine integrierten Trackingdienste. Der neue OCR-Scanner lädt Drittanbieter-Code von CDN-Diensten nach. Ein verschlüsseltes Backup schützt **nur die exportierte Datei**, nicht automatisch den Browserspeicher.
+- Alte Einträge (`asthma-local-1`, `localStorage`) werden **nicht** migriert oder nachträglich verschlüsselt. Das alte Dokumentenarchiv bleibt lokal unverschlüsselt. Die zusätzliche Verschlüsselung umfasst nur neue Messreihen, Medikamente, Selbstkontrollen, Aktionspläne und Arbeitsbeobachtungen im Speicher `asthma-suite-1`.
+- Bei aktivierter Verschlüsselung wird ein Passwort von mindestens 12 Zeichen benötigt; der App-Anbieter kennt es nicht. Ohne Passwort können diese Daten nicht wiederhergestellt werden. Die exportierten Backup-Dateien sind verschlüsselt, **nicht** die ursprüngliche Download-Ordnerablage.
+- **Zwei getrennte Backups nötig**: Das bisherige unter „Meine Akte“ (inkl. vorhandener Unterlagen/Profile) und zusätzlich das neue unter „Einstellungen“. Keines der Backups darf als vollständige Gesamtsicherung aller Daten missverstanden werden.
+- Der Scanner lädt Tesseract.js und beim PDF-Einlesen PDF.js von einem externen CDN. Die App sendet Bilder nicht absichtlich an einen Bildserver; durch Drittanbieter-Code und die Internetabhängigkeit kann nicht garantiert werden, dass der Scanner offline oder für streng vertrauliche Dokumente geeignet ist.
+- Ohne ausdrücklich gespeicherten Termin können keine verlässlichen Erinnerungen erfolgen; bei geschlossener Webapp funktionieren keine Push-Benachrichtigungen. Der Kalenderexport benötigt die eigene Kalender-App.
+- Browser-Speicher, Private-Browsing, Geräteverlust oder das Entfernen der Website-Daten können persönliche Einträge löschen. Sicherungen regelmäßig extern verwahren und Wiederherstellung testen.
 
-Nur der offizielle Quellenlink führt zu einem externen Anbieter. **Weder Mustervorlagen noch Anträge werden automatisch versendet.** Das Speichern von Einträgen ist kein Nachweis für die Einreichung bei einer Behörde. Die Fristanzeige zeigt ausschließlich selbst hinterlegte Daten und kann keine Rechtsbehelfsbelehrung prüfen. Keine automatische Benachrichtigung bei geschlossener App. Die 12-MB-Grenze gilt pro einzelner Datei; für verschlüsselte Backups liegt die Dokument-Gesamtgrenze aus Speichergründen bei 32 MB. Darüber hinaus begrenzt der Browser die Gesamtkapazität.
+## Hinweise zur Gesundheit und zum Recht
 
-Die App ist kein Medizinprodukt, erhebt keinen Anspruch auf medizinische Diagnose oder individuelle Rechtsberatung. Bei schwerer Atemnot Notruf 112 und den ärztlichen Notfallplan befolgen.
+Diese App gibt keine Diagnosen, Therapieänderungen oder garantierte Leistungszusagen. Ein FEV₁-Prozentwert allein reicht weder zur Diagnose noch zur Zuerkennung eines bestimmten GdB oder eines Hilfsmittels. Asthma-Aktionspläne müssen individuell ärztlich festgelegt werden. Bei schwerer akuter Atemnot 112 wählen.
 
-## Installation in GitHub Pages
+Relevante Originalquellen und Antragswege: `QUELLEN.md`, `ANTRAEGE_QUELLEN.md`, `LUNGENFUNKTION_QUELLEN.md`, `BEFUNDSCANNER_QUELLEN.md`, `QUELLEN_RECHT_1.2.0.md`, `NEUE_QUELLEN.md`.
 
-1. Alle Dateien aus der ZIP **direkt ins Wurzelverzeichnis** des Repositorys `4h7zm6hnjy-skizze/Asthma-` hochladen und vorhandene gleichnamige Dateien ersetzen. Keine ZIP als einzelne Datei hochladen.
-2. In GitHub unter **Settings > Pages** `Deploy from a branch`, Branch `main`, Ordner `/ (root)` wählen.
-3. Veröffentlichungsstatus unter **Actions** kontrollieren. Danach `https://4h7zm6hnjy-skizze.github.io/Asthma-/` öffnen.
-4. Auf iPhone in Safari `Teilen` → `Zum Home-Bildschirm` (erst nachdem die Seite erfolgreich geladen wurde).
-5. Bei Update den Button **Nach Updates suchen** verwenden. Bei Bedarf Webseite neu öffnen/Cache aktualisieren.
+## Installation / Aktualisierung
 
-**Vor dem Update persönliche Daten sichern**, sobald die Antragsakte benutzt wird. Ältere Profildaten werden weiterhin unter demselben LocalStorage-Schlüssel gelesen. Der neue private Bereich verwendet eine eigene IndexedDB-Datenbank und löscht keine vorher vorhandene Anwendungsspeicherung. 
+1. In der bestehenden App vor dem Upgrade **beide angebotenen Backups sichern**, sofern bereits Daten erfasst sind. Das zweite Backup für die neuen Funktionen gibt es erst nach 1.5.0; ältere Daten müssen weiterhin über „Meine Akte“ gesichert werden.
+2. Inhalt dieser ZIP-Datei **entpackt direkt in das Wurzelverzeichnis** des GitHub-Repositories `https://github.com/4h7zm6hnjy-skizze/Asthma-` laden und gleichnamige Dateien ersetzen.
+3. GitHub Pages in Einstellungen → Pages auf `main` und `/ (root)` belassen; erfolgreichen Build bei Actions kontrollieren.
+4. App öffnen unter `https://4h7zm6hnjy-skizze.github.io/Asthma-/`. Bei alter Anzeige einmal über „Update suchen“ oder neues Laden aktualisieren.
+5. In Safari mit „Teilen“ → „Zum Home-Bildschirm“ installieren.
 
-## Dateien
+## Grenzen der Prüfung
 
-`index.html`, `styles.css`, `content.js`, `app.js`, `antraege-data.js`, `antraege.js`, `meine-daten.js`, `lungenprofil.js`, `befundscan-parser.js`, `befundscan.js`, `sw.js`, `version.json`, `manifest.webmanifest`, `icon.svg`, `QUELLEN.md`, `ANTRAEGE_QUELLEN.md`, `NEUE_QUELLEN.md`, `DATENSCHUTZ.md`, `PRUEFBERICHT.md`, `browser_smoke.py` (älterer Beispieltest).
-
-
-## Neue Funktionen 1.3.0: Lungenfunktions-Profil
-- GdB-Auswahl (10–100), FEV1 (0–100 % vom Soll) und optionale FVC (0–100 % vom Soll) getrennt veränderbar.
-- Sowohl Zahleneingabe als auch Schieberegler, jeweils mit Zurücksetzen; auch der Wert **0 %** ist technisch erlaubt, wird aber mit Verifikationshinweis ausgegeben.
-- Optionales Befunddatum und vier freiwillige Angaben zur Alltagsbelastung.
-- Automatisch aktualisierte Hilfsangebote aus dem vorhandenen Katalog mit passenden offiziellen Quellen und Weiterleitung zu Antragsvorlagen.
-- Automatische Einstufung in einen Bewilligungsanspruch erfolgt **nicht**; insbesondere kein Rückschluss auf Sauerstoffbedarf, GdB, Asthma-Schweregrad oder Therapie aus FEV1/FVC-Sollprozenten allein.
-- Speicherung im bestehenden lokalen Profil: enthalten im passwortverschlüsselten Export der Version 1.2.0; bisherige Profildaten bleiben beim Update erhalten.
-- GINA 2026 stuft FEV1 < 60 % vom Soll als Risikofaktor für Exazerbationen ein. Kein eigenständiges Akut-Notfallkriterium.
-
-## Neu 1.4.0: Spirometrie-Fotoscanner
-- Aufnahme mit iPhone-Kamera oder Bild aus der Mediathek, optische Zeichenerkennung durch **Tesseract.js 5.1.1** im Browser; OCR-Komponenten werden beim Start der Erkennung über öffentliche CDNs geladen, daher benötigt die Funktion beim ersten Einsatz eine aktive Internetverbindung. Fotos werden durch die Anwendungslogik nicht an externe Bildserver gesendet. Externe Bibliotheken sind dennoch Drittanbieter-Code; ohne weitere Sicherheitsprüfung ist keine absolute Vertraulichkeitsgarantie möglich.
-- OCR-Vorschläge zu **FEV1 % Soll**, **FVC % Soll**, **FEV1 Liter**, **FVC Liter**, optional Verhältnis und Datum. Tabellen mit unklarer Spaltenzuordnung, Prä-/Post-Mehrdeutigkeiten und widersprüchlichen Angaben werden zur manuellen Prüfung markiert.
-- **Nichts wird ohne ausdrückliche Freigabe übernommen.** Alle Felder können vor dem Speichern geändert werden; bei leer gelassenen Feldern bleiben bestehende Werte erhalten. Datum nur bei eindeutiger Erkennung. OCR ist nie Ersatz für den Originalbefund.
-- Falls OCR mangels Netzwerk oder auf dem Endgerät scheitert, können Werte weiterhin manuell eingetragen werden.
-- Literwerte werden im bisherigen lokalen Profil unter demselben Schlüssel gespeichert und damit wie bisher in verschlüsselten Backups erfasst. Kein automatisches Speichern des Befundbildes; zum Archiv separat hochladen.
-- Die Gesundheitsinformationen beziehen sich auf ATS/ERS-Empfehlungen zur standardisierten Darstellung. Kein algorithmisches Diagnostizieren.
+Statische JavaScript-Syntax, referenzierte HTML-Elemente und Navigation der zwölf Ansichten sind geprüft. Die lokale Chromium-Testumgebung sperrt alle URL-Navigationen und gibt im isolierten `about:blank`-Modus keinen Zugriff auf IndexedDB oder WebCrypto frei. Deshalb sind **Kamera-/PDF-OCR, reale Speicherung, AES-Verschlüsselung/Restore sowie der neue Service-Worker auf einem echten iPhone und GitHub Pages nicht end-to-end getestet**. Sie dürfen nicht als vollständig verifiziert gelten. Siehe `PRUEFBERICHT.md`.

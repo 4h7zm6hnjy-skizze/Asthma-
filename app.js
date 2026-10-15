@@ -1,6 +1,6 @@
 'use strict';
 (() => {
-  const VERSION = '1.4.0';
+  const VERSION = '1.5.0';
   const STORAGE = 'asthma-v1-preferences';
   const sources = window.ASTHMA_SOURCES || {};
   const articles = window.ASTHMA_ARTICLES || [];
@@ -123,7 +123,7 @@
     $('show-all').addEventListener('click',()=>{state.all=!state.all;render()});
     $('reset-filters').addEventListener('click',()=>{state.all=true;state.section='all';state.query='';$('search').value='';render()});
     $('check-update').addEventListener('click',checkUpdate);
-    $('update-top').addEventListener('click',()=>{$('app-settings').scrollIntoView({behavior:'smooth'});checkUpdate()});
+    $('update-top').addEventListener('click',()=>{window.ASTHMA_NAV?.go('einstellungen');checkUpdate()});
     $('reload-app').addEventListener('click',async()=>{ $('update-status').textContent='Aktualisiere die App-Dateien…';if('serviceWorker' in navigator){try{const reg=await navigator.serviceWorker.getRegistration();if(reg){await reg.update();if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});}}catch{}}location.reload()});
     $('forget').addEventListener('click',()=>{if(!confirm('GdB-Auswahl, Gleichstellung und Merkliste auf diesem Gerät wirklich löschen?'))return;try{localStorage.removeItem(STORAGE)}catch{}state.gdb=30;state.equal=false;state.fev1=null;state.fvc=null;state.fev1Liters=null;state.fvcLiters=null;state.lungDate='';state.lungSymptoms=[];state.saved=[];state.section='all';state.query='';state.all=false;$('search').value='';render();window.dispatchEvent(new Event('asthma:profile-reset'));$('update-status').textContent='Lokale Profildaten wurden gelöscht.'});
     window.addEventListener('online',updateConnection);window.addEventListener('offline',updateConnection);

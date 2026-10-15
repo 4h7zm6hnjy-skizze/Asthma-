@@ -1,16 +1,12 @@
-# Technische Datenschutzinformation – Version 1.4.0
+# Datenschutz und lokale Speicherung – Asthma 1.5.0
 
-Die App ist eine statische Webseite. Angaben zu GdB und Merkliste werden im Browser-LocalStorage gespeichert; persönliche Vorgänge, Dokumente und Tagebuchwerte in IndexedDB. Sie werden nicht automatisch synchronisiert oder an das GitHub-Repository übertragen. Die App enthält keinen Analysedienst, keine Werbung, kein Nutzerkonto und keine serverseitige Datenannahme für diese Datensätze. Das Öffnen externer Quellen und das Abrufen statischer Dateien/der Versionsdatei erzeugt jedoch normale Netzwerkaufrufe zum jeweiligen Hosting-Anbieter.
+**Daten verlassen die Webapp bei normaler Benutzung nicht automatisch über einen eigenen Asthma-Server.** GitHub Pages stellt nur die statische Webapp bereit. Medizinische Eingaben und Dokumente sind personenbezogene sensible Daten.
 
-**Keine Verschlüsselung der aktiven lokalen Datenbank.** Wer Zugriff auf ein entsperrtes Gerät, ein Browserprofil oder Browser-Daten hat, kann unter Umständen auf die Einträge zugreifen. Browserdaten-Löschung, privater Modus, mangelnder Gerätespeicher oder Browser-Verhalten können lokale Daten verlieren lassen. Bei einem Wechsel des Geräts ist das verschlüsselte Backup erforderlich.
+## Speicherbereiche
 
-Die **exportierte Sicherungsdatei** wird clientseitig mit WebCrypto verschlüsselt (AES-GCM-256, passwortabhängiger Schlüssel via PBKDF2-HMAC-SHA256 mit 250.000 Iterationen, zufälligem Salz und Initialisierungsvektor). Passwörter werden nicht abgelegt oder an einen Server übermittelt. Ein verlorenes Passwort lässt sich nicht zurücksetzen. Kurze/schwache Passwörter lassen sich eher erraten, daher wird eine längere, einmalige Passphrase empfohlen. Nach dem Import werden die Daten wieder **unverschlüsselt** in IndexedDB gespeichert.
+- **Bestandsdaten**: ältere Anträge, Dokumente, Asthma-Tagebuch in `asthma-local-1` (IndexedDB); GdB/Lungenprofil in LocalStorage. Diese Daten bleiben derzeit im Klartext in dem jeweiligen Browserprofil. Beim Update auf 1.5.0 werden sie nicht gelöscht, aber auch nicht verschlüsselt.
+- **Zusatzdaten 1.5.0**: Messreihen, Medikationsliste, Kontrollen, Aktionsplan und Arbeitsplatzprotokoll in `asthma-suite-1`. Initial auch hier unverschlüsselt; in Einstellungen kannst du sie ausdrücklich mit einer mindestens 12 Zeichen langen Passphrase in der lokalen Datenbank mit AES-256-GCM verschlüsseln. Das Passwort wird nicht gespeichert. Es wird mittels PBKDF2-SHA256 abgeleitet.
+- **Zwei getrennte Sicherungen**: Passwortverschlüsseltes bisheriges Backup unter Meine Akte und weiteres verschlüsseltes Zusatzdatenbackup in Einstellungen. Nur beide zusammen umfassen die zwei Teil-Datenbanken. Es erfolgt keine automatische externe Synchronisation.
+- **Scanner**: Foto wird im lokalen Browser verarbeitet. Zum Laden von OCR/PDF-Bibliotheken wird externe Software von CDN-Anbietern bezogen. Da sie extern eingebundener JavaScript-Code ist, kann dessen Verhalten ohne eigene Auditierung nicht abschließend verifiziert werden. Bei vertraulichen Arztunterlagen manuelle Eingabe als Alternative verwenden.
 
-Die Funktionen sind nicht medizinisch validiert. Arztbriefe, Laborberichte und andere personenbezogene Informationen sollten nicht auf gemeinsam genutzten Geräten in der App hinterlegt werden. Die Webapp ersetzt keine professionelle Patientenakte oder sichere medizinische Datenplattform.
-
-
-## Befundscanner (ab Version 1.4.0)
-
-Eine ausgewählte Bilddatei wird auf dem Endgerät per Canvas verarbeitet. Die App übermittelt das Foto nicht absichtlich an einen Server. Die optische Texterkennung verwendet jedoch eine **von Drittanbieter-CDNs geladene Browserbibliothek (Tesseract.js 5.1.1)** samt WebAssembly-Sprachdaten. Bei deren Abruf erhalten die CDN-Betreiber Netzwerkdaten, z. B. IP-Adresse, Uhrzeit und Browserkennung. Fremdcode läuft im Browser und kann grundsätzlich auf Seiteninhalte zugreifen; ein absoluter Ausschluss einer Datenübertragung durch fremde Bibliotheken lässt sich ohne eigenständig gehostete und verifizierte Bibliothek nicht garantieren. Für besonders sensible Befunde kann daher die manuelle Eingabe statt des Scanners die bessere Wahl sein.
-
-Das Originalfoto und der erkannte Rohtext werden nach der bestätigten Übernahme oder dem Verwerfen **nicht dauerhaft** gespeichert. Ausschließlich bestätigte Messwerte werden im bisherigen unverschlüsselten Browserprofil gespeichert. Die Befundfotos können freiwillig separat im Dokumentenarchiv abgelegt werden. Der OCR-Scanner arbeitet nur, wenn die Erkennungssoftware geladen werden kann; der normale Informations- und Profilbereich funktioniert weiterhin offline.
+Zum Schutz: Gerät und Browserprofil sperren, keine fremden Geräte verwenden, verschlüsselte Backups separat aufbewahren, aktuelle Originalbefunde nicht ausschließlich in der App ablegen. Keine automatisierten Frist- oder Medikamentenalarme im geschlossenen Browser.

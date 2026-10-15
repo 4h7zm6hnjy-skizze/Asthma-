@@ -48,7 +48,7 @@
     const search=$('apply-search'),category=$('apply-category');
     category.value='all';category.dispatchEvent(new Event('change',{bubbles:true}));
     search.value=x.title;search.dispatchEvent(new Event('input',{bubbles:true}));
-    const target=$('antraege');target?.scrollIntoView({behavior:'smooth',block:'start'});
+    window.ASTHMA_NAV?.go('antraege');const target=$('antraege');target?.scrollIntoView({behavior:'smooth',block:'start'});
     const match=$('apply-list')?.querySelector('[data-application="'+CSS.escape(id)+'"]');
     if(match){match.classList.add('lung-jump-highlight');match.querySelector('details')?.setAttribute('open','');}
   }
@@ -95,7 +95,7 @@
     input.addEventListener('input',()=>{
       const v=input.value.trim();if(v!==''){
         const n=Number(v);
-        if(!Number.isInteger(n)||n<0||n>100){input.setCustomValidity('Bitte einen ganzen Wert zwischen 0 und 100 eingeben.');return;}
+        if(!Number.isFinite(n)||n<0||n>100){input.setCustomValidity('Bitte einen Wert zwischen 0 und 100 eingeben.');return;}
       }
       input.setCustomValidity('');change(field,v);
     });

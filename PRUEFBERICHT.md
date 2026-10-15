@@ -1,24 +1,27 @@
-# Prüfbericht Asthma 1.4.0 – 15.10.2026
+# Prüfbericht: Asthma 1.5.0 (15. Oktober 2026)
 
-## Neu
-- Befundscanner mit Bildauswahl und iPhone-Kamera-Eingabe (HTML `capture="environment"`).
-- OCR-Textverarbeitung per Tesseract.js 5.1.1 (erst beim Scan von externer CDN-Quelle geladen; kein OCR-Modell in der ZIP).
-- Tabellenauswertung: FEV1 und FVC (Prozent vom Soll, Liter als Istwert), optional Verhältnis und eindeutiges Untersuchungsdatum.
-- Erkannte Werte mit manueller Kontrolle vor der Speicherung; Plausibilitätsprüfungen sowie Unterscheidung Vor-/Nach-Bronchodilatator.
-- Literwerte ergänzen das bestehende Profil und werden beim verschlüsselten Profilexport mitgesichert.
+## Automatisch geprüft
 
-## Automatisiert geprüft
-- JavaScript-Syntax der gesamten App; vorhandene Module und GdB-Profil weiter ansprechbar.
-- Browser-Smoke-Test (Chromium): Bildauswahl, vorgeschlagene OCR-Werte (simulierte Tesseract-Rückgabe), kein Speichern vor der ausdrücklichen Bestätigung, danach Änderung von FEV1/FVC und Ist-Literwerten, Aktualisierung des Profils, unveränderter GdB. Abbrechen ohne Änderung, fehlerhafte Literwerte zurückgewiesen.
-- Regex-Parser: sieben Testfälle für Soll/Ist/%-Tabellen, FEV1/FVC-Abgrenzung, zweideutige Prä-/Post-Messung, unbekannte Spalten, Datumsprüfung.
-- Eine synthetische Spirometrie-Testgrafik wurde von lokal installiertem Tesseract (nicht vom Online-Browser-Tesseract) ausgelesen; der Textparser erkannte Werte und Datum richtig.
-- Responsives Layout bei 320, 375, 390, 768 und 1366 Pixeln ohne horizontalen Seitenüberlauf.
+- Alle JavaScript-Dateien mit `node --check`: Syntax ohne Fehler.
+- Alle per `$("id")` fest referenzierten UI-Elemente gegen HTML-IDs geprüft: keine fehlenden Referenzen.
+- Isolierter Chromium-DOM-Test mit 390 px Breite: 12 Navigationsbereiche nacheinander geöffnet. Pro Klick sind nur die zugehörigen Hauptabschnitte sichtbar, Start/Unterseiten haben keine horizontale Gesamtseiten-Überläufe. Keine ungefangenen JavaScript-Fehler.
+- Versionsnummer `1.5.0` in `app.js`, `sw.js` und `version.json` übereinstimmend; `suite15.js` befindet sich in den statischen Service-Worker-Dateien.
+- Alte Komponenten und Datenbanknamen unverändert; die Zusatzdatenbank ist separat.
 
-## Nicht bestätigt
-- Eine echte OCR-Ausführung mit dem nachgeladenen Tesseract.js im Webbrowser über CDN konnte in der isolierten Testumgebung nicht geprüft werden (Netzwerkzugriff blockiert).
-- Safari auf einem realen iPhone, Kamera-Berechtigungen, HEIC-Dekodierung und Offline-Verhalten der OCR-Bibliothek sind nicht end-to-end getestet.
-- OCR-Treffsicherheit mit unterschiedlichen echten medizinischen Befunden, insbesondere bei unscharfen Bildern und komplexen Spaltenlayouts, ist nicht klinisch validiert.
-- Die lokal gespeicherten Daten sind weiterhin nicht verschlüsselt; nur die separate exportierte Backupdatei ist geschützt.
+## Noch nicht auf dem Endgerät verifiziert
 
-## Wichtig
-Arztbefunde vor der Übernahme immer im Original gegenprüfen. Eine Messzahl ist keine Diagnose, keine GdB-Einstufung und kein automatischer Leistungsanspruch. Vor dem Ersetzen der bisherigen Version ein passwortgeschütztes Backup der bestehenden persönlichen Daten erstellen und den Export extern aufbewahren.
+- Echte Bild- und PDF-Texterkennung (Tesseract.js / PDF.js über Drittanbieter-CDNs), iPhone-Kamera, PDF-Seitenauswahl auf Safari.
+- Echte IndexedDB-Transaktionen, datensichere AES-GCM-Verschlüsselung und Sicherungs-Wiederherstellung in einem Webbrowser mit sicherem Origin.
+- Service-Worker-Installation, Offline-Erststart und Update-Verhalten nach Bereitstellung über GitHub Pages.
+- Drucken/als PDF speichern und Kalenderimport auf iOS.
+- Barrierefreiheit mit Screen Reader und vollständige manuelle Fachprüfung aller externen Quellen.
+
+**Grund**: Die automatisierte Browserumgebung blockiert URL-Navigation; der erlaubte isolierte DOM-Modus unterstützt weder IndexedDB noch WebCrypto. Bei Aussagen zu diesen Funktionen daher nur 'implementiert, nicht vollständig verifiziert' angeben.
+
+## Datenerhalt
+
+Bestands-Datenbanken `asthma-local-1` und `asthma-v1-preferences` werden nicht gelöscht. Die App migriert/verschlüsselt Bestandsdaten nicht; sichere diese vorher. Neue Datensätze liegen im zusätzlichen Speicher `asthma-suite-1`. Bei Import eines 1.5.0-Backups wird die entsprechende Zusatzdatenbank nach Bestätigung ersetzt; die alte Antragsakte nicht.
+
+## Risiko / Hinweis
+
+Asthma 1.5.0 ist ein Informations- und Dokumentationswerkzeug. Keine Diagnose-Software oder automatische Behandlungsanweisung. Medizinische Angaben vor Übernahme prüfen; medikamentöse Pläne ausschließlich ärztlich vorgeben. Bei schwerer Atemnot 112.

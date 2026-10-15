@@ -1,263 +1,265 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#123b52">
-  <meta name="description" content="Asthma: verständliche Informationen zu Asthma, GdB, Arbeitsrecht und Hilfsmitteln mit amtlichen Quellen.">
-  <meta name="color-scheme" content="light">
-  <meta name="referrer" content="no-referrer">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <title>Asthma – Wissen, Rechte & Hilfsmittel</title>
-  <link rel="stylesheet" href="styles.css">
-  <script defer src="content.js"></script>
-  <script defer src="app.js"></script>
-  <script defer src="antraege-data.js"></script>
-  <script defer src="antraege.js"></script>
-  <script defer src="meine-daten.js"></script>
-  <script defer src="lungenprofil.js"></script>
-  <script defer src="befundscan-parser.js"></script>
-  <script defer src="befundscan.js"></script>
-</head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<meta content="#123b52" name="theme-color"/>
+<meta content="Asthma: verständliche Informationen zu Asthma, GdB, Arbeitsrecht und Hilfsmitteln mit amtlichen Quellen." name="description"/>
+<meta content="light" name="color-scheme"/>
+<meta content="no-referrer" name="referrer"/>
+<link href="manifest.webmanifest" rel="manifest"/>
+<link href="icon.svg" rel="icon" type="image/svg+xml"/>
+<title>Asthma – Wissen, Rechte &amp; Hilfsmittel</title>
+<link href="styles.css" rel="stylesheet"/>
+<script defer="" src="content.js"></script>
+<script defer="" src="app.js"></script>
+<script defer="" src="antraege-data.js"></script>
+<script defer="" src="antraege.js"></script>
+<script defer="" src="meine-daten.js"></script>
+<script defer="" src="lungenprofil.js"></script>
+<script defer="" src="befundscan-parser.js"></script>
+<script defer="" src="befundscan.js"></script>
+<script defer="" src="suite15.js"></script></head>
 <body>
-  <a class="skip-link" href="#main">Zum Hauptinhalt springen</a>
-  <header class="topbar">
-    <div class="shell topbar-inner">
-      <a class="brand" href="#start" aria-label="Asthma Startseite">
-        <span class="brand-icon" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><path d="M20 7v11m0 0-5 5m5-5 5 5M15 23C9 18 5 23 5 30c0 5 7 7 12 1V22m8 1c6-5 10 0 10 7 0 5-7 7-12 1V22" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span><strong>Asthma</strong><small>Wissen · Rechte · Hilfsmittel · Mein Bereich</small></span>
-      </a>
-      <div class="top-actions"><span id="connection" class="connection" role="status">Lokal nutzbar</span><button class="btn btn-ghost compact" id="update-top" type="button">↻ <span>Update suchen</span></button></div>
-    </div>
-  </header>
-  <main id="main">
-    <section class="hero" id="start">
-      <div class="shell hero-content">
-        <div class="hero-copy">
-          <span class="eyebrow"><span class="tiny-dot"></span> Orientierung für Deutschland</span>
-          <h1>Dein Wegweiser<br><em>rund um Asthma.</em></h1>
-          <p>Welche Hilfsmittel kommen infrage? Welche Rechte gelten am Arbeitsplatz? Und was ändert sich mit deinem Grad der Behinderung? Hier findest du verständliche Antworten – mit überprüfbaren Quellen.</p>
-          <a class="btn btn-primary hero-apply" href="#antraege">Hilfen und Anträge entdecken →</a> <a class="btn btn-outline hero-private" href="#mein-bereich">Meine Antragsakte öffnen</a>
-          <div class="hero-meta"><span>Offizielle Rechtsgrundlagen</span><span>Individuell filterbar</span><span>Ohne Anmeldung</span></div>
-        </div>
-        <div class="hero-illustration" aria-hidden="true">
-          <svg viewBox="0 0 360 310"><defs><linearGradient id="lungs" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#82d5d7"/><stop offset="1" stop-color="#2d88a0"/></linearGradient></defs><circle cx="184" cy="157" r="130" fill="#ffffff" opacity=".1"/><circle cx="185" cy="156" r="106" fill="#ffffff" opacity=".1"/><path d="M178 50v100m0-8-41 36m41-36 42 36" stroke="#c8f7f2" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><path d="M137 118c-30-12-71 14-78 73-7 62 30 75 78 45 15-10 23-25 25-43v-41l-25-34Z" fill="url(#lungs)" stroke="#d9fffa" stroke-width="4"/><path d="M220 118c30-12 71 14 78 73 7 62-30 75-78 45-15-10-23-25-25-43v-41l25-34Z" fill="url(#lungs)" stroke="#d9fffa" stroke-width="4"/><path d="m178 143-35 39m35-21-30 48m47-66 35 39m-35-21 30 48" stroke="#c6f7f5" stroke-width="5" opacity=".6" stroke-linecap="round"/><circle cx="283" cy="70" r="22" fill="#a2e3de"/><path d="M271 70h24m-12-12v24" stroke="#144a59" stroke-width="5" stroke-linecap="round"/></svg>
-        </div>
-      </div>
-    </section>
-
-    <div class="shell main-layout">
-      <section class="profile panel" aria-labelledby="profil-title">
-        <div class="section-heading"><div><p class="section-kicker">01 · Dein Profil</p><h2 id="profil-title">Informationen auf dich abstimmen</h2><p>GdB und Lungenfunktion sind getrennt einstellbar. Die Eingaben steuern passende Hinweise, keine automatische Bewilligung.</p></div><span class="shield">Privat auf diesem Gerät</span></div>
-        <div class="profile-grid">
-          <div class="field"><label for="gdb">Grad der Behinderung (GdB)</label><div class="select-wrap"><select id="gdb" aria-describedby="gdb-note"><option value="10">GdB 10</option><option value="20">GdB 20</option><option value="30" selected>GdB 30</option><option value="40">GdB 40</option><option value="50">GdB 50</option><option value="60">GdB 60</option><option value="70">GdB 70</option><option value="80">GdB 80</option><option value="90">GdB 90</option><option value="100">GdB 100</option></select></div><p class="input-note" id="gdb-note">GdB 10 ist als Vergleichswert wählbar; ein behördlicher GdB wird ab 20 festgestellt.</p></div>
-          <div class="field" id="equal-field"><label for="equal">Gleichstellung mit schwerbehinderten Menschen</label><div class="select-wrap"><select id="equal"><option value="no">Nein / noch nicht bewilligt</option><option value="yes">Ja, bewilligt</option></select></div><p class="input-note">Bei GdB 30/40 nur nach Antrag und positiver Entscheidung; nicht automatisch.</p></div>
-          <div class="lung-field" id="lung-fieldset">
-            <div class="lung-head"><h3>Lungenfunktionswerte individuell einstellen</h3><span class="version-chip">0–100 %</span></div>
-            <p class="input-note">Beide Werte lassen sich unabhängig voneinander per Schieberegler oder Zahleneingabe verändern. Werte aus deinem Spirometrie-Befund übernehmen – nicht mit Sauerstoffsättigung oder GdB verwechseln.</p>
-            <div class="lung-values">
-              <div class="lung-control">
-                <label for="lung-fev1-number">FEV₁ – Prozent vom Sollwert</label>
-                <div class="lung-number-wrap"><input type="number" id="lung-fev1-number" min="0" max="100" step="0.1" inputmode="numeric" placeholder="Noch kein Wert" aria-describedby="lung-fev1-help"><span>%</span><button class="lung-clear" id="lung-fev1-clear" type="button">Löschen</button></div>
-                <input type="range" id="lung-fev1-range" min="0" max="100" value="100" step="0.1" aria-label="FEV1 in Prozent des Sollwerts einstellen">
-                <p class="input-note" id="lung-fev1-help">FEV₁: ausgeatmetes Volumen in einer Sekunde, als Anteil am persönlichen Referenz-Sollwert.</p>
-              </div>
-              <div class="lung-control">
-                <label for="lung-fvc-number">FVC – Prozent vom Sollwert (optional)</label>
-                <div class="lung-number-wrap"><input type="number" id="lung-fvc-number" min="0" max="100" step="0.1" inputmode="numeric" placeholder="Noch kein Wert" aria-describedby="lung-fvc-help"><span>%</span><button class="lung-clear" id="lung-fvc-clear" type="button">Löschen</button></div>
-                <input type="range" id="lung-fvc-range" min="0" max="100" value="100" step="0.1" aria-label="FVC in Prozent des Sollwerts einstellen">
-                <p class="input-note" id="lung-fvc-help">FVC: forcierte Vitalkapazität. Die Sollwert-Prozente sind nicht der FEV₁/FVC-Quotient.</p>
-              </div>
-            </div>
-            <div class="lung-extra"><label for="lung-date">Datum der Messung (optional)</label><input type="date" id="lung-date"></div>
-            <div class="lung-values lung-liters">
-              <div class="lung-control"><label for="lung-fev1-liters">FEV₁ – gemessen (Liter, optional)</label><input type="number" id="lung-fev1-liters" min="0" max="12" step="0.01" inputmode="decimal" placeholder="z. B. 1,85"><p class="input-note">Gemessener Ist-Wert, nicht der Sollwert.</p></div>
-              <div class="lung-control"><label for="lung-fvc-liters">FVC – gemessen (Liter, optional)</label><input type="number" id="lung-fvc-liters" min="0" max="12" step="0.01" inputmode="decimal" placeholder="z. B. 3,10"><p class="input-note">Gemessener Ist-Wert, nicht der Sollwert.</p></div>
-            </div>
-            <p class="input-note" id="lung-ratio-preview" aria-live="polite">FEV₁/FVC aus Literwerten: noch nicht berechenbar.</p>
-            <fieldset class="lung-symptoms"><legend>Was ist im Alltag zusätzlich ein Problem? (freiwillig)</legend>
-              <label><input type="checkbox" value="dyspnea" name="lung-symptom"> Atemnot bei Belastung</label>
-              <label><input type="checkbox" value="night" name="lung-symptom"> Nächtliche Beschwerden</label>
-              <label><input type="checkbox" value="mucus" name="lung-symptom"> Schleim / schwieriges Abhusten</label>
-              <label><input type="checkbox" value="work" name="lung-symptom"> Belastung am Arbeitsplatz</label>
-            </fieldset>
-            <section class="scan-panel" id="scan-panel" aria-labelledby="scan-title">
-              <div class="scan-panel-head"><div><h3 id="scan-title">Lungenfunktion per Foto einlesen</h3><p class="input-note">Spirometrie-Befund fotografieren oder ein Bild aus der Mediathek auswählen. Erkannte Werte vor Übernahme kontrollieren.</p></div><span class="version-chip">Neu · v1.4</span></div>
-              <div class="scan-actions">
-                <label class="btn btn-primary scan-file-button" for="scan-gallery">Bild auswählen<input id="scan-gallery" type="file" accept="image/*" hidden></label>
-                <label class="btn btn-outline scan-file-button" for="scan-camera">Kamera öffnen<input id="scan-camera" type="file" accept="image/*" capture="environment" hidden></label>
-              </div>
-              <p class="input-note">Die Texterkennung läuft im Browser. Beim ersten Scan wird Drittanbieter-OCR-Software aus dem Internet geladen; die App selbst überträgt das Bild nicht an einen Server. Externer Code ist jedoch nicht mit vollständig lokaler Software gleichzusetzen. Für den Scan ist eine Internetverbindung erforderlich, falls die Erkennung nicht bereits geladen ist. <strong>Der Scanner ersetzt keine ärztliche Befundprüfung.</strong></p>
-              <div class="scan-picked" id="scan-picked" hidden>
-                <img id="scan-preview" alt="Vorschau des ausgewählten Lungenfunktionsbefunds">
-                <div><p id="scan-filename"></p><button id="scan-start" class="btn btn-primary" type="button">Werte aus Bild erkennen</button><button id="scan-clear" class="btn btn-text" type="button">Bild verwerfen</button></div>
-              </div>
-              <p id="scan-progress" class="scan-status" role="status" aria-live="polite">Noch kein Befundbild ausgewählt.</p>
-              <div id="scan-review" class="scan-review" hidden>
-                <h4>Erkannte Werte prüfen</h4>
-                <p class="input-note">Fehlerhafte Ziffern, vertauschte Spalten oder Vor-/Nach-Messungen sind möglich. Ohne deine Bestätigung wird kein Wert eingetragen.</p>
-                <div class="field"><label for="scan-phase">Messung im Bericht</label><select id="scan-phase"><option value="unbekannt">Nicht eindeutig / ohne Kennzeichnung</option><option value="vor">Vor Bronchodilatator (prä)</option><option value="nach">Nach Bronchodilatator (post)</option></select></div>
-                <div class="scan-fields">
-                  <label>FEV₁ (% vom Soll) <input id="scan-fev1-percent" type="text" inputmode="decimal" placeholder="Nicht erkannt"></label>
-                  <label>FVC (% vom Soll) <input id="scan-fvc-percent" type="text" inputmode="decimal" placeholder="Nicht erkannt"></label>
-                  <label>FEV₁ (Liter, Ist) <input id="scan-fev1-liters" type="text" inputmode="decimal" placeholder="Nicht erkannt"></label>
-                  <label>FVC (Liter, Ist) <input id="scan-fvc-liters" type="text" inputmode="decimal" placeholder="Nicht erkannt"></label>
-                  <label>FEV₁/FVC (% gemessen, nur Anzeige) <input id="scan-ratio" type="text" inputmode="decimal" placeholder="Nicht erkannt"></label>
-                  <label>Untersuchungsdatum <input id="scan-date" type="date"></label>
-                </div>
-                <p id="scan-review-warnings" class="scan-status" role="status" aria-live="polite"></p>
-                <details class="scan-text"><summary>Erkannten Text kontrollieren / korrigieren</summary><label for="scan-raw">OCR-Text des Bildes</label><textarea id="scan-raw" rows="6" spellcheck="false" placeholder="Befundtext erscheint hier"></textarea><button id="scan-reparse" type="button" class="btn btn-outline">Korrigierten Text erneut auswerten</button></details>
-                <div class="scan-actions"><button type="button" id="scan-apply" class="btn btn-primary">Geprüfte Werte übernehmen</button><button id="scan-discard" type="button" class="btn btn-outline">Abbrechen</button></div>
-              </div>
-            </section>
-            <div id="lung-profile-status" class="lung-profile-status" role="status" aria-live="polite"></div>
-          </div>
-          <div class="profile-result" id="profile-result" aria-live="polite"></div>
-        </div>
-      </section>
-
-      <section class="lung-recommendations panel" id="lung-empfehlungen" aria-labelledby="lung-recommendations-title">
-        <div class="section-heading"><div><p class="section-kicker">02a · Persönliche Orientierung</p><h2 id="lung-recommendations-title">Welche Unterstützung könnte zu deinen Werten passen?</h2><p>Die Vorschläge berücksichtigen FEV₁, weitere Angaben und deinen GdB unabhängig voneinander. Je Vorschlag erreichst du direkt den passenden Antrag oder die offizielle Informationsseite.</p></div><span class="version-chip" id="lung-match-count">Wird geladen</span></div>
-        <p class="lung-legal-note">Diese Vorschläge sind <strong>keine Diagnose, Bewilligung oder Therapieentscheidung</strong>. Ein niedriger FEV₁-Wert bedeutet nicht automatisch, dass du ein Hilfsmittel oder Sauerstoff benötigst. Medizinische Notwendigkeit und Kostenübernahme werden individuell geprüft.</p>
-        <div id="lung-recommendation-results" class="lung-recommendation-results" aria-live="polite"></div>
-        <p class="lung-sources"><strong>Grundlagen:</strong> <a href="https://ginasthma.org/2026-gina-strategy-report/" target="_blank" rel="noopener noreferrer">GINA 2026</a> · <a href="https://www.nvl-programm.de/themen/asthma" target="_blank" rel="noopener noreferrer">NVL Asthma</a> · <a href="https://www.g-ba.de/themen/veranlasste-leistungen/hilfsmittel/" target="_blank" rel="noopener noreferrer">G-BA Hilfsmittel</a> · <a href="https://www.g-ba.de/themen/veranlasste-leistungen/heilmittel/" target="_blank" rel="noopener noreferrer">G-BA Heilmittel</a></p>
-      </section>
-
-      <section class="facts-strip" aria-label="Wichtige Hinweise">
-        <div class="mini-fact"><span class="fact-num">20</span><span>Ab hier wird ein GdB behördlich festgestellt</span></div>
-        <div class="mini-fact"><span class="fact-num">30/40</span><span>Gleichstellung für den Arbeitsplatz möglich</span></div>
-        <div class="mini-fact"><span class="fact-num">50+</span><span>Gesetzlich schwerbehindert</span></div>
-      </section>
-
-
-      <section class="applications panel" id="antraege" aria-labelledby="antraege-title">
-        <div class="section-heading"><div><p class="section-kicker">02 · Hilfen & direkte Antragswege</p><h2 id="antraege-title">Hilfsmittel, Physiotherapie und Anträge</h2><p>Wähle ein Thema. Du siehst die zuständige Stelle, den offiziellen Weg und eine eigene ausfüllbare Mustervorlage. Die App verschickt nichts automatisch.</p></div><span class="version-chip">29 Wege</span></div>
-        <div class="application-note" role="note"><strong>Wichtiger Unterschied:</strong> Ärztliche Verordnungen (z. B. Atemphysiotherapie) darf nur die behandelnde Praxis ausstellen. Die Mustervorlage ist eine Anfrage, kein ärztliches Rezept und kein amtlicher Antrag. GdB allein begründet keine Leistung.</div>
-        <div class="application-tools">
-          <label class="field">Thema suchen<input id="apply-search" type="search" placeholder="z. B. Atemphysio, Lungensport, Reha, BEM"></label>
-          <label class="field">Bereich<select id="apply-category"><option value="all">Alle Leistungen</option><option>Hilfsmittel</option><option>Physio & Therapie</option><option>Therapie & Schulung</option><option>Reha</option><option>Arbeitsplatz</option><option>Behinderung & Finanzen</option><option>Pflege</option></select></label>
-        </div>
-        <p class="muted application-count" id="apply-count" aria-live="polite"></p>
-        <div class="application-list" id="apply-list"></div>
-        <button id="apply-more" class="btn btn-outline app-more" type="button" hidden>Weitere Leistungen anzeigen</button>
-        <div id="apply-editor" class="application-editor" hidden>
-          <div class="section-heading"><div><p class="section-kicker">Unverbindliche Mustervorlage</p><h3 id="apply-edit-title">Antragsentwurf erstellen</h3><p>Bitte prüfe den Text vor dem Versand. Die Felder werden nicht dauerhaft gespeichert.</p></div><button type="button" class="btn btn-outline" id="apply-close">Schließen</button></div>
-          <div class="application-form">
-            <label>Dein Name <input id="apply-name" autocomplete="name" placeholder="Vor- und Nachname"></label>
-            <label>Deine Anschrift (optional) <input id="apply-address" autocomplete="street-address" placeholder="Straße, PLZ und Ort"></label>
-            <label>Empfänger / Institution <input id="apply-recipient" placeholder="z. B. Krankenkasse, Arztpraxis oder Arbeitgeber"></label>
-            <label>Aktenzeichen (optional) <input id="apply-ref" placeholder="z. B. Antrags- oder Versicherungszeichen"></label>
-            <label class="wide">Deine persönliche Begründung <textarea id="apply-reason" rows="3" placeholder="Beschreibe nur belegbare Einschränkungen und deinen konkreten Bedarf. Keine Diagnosen nötig, wenn nicht erforderlich."></textarea></label>
-          </div>
-          <p class="application-disclaimer">Keine elektronische Übermittlung: „Kopieren“ und „Drucken / als PDF sichern“ erstellen nur einen Text auf deinem Gerät. Du musst ihn selbst bei der zuständigen Stelle einreichen.</p>
-          <div class="application-preview" id="apply-preview" aria-live="polite"></div>
-          <div class="application-buttons"><button type="button" class="btn btn-primary" id="apply-copy">Text kopieren</button><button type="button" class="btn btn-outline" id="apply-print">Drucken / PDF sichern</button></div>
-          <p class="muted" id="apply-action-msg" role="status" aria-live="polite"></p>
-        </div>
-      </section>
-
-      <section class="my-area panel" id="mein-bereich" aria-labelledby="my-title">
-        <div class="section-heading"><div><p class="section-kicker">03 · Persönlicher Bereich</p><h2 id="my-title">Anträge, Dokumente & Asthma-Verlauf</h2><p>Deine Einträge und hochgeladenen Dateien bleiben in diesem Browser auf diesem Gerät. Keine Übertragung an GitHub oder die Betreiber der App.</p></div><span class="shield">Lokale Ablage</span></div>
-        <div class="application-note"><strong>Datenschutz:</strong> Lokale Daten sind nicht automatisch verschlüsselt. Andere Personen mit Zugriff auf dein Gerät oder Browserprofil können sie möglicherweise sehen. Sichere wichtige Daten regelmäßig mit dem <strong>verschlüsselten Backup</strong> unten. Private Browserfenster, Browserdaten-Löschung oder Gerätewechsel können Einträge löschen.</div>
-        <div id="private-unavailable" class="private-error" role="alert" hidden>Die lokale Datenbank ist nicht verfügbar. Bitte nutze einen aktuellen Browser ohne privaten Modus. Hier werden keine Daten gespeichert.</div>
-        <nav class="my-tabs" aria-label="Persönliche Bereiche">
-          <button type="button" data-my-tab="cases" class="my-tab active" aria-pressed="true">Antragsakte</button>
-          <button type="button" data-my-tab="documents" class="my-tab" aria-pressed="false">Dokumente</button>
-          <button type="button" data-my-tab="diary" class="my-tab" aria-pressed="false">Asthma-Tagebuch</button>
-          <button type="button" data-my-tab="backup" class="my-tab" aria-pressed="false">Datensicherung</button>
-        </nav>
-        <div id="my-cases" class="my-panel">
-          <div class="my-stats" id="case-stats" aria-live="polite"></div>
-          <div class="my-topline"><h3>Meine Anträge & Bescheide</h3><button type="button" class="btn btn-primary" id="case-new">+ Vorgang hinzufügen</button></div>
-          <p class="input-note">Notiere, was du eingereicht hast, wann der Bescheid kam und welche Frist du selbst anhand des Bescheids geprüft hast. Keine automatische Einreichung oder rechtsverbindliche Fristberechnung. CSV- und Kalenderdateien bleiben in deiner eigenen Verantwortung; sie werden nicht automatisch synchronisiert.</p>
-          <div class="my-actions my-export-tools"><button type="button" id="case-export" class="btn btn-outline">Antragsübersicht CSV</button><button type="button" id="case-calendar" class="btn btn-outline">Termine als Kalenderdatei</button></div><div class="my-filter-grid"><label>Vorgang suchen <input type="search" id="case-search" placeholder="z. B. Reha, Hilfsmittel, GdB"></label><label>Status filtern <select id="case-filter"><option value="all">Alle Status</option><option>Geplant</option><option>Eingereicht</option><option>Nachforderung</option><option>Bewilligt</option><option>Abgelehnt</option><option>Widerspruch</option><option>Abgeschlossen</option></select></label></div>
-          <div id="case-list" class="my-list" aria-live="polite"></div>
-          <form id="case-form" class="my-editor" hidden><div class="my-topline"><h3 id="case-form-title">Vorgang erfassen</h3><button type="button" class="btn btn-outline" id="case-cancel">Schließen</button></div>
-            <div class="my-grid">
-              <label class="wide">Bezeichnung des Vorgangs * <input id="case-title" maxlength="140" required placeholder="z. B. Atemphysiotherapie / GdB-Erhöhung"></label>
-              <label>Bereich <select id="case-category"><option>Hilfsmittel</option><option>Physio & Therapie</option><option>Rehabilitation</option><option>GdB & Gleichstellung</option><option>Arbeitsplatz</option><option>Krankenkasse</option><option>Andere Leistung</option></select></label>
-              <label>Status <select id="case-status"><option>Geplant</option><option>Eingereicht</option><option>Nachforderung</option><option>Bewilligt</option><option>Abgelehnt</option><option>Widerspruch</option><option>Abgeschlossen</option></select></label>
-              <label>Zuständige Stelle / Ansprechpartner <input id="case-authority" maxlength="160" placeholder="z. B. Krankenkasse"></label>
-              <label>Aktenzeichen (optional) <input id="case-reference" maxlength="100"></label>
-              <label>Eingereicht am <input type="date" id="case-submitted"></label>
-              <label>Bescheid / Bekanntgabe am (selbst eintragen) <input type="date" id="case-received"></label>
-              <label>Geprüfte Frist / Wiedervorlage <input type="date" id="case-due"></label>
-              <label class="wide">Notizen / benötigte Unterlagen <textarea id="case-notes" rows="3" maxlength="4000"></textarea></label>
-            </div>
-            <div class="application-note"><strong>Fristen:</strong> Ein Widerspruch im Sozialrecht ist regelmäßig innerhalb eines Monats nach Bekanntgabe einzulegen. Abweichungen sind möglich, etwa bei fehlender Rechtsbehelfsbelehrung, im Ausland oder aufgrund besonderer Verfahrensregeln. Entscheidend sind der Bescheid und die Rechtsbehelfsbelehrung. <a href="https://www.gesetze-im-internet.de/sgg/__84.html" target="_blank" rel="noopener noreferrer">§ 84 SGG</a>, <a href="https://www.gesetze-im-internet.de/sgg/__66.html" target="_blank" rel="noopener noreferrer">§ 66 SGG</a>, <a href="https://www.gesetze-im-internet.de/sgb_10/__26.html" target="_blank" rel="noopener noreferrer">§ 26 SGB X</a>. Diese App berechnet keine rechtsverbindlichen Fristen. Trage dein selbst geprüftes Datum ein.</div>
-            <div class="my-actions"><button class="btn btn-primary" type="submit">Vorgang speichern</button><button type="button" class="btn btn-text" id="case-delete" hidden>Vorgang löschen</button></div>
-          </form>
-        </div>
-        <div id="my-documents" class="my-panel" hidden>
-          <h3>Meine Unterlagen</h3><p class="muted">Fotos von Verordnungen, Anträge, Arztbriefe, Nachweise und Bescheide. Dateitypen: PDF, JPG, PNG, WebP, HEIC, DOC, DOCX und TXT. Je Datei höchstens 12 MB. Kein automatisches Auslesen oder KI-Analysieren.</p>
-          <form id="document-form" class="my-grid my-editor">
-            <label class="wide">Dokumente auswählen * <input id="document-files" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.doc,.docx,.txt,image/jpeg,image/png,image/webp,application/pdf" multiple required></label>
-            <label>Zu einem Antrag zuordnen <select id="document-case"><option value="">Ohne Zuordnung</option></select></label>
-            <label>Dokumentart <select id="document-kind"><option>Arztbrief</option><option>Verordnung</option><option>Bescheid</option><option>Antrag</option><option>Nachweis</option><option>Sonstiges</option></select></label>
-            <div class="wide my-actions"><button class="btn btn-primary" type="submit">Dateien lokal speichern</button></div>
-          </form>
-          <p id="document-storage-note" class="input-note">Dateien bleiben im Browserspeicher. Die verfügbare Speichermenge hängt vom Gerät ab.</p>
-          <div id="document-list" class="my-list"></div>
-        </div>
-        <div id="my-diary" class="my-panel" hidden>
-          <h3>Mein Asthma-Tagebuch</h3><p class="muted">Dokumentiere Symptome, Peak-Flow, Bedarfsmedikation und Auslöser für das Gespräch mit der behandelnden Praxis. Die App stellt keine Diagnose und legt keine individuellen Ampelgrenzen fest.</p>
-          <div class="application-note"><strong>Achtung:</strong> Bei schwerer Atemnot oder Warnzeichen unverzüglich die individuell vereinbarten Notfallmaßnahmen befolgen und im Notfall <strong>112</strong> anrufen. Aus einem einzelnen Peak-Flow-Wert ist keine sichere Behandlungsempfehlung ableitbar. <a href="https://www.lungeninformationsdienst.de/krankheiten/asthma/therapien" target="_blank" rel="noopener noreferrer">Quelle: Lungeninformationsdienst</a>.</div>
-          <form id="diary-form" class="my-editor">
-            <div class="my-grid">
-              <label>Datum * <input type="date" id="diary-date" required></label>
-              <label>Uhrzeit <input type="time" id="diary-time"></label>
-              <label>Peak-Flow (L/min; optional) <input type="number" inputmode="numeric" id="diary-peak" min="50" max="1000" step="1" placeholder="z. B. 430"></label>
-              <label>Beschwerden <select id="diary-symptoms"><option value="0">Keine</option><option value="1">Leicht</option><option value="2">Mittel</option><option value="3">Stark</option></select></label>
-              <label>Bedarfsmedikation: Anwendungen heute (optional) <input type="number" id="diary-rescue" min="0" max="99" step="1" placeholder="Anzahl"></label>
-              <label>Nachts durch Beschwerden aufgewacht? <select id="diary-night"><option value="no">Nein</option><option value="yes">Ja</option></select></label>
-              <label class="wide">Mögliche Auslöser / Belastung / freie Notizen <textarea id="diary-notes" rows="2" maxlength="1500" placeholder="z. B. Sport, Pollen, Wärme, Arbeit"></textarea></label>
-            </div>
-            <div class="my-actions"><button type="submit" class="btn btn-primary">Eintrag speichern</button><button type="button" id="diary-cancel" class="btn btn-outline" hidden>Bearbeitung abbrechen</button><button type="button" id="diary-export" class="btn btn-outline">CSV exportieren</button></div>
-          </form>
-          <div class="diary-chart" id="diary-chart" aria-label="Peak-Flow-Verlauf der letzten Messungen"></div>
-          <div id="diary-stats" class="my-stats"></div>
-          <div id="diary-list" class="my-list"></div>
-        </div>
-        <div id="my-backup" class="my-panel" hidden>
-          <h3>Verschlüsselte Datensicherung</h3><p>Exportiere Anträge, Dokumente, Asthma-Einträge und dein GdB-Profil als <strong>passwortgeschützte AES-GCM-Sicherungsdatei</strong>. Das Passwort wird nicht gespeichert. Ohne dieses Passwort kann die Sicherung nicht entschlüsselt werden. Sichere die Datei außerhalb des Browsers.</p>
-          <form id="backup-export-form" class="my-editor"><label>Passwort für die Datensicherung (mindestens 12 Zeichen) <input type="password" id="backup-password" required minlength="12" autocomplete="new-password"></label><label>Passwort wiederholen <input type="password" id="backup-confirm" required minlength="12" autocomplete="new-password"></label><button class="btn btn-primary" type="submit">Verschlüsseltes Backup herunterladen</button></form>
-          <div class="my-divider"></div><h3>Backup wiederherstellen</h3><p class="muted">Die Wiederherstellung <strong>ersetzt alle bestehenden privaten Einträge, Dokumente und Tagebuchdaten</strong> auf diesem Gerät. Vorher eine eigene Sicherung erstellen!</p>
-          <form id="backup-import-form" class="my-editor"><label>Verschlüsselte Sicherungsdatei <input type="file" id="backup-file" accept=".asthma,.json,application/json" required></label><label>Passwort der Sicherung <input type="password" id="backup-import-password" required autocomplete="off"></label><button type="submit" class="btn btn-outline">Backup prüfen und wiederherstellen</button></form>
-          <div class="my-divider"></div><h3>Datenschutz & Zurücksetzen</h3><p class="muted">Die App speichert Daten in IndexedDB und LocalStorage deines Browsers. Ohne Passcode/verschlüsseltes Gerät sind sie möglicherweise für andere Nutzer dieses Browserprofils zugänglich. Eine Verteilung über Browserprofile oder Geräte findet nicht automatisch statt.</p>
-          <button type="button" id="private-delete-all" class="btn btn-text">Alle privaten Einträge, Dokumente und Tagebuchdaten löschen</button>
-        </div>
-        <p role="status" aria-live="polite" id="my-message" class="my-message"></p>
-      </section>
-
-      <section class="explore" aria-labelledby="explore-title">
-        <div class="section-heading explore-heading"><div><p class="section-kicker">04 · Wissensbereich</p><h2 id="explore-title">Rechte und Möglichkeiten entdecken</h2><p>Jeder Beitrag enthält eine Quelle. Ansprüche sind nach ihrem rechtlichen Status gekennzeichnet.</p></div><button id="show-all" class="btn btn-outline" type="button" aria-pressed="false">Alle Themen anzeigen</button></div>
-        <div class="controls panel-lite">
-          <div class="search-wrap"><span aria-hidden="true">⌕</span><input type="search" id="search" placeholder="z. B. Urlaub, Inhalator, Kündigung, Antrag…" aria-label="Themen durchsuchen" autocomplete="off"><button type="button" id="clear-search" class="clear" aria-label="Suche löschen" hidden>×</button></div>
-          <div class="tabs" role="group" aria-label="Themen filtern" id="tabs">
-            <button class="tab active" data-section="all" aria-pressed="true">Alle</button>
-            <button class="tab" data-section="hilfsmittel" aria-pressed="false">Hilfsmittel</button>
-            <button class="tab" data-section="arbeit" aria-pressed="false">Arbeitsrecht</button>
-            <button class="tab" data-section="gdb" aria-pressed="false">GdB & Anträge</button>
-            <button class="tab" data-section="finanzen" aria-pressed="false">Steuern & Vorteile</button>
-            <button class="tab" data-section="wissen" aria-pressed="false">Asthma-Wissen</button>
-            <button class="tab" data-section="saved" aria-pressed="false">Merkliste <span id="saved-count">0</span></button>
-          </div>
-          <div class="results-head"><span id="result-count" aria-live="polite"></span><span class="result-legend"><span class="legend-dot yes"></span> grundsätzlich möglich <span class="legend-dot check"></span> Einzelfallprüfung</span></div>
-        </div>
-        <div id="cards" class="cards" aria-live="polite"></div>
-        <div class="empty" id="empty" hidden><h3>Keine passenden Themen gefunden.</h3><p>Versuche einen anderen Suchbegriff oder aktiviere „Alle Themen anzeigen“.</p><button class="btn btn-primary" id="reset-filters" type="button">Filter zurücksetzen</button></div>
-      </section>
-
-      <section class="steps panel" aria-labelledby="steps-title"><div class="section-heading"><div><p class="section-kicker">05 · So gehst du vor</p><h2 id="steps-title">Hilfsmittel und Unterstützung beantragen</h2></div></div><div class="step-grid"><article><span>1</span><h3>Bedarf festhalten</h3><p>Symptome, Belastungen und konkrete Einschränkungen im Alltag oder Beruf beschreiben. Ärztliche Unterlagen sammeln.</p></article><article><span>2</span><h3>Stelle klären</h3><p>Medizinische Hilfsmittel: Krankenkasse. Arbeitsbezogene Hilfen: je nach Fall Arbeitgeber, Rehabilitationsträger oder Integrationsamt.</p></article><article><span>3</span><h3>Schriftlich beantragen</h3><p>Individuelle Notwendigkeit begründen lassen, Unterlagen einreichen und einen rechtsmittelfähigen Bescheid anfordern.</p></article><article><span>4</span><h3>Bescheid prüfen</h3><p>Bei Ablehnung Begründung und Rechtsbehelfsbelehrung beachten. Ggf. unabhängige Beratung nutzen.</p></article></div></section>
-
-      <section class="sources panel" id="quellen" aria-labelledby="sources-title"><div class="section-heading"><div><p class="section-kicker">06 · Transparenz</p><h2 id="sources-title">Quellen & Aktualität</h2><p>Gesetzestexte vom Bundesrecht-Portal sowie Informationen öffentlicher Stellen. Die App überprüft Gesetzesänderungen nicht automatisch.</p></div></div><div id="source-list" class="source-list"></div><p class="muted note">Rechtsstand der eingebauten Erläuterungen: Recherche am 15.10.2026. Spätere Gesetzesänderungen können Abweichungen verursachen. Prüfe vor wichtigen Entscheidungen stets den verlinkten aktuellen Originaltext.</p></section>
-
-      <section class="app-settings panel" id="app-settings" aria-labelledby="settings-title"><div class="section-heading"><div><p class="section-kicker">07 · App-Einstellungen</p><h2 id="settings-title">Version & Updates</h2></div><span class="version-chip" id="version-chip">v1.4.0</span></div><div class="settings-row"><div><strong>Asthma</strong><p>Updateprüfung auf dem Server, auf dem diese App veröffentlicht ist (z. B. GitHub Pages). Kein App-Store und kein externer Update-Dienst erforderlich.</p><p class="muted">Installationshinweis für iPhone: In Safari „Teilen“ → „Zum Home-Bildschirm“.</p></div><button type="button" id="check-update" class="btn btn-primary">Nach Updates suchen</button></div><p class="update-status" id="update-status" role="status" aria-live="polite">Installierte Version: 1.4.0</p><div class="settings-actions"><button type="button" id="reload-app" class="btn btn-outline" hidden>Neue Version laden</button><button type="button" id="forget" class="btn btn-text">Gespeichertes Profil und Merkliste löschen</button></div><p class="muted privacy">Datenschutz: Die Profil-, Lungenfunktions- und Merklisten-Daten werden in LocalStorage, persönliche Anträge, Dokumente und Tagebucheinträge in IndexedDB dieses Browsers gespeichert. Diese lokalen Daten sind nicht automatisch verschlüsselt; nur exportierte Sicherungsdateien werden mit Passwort verschlüsselt. Die App verwendet keine Trackingdienste und sendet keine Profildaten an einen Server. Externe Quellen werden erst geöffnet, wenn du den Link anklickst. Die Updateprüfung fordert nur die Versionsdatei vom Hosting-Server an. Der optionale Befundscanner lädt beim ersten Gebrauch OCR-Software von einem CDN nach; ausgewählte Bilder werden durch unsere App nicht hochgeladen.</p></section>
-    </div>
-  </main>
-  <footer><div class="shell footer-inner"><div><strong>Asthma</strong><p>Informationsangebot – keine medizinische Diagnostik und keine individuelle Rechtsberatung. Bei schwerer akuter Atemnot: 112.</p></div><div><a href="#lung-empfehlungen">Empfehlungen</a><a href="#antraege">Anträge</a><a href="#mein-bereich">Mein Bereich</a><a href="#quellen">Quellen</a><a href="#app-settings">Updates</a><span>Version <span id="footer-version">1.4.0</span></span></div></div></footer>
-  <section id="antrag-print" aria-label="Druckansicht Mustervorlage" hidden></section>
-  <template id="card-template"><article class="card"><div class="card-top"><span class="category-tag"></span><button class="save-btn" type="button" aria-label="Zur Merkliste hinzufügen" title="Merkliste">☆</button></div><h3 class="card-title"></h3><p class="card-summary"></p><span class="status"></span><details class="card-detail"><summary>Details und Voraussetzungen <span aria-hidden="true">⌄</span></summary><div class="details-body"><p class="card-body"></p><div class="card-sources"><strong>Quellen</strong><div class="links"></div></div></div></details></article></template>
+<a class="skip-link" href="#main">Zum Hauptinhalt springen</a>
+<header class="topbar">
+<div class="shell topbar-inner">
+<a aria-label="Asthma Startseite" class="brand" href="#start">
+<span aria-hidden="true" class="brand-icon"><svg fill="none" viewbox="0 0 40 40"><path d="M20 7v11m0 0-5 5m5-5 5 5M15 23C9 18 5 23 5 30c0 5 7 7 12 1V22m8 1c6-5 10 0 10 7 0 5-7 7-12 1V22" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.7"></path></svg></span>
+<span><strong>Asthma</strong><small>Lungenwerte · Therapie · Hilfen · Anträge</small></span>
+</a>
+<div class="top-actions"><span class="connection" id="connection" role="status">Lokal nutzbar</span><button class="btn btn-ghost compact" id="update-top" type="button">↻ <span>Update suchen</span></button></div>
+</div>
+</header><nav aria-label="Hauptbereiche" class="app-nav"><div class="shell nav-scroll">
+<button class="nav-item" data-goto="start" type="button">Übersicht</button><button class="nav-item" data-goto="profil" type="button">Mein Profil</button><button class="nav-item" data-goto="lungenwerte" type="button">Lungenwerte</button><button class="nav-item" data-goto="befunde" type="button">Befunde</button><button class="nav-item" data-goto="therapie" type="button">Therapie</button><button class="nav-item" data-goto="hilfen" type="button">Hilfsmittel</button><button class="nav-item" data-goto="antraege" type="button">Anträge</button><button class="nav-item" data-goto="akte" type="button">Meine Akte</button><button class="nav-item" data-goto="arbeit" type="button">Arbeit</button><button class="nav-item" data-goto="bericht" type="button">Arztbericht</button><button class="nav-item" data-goto="wissen" type="button">Wissen</button><button class="nav-item" data-goto="einstellungen" type="button">Einstellungen</button></div></nav>
+<main id="main">
+<section class="hero" data-nav-page="start" id="start">
+<div class="shell hero-content">
+<div class="hero-copy">
+<span class="eyebrow"><span class="tiny-dot"></span> Orientierung für Deutschland</span>
+<h1>Asthma. Deine Gesundheit im Blick.</h1>
+<p>Alle Informationen und Werkzeuge getrennt nach Themen. Erfasse Werte, verwalte Anträge und bereite Arzttermine vor – ohne lange, unübersichtliche Seiten.</p>
+<a class="btn btn-primary hero-apply" href="#antraege">Hilfen und Anträge entdecken →</a> <a class="btn btn-outline hero-private" href="#mein-bereich">Meine Antragsakte öffnen</a>
+<div class="hero-meta"><span>Offizielle Rechtsgrundlagen</span><span>Individuell filterbar</span><span>Ohne Anmeldung</span></div>
+</div>
+<div aria-hidden="true" class="hero-illustration">
+<svg viewbox="0 0 360 310"><defs><lineargradient id="lungs" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#82d5d7"></stop><stop offset="1" stop-color="#2d88a0"></stop></lineargradient></defs><circle cx="184" cy="157" fill="#ffffff" opacity=".1" r="130"></circle><circle cx="185" cy="156" fill="#ffffff" opacity=".1" r="106"></circle><path d="M178 50v100m0-8-41 36m41-36 42 36" stroke="#c8f7f2" stroke-linecap="round" stroke-linejoin="round" stroke-width="13"></path><path d="M137 118c-30-12-71 14-78 73-7 62 30 75 78 45 15-10 23-25 25-43v-41l-25-34Z" fill="url(#lungs)" stroke="#d9fffa" stroke-width="4"></path><path d="M220 118c30-12 71 14 78 73 7 62-30 75-78 45-15-10-23-25-25-43v-41l25-34Z" fill="url(#lungs)" stroke="#d9fffa" stroke-width="4"></path><path d="m178 143-35 39m35-21-30 48m47-66 35 39m-35-21 30 48" opacity=".6" stroke="#c6f7f5" stroke-linecap="round" stroke-width="5"></path><circle cx="283" cy="70" fill="#a2e3de" r="22"></circle><path d="M271 70h24m-12-12v24" stroke="#144a59" stroke-linecap="round" stroke-width="5"></path></svg>
+</div>
+</div>
+</section>
+<div class="shell main-layout"><section class="panel suite-dashboard" data-nav-page="start" id="uebersicht"><div class="section-heading"><div><p class="section-kicker">Deine Startseite</p><h2>Alles Wichtige auf einen Blick</h2><p>Wähle nur den Bereich, den du gerade benötigst. Deine medizinischen Daten verlassen die App nicht automatisch.</p></div><span class="version-chip">Version 1.5.0</span></div><div class="suite-stats"><article><strong id="dash-fev">–</strong><span>Letzter FEV₁-Sollwert</span></article><article><strong id="dash-measurements">0</strong><span>Untersuchungen</span></article><article><strong id="dash-medications">0</strong><span>Medikamente</span></article><article><strong id="dash-due">–</strong><span>Nächster Termin</span></article></div>
+<h3>Direkt zu deinen Bereichen</h3><div class="suite-launcher"><button data-goto="lungenwerte"><span>◷</span><strong>Lungenwerte</strong><small>Messungen und Verlauf</small></button><button data-goto="befunde"><span>▣</span><strong>Befunde</strong><small>Kamera, PDF und OCR</small></button><button data-goto="therapie"><span>✚</span><strong>Therapie</strong><small>Medikamente und Notfallplan</small></button><button data-goto="hilfen"><span>♡</span><strong>Hilfsmittel</strong><small>Passende Hilfen finden</small></button><button data-goto="antraege"><span>☷</span><strong>Anträge</strong><small>Formulare und Fristen</small></button><button data-goto="akte"><span>▤</span><strong>Meine Akte</strong><small>Dokumente und Tagebuch</small></button></div><p class="suite-emergency">Bei schwerer akuter Atemnot: <a href="tel:112">112 anrufen</a>. Diese App ist kein Notfallüberwachungssystem.</p></section>
+<section aria-labelledby="profil-title" class="profile panel" data-nav-page="profil" id="profil">
+<div class="section-heading"><div><p class="section-kicker">01 · Dein Profil</p><h2 id="profil-title">Informationen auf dich abstimmen</h2><p>GdB und Lungenfunktion sind getrennt einstellbar. Die Eingaben steuern passende Hinweise, keine automatische Bewilligung.</p></div><span class="shield">Privat auf diesem Gerät</span></div>
+<div class="profile-grid">
+<div class="field"><label for="gdb">Grad der Behinderung (GdB)</label><div class="select-wrap"><select aria-describedby="gdb-note" id="gdb"><option value="10">GdB 10</option><option value="20">GdB 20</option><option selected="" value="30">GdB 30</option><option value="40">GdB 40</option><option value="50">GdB 50</option><option value="60">GdB 60</option><option value="70">GdB 70</option><option value="80">GdB 80</option><option value="90">GdB 90</option><option value="100">GdB 100</option></select></div><p class="input-note" id="gdb-note">GdB 10 ist als Vergleichswert wählbar; ein behördlicher GdB wird ab 20 festgestellt.</p></div>
+<div class="field" id="equal-field"><label for="equal">Gleichstellung mit schwerbehinderten Menschen</label><div class="select-wrap"><select id="equal"><option value="no">Nein / noch nicht bewilligt</option><option value="yes">Ja, bewilligt</option></select></div><p class="input-note">Bei GdB 30/40 nur nach Antrag und positiver Entscheidung; nicht automatisch.</p></div>
+<div aria-live="polite" class="profile-result" id="profile-result"></div>
+</div>
+</section><section class="panel new-page" data-nav-page="lungenwerte" id="lungenwerte"><div class="section-heading"><div><p class="section-kicker">Meine Messwerte</p><h2>Lungenfunktion und Verlauf</h2><p>Messungen mit Datum speichern und über längere Zeit vergleichen. Jeder Befund bleibt als eigener Eintrag erhalten.</p></div></div><div class="lung-field" id="lung-fieldset">
+<div class="lung-head"><h3>Lungenfunktionswerte individuell einstellen</h3><span class="version-chip">0–100 %</span></div>
+<p class="input-note">Beide Werte lassen sich unabhängig voneinander per Schieberegler oder Zahleneingabe verändern. Werte aus deinem Spirometrie-Befund übernehmen – nicht mit Sauerstoffsättigung oder GdB verwechseln.</p>
+<div class="lung-values">
+<div class="lung-control">
+<label for="lung-fev1-number">FEV₁ – Prozent vom Sollwert</label>
+<div class="lung-number-wrap"><input aria-describedby="lung-fev1-help" id="lung-fev1-number" inputmode="numeric" max="100" min="0" placeholder="Wert eingeben" step="0.1" type="number"/><span>%</span><button class="lung-clear" id="lung-fev1-clear" type="button">Löschen</button></div>
+<input aria-label="FEV1 in Prozent des Sollwerts einstellen" id="lung-fev1-range" max="100" min="0" step="0.1" type="range" value="100"/>
+<p class="input-note" id="lung-fev1-help">FEV₁: ausgeatmetes Volumen in einer Sekunde, als Anteil am persönlichen Referenz-Sollwert.</p>
+</div>
+<div class="lung-control">
+<label for="lung-fvc-number">FVC – Prozent vom Sollwert (optional)</label>
+<div class="lung-number-wrap"><input aria-describedby="lung-fvc-help" id="lung-fvc-number" inputmode="numeric" max="100" min="0" placeholder="Wert eingeben" step="0.1" type="number"/><span>%</span><button class="lung-clear" id="lung-fvc-clear" type="button">Löschen</button></div>
+<input aria-label="FVC in Prozent des Sollwerts einstellen" id="lung-fvc-range" max="100" min="0" step="0.1" type="range" value="100"/>
+<p class="input-note" id="lung-fvc-help">FVC: forcierte Vitalkapazität. Die Sollwert-Prozente sind nicht der FEV₁/FVC-Quotient.</p>
+</div>
+</div>
+<div class="lung-extra"><label for="lung-date">Datum der Messung (optional)</label><input id="lung-date" type="date"/></div>
+<div class="lung-values lung-liters">
+<div class="lung-control"><label for="lung-fev1-liters">FEV₁ – gemessen (Liter, optional)</label><input id="lung-fev1-liters" inputmode="decimal" max="12" min="0" placeholder="z. B. 1,85" step="0.01" type="number"/><p class="input-note">Gemessener Ist-Wert, nicht der Sollwert.</p></div>
+<div class="lung-control"><label for="lung-fvc-liters">FVC – gemessen (Liter, optional)</label><input id="lung-fvc-liters" inputmode="decimal" max="12" min="0" placeholder="z. B. 3,10" step="0.01" type="number"/><p class="input-note">Gemessener Ist-Wert, nicht der Sollwert.</p></div>
+</div>
+<p aria-live="polite" class="input-note" id="lung-ratio-preview">FEV₁/FVC aus Literwerten: noch nicht berechenbar.</p>
+<fieldset class="lung-symptoms"><legend>Was ist im Alltag zusätzlich ein Problem? (freiwillig)</legend>
+<label><input name="lung-symptom" type="checkbox" value="dyspnea"/> Atemnot bei Belastung</label>
+<label><input name="lung-symptom" type="checkbox" value="night"/> Nächtliche Beschwerden</label>
+<label><input name="lung-symptom" type="checkbox" value="mucus"/> Schleim / schwieriges Abhusten</label>
+<label><input name="lung-symptom" type="checkbox" value="work"/> Belastung am Arbeitsplatz</label>
+</fieldset>
+<div aria-live="polite" class="lung-profile-status" id="lung-profile-status" role="status"></div>
+</div><div class="suite-divider"></div>
+<div class="suite-toolbar"><h3>Verlauf gespeicherter Untersuchungen</h3><button class="btn btn-outline" id="measurement-save-profile" type="button">Aktuelle Werte in Verlauf speichern</button></div>
+<div class="suite-controls"><label>Darstellung <select id="measurement-metric"><option value="fev1">FEV₁ (% Soll)</option><option value="fvc">FVC (% Soll)</option><option value="fev1Liters">FEV₁ (Liter)</option><option value="fvcLiters">FVC (Liter)</option><option value="ratio">FEV₁/FVC-Verhältnis</option></select></label><label>Messphase <select id="measurement-phase"><option value="unbekannt">Nicht angegeben</option><option value="vor">Vor Bronchodilatation</option><option value="nach">Nach Bronchodilatation</option></select></label></div>
+<div aria-live="polite" class="suite-chart" id="measurement-chart"></div><div class="suite-list" id="measurement-list"></div><p class="suite-msg" id="measurement-msg" role="status"></p></section><section class="panel new-page" data-nav-page="befunde" id="befunde"><div class="section-heading"><div><p class="section-kicker">Befunde und Scanner</p><h2>Arztberichte erfassen</h2><p>Foto oder PDF überprüfen, Messwerte korrigieren und erst nach Bestätigung speichern.</p></div></div><section aria-labelledby="scan-title" class="scan-panel" id="scan-panel">
+<div class="scan-panel-head"><div><h3 id="scan-title">Lungenfunktion per Foto einlesen</h3><p class="input-note">Spirometrie-Befund fotografieren oder ein Bild aus der Mediathek auswählen. Erkannte Werte vor Übernahme kontrollieren.</p></div><span class="version-chip">Neu · v1.5</span></div>
+<div class="scan-actions">
+<label class="btn btn-primary scan-file-button" for="scan-gallery">Bild auswählen<input accept="image/*" hidden="" id="scan-gallery" type="file"/></label>
+<label class="btn btn-outline scan-file-button" for="scan-camera">Kamera öffnen<input accept="image/*" capture="environment" hidden="" id="scan-camera" type="file"/></label>
+</div>
+<p class="input-note">Die Texterkennung läuft im Browser. Beim ersten Scan wird Drittanbieter-OCR-Software aus dem Internet geladen; die App selbst überträgt das Bild nicht an einen Server. Externer Code ist jedoch nicht mit vollständig lokaler Software gleichzusetzen. Für den Scan ist eine Internetverbindung erforderlich, falls die Erkennung nicht bereits geladen ist. <strong>Der Scanner ersetzt keine ärztliche Befundprüfung.</strong></p>
+<div class="scan-picked" hidden="" id="scan-picked">
+<img alt="Vorschau des ausgewählten Lungenfunktionsbefunds" id="scan-preview"/>
+<div><p id="scan-filename"></p><button class="btn btn-primary" id="scan-start" type="button">Werte aus Bild erkennen</button><button class="btn btn-text" id="scan-clear" type="button">Bild verwerfen</button></div>
+</div>
+<p aria-live="polite" class="scan-status" id="scan-progress" role="status">Noch kein Befundbild ausgewählt.</p>
+<div class="scan-review" hidden="" id="scan-review">
+<h4>Erkannte Werte prüfen</h4>
+<p class="input-note">Fehlerhafte Ziffern, vertauschte Spalten oder Vor-/Nach-Messungen sind möglich. Ohne deine Bestätigung wird kein Wert eingetragen.</p>
+<div class="field"><label for="scan-phase">Messung im Bericht</label><select id="scan-phase"><option value="unbekannt">Nicht eindeutig / ohne Kennzeichnung</option><option value="vor">Vor Bronchodilatator (prä)</option><option value="nach">Nach Bronchodilatator (post)</option></select></div>
+<div class="scan-fields">
+<label>FEV₁ (% vom Soll) <input id="scan-fev1-percent" inputmode="decimal" placeholder="Nicht erkannt" type="text"/></label>
+<label>FVC (% vom Soll) <input id="scan-fvc-percent" inputmode="decimal" placeholder="Nicht erkannt" type="text"/></label>
+<label>FEV₁ (Liter, Ist) <input id="scan-fev1-liters" inputmode="decimal" placeholder="Nicht erkannt" type="text"/></label>
+<label>FVC (Liter, Ist) <input id="scan-fvc-liters" inputmode="decimal" placeholder="Nicht erkannt" type="text"/></label>
+<label>FEV₁/FVC (% gemessen, nur Anzeige) <input id="scan-ratio" inputmode="decimal" placeholder="Nicht erkannt" type="text"/></label>
+<label>Untersuchungsdatum <input id="scan-date" type="date"/></label>
+</div>
+<p aria-live="polite" class="scan-status" id="scan-review-warnings" role="status"></p>
+<details class="scan-text"><summary>Erkannten Text kontrollieren / korrigieren</summary><label for="scan-raw">OCR-Text des Bildes</label><textarea id="scan-raw" placeholder="Befundtext erscheint hier" rows="6" spellcheck="false"></textarea><button class="btn btn-outline" id="scan-reparse" type="button">Korrigierten Text erneut auswerten</button></details>
+<div class="scan-actions"><button class="btn btn-primary" id="scan-apply" type="button">Geprüfte Werte übernehmen</button><button class="btn btn-outline" id="scan-discard" type="button">Abbrechen</button></div>
+</div>
+</section><section class="suite-subpanel" id="scan-enhance"><h3>Scanner-Werkzeuge</h3><p class="input-note">Bild drehen oder auf den Messwertbereich zuschneiden. Danach die Erkennung erneut starten.</p><div class="suite-actions"><button class="btn btn-outline" id="scan-rotate" type="button">Bild um 90° drehen</button><button class="btn btn-outline" id="scan-save-original" type="button">Originalbild archivieren</button><button class="btn btn-outline" id="scan-crop" type="button">Bildbereich wählen</button><label class="btn btn-outline">PDF einlesen<input accept="application/pdf,.pdf" hidden="" id="scan-pdf" type="file"/></label></div><div hidden="" id="crop-workspace"><canvas aria-label="Bildbereich durch Ziehen mit dem Finger auswählen" class="crop-canvas" id="crop-canvas"></canvas><p class="input-note">Ziehen, um den gewünschten Bildausschnitt zu markieren.</p><div class="suite-actions"><button class="btn btn-primary" id="crop-apply" type="button">Ausschnitt übernehmen</button><button class="btn btn-outline" id="crop-cancel" type="button">Abbrechen</button></div></div><p class="suite-msg" id="scan-enhance-status" role="status"></p></section>
+<section class="suite-subpanel"><h3>Bestätigte Befunde</h3><p class="input-note">Neue Einträge ersetzen frühere Messungen nicht. Originaldateien kannst du zusätzlich in der Dokumentenablage speichern.</p><div class="suite-list" id="report-list"></div></section></section>
+<section aria-labelledby="lung-recommendations-title" class="lung-recommendations panel" data-nav-page="hilfen" id="lung-empfehlungen">
+<div class="section-heading"><div><p class="section-kicker">02a · Persönliche Orientierung</p><h2 id="lung-recommendations-title">Welche Unterstützung könnte zu deinen Werten passen?</h2><p>Die Vorschläge berücksichtigen FEV₁, weitere Angaben und deinen GdB unabhängig voneinander. Je Vorschlag erreichst du direkt den passenden Antrag oder die offizielle Informationsseite.</p></div><span class="version-chip" id="lung-match-count">Wird geladen</span></div><div class="suite-subpanel"><h3>Hilfsmittel-Finder</h3><p>Was möchtest du mit deinem Arzt oder Leistungsträger besprechen?</p><div class="suite-checks"><label><input class="suite-help-filter" type="checkbox" value="atem"/> Atemnot oder Belastungsprobleme</label><label><input class="suite-help-filter" type="checkbox" value="schleim"/> Schweres Abhusten</label><label><input class="suite-help-filter" type="checkbox" value="arbeit"/> Probleme am Arbeitsplatz</label><label><input class="suite-help-filter" type="checkbox" value="reha"/> Rehabilitation / Training</label></div><div class="suite-list" id="help-matches"></div></div>
+<p class="lung-legal-note">Diese Vorschläge sind <strong>keine Diagnose, Bewilligung oder Therapieentscheidung</strong>. Ein niedriger FEV₁-Wert bedeutet nicht automatisch, dass du ein Hilfsmittel oder Sauerstoff benötigst. Medizinische Notwendigkeit und Kostenübernahme werden individuell geprüft.</p>
+<div aria-live="polite" class="lung-recommendation-results" id="lung-recommendation-results"></div>
+<p class="lung-sources"><strong>Grundlagen:</strong> <a href="https://ginasthma.org/2026-gina-strategy-report/" rel="noopener noreferrer" target="_blank">GINA 2026</a> · <a href="https://www.nvl-programm.de/themen/asthma" rel="noopener noreferrer" target="_blank">NVL Asthma</a> · <a href="https://www.g-ba.de/themen/veranlasste-leistungen/hilfsmittel/" rel="noopener noreferrer" target="_blank">G-BA Hilfsmittel</a> · <a href="https://www.g-ba.de/themen/veranlasste-leistungen/heilmittel/" rel="noopener noreferrer" target="_blank">G-BA Heilmittel</a></p>
+</section>
+<section aria-label="Wichtige Hinweise" class="facts-strip" data-nav-page="profil">
+<div class="mini-fact"><span class="fact-num">20</span><span>Ab hier wird ein GdB behördlich festgestellt</span></div>
+<div class="mini-fact"><span class="fact-num">30/40</span><span>Gleichstellung für den Arbeitsplatz möglich</span></div>
+<div class="mini-fact"><span class="fact-num">50+</span><span>Gesetzlich schwerbehindert</span></div>
+</section>
+<section aria-labelledby="antraege-title" class="applications panel" data-nav-page="antraege" id="antraege">
+<div class="section-heading"><div><p class="section-kicker">02 · Hilfen &amp; direkte Antragswege</p><h2 id="antraege-title">Hilfsmittel, Physiotherapie und Anträge</h2><p>Wähle ein Thema. Du siehst die zuständige Stelle, den offiziellen Weg und eine eigene ausfüllbare Mustervorlage. Die App verschickt nichts automatisch.</p></div><span class="version-chip">29 Wege</span></div>
+<div class="application-note" role="note"><strong>Wichtiger Unterschied:</strong> Ärztliche Verordnungen (z. B. Atemphysiotherapie) darf nur die behandelnde Praxis ausstellen. Die Mustervorlage ist eine Anfrage, kein ärztliches Rezept und kein amtlicher Antrag. GdB allein begründet keine Leistung.</div>
+<div class="application-tools">
+<label class="field">Thema suchen<input id="apply-search" placeholder="z. B. Atemphysio, Lungensport, Reha, BEM" type="search"/></label>
+<label class="field">Bereich<select id="apply-category"><option value="all">Alle Leistungen</option><option>Hilfsmittel</option><option>Physio &amp; Therapie</option><option>Therapie &amp; Schulung</option><option>Reha</option><option>Arbeitsplatz</option><option>Behinderung &amp; Finanzen</option><option>Pflege</option></select></label>
+</div>
+<p aria-live="polite" class="muted application-count" id="apply-count"></p>
+<div class="application-list" id="apply-list"></div>
+<button class="btn btn-outline app-more" hidden="" id="apply-more" type="button">Weitere Leistungen anzeigen</button>
+<div class="application-editor" hidden="" id="apply-editor">
+<div class="section-heading"><div><p class="section-kicker">Unverbindliche Mustervorlage</p><h3 id="apply-edit-title">Antragsentwurf erstellen</h3><p>Bitte prüfe den Text vor dem Versand. Die Felder werden nicht dauerhaft gespeichert.</p></div><button class="btn btn-outline" id="apply-close" type="button">Schließen</button></div>
+<div class="application-form">
+<label>Dein Name <input autocomplete="name" id="apply-name" placeholder="Vor- und Nachname"/></label>
+<label>Deine Anschrift (optional) <input autocomplete="street-address" id="apply-address" placeholder="Straße, PLZ und Ort"/></label>
+<label>Empfänger / Institution <input id="apply-recipient" placeholder="z. B. Krankenkasse, Arztpraxis oder Arbeitgeber"/></label>
+<label>Aktenzeichen (optional) <input id="apply-ref" placeholder="z. B. Antrags- oder Versicherungszeichen"/></label>
+<label class="wide">Deine persönliche Begründung <textarea id="apply-reason" placeholder="Beschreibe nur belegbare Einschränkungen und deinen konkreten Bedarf. Keine Diagnosen nötig, wenn nicht erforderlich." rows="3"></textarea><button class="btn btn-outline" id="apply-autofill" type="button">Antrag mit Profilangaben vorbereiten</button></label>
+</div>
+<p class="application-disclaimer">Keine elektronische Übermittlung: „Kopieren“ und „Drucken / als PDF sichern“ erstellen nur einen Text auf deinem Gerät. Du musst ihn selbst bei der zuständigen Stelle einreichen.</p>
+<div aria-live="polite" class="application-preview" id="apply-preview"></div>
+<div class="application-buttons"><button class="btn btn-outline" id="apply-autofill" type="button">Mein Profil als Entwurf übernehmen</button><button class="btn btn-primary" id="apply-copy" type="button">Text kopieren</button><button class="btn btn-outline" id="apply-print" type="button">Drucken / PDF sichern</button></div>
+<p aria-live="polite" class="muted" id="apply-action-msg" role="status"></p>
+</div>
+</section>
+<section aria-labelledby="my-title" class="my-area panel" data-nav-page="akte" id="mein-bereich">
+<div class="section-heading"><div><p class="section-kicker">03 · Persönlicher Bereich</p><h2 id="my-title">Anträge, Dokumente &amp; Asthma-Verlauf</h2><p>Deine Einträge und hochgeladenen Dateien bleiben in diesem Browser auf diesem Gerät. Keine Übertragung an GitHub oder die Betreiber der App.</p></div><span class="shield">Lokale Ablage</span></div>
+<div class="application-note"><strong>Datenschutz:</strong> Lokale Daten sind nicht automatisch verschlüsselt. Andere Personen mit Zugriff auf dein Gerät oder Browserprofil können sie möglicherweise sehen. Sichere wichtige Daten regelmäßig mit dem <strong>verschlüsselten Backup</strong> unten. Private Browserfenster, Browserdaten-Löschung oder Gerätewechsel können Einträge löschen.</div>
+<div class="private-error" hidden="" id="private-unavailable" role="alert">Die lokale Datenbank ist nicht verfügbar. Bitte nutze einen aktuellen Browser ohne privaten Modus. Hier werden keine Daten gespeichert.</div>
+<nav aria-label="Persönliche Bereiche" class="my-tabs">
+<button aria-pressed="true" class="my-tab active" data-my-tab="cases" type="button">Antragsakte</button>
+<button aria-pressed="false" class="my-tab" data-my-tab="documents" type="button">Dokumente</button>
+<button aria-pressed="false" class="my-tab" data-my-tab="diary" type="button">Asthma-Tagebuch</button>
+<button aria-pressed="false" class="my-tab" data-my-tab="backup" type="button">Datensicherung</button>
+</nav>
+<div class="my-panel" id="my-cases">
+<div aria-live="polite" class="my-stats" id="case-stats"></div>
+<div class="my-topline"><h3>Meine Anträge &amp; Bescheide</h3><button class="btn btn-primary" id="case-new" type="button">+ Vorgang hinzufügen</button></div>
+<p class="input-note">Notiere, was du eingereicht hast, wann der Bescheid kam und welche Frist du selbst anhand des Bescheids geprüft hast. Keine automatische Einreichung oder rechtsverbindliche Fristberechnung. CSV- und Kalenderdateien bleiben in deiner eigenen Verantwortung; sie werden nicht automatisch synchronisiert.</p>
+<div class="my-actions my-export-tools"><button class="btn btn-outline" id="case-export" type="button">Antragsübersicht CSV</button><button class="btn btn-outline" id="case-calendar" type="button">Termine als Kalenderdatei</button></div><div class="my-filter-grid"><label>Vorgang suchen <input id="case-search" placeholder="z. B. Reha, Hilfsmittel, GdB" type="search"/></label><label>Status filtern <select id="case-filter"><option value="all">Alle Status</option><option>Geplant</option><option>Eingereicht</option><option>Nachforderung</option><option>Bewilligt</option><option>Abgelehnt</option><option>Widerspruch</option><option>Abgeschlossen</option></select></label></div>
+<div aria-live="polite" class="my-list" id="case-list"></div>
+<form class="my-editor" hidden="" id="case-form"><div class="my-topline"><h3 id="case-form-title">Vorgang erfassen</h3><button class="btn btn-outline" id="case-cancel" type="button">Schließen</button></div>
+<div class="my-grid">
+<label class="wide">Bezeichnung des Vorgangs * <input id="case-title" maxlength="140" placeholder="z. B. Atemphysiotherapie / GdB-Erhöhung" required=""/></label>
+<label>Bereich <select id="case-category"><option>Hilfsmittel</option><option>Physio &amp; Therapie</option><option>Rehabilitation</option><option>GdB &amp; Gleichstellung</option><option>Arbeitsplatz</option><option>Krankenkasse</option><option>Andere Leistung</option></select></label>
+<label>Status <select id="case-status"><option>Geplant</option><option>Eingereicht</option><option>Nachforderung</option><option>Bewilligt</option><option>Abgelehnt</option><option>Widerspruch</option><option>Abgeschlossen</option></select></label>
+<label>Zuständige Stelle / Ansprechpartner <input id="case-authority" maxlength="160" placeholder="z. B. Krankenkasse"/></label>
+<label>Aktenzeichen (optional) <input id="case-reference" maxlength="100"/></label>
+<label>Eingereicht am <input id="case-submitted" type="date"/></label>
+<label>Bescheid / Bekanntgabe am (selbst eintragen) <input id="case-received" type="date"/></label>
+<label>Geprüfte Frist / Wiedervorlage <input id="case-due" type="date"/></label>
+<label class="wide">Notizen / benötigte Unterlagen <textarea id="case-notes" maxlength="4000" rows="3"></textarea></label>
+</div>
+<div class="application-note"><strong>Fristen:</strong> Ein Widerspruch im Sozialrecht ist regelmäßig innerhalb eines Monats nach Bekanntgabe einzulegen. Abweichungen sind möglich, etwa bei fehlender Rechtsbehelfsbelehrung, im Ausland oder aufgrund besonderer Verfahrensregeln. Entscheidend sind der Bescheid und die Rechtsbehelfsbelehrung. <a href="https://www.gesetze-im-internet.de/sgg/__84.html" rel="noopener noreferrer" target="_blank">§ 84 SGG</a>, <a href="https://www.gesetze-im-internet.de/sgg/__66.html" rel="noopener noreferrer" target="_blank">§ 66 SGG</a>, <a href="https://www.gesetze-im-internet.de/sgb_10/__26.html" rel="noopener noreferrer" target="_blank">§ 26 SGB X</a>. Diese App berechnet keine rechtsverbindlichen Fristen. Trage dein selbst geprüftes Datum ein.</div>
+<div class="my-actions"><button class="btn btn-primary" type="submit">Vorgang speichern</button><button class="btn btn-text" hidden="" id="case-delete" type="button">Vorgang löschen</button></div>
+</form>
+</div>
+<div class="my-panel" hidden="" id="my-documents">
+<h3>Meine Unterlagen</h3><p class="muted">Fotos von Verordnungen, Anträge, Arztbriefe, Nachweise und Bescheide. Dateitypen: PDF, JPG, PNG, WebP, HEIC, DOC, DOCX und TXT. Je Datei höchstens 12 MB. Kein automatisches Auslesen oder KI-Analysieren.</p>
+<form class="my-grid my-editor" id="document-form">
+<label class="wide">Dokumente auswählen * <input accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.doc,.docx,.txt,image/jpeg,image/png,image/webp,application/pdf" id="document-files" multiple="" required="" type="file"/></label>
+<label>Zu einem Antrag zuordnen <select id="document-case"><option value="">Ohne Zuordnung</option></select></label>
+<label>Dokumentart <select id="document-kind"><option>Arztbrief</option><option>Verordnung</option><option>Bescheid</option><option>Antrag</option><option>Nachweis</option><option>Sonstiges</option></select></label>
+<div class="wide my-actions"><button class="btn btn-primary" type="submit">Dateien lokal speichern</button></div>
+</form>
+<p class="input-note" id="document-storage-note">Dateien bleiben im Browserspeicher. Die verfügbare Speichermenge hängt vom Gerät ab.</p>
+<div class="my-list" id="document-list"></div>
+</div>
+<div class="my-panel" hidden="" id="my-diary">
+<h3>Mein Asthma-Tagebuch</h3><p class="muted">Dokumentiere Symptome, Peak-Flow, Bedarfsmedikation und Auslöser für das Gespräch mit der behandelnden Praxis. Die App stellt keine Diagnose und legt keine individuellen Ampelgrenzen fest.</p>
+<div class="application-note"><strong>Achtung:</strong> Bei schwerer Atemnot oder Warnzeichen unverzüglich die individuell vereinbarten Notfallmaßnahmen befolgen und im Notfall <strong>112</strong> anrufen. Aus einem einzelnen Peak-Flow-Wert ist keine sichere Behandlungsempfehlung ableitbar. <a href="https://www.lungeninformationsdienst.de/krankheiten/asthma/therapien" rel="noopener noreferrer" target="_blank">Quelle: Lungeninformationsdienst</a>.</div>
+<form class="my-editor" id="diary-form">
+<div class="my-grid">
+<label>Datum * <input id="diary-date" required="" type="date"/></label>
+<label>Uhrzeit <input id="diary-time" type="time"/></label>
+<label>Peak-Flow (L/min; optional) <input id="diary-peak" inputmode="numeric" max="1000" min="50" placeholder="z. B. 430" step="1" type="number"/></label>
+<label>Beschwerden <select id="diary-symptoms"><option value="0">Keine</option><option value="1">Leicht</option><option value="2">Mittel</option><option value="3">Stark</option></select></label>
+<label>Bedarfsmedikation: Anwendungen heute (optional) <input id="diary-rescue" max="99" min="0" placeholder="Anzahl" step="1" type="number"/></label>
+<label>Nachts durch Beschwerden aufgewacht? <select id="diary-night"><option value="no">Nein</option><option value="yes">Ja</option></select></label>
+<label class="wide">Mögliche Auslöser / Belastung / freie Notizen <textarea id="diary-notes" maxlength="1500" placeholder="z. B. Sport, Pollen, Wärme, Arbeit" rows="2"></textarea></label>
+</div>
+<div class="my-actions"><button class="btn btn-primary" type="submit">Eintrag speichern</button><button class="btn btn-outline" hidden="" id="diary-cancel" type="button">Bearbeitung abbrechen</button><button class="btn btn-outline" id="diary-export" type="button">CSV exportieren</button></div>
+</form>
+<div aria-label="Peak-Flow-Verlauf der letzten Messungen" class="diary-chart" id="diary-chart"></div>
+<div class="my-stats" id="diary-stats"></div>
+<div class="my-list" id="diary-list"></div>
+</div>
+<div class="my-panel" hidden="" id="my-backup">
+<h3>Verschlüsselte Datensicherung</h3><p>Exportiere Anträge, Dokumente, Asthma-Einträge und dein GdB-Profil als <strong>passwortgeschützte AES-GCM-Sicherungsdatei</strong>. Das Passwort wird nicht gespeichert. Ohne dieses Passwort kann die Sicherung nicht entschlüsselt werden. Sichere die Datei außerhalb des Browsers.</p>
+<form class="my-editor" id="backup-export-form"><label>Passwort für die Datensicherung (mindestens 12 Zeichen) <input autocomplete="new-password" id="backup-password" minlength="12" required="" type="password"/></label><label>Passwort wiederholen <input autocomplete="new-password" id="backup-confirm" minlength="12" required="" type="password"/></label><button class="btn btn-primary" type="submit">Verschlüsseltes Backup herunterladen</button></form>
+<div class="my-divider"></div><h3>Backup wiederherstellen</h3><p class="muted">Die Wiederherstellung <strong>ersetzt alle bestehenden privaten Einträge, Dokumente und Tagebuchdaten</strong> auf diesem Gerät. Vorher eine eigene Sicherung erstellen!</p>
+<form class="my-editor" id="backup-import-form"><label>Verschlüsselte Sicherungsdatei <input accept=".asthma,.json,application/json" id="backup-file" required="" type="file"/></label><label>Passwort der Sicherung <input autocomplete="off" id="backup-import-password" required="" type="password"/></label><button class="btn btn-outline" type="submit">Backup prüfen und wiederherstellen</button></form>
+<div class="my-divider"></div><h3>Datenschutz &amp; Zurücksetzen</h3><p class="muted">Die App speichert Daten in IndexedDB und LocalStorage deines Browsers. Ohne Passcode/verschlüsseltes Gerät sind sie möglicherweise für andere Nutzer dieses Browserprofils zugänglich. Eine Verteilung über Browserprofile oder Geräte findet nicht automatisch statt.</p>
+<button class="btn btn-text" id="private-delete-all" type="button">Alle privaten Einträge, Dokumente und Tagebuchdaten löschen</button>
+</div>
+<p aria-live="polite" class="my-message" id="my-message" role="status"></p>
+</section>
+<section class="panel suite-page" data-nav-page="therapie" id="therapie"><div class="section-heading"><div><p class="section-kicker">Behandlung</p><h2>Therapie und Asthma-Kontrolle</h2><p>Deine eigenen Angaben – ohne automatische Medikamentenempfehlungen.</p></div></div>
+<div class="suite-subnav"><button class="suite-subnav-active" data-subtab="meds" type="button">Medikamente</button><button data-subtab="control" type="button">Kontrollfragen</button><button data-subtab="action" type="button">Notfallplan</button><button data-subtab="physio" type="button">Atemphysiotherapie</button></div>
+<div class="suite-subtab" data-therapy-tab="meds"><div class="suite-toolbar"><h3>Meine Medikamente und Termine</h3></div><form class="suite-form" id="med-form"><label>Medikament / Behandlung * <input id="med-name" maxlength="100" placeholder="Name laut Packung" required=""/></label><label>Ärztlich verordnete Dosis <input id="med-dose" maxlength="100" placeholder="Keine automatische Dosisvorgabe"/></label><label>Art <select id="med-kind"><option>Dauermedikation</option><option>Bedarfsmedikation</option><option>Biologikum / Injektion</option><option>Sonstige Behandlung</option></select></label><label>Einnahme-/Terminuhrzeit (optional) <input id="med-time" type="time"/></label><label>Intervall in Tagen (optional) <input id="med-interval" max="365" min="1" placeholder="z. B. 28" type="number"/></label><label>Nächster eigener Termin <input id="med-next" type="date"/></label><label>Rezept bestellen am <input id="med-refill" type="date"/></label><label class="suite-wide">Hinweise / mögliche Nebenwirkungen <textarea id="med-notes" maxlength="800" rows="2"></textarea></label><div class="suite-actions"><button class="btn btn-primary" type="submit">Medikament speichern</button><button class="btn btn-outline" type="reset">Zurücksetzen</button></div></form><p class="input-note">Termine und wiederkehrende Intervalle lassen sich als ICS-Datei exportieren. Diese Webapp kann bei geschlossener App keine verlässlichen Push-Erinnerungen auslösen.</p><div class="suite-list" id="med-list"></div><button class="btn btn-outline" id="med-ics" type="button">Termine als Kalenderdatei</button></div>
+<div class="suite-subtab" data-therapy-tab="control" hidden=""><h3>Vier Fragen zur Symptomkontrolle</h3><p class="input-note">Selbstbeobachtung der letzten vier Wochen, kein lizenzierter Asthma Control Test und keine Diagnose.</p><form class="suite-form" id="control-form"><label>Beschwerden tagsüber mehr als zweimal pro Woche? <select id="control-day"><option value="">Bitte wählen</option><option value="yes">Ja</option><option value="no">Nein</option></select></label><label>Nachts wegen Asthma aufgewacht? <select id="control-night"><option value="">Bitte wählen</option><option value="yes">Ja</option><option value="no">Nein</option></select></label><label>Durch Asthma in Aktivitäten eingeschränkt? <select id="control-activity"><option value="">Bitte wählen</option><option value="yes">Ja</option><option value="no">Nein</option></select></label><label>Bedarfsmedikation mehr als zweimal pro Woche genutzt? <select id="control-relief"><option value="">Bitte wählen</option><option value="yes">Ja</option><option value="no">Nein</option></select></label><button class="btn btn-primary" type="submit">Kontrollangaben speichern</button></form><div class="suite-msg" id="control-result" role="status"></div><div class="suite-list" id="control-history"></div></div>
+<div class="suite-subtab" data-therapy-tab="action" hidden=""><h3>Mein ärztlich abgestimmter Asthma-Aktionsplan</h3><p class="suite-alert">Die Felder werden ausschließlich aus dem ärztlichen Plan übertragen. Diese App berechnet keine Therapiegrenzen und verändert keine Medikamentendosen.</p><form class="suite-form" id="action-form"><label>Praxis / Kontakt <input id="action-contact" maxlength="200" placeholder="Arztpraxis und Telefonnummer"/></label><label>Persönlicher Bestwert Peak-Flow (optional) <input id="action-best" max="1000" min="50" type="number"/></label><label class="suite-wide">Grüner Bereich – ärztliche Vorgaben <textarea id="action-green" maxlength="1400" rows="2"></textarea></label><label class="suite-wide">Gelber Bereich – ärztliche Vorgaben <textarea id="action-yellow" maxlength="1400" rows="2"></textarea></label><label class="suite-wide">Roter Bereich – ärztliche Vorgaben <textarea id="action-red" maxlength="1400" rows="2"></textarea></label><label class="suite-wide"><input id="action-confirm" required="True" type="checkbox"/> Der Aktionsplan wurde mit den Originalvorgaben der behandelnden Arztpraxis abgeglichen.</label><button class="btn btn-primary" type="submit">Ärztlichen Plan speichern</button></form><div class="suite-list" id="action-summary"></div><a class="btn btn-outline" href="tel:112">Bei schwerer Atemnot: 112</a></div>
+<div class="suite-subtab" data-therapy-tab="physio" hidden=""><h3>Atemphysiotherapie und Lungensport</h3><p>Mit Atemphysiotherapie können etwa Atemwahrnehmung, atemerleichternde Positionen und spezielle Techniken unter fachlicher Anleitung geübt werden. Welche Übungen geeignet sind, muss individuell abgeklärt werden.</p><div class="suite-launcher"><button data-help="atemphysio" type="button"><strong>Atemphysiotherapie</strong><small>Ärztliche Verordnung prüfen</small></button><button data-help="lungensport" type="button"><strong>Lungensport</strong><small>Rehasport-Verordnung prüfen</small></button><button data-help="pneureha" type="button"><strong>Pneumologische Reha</strong><small>Indikation und Antrag prüfen</small></button></div><p class="input-note">Offizielle Informationen: <a href="https://www.g-ba.de/themen/veranlasste-leistungen/heilmittel/" rel="noopener noreferrer" target="_blank">G-BA Heilmittel</a>, <a href="https://www.g-ba.de/themen/disease-management-programme/" rel="noopener noreferrer" target="_blank">G-BA DMP</a>.</p></div></section><section class="panel suite-page" data-nav-page="arbeit" id="arbeit"><div class="section-heading"><div><p class="section-kicker">Arbeitsalltag</p><h2>Arbeitsplatz und Belastungen</h2><p>Beobachtungen sachlich dokumentieren und mit betriebsärztlicher Beratung oder dem behandelnden Arzt besprechen.</p></div></div><div class="suite-subpanel"><h3>Belastung dokumentieren</h3><form class="suite-form" id="work-form"><label>Datum <input id="work-date" required="" type="date"/></label><label>Schicht <select id="work-shift"><option>Frühschicht</option><option>Spätschicht</option><option>Nachtschicht</option><option>Andere</option></select></label><label>Temperatur (°C, optional) <input id="work-temperature" max="70" min="-20" step="0.5" type="number"/></label><label>Art der Belastung <select id="work-exposure"><option>Hitze</option><option>Staub / Partikel</option><option>Dämpfe / Chemikalien</option><option>Körperliche Anstrengung</option><option>Sonstiges</option></select></label><label>Beschwerden 0–3 <select id="work-symptoms"><option value="0">0 – keine</option><option value="1">1 – leicht</option><option value="2">2 – mittel</option><option value="3">3 – stark</option></select></label><label class="suite-wide">Sachliche Notizen <textarea id="work-notes" maxlength="800" rows="2"></textarea></label><button class="btn btn-primary" type="submit">Beobachtung speichern</button></form><div class="suite-list" id="work-list"></div><button class="btn btn-outline" id="work-csv" type="button">Protokoll als CSV exportieren</button></div><div class="suite-subpanel"><h3>Passende Wege</h3><p>Je nach Situation kommen Gefährdungsbeurteilung, Betriebsarzt, BEM, technische Arbeitsplatzhilfen oder Leistungen zur Teilhabe am Arbeitsleben infrage.</p><div class="suite-launcher"><button data-help="bem" type="button"><strong>BEM</strong><small>Voraussetzungen prüfen</small></button><button data-help="arbgerät" type="button"><strong>Technische Hilfen</strong><small>Förderwege prüfen</small></button><button data-help="teilhabe" type="button"><strong>Berufliche Teilhabe</strong><small>Offizielle Antragswege</small></button></div></div></section><section class="panel suite-page" data-nav-page="bericht" id="bericht"><div class="section-heading"><div><p class="section-kicker">Arzttermin</p><h2>Zusammenfassung für die Praxis</h2><p>Nur selbst eingegebene und bestätigte Daten werden verwendet. Du entscheidest, was gedruckt wird.</p></div></div><div class="suite-checks"><label><input checked="" id="report-measurements" type="checkbox"/> Untersuchungen</label><label><input checked="" id="report-meds" type="checkbox"/> Medikamente</label><label><input checked="" id="report-diary" type="checkbox"/> Asthma-Tagebuch</label><label><input id="report-work" type="checkbox"/> Arbeitsplatzbeobachtungen</label><label><input checked="" id="report-control" type="checkbox"/> Symptomkontrolle</label></div><div class="suite-actions"><button class="btn btn-primary" id="report-build" type="button">Arztbericht erstellen</button><button class="btn btn-outline" id="report-print" type="button">Drucken / als PDF speichern</button></div><p class="input-note">PDF über die Druckfunktion des Browsers. Kein Upload an einen Server.</p><article aria-live="polite" class="suite-report" id="medical-report"><p>Mit „Arztbericht erstellen“ wird eine lokale Vorschau erzeugt.</p></article></section><section aria-labelledby="explore-title" class="explore" data-nav-page="wissen" id="wissen">
+<div class="section-heading explore-heading"><div><p class="section-kicker">04 · Wissensbereich</p><h2 id="explore-title">Rechte und Möglichkeiten entdecken</h2><p>Jeder Beitrag enthält eine Quelle. Ansprüche sind nach ihrem rechtlichen Status gekennzeichnet.</p></div><button aria-pressed="false" class="btn btn-outline" id="show-all" type="button">Alle Themen anzeigen</button></div>
+<div class="controls panel-lite">
+<div class="search-wrap"><span aria-hidden="true">⌕</span><input aria-label="Themen durchsuchen" autocomplete="off" id="search" placeholder="z. B. Urlaub, Inhalator, Kündigung, Antrag…" type="search"/><button aria-label="Suche löschen" class="clear" hidden="" id="clear-search" type="button">×</button></div>
+<div aria-label="Themen filtern" class="tabs" id="tabs" role="group">
+<button aria-pressed="true" class="tab active" data-section="all">Alle</button>
+<button aria-pressed="false" class="tab" data-section="hilfsmittel">Hilfsmittel</button>
+<button aria-pressed="false" class="tab" data-section="arbeit">Arbeitsrecht</button>
+<button aria-pressed="false" class="tab" data-section="gdb">GdB &amp; Anträge</button>
+<button aria-pressed="false" class="tab" data-section="finanzen">Steuern &amp; Vorteile</button>
+<button aria-pressed="false" class="tab" data-section="wissen">Asthma-Wissen</button>
+<button aria-pressed="false" class="tab" data-section="saved">Merkliste <span id="saved-count">0</span></button>
+</div>
+<div class="results-head"><span aria-live="polite" id="result-count"></span><span class="result-legend"><span class="legend-dot yes"></span> grundsätzlich möglich <span class="legend-dot check"></span> Einzelfallprüfung</span></div>
+</div>
+<div aria-live="polite" class="cards" id="cards"></div>
+<div class="empty" hidden="" id="empty"><h3>Keine passenden Themen gefunden.</h3><p>Versuche einen anderen Suchbegriff oder aktiviere „Alle Themen anzeigen“.</p><button class="btn btn-primary" id="reset-filters" type="button">Filter zurücksetzen</button></div>
+</section>
+<section aria-labelledby="steps-title" class="steps panel" data-nav-page="antraege" id="hilfe-schritte"><div class="section-heading"><div><p class="section-kicker">05 · So gehst du vor</p><h2 id="steps-title">Hilfsmittel und Unterstützung beantragen</h2></div></div><div class="step-grid"><article><span>1</span><h3>Bedarf festhalten</h3><p>Symptome, Belastungen und konkrete Einschränkungen im Alltag oder Beruf beschreiben. Ärztliche Unterlagen sammeln.</p></article><article><span>2</span><h3>Stelle klären</h3><p>Medizinische Hilfsmittel: Krankenkasse. Arbeitsbezogene Hilfen: je nach Fall Arbeitgeber, Rehabilitationsträger oder Integrationsamt.</p></article><article><span>3</span><h3>Schriftlich beantragen</h3><p>Individuelle Notwendigkeit begründen lassen, Unterlagen einreichen und einen rechtsmittelfähigen Bescheid anfordern.</p></article><article><span>4</span><h3>Bescheid prüfen</h3><p>Bei Ablehnung Begründung und Rechtsbehelfsbelehrung beachten. Ggf. unabhängige Beratung nutzen.</p></article></div></section>
+<section aria-labelledby="sources-title" class="sources panel" data-nav-page="einstellungen" id="quellen"><div class="section-heading"><div><p class="section-kicker">06 · Transparenz</p><h2 id="sources-title">Quellen &amp; Aktualität</h2><p>Gesetzestexte vom Bundesrecht-Portal sowie Informationen öffentlicher Stellen. Die App überprüft Gesetzesänderungen nicht automatisch.</p></div></div><div class="source-list" id="source-list"></div><p class="muted note">Rechtsstand der eingebauten Erläuterungen: Recherche am 15.10.2026. Spätere Gesetzesänderungen können Abweichungen verursachen. Prüfe vor wichtigen Entscheidungen stets den verlinkten aktuellen Originaltext.</p></section>
+<section aria-labelledby="settings-title" class="app-settings panel" data-nav-page="einstellungen" id="app-settings"><div class="section-heading"><div><p class="section-kicker">07 · App-Einstellungen</p><h2 id="settings-title">Version &amp; Updates</h2></div><span class="version-chip" id="version-chip">v1.5.0</span></div><div class="settings-row"><div><strong>Asthma</strong><p>Updateprüfung auf dem Server, auf dem diese App veröffentlicht ist (z. B. GitHub Pages). Kein App-Store und kein externer Update-Dienst erforderlich.</p><p class="muted">Installationshinweis für iPhone: In Safari „Teilen“ → „Zum Home-Bildschirm“.</p></div><button class="btn btn-primary" id="check-update" type="button">Nach Updates suchen</button></div><p aria-live="polite" class="update-status" id="update-status" role="status">Installierte Version: 1.5.0</p><div class="settings-actions"><button class="btn btn-outline" hidden="" id="reload-app" type="button">Neue Version laden</button><button class="btn btn-text" id="forget" type="button">Gespeichertes Profil und Merkliste löschen</button></div><p class="muted privacy">Datenschutz: Bereits gespeicherte GdB-/Lungenwerte und ältere Antragsakten verbleiben im Browser weiterhin unverschlüsselt. Die neuen Zusatzdaten können optional mit einer Passphrase verschlüsselt werden. Für vertrauliche Unterlagen empfiehlt sich ein verschlüsseltes Backup und ein geschütztes Gerät. OCR- und PDF-Erkennung können externe Bibliotheksdateien nachladen, übertragen aber keine Befundbilder durch den Anwendungscode.</p><div class="suite-divider"></div><section class="suite-subpanel"><h3>Verschlüsselte Zusatzakte und Komplettbackup</h3><p class="input-note">Neue Therapie-, Befund- und Arbeitsdaten können in einem gesonderten verschlüsselten Bereich gespeichert werden. Bestehende ältere App-Dokumente und die Profilwerte in LocalStorage bleiben technisch noch unverschlüsselt. Für einen dauerhaften Gesamtschutz müssten sie in eine verschlüsselte Datenablage migriert werden. Bitte deshalb das Gerät mit einem sicheren Code schützen.</p><p class="suite-msg" id="vault-state" role="status"></p><form class="suite-form" id="vault-form"><label>Passphrase (mindestens 12 Zeichen) <input autocomplete="new-password" id="vault-pass" minlength="12" type="password"/></label><button class="btn btn-primary" id="vault-open" type="submit">Verschlüsselung aktivieren / entsperren</button></form><div class="suite-actions"><button class="btn btn-outline" id="vault-lock" type="button">Zusatzakte sperren</button></div><p class="input-note">Das Passwort wird nicht gespeichert oder synchronisiert. Bei Verlust sind verschlüsselte Zusatzdaten ohne Backup nicht wiederherstellbar.</p></section>
+<section class="suite-subpanel"><h3>Komplettbackup (zusätzliche Funktionen)</h3><p class="input-note">Die bisherige Sicherung der persönlichen Akte bleibt unverändert. Hier werden zusätzlich die neuen Messungen, Therapie- und Arbeitsdatensätze gesichert.</p><form class="suite-form" id="suite-export"><label>Backup-Passwort (mindestens 12 Zeichen) <input autocomplete="new-password" id="suite-backup-pass" minlength="12" required="" type="password"/></label><button class="btn btn-primary" type="submit">Erweitertes Backup herunterladen</button></form><form class="suite-form" id="suite-import"><label>Erweitertes Backup auswählen <input accept=".asthma15,.json" id="suite-backup-file" required="" type="file"/></label><label>Backup-Passwort <input id="suite-import-pass" required="" type="password"/></label><button class="btn btn-outline" type="submit">Backup prüfen und Zusatzdaten wiederherstellen</button></form><p class="suite-msg" id="suite-backup-message" role="status"></p></section>
+<section class="suite-subpanel"><h3>Systemprüfung</h3><button class="btn btn-outline" id="suite-diagnostics" type="button">Offline, Datenbank und Version prüfen</button><div class="suite-msg" id="suite-diagnostic-status" role="status"></div></section></section>
+</div>
+</main>
+<footer><div class="shell footer-inner"><div><strong>Asthma</strong><p>Informationsangebot – keine medizinische Diagnostik und keine individuelle Rechtsberatung. Bei schwerer akuter Atemnot: 112.</p></div><div><a href="#lung-empfehlungen">Empfehlungen</a><a href="#antraege">Anträge</a><a href="#mein-bereich">Mein Bereich</a><a href="#quellen">Quellen</a><a href="#app-settings">Updates</a><span>Version <span id="footer-version">1.5.0</span></span></div></div></footer>
+<section aria-label="Druckansicht Mustervorlage" hidden="" id="antrag-print"></section>
+<template id="card-template"><article class="card"><div class="card-top"><span class="category-tag"></span><button aria-label="Zur Merkliste hinzufügen" class="save-btn" title="Merkliste" type="button">☆</button></div><h3 class="card-title"></h3><p class="card-summary"></p><span class="status"></span><details class="card-detail"><summary>Details und Voraussetzungen <span aria-hidden="true">⌄</span></summary><div class="details-body"><p class="card-body"></p><div class="card-sources"><strong>Quellen</strong><div class="links"></div></div></div></details></article></template>
 </body>
 </html>

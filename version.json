@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0",
+  "version": "1.5.0",
   "released": "2026-10-15",
-  "notes": "Befundscanner per Kamera oder Bildauswahl, OCR-Vorschläge mit manueller Prüfung vor Übernahme, gemessene Literwerte, automatische Profil-Aktualisierung. OCR benötigt zum ersten Start Internet."
+  "notes": "Neue getrennte Ansichten, Lungenfunktions-Verlauf, Medikamenten- und Therapieplan, Asthma-Selbstkontrolle, Aktionsplan, Arbeitsplatzprotokoll, Befundscanner-Werkzeuge, Arztbericht und optionale Verschlüsselung neuer Zusatzdaten. Frühere Datenbanken bleiben erhalten."
 }
