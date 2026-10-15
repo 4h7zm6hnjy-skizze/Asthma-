@@ -1,5 +1,5 @@
 {
-  "version": "1.9.1",
+  "version": "1.9.2",
   "released": "2026-10-15",
-  "notes": "Mobile Layoutkorrektur: verhindert automatischen iPhone-Safari-Eingabezoom bei kleinen Eingabefeldern, stapelt Scannerbuttons, passt Fotos und untere Schnellnavigation an die Bildschirmbreite an. Lokale OCR auf iPhone-Safari weiterhin nicht verfügbar."
+  "notes": "Seitenanpassung fixiert: iPhone-Viewport auf Bildschirmbreite, Seitengesten-Zoom standardmäßig eingeschränkt, Bildzoom separat, Schaltfläche Ansicht einpassen, Zoomfreigabe in Einstellungen, responsive Layoutschutz."
 }

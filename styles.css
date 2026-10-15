@@ -254,3 +254,32 @@ img,svg,video,canvas{max-width:100%}
   .scan-metric-grid{gap:5px}
   .scan-metric-grid input{padding:9px 3px}
 }
+
+
+/* 1.9.2: stabilize iPhone full-page viewport; all zoom for document photos is inside dialog. */
+html,body{width:100%;max-width:100%;min-width:0;overflow-x:clip}
+#secure-application{width:100%;max-width:100%;min-width:0;overflow-x:clip}
+#secure-application header,#secure-application main,#secure-application footer,
+#secure-application .shell,#secure-application .main-layout,
+#secure-application .panel,#secure-application .scan-panel,
+#secure-application .suite-page{box-sizing:border-box;max-width:100%;min-width:0}
+#secure-application .scan-panel-head>*{min-width:0;max-width:100%}
+#secure-application .scan-panel-head h3,#secure-application .scan-panel-head p,
+#secure-application .scan-panel p,#secure-application .suite-subpanel p{overflow-wrap:anywhere}
+.scan-viewport-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-start;min-width:0}
+.scan-viewport-tools .app-fit-view{font-size:13px;min-height:42px;max-width:100%;padding:9px 12px;white-space:normal}
+.viewport-settings{width:100%;max-width:100%;min-width:0}
+.viewport-controls{display:flex;flex-direction:column;align-items:flex-start;gap:15px;max-width:100%}
+.viewport-controls .btn{white-space:normal;min-height:44px;max-width:100%}
+.viewport-access{display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:15px;font-weight:600;line-height:1.5}
+.viewport-access input{width:21px;height:21px;flex:0 0 21px;margin-top:3px}
+.viewport-message{font-size:13px;color:var(--sea)}
+@media(max-width:620px){
+  #secure-application .shell{max-width:100%;min-width:0}
+  #secure-application .scan-panel{width:100%;max-width:100%;min-width:0}
+  #secure-application .scan-panel-head{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+  #secure-application .scan-viewport-tools{width:100%;}
+  #secure-application .scan-viewport-tools .app-fit-view{flex:1 1 160px}
+  #secure-application .scan-picked,#secure-application .scan-picked>div{width:100%;max-width:100%;min-width:0}
+  .bottom-dock{width:100%;max-width:100%;min-width:0;overflow-x:clip}
+}
