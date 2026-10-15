@@ -15,3 +15,7 @@ Der Startseitenfilter zeigt standardmäßig die letzten 30 vorhandenen Messungen
 **Einrichten:** Entpackte Dateien (nicht die ZIP selbst) ins GitHub-Repository-Hauptverzeichnis laden; alte Dateien ersetzen und die GitHub-Pages-Veröffentlichung abwarten.
 
 Die Dokumentation der bisherigen Funktionen ist weiterhin in den älteren README- und Quellen-Dateien sowie im Code enthalten.
+
+
+## Korrektur 2.2.1 – ePEF-Export mit Datum/Uhrzeit in einer Spalte
+Die ePEF-Excel-Datei aus der gezeigten App hat Spalten `date | pef | fev-1 | note`. Die Spalte `date` enthält zusätzlich Uhrzeit und AM/PM, beispielsweise `2026/10/15 7:31 AM`. Diese kombinierte Angabe wird nun automatisch erkannt. Werte aus älteren Imports bleiben unverändert; identische Datensätze werden nicht erneut gespeichert. Vor dem Update die lokale Akte verschlüsselt sichern.

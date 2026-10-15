@@ -1,5 +1,5 @@
 {
-  "version": "2.2.0",
+  "version": "2.2.1",
   "released": "2026-10-15",
-  "notes": "Peak-Flow- und FEV1-Diagramme direkt auf der Startseite, aus demselben verschlüsselten ePEF-Datenbestand; robuste, idempotente Importvorschau und gezielte Bereinigung identischer Alt-Duplikate."
+  "notes": "ePEF-XLSX-Korrektur: erkennt Datum und Uhrzeit gemeinsam in Spalte date (z. B. 2026/10/15 7:31 AM), automatisch zugeordnet; dieselbe verschlüsselte Duplikatprüfung und Startseiten-Diagramme bleiben erhalten."
 }

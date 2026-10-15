@@ -1,5 +1,5 @@
 'use strict';
-/* Asthma 2.1 – private ePEF import. All XLSX/CSV parsing happens on the device.
+/* Asthma 2.2.1 – private ePEF import (combined ePEF date/time). All XLSX/CSV parsing happens on the device.
    Time colors are NOT medical risk zones. No network or external JavaScript. */
 (()=>{
   const $=id=>document.getElementById(id), SEC=window.ASTHMA_SECURITY;
@@ -141,6 +141,16 @@
       if(/status|result|ampel|zone|bewertung/.test(s)&&map.status===null)map.status=i;
     });
     if(map.datetime!==null){map.date=null;map.time=null;}
+    // The standard ePEF file calls this combined field simply "date".
+    // Detect the content as well as the column header so users need not
+    // manually change the dropdown for every export.
+    if(map.datetime===null&&map.date!==null&&map.time===null){
+      const candidates=rows.slice(hdr+1,hdr+Math.min(14,rows.length));
+      const checked=candidates.map(r=>r[map.date]).filter(v=>v!==undefined&&v!==null&&String(v).trim()!=='');
+      if(checked.length&&checked.slice(0,7).filter(v=>Boolean(dateTime(v)?.date&&dateTime(v)?.time)).length>=Math.ceil(Math.min(7,checked.length)*.7)){
+        map.datetime=map.date;map.date=null;
+      }
+    }
     return {header:hdr, map};
   }
   function getMapping(){const map={};for(const k of mcols){const v=$('epef-col-'+k).value;map[k]=v===''?null:+v;}return map;}
@@ -150,10 +160,16 @@
     const get=(row,k)=>map[k]===null?null:row[map[k]];
     for(const [i,row] of rawRows(sheet,header).entries()){
       const combined=get(row,'datetime');let parsedDT=combined!=null?dateTime(combined):null;
-      let date=parsedDT?.date||dateValue(get(row,'date')),
-          time=parsedDT?.time||timeValue(get(row,'time'));
-      // If date is an Excel timestamp with both date/time, use time from same cell if separate time missing.
-      if(!time&&typeof get(row,'date')==='number')time=excelTime(get(row,'date'))?.time;
+      const rawDate=get(row,'date');
+      // ePEF exports put both pieces in the column named "date", e.g.
+      // "2026/10/15 7:31 AM". A missing separate time column MUST NOT
+      // cause a valid measurement to be discarded.
+      const embeddedDT=rawDate==null?null:dateTime(rawDate);
+      let date=parsedDT?.date||embeddedDT?.date||dateValue(rawDate),
+          time=parsedDT?.time||timeValue(get(row,'time'))||embeddedDT?.time;
+      // If the date column uses an Excel serial number with a fractional day,
+      // extract its time as well (only when no more explicit time was present).
+      if(!time&&typeof rawDate==='number')time=excelTime(rawDate)?.time;
       if(!date||!time){if(row.some(x=>trim(x)!=='')){errors++;if(samples.length<4)samples.push(`Zeile ${header+i+2}: Datum oder Uhrzeit unklar`)}continue}
       const pef=decimal(get(row,'pef')),fev1=decimal(get(row,'fev1'));
       const rec={date,time,pef,fev1,status:trim(get(row,'status')).slice(0,80),source:'ePEF-Datei'};
