@@ -17,3 +17,23 @@ Stand: 15.10.2026
 - Live-Safari/iPhone-Kamera, iOS Live Text, Live-PWA-GitHub-Pages-Aktualisierung und echte vorhandene lokale Patientendaten konnten nicht getestet werden.
 - Ein vollständiges unabhängiges Sicherheits-Audit und eine forensische Prüfung der Datenträger finden nicht statt. Der Hosting-Anbieter sieht übliche HTTP-Aufrufe, jedoch keine durch die App absichtlich übertragenen Gesundheitsdaten.
 - Verschlüsselter Browser-Speicher bleibt bei Browserdatenlöschung oder Gerätewechsel ohne Backup nicht erhalten. Das Passwort selbst kann nicht rekonstruiert werden.
+
+
+## Nachtrag Version 1.9.0
+
+- Navigationsziel Lungenfunktion: Direktbutton unten und zusätzlicher Schnellzugriff zum Scanner.
+- Responsive CSS: Foto passt in die verfügbare Breite; Vollbild-Dialog mit Zoom und Bildverschiebung.
+- iOS Live Text: native Eingabehilfe; kein Remote-OCR. Echte iPhone-„Text scannen“-Verfügbarkeit ist geräte- und iOS-abhängig.
+- Kein eigener vollständig lokaler OCR-Motor ist eingebaut: Die 100% automatische Bildtexterkennung ist deshalb **nicht erfüllt**.
+- Vorhandene verschlüsselte Datenspeicher unverändert; vorheriges Backup vor Update nötig.
+
+
+### Verifizierte Tests für 1.9.0 (isolierter Browser, 15.10.2026)
+
+- Syntaktische Prüfung sämtlicher 16 JavaScript-Dateien mit `node --check`: **bestanden**.
+- Service-Worker-ASSETS auf fehlende Dateien und Duplikate geprüft: **bestanden**.
+- Chromium mit simuliertem mobilem Viewport 390×844: Bildvorschau eingepasst, Dokument vollständig sichtbar, kein horizontaler Überlauf (390/390): **bestanden**.
+- Foto-Vollbild-Dialog geöffnet, 2× Zoom plus Vergrößerung auf 1,96-fach, geschlossen, Textfeld fokussiert: **bestanden**, keine ungefangenen JavaScript-Fehler.
+- Alle App-Ansichten auf horizontalen Überlauf geprüft: **bestanden**. Screenshot ist mit statischem HTML getestet, nicht mit echten iPhone-Daten.
+- Kein kompletter Live-Test auf GitHub Pages oder iPhone: lokale HTTP-Aufrufe im Browser waren durch Administrator-Policy blockiert; es wurde deshalb über eingebettete HTML/CSS/JS-Snapshots getestet.
+- **Nicht implementiert:** eigenständig mitgelieferte On-Device-OCR für iPhone-Safari; automatische OCR aus dem Befundfoto daher dort weiterhin nicht verfügbar. Native Live-Text-Eingabehilfe ist nur eine Übergangslösung und erfordert eine Nutzeraktion.

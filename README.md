@@ -1,4 +1,4 @@
-# Asthma Webapp – Version 1.8.0
+# Asthma Webapp – Version 1.9.0
 
 ## Neu: Spirometrie-Befunde und Laborwerte
 
@@ -23,3 +23,15 @@ Startseite, untere sechs Schnellbuttons, Bundesländer/Region, FEV1- und FVC-Pro
 ## Grenzen und Prüfstatus
 
 Siehe `PRUEFBERICHT.md` für Syntax-, Browser- und Kryptotests sowie offene Live-iPhone- und OCR-Tests. Die App bietet Gesundheitsdokumentation, **keine eigenständige Diagnose**. Bei akuter schwerer Atemnot 112.
+
+## Neu in 1.9.0 – Lungenfunktion und Bildanzeige
+
+- **Unterer Schnellbutton „Lunge“** öffnet die Lungenfunktionsseite unmittelbar. Dort gibt es einen eigenen Button „Befund fotografieren / scannen“. Die vorhandenen 5 anderen Schnellbuttons und alle Daten bleiben erhalten.
+- **Foto automatisch einpassen:** Das gesamte Befundfoto passt ohne Zuschneiden in die verfügbare Breite. Vollbildansicht mit Zoomtasten, Touch-Zoom und Verschieben im vergrößerten Zustand.
+- **Benutzer-Zoom bleibt erlaubt:** Keine Sperre für iOS-Pinch-Zoom. Die App selbst verhindert durch responsive Breiten horizontale Überläufe.
+- **iPhone OCR:** Der Button „iPhone-Texterkennung nutzen“ öffnet die Text-Eingabe, in der iOS je nach Version die native Aktion „Text scannen“ anbietet. Alternativ in der Fotos-App Apple Live Text kopieren und hier einfügen. Browser mit lokaler TextDetector-Funktion werden weiterhin unterstützt. Eine vollautomatische Texterkennung aus beliebigen Bildern in iPhone-Safari ist **weiterhin nicht implementiert**; es wurde kein lokaler OCR-WASM-Motor mitgeliefert. Die App behauptet nicht, dass Safari diese Funktion besitzt. Bei der Texterkennung findet keine Befundübertragung an einen externen Dienst statt.
+- **Dateien:** Neue `foto19.js` und angepasste `index.html`, `styles.css`, `secure17.js`, `sw.js`, `version.json` und Versionshinweise.
+
+### Update wichtig
+
+Vor dem Upload ein vollständiges verschlüsseltes Backup erstellen. ZIP-Datei entpacken, enthaltene Dateien direkt in das Hauptverzeichnis des GitHub-Repositories hochladen und vorhandene ersetzen. Die ZIP-Datei selbst nicht hochladen.

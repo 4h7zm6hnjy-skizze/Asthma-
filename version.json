@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0",
+  "version": "1.9.0",
   "released": "2026-10-15",
-  "notes": "Befundscanner mit spaltenweiser Auswertung von Spirometrietabellen, lokaler Browser-OCR soweit unterstützt, iPhone Live Text, vollständigen überprüfbaren Messwerten; asthma-relevante Laborwerte verschlüsselt im Kalender und Arztbericht."
+  "notes": "Direktzugriff Lungenfunktion in fester unterer Navigation, responsive Bildvorschau mit Vollbildzoom/Pan, iPhone-Live-Text-Eingabehilfe, alle persönlichen Daten weiterhin lokal verschlüsselt; keine externe OCR-Übertragung."
 }
