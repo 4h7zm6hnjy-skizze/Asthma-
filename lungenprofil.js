@@ -8,7 +8,7 @@
   if(!bridge||!box)return;
   const catalog=window.ASTHMA_APPLICATIONS||[];
   const byId=new Map(catalog.map(x=>[x.id,x]));
-  const percent=x=>x===null||x===undefined||x===''?null:(Number.isInteger(Number(x))&&Number(x)>=0&&Number(x)<=100?Number(x):null);
+  const percent=x=>x===null||x===undefined||x===''?null:(Number.isFinite(Number(x))&&Number(x)>=0&&Number(x)<=100?Number(x):null);
   const text=(tag,cls,value)=>{const n=document.createElement(tag);if(cls)n.className=cls;n.textContent=value;return n;};
   // IDs refer to the independently maintained official application list.
   const recommendations=[
@@ -61,6 +61,13 @@
       if(document.activeElement!==range)range.value=String(p[field]===null?100:p[field]);
       range.setAttribute('aria-valuetext',p[field]===null?'Nicht eingetragen':p[field]+' Prozent des Sollwerts');
     }
+    for(const [field,id] of [['fev1Liters','lung-fev1-liters'],['fvcLiters','lung-fvc-liters']]){
+      const el=$(id);if(document.activeElement!==el)el.value=p[field]===null?'':String(p[field]);
+    }
+    const a=p.fev1Liters,b=p.fvcLiters;
+    $('lung-ratio-preview').textContent=Number.isFinite(a)&&Number.isFinite(b)&&b>0&&a<=b
+      ?'FEV₁/FVC aus gemessenen Literwerten: '+(100*a/b).toFixed(1).replace('.',',')+' % (rechnerisch, keine Diagnosestellung).'
+      :'FEV₁/FVC aus Literwerten: nicht berechenbar. FEV₁ und FVC müssen plausibel sein.';
     $('lung-date').value=p.lungDate;
     document.querySelectorAll('input[name="lung-symptom"]').forEach(el=>{el.checked=p.lungSymptoms.includes(el.value)});
     $('lung-profile-status').textContent=summary(p);
@@ -96,6 +103,16 @@
     slider.addEventListener('input',()=>{change(field,slider.value);input.value=slider.value;});
     clear.addEventListener('click',()=>change(field,null));
   });
+  [['fev1Liters','lung-fev1-liters'],['fvcLiters','lung-fvc-liters']].forEach(([field,id])=>{
+    const el=$(id);el.addEventListener('input',()=>{
+      const raw=el.value;
+      if(raw!==''&&(!Number.isFinite(Number(raw))||Number(raw)<0||Number(raw)>12)){
+        el.setCustomValidity('Bitte 0 bis 12 Liter eingeben.');return;
+      }
+      el.setCustomValidity('');const p=bridge.get();p[field]=raw===''?null:Number(raw);bridge.setLung(p);render();
+    });el.addEventListener('blur',()=>{el.setCustomValidity('');render();});
+  });
+  window.addEventListener('asthma:lung-imported',render);
   $('lung-date').addEventListener('change',ev=>{const p=bridge.get();p.lungDate=ev.target.value;bridge.setLung(p);render()});
   document.querySelectorAll('input[name="lung-symptom"]').forEach(el=>el.addEventListener('change',()=>{
     const p=bridge.get();p.lungSymptoms=[...document.querySelectorAll('input[name="lung-symptom"]:checked')].map(x=>x.value);

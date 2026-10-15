@@ -17,6 +17,8 @@
   <script defer src="antraege.js"></script>
   <script defer src="meine-daten.js"></script>
   <script defer src="lungenprofil.js"></script>
+  <script defer src="befundscan-parser.js"></script>
+  <script defer src="befundscan.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Zum Hauptinhalt springen</a>
@@ -57,24 +59,58 @@
             <div class="lung-values">
               <div class="lung-control">
                 <label for="lung-fev1-number">FEV₁ – Prozent vom Sollwert</label>
-                <div class="lung-number-wrap"><input type="number" id="lung-fev1-number" min="0" max="100" step="1" inputmode="numeric" placeholder="Noch kein Wert" aria-describedby="lung-fev1-help"><span>%</span><button class="lung-clear" id="lung-fev1-clear" type="button">Löschen</button></div>
-                <input type="range" id="lung-fev1-range" min="0" max="100" value="100" step="1" aria-label="FEV1 in Prozent des Sollwerts einstellen">
+                <div class="lung-number-wrap"><input type="number" id="lung-fev1-number" min="0" max="100" step="0.1" inputmode="numeric" placeholder="Noch kein Wert" aria-describedby="lung-fev1-help"><span>%</span><button class="lung-clear" id="lung-fev1-clear" type="button">Löschen</button></div>
+                <input type="range" id="lung-fev1-range" min="0" max="100" value="100" step="0.1" aria-label="FEV1 in Prozent des Sollwerts einstellen">
                 <p class="input-note" id="lung-fev1-help">FEV₁: ausgeatmetes Volumen in einer Sekunde, als Anteil am persönlichen Referenz-Sollwert.</p>
               </div>
               <div class="lung-control">
                 <label for="lung-fvc-number">FVC – Prozent vom Sollwert (optional)</label>
-                <div class="lung-number-wrap"><input type="number" id="lung-fvc-number" min="0" max="100" step="1" inputmode="numeric" placeholder="Noch kein Wert" aria-describedby="lung-fvc-help"><span>%</span><button class="lung-clear" id="lung-fvc-clear" type="button">Löschen</button></div>
-                <input type="range" id="lung-fvc-range" min="0" max="100" value="100" step="1" aria-label="FVC in Prozent des Sollwerts einstellen">
+                <div class="lung-number-wrap"><input type="number" id="lung-fvc-number" min="0" max="100" step="0.1" inputmode="numeric" placeholder="Noch kein Wert" aria-describedby="lung-fvc-help"><span>%</span><button class="lung-clear" id="lung-fvc-clear" type="button">Löschen</button></div>
+                <input type="range" id="lung-fvc-range" min="0" max="100" value="100" step="0.1" aria-label="FVC in Prozent des Sollwerts einstellen">
                 <p class="input-note" id="lung-fvc-help">FVC: forcierte Vitalkapazität. Die Sollwert-Prozente sind nicht der FEV₁/FVC-Quotient.</p>
               </div>
             </div>
             <div class="lung-extra"><label for="lung-date">Datum der Messung (optional)</label><input type="date" id="lung-date"></div>
+            <div class="lung-values lung-liters">
+              <div class="lung-control"><label for="lung-fev1-liters">FEV₁ – gemessen (Liter, optional)</label><input type="number" id="lung-fev1-liters" min="0" max="12" step="0.01" inputmode="decimal" placeholder="z. B. 1,85"><p class="input-note">Gemessener Ist-Wert, nicht der Sollwert.</p></div>
+              <div class="lung-control"><label for="lung-fvc-liters">FVC – gemessen (Liter, optional)</label><input type="number" id="lung-fvc-liters" min="0" max="12" step="0.01" inputmode="decimal" placeholder="z. B. 3,10"><p class="input-note">Gemessener Ist-Wert, nicht der Sollwert.</p></div>
+            </div>
+            <p class="input-note" id="lung-ratio-preview" aria-live="polite">FEV₁/FVC aus Literwerten: noch nicht berechenbar.</p>
             <fieldset class="lung-symptoms"><legend>Was ist im Alltag zusätzlich ein Problem? (freiwillig)</legend>
               <label><input type="checkbox" value="dyspnea" name="lung-symptom"> Atemnot bei Belastung</label>
               <label><input type="checkbox" value="night" name="lung-symptom"> Nächtliche Beschwerden</label>
               <label><input type="checkbox" value="mucus" name="lung-symptom"> Schleim / schwieriges Abhusten</label>
               <label><input type="checkbox" value="work" name="lung-symptom"> Belastung am Arbeitsplatz</label>
             </fieldset>
+            <section class="scan-panel" id="scan-panel" aria-labelledby="scan-title">
+              <div class="scan-panel-head"><div><h3 id="scan-title">Lungenfunktion per Foto einlesen</h3><p class="input-note">Spirometrie-Befund fotografieren oder ein Bild aus der Mediathek auswählen. Erkannte Werte vor Übernahme kontrollieren.</p></div><span class="version-chip">Neu · v1.4</span></div>
+              <div class="scan-actions">
+                <label class="btn btn-primary scan-file-button" for="scan-gallery">Bild auswählen<input id="scan-gallery" type="file" accept="image/*" hidden></label>
+                <label class="btn btn-outline scan-file-button" for="scan-camera">Kamera öffnen<input id="scan-camera" type="file" accept="image/*" capture="environment" hidden></label>
+              </div>
+              <p class="input-note">Die Texterkennung läuft im Browser. Beim ersten Scan wird Drittanbieter-OCR-Software aus dem Internet geladen; die App selbst überträgt das Bild nicht an einen Server. Externer Code ist jedoch nicht mit vollständig lokaler Software gleichzusetzen. Für den Scan ist eine Internetverbindung erforderlich, falls die Erkennung nicht bereits geladen ist. <strong>Der Scanner ersetzt keine ärztliche Befundprüfung.</strong></p>
+              <div class="scan-picked" id="scan-picked" hidden>
+                <img id="scan-preview" alt="Vorschau des ausgewählten Lungenfunktionsbefunds">
+                <div><p id="scan-filename"></p><button id="scan-start" class="btn btn-primary" type="button">Werte aus Bild erkennen</button><button id="scan-clear" class="btn btn-text" type="button">Bild verwerfen</button></div>
+              </div>
+              <p id="scan-progress" class="scan-status" role="status" aria-live="polite">Noch kein Befundbild ausgewählt.</p>
+              <div id="scan-review" class="scan-review" hidden>
+                <h4>Erkannte Werte prüfen</h4>
+                <p class="input-note">Fehlerhafte Ziffern, vertauschte Spalten oder Vor-/Nach-Messungen sind möglich. Ohne deine Bestätigung wird kein Wert eingetragen.</p>
+                <div class="field"><label for="scan-phase">Messung im Bericht</label><select id="scan-phase"><option value="unbekannt">Nicht eindeutig / ohne Kennzeichnung</option><option value="vor">Vor Bronchodilatator (prä)</option><option value="nach">Nach Bronchodilatator (post)</option></select></div>
+                <div class="scan-fields">
+                  <label>FEV₁ (% vom Soll) <input id="scan-fev1-percent" type="text" inputmode="decimal" placeholder="Nicht erkannt"></label>
+                  <label>FVC (% vom Soll) <input id="scan-fvc-percent" type="text" inputmode="decimal" placeholder="Nicht erkannt"></label>
+                  <label>FEV₁ (Liter, Ist) <input id="scan-fev1-liters" type="text" inputmode="decimal" placeholder="Nicht erkannt"></label>
+                  <label>FVC (Liter, Ist) <input id="scan-fvc-liters" type="text" inputmode="decimal" placeholder="Nicht erkannt"></label>
+                  <label>FEV₁/FVC (% gemessen, nur Anzeige) <input id="scan-ratio" type="text" inputmode="decimal" placeholder="Nicht erkannt"></label>
+                  <label>Untersuchungsdatum <input id="scan-date" type="date"></label>
+                </div>
+                <p id="scan-review-warnings" class="scan-status" role="status" aria-live="polite"></p>
+                <details class="scan-text"><summary>Erkannten Text kontrollieren / korrigieren</summary><label for="scan-raw">OCR-Text des Bildes</label><textarea id="scan-raw" rows="6" spellcheck="false" placeholder="Befundtext erscheint hier"></textarea><button id="scan-reparse" type="button" class="btn btn-outline">Korrigierten Text erneut auswerten</button></details>
+                <div class="scan-actions"><button type="button" id="scan-apply" class="btn btn-primary">Geprüfte Werte übernehmen</button><button id="scan-discard" type="button" class="btn btn-outline">Abbrechen</button></div>
+              </div>
+            </section>
             <div id="lung-profile-status" class="lung-profile-status" role="status" aria-live="polite"></div>
           </div>
           <div class="profile-result" id="profile-result" aria-live="polite"></div>
@@ -217,10 +253,10 @@
 
       <section class="sources panel" id="quellen" aria-labelledby="sources-title"><div class="section-heading"><div><p class="section-kicker">06 · Transparenz</p><h2 id="sources-title">Quellen & Aktualität</h2><p>Gesetzestexte vom Bundesrecht-Portal sowie Informationen öffentlicher Stellen. Die App überprüft Gesetzesänderungen nicht automatisch.</p></div></div><div id="source-list" class="source-list"></div><p class="muted note">Rechtsstand der eingebauten Erläuterungen: Recherche am 15.10.2026. Spätere Gesetzesänderungen können Abweichungen verursachen. Prüfe vor wichtigen Entscheidungen stets den verlinkten aktuellen Originaltext.</p></section>
 
-      <section class="app-settings panel" id="app-settings" aria-labelledby="settings-title"><div class="section-heading"><div><p class="section-kicker">07 · App-Einstellungen</p><h2 id="settings-title">Version & Updates</h2></div><span class="version-chip" id="version-chip">v1.3.0</span></div><div class="settings-row"><div><strong>Asthma</strong><p>Updateprüfung auf dem Server, auf dem diese App veröffentlicht ist (z. B. GitHub Pages). Kein App-Store und kein externer Update-Dienst erforderlich.</p><p class="muted">Installationshinweis für iPhone: In Safari „Teilen“ → „Zum Home-Bildschirm“.</p></div><button type="button" id="check-update" class="btn btn-primary">Nach Updates suchen</button></div><p class="update-status" id="update-status" role="status" aria-live="polite">Installierte Version: 1.3.0</p><div class="settings-actions"><button type="button" id="reload-app" class="btn btn-outline" hidden>Neue Version laden</button><button type="button" id="forget" class="btn btn-text">Gespeichertes Profil und Merkliste löschen</button></div><p class="muted privacy">Datenschutz: Die Profil-, Lungenfunktions- und Merklisten-Daten werden in LocalStorage, persönliche Anträge, Dokumente und Tagebucheinträge in IndexedDB dieses Browsers gespeichert. Diese lokalen Daten sind nicht automatisch verschlüsselt; nur exportierte Sicherungsdateien werden mit Passwort verschlüsselt. Die App verwendet keine Trackingdienste und sendet keine Profildaten an einen Server. Externe Quellen werden erst geöffnet, wenn du den Link anklickst. Die Updateprüfung fordert nur die Versionsdatei vom Hosting-Server an.</p></section>
+      <section class="app-settings panel" id="app-settings" aria-labelledby="settings-title"><div class="section-heading"><div><p class="section-kicker">07 · App-Einstellungen</p><h2 id="settings-title">Version & Updates</h2></div><span class="version-chip" id="version-chip">v1.4.0</span></div><div class="settings-row"><div><strong>Asthma</strong><p>Updateprüfung auf dem Server, auf dem diese App veröffentlicht ist (z. B. GitHub Pages). Kein App-Store und kein externer Update-Dienst erforderlich.</p><p class="muted">Installationshinweis für iPhone: In Safari „Teilen“ → „Zum Home-Bildschirm“.</p></div><button type="button" id="check-update" class="btn btn-primary">Nach Updates suchen</button></div><p class="update-status" id="update-status" role="status" aria-live="polite">Installierte Version: 1.4.0</p><div class="settings-actions"><button type="button" id="reload-app" class="btn btn-outline" hidden>Neue Version laden</button><button type="button" id="forget" class="btn btn-text">Gespeichertes Profil und Merkliste löschen</button></div><p class="muted privacy">Datenschutz: Die Profil-, Lungenfunktions- und Merklisten-Daten werden in LocalStorage, persönliche Anträge, Dokumente und Tagebucheinträge in IndexedDB dieses Browsers gespeichert. Diese lokalen Daten sind nicht automatisch verschlüsselt; nur exportierte Sicherungsdateien werden mit Passwort verschlüsselt. Die App verwendet keine Trackingdienste und sendet keine Profildaten an einen Server. Externe Quellen werden erst geöffnet, wenn du den Link anklickst. Die Updateprüfung fordert nur die Versionsdatei vom Hosting-Server an. Der optionale Befundscanner lädt beim ersten Gebrauch OCR-Software von einem CDN nach; ausgewählte Bilder werden durch unsere App nicht hochgeladen.</p></section>
     </div>
   </main>
-  <footer><div class="shell footer-inner"><div><strong>Asthma</strong><p>Informationsangebot – keine medizinische Diagnostik und keine individuelle Rechtsberatung. Bei schwerer akuter Atemnot: 112.</p></div><div><a href="#lung-empfehlungen">Empfehlungen</a><a href="#antraege">Anträge</a><a href="#mein-bereich">Mein Bereich</a><a href="#quellen">Quellen</a><a href="#app-settings">Updates</a><span>Version <span id="footer-version">1.3.0</span></span></div></div></footer>
+  <footer><div class="shell footer-inner"><div><strong>Asthma</strong><p>Informationsangebot – keine medizinische Diagnostik und keine individuelle Rechtsberatung. Bei schwerer akuter Atemnot: 112.</p></div><div><a href="#lung-empfehlungen">Empfehlungen</a><a href="#antraege">Anträge</a><a href="#mein-bereich">Mein Bereich</a><a href="#quellen">Quellen</a><a href="#app-settings">Updates</a><span>Version <span id="footer-version">1.4.0</span></span></div></div></footer>
   <section id="antrag-print" aria-label="Druckansicht Mustervorlage" hidden></section>
   <template id="card-template"><article class="card"><div class="card-top"><span class="category-tag"></span><button class="save-btn" type="button" aria-label="Zur Merkliste hinzufügen" title="Merkliste">☆</button></div><h3 class="card-title"></h3><p class="card-summary"></p><span class="status"></span><details class="card-detail"><summary>Details und Voraussetzungen <span aria-hidden="true">⌄</span></summary><div class="details-body"><p class="card-body"></p><div class="card-sources"><strong>Quellen</strong><div class="links"></div></div></div></details></article></template>
 </body>

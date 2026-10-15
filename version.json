@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0",
+  "version": "1.4.0",
   "released": "2026-10-15",
-  "notes": "Zwei unabhängig einstellbare Lungenfunktionswerte (FEV1/FVC 0–100 % vom Soll), getrennt vom GdB; automatisch passende Orientierung zu Hilfsmitteln, Physio, Reha und Antragswegen."
+  "notes": "Befundscanner per Kamera oder Bildauswahl, OCR-Vorschläge mit manueller Prüfung vor Übernahme, gemessene Literwerte, automatische Profil-Aktualisierung. OCR benötigt zum ersten Start Internet."
 }
