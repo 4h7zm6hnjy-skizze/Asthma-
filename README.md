@@ -1,3 +1,7 @@
+# Asthma 2.3.0 – Spirometrie-Verlauf
+
+Neu: Diagramm echter Lungenfunktionstests auf der Startseite und Detailansicht unter Lunge. Eigener Datenbestand getrennt von ePEF. Prozent-/Literkurven, FEV₁/FVC, Zeit- und Phasenfilter, Notizen und vorsichtiger Zahlenvergleich. Details: `README_LUFU_2.3.0.md`; Testgrenzen: `PRUEFBERICHT_2.3.0.md`.
+
 # Asthma 2.2.0 – Peak-Flow-Diagramme auf der Startseite
 
 Die Startseite zeigt unter den Gesundheitskennzahlen zwei Diagramme für PEF (l/min) und FEV₁ (Liter). Sie verwenden die bereits in `ASTHMA_SECURITY` lokal verschlüsselt gespeicherten ePEF-Messungen. Ein erneuter Import ist nicht nötig. Auf dem iPhone müssen die Daten im selben Browser/App-Speicher und mit demselben Passwort geöffnet werden.

@@ -1,3 +1,3 @@
-# Prüfberichte
+# Asthma – Prüfberichte
 
-Aktuell: `PRUEFBERICHT_2.1.0.md`. Ältere Prüfberichte und Einschränkungen bleiben dokumentiert.
+Aktueller Prüfbericht: `PRUEFBERICHT_2.3.0.md`. Ältere Tests sind als Vorversionen dokumentiert.

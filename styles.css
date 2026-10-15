@@ -398,3 +398,39 @@ body :is(input,select,textarea){font-size:max(16px,1rem)}
 #epef-clean-duplicates{font-size:14px;margin:8px 0 12px;white-space:normal}
 @media(max-width:720px){.home-epef-charts{grid-template-columns:minmax(0,1fr)}.home-epef{padding:14px 12px;border-radius:14px}}
 @media(max-width:365px){.home-epef-toolbar select,.home-epef-open{width:100%}.home-epef-toolbar{align-items:stretch}}
+
+/* Asthma 2.3 – separate real spirometry trends. Fully responsive and readable on iPhone. */
+.lufu23{margin:1.2rem 0 1.5rem;min-width:0;max-width:100%;border:1px solid #d4e4e8;background:linear-gradient(145deg,#fff,#f3fbfa);border-radius:22px;padding:clamp(12px,3vw,24px);overflow:hidden}
+.lufu23 h3{font-size:clamp(1.18rem,4vw,1.55rem);margin:.25rem 0 .5rem;color:#123b52}
+.lufu23 p{overflow-wrap:anywhere;line-height:1.55}
+.lufu23-heading{display:flex;gap:.75rem;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.lufu23-heading p{margin:.25rem 0 .55rem}
+.lufu23-controls{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin:14px 0}
+.lufu23-controls label{display:grid;gap:6px;flex:1 1 175px;font-weight:650;color:#284a58;min-width:0}
+.lufu23-controls select{font-size:16px;padding:.65rem;max-width:100%;width:100%;border:1px solid #bdced5;background:white;color:#173c4c;border-radius:10px}
+.lufu23-caption{font-size:.91rem;color:#637981;align-self:center}
+.lufu23-graph{width:100%;min-width:0;max-width:100%;border:1px solid #e2eff1;border-radius:14px;background:#fff;padding:10px 7px;overflow:hidden}
+.lufu23-svg{display:block;width:100%;height:auto;max-width:100%;touch-action:pan-y}
+.lufu23-svg [role=button]:focus-visible{outline:2px solid #126b80;outline-offset:2px}
+.lufu23-detail{margin:12px 0;padding:.7rem .9rem;border-radius:12px;background:#ecf7f6;color:#1c4756;min-height:44px}
+.lufu23-detail p{margin:.3rem 0}
+.lufu23-selected-top{display:flex;flex-wrap:wrap;gap:7px;align-items:center;justify-content:space-between}
+.lufu23-badge{font-size:.78rem;padding:4px 9px;border-radius:20px;border:1px solid #d3e3e7;background:#f2f4f5;color:#385365}
+.lufu23-badge.green{background:#dcefe8;color:#14553a}.lufu23-badge.yellow{background:#fff2cc;color:#745400}.lufu23-badge.red{background:#fde7e2;color:#8c3125}
+.lufu23-note,.lufu23-muted{font-size:.87rem;color:#627782}.lufu23-note{margin-top:12px}
+.lufu23-legend{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:10px;font-size:.9rem}
+.lufu23-swatch{display:inline-block;width:13px;height:13px;border-radius:50%;vertical-align:middle;margin-right:5px}
+.lufu23-stats{margin:1rem 0;display:grid;gap:7px;font-size:.94rem}
+.lufu23-stats p{margin:0}
+.lufu23-metadata{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}
+.lufu23-metadata label{display:grid;gap:6px;min-width:0}
+.lufu23-metadata input,.lufu23-metadata textarea{width:100%;max-width:100%;min-width:0;box-sizing:border-box;border:1px solid #c5d7dc;border-radius:10px;background:#fff;padding:11px;font-size:16px;color:#183f50}
+@media(max-width:600px){.lufu23-metadata{grid-template-columns:minmax(0,1fr)}.lufu23{padding:14px}.lufu23-controls label{flex:1 1 100%}.lufu23-svg{min-height:145px}}
+
+.lufu23-graph .lufu23-inner-chart{margin:.35rem 0 .9rem}
+.lufu23-graph h4{font-size:1rem;color:#184b60;margin:.75rem .3rem}
+
+.lufu23-record-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,235px),1fr));gap:8px;margin-top:12px}
+.lufu23-record-list h4{grid-column:1/-1;margin:.2rem 0;color:#214e60;font-size:.94rem}
+.lufu23-record-btn{text-align:left;cursor:pointer;border:1px solid #cddfe2;border-radius:11px;padding:10px 12px;background:#fff;color:#1e4a5b;font:inherit;font-size:.86rem;line-height:1.4;overflow-wrap:anywhere}
+.lufu23-record-btn:focus-visible,.lufu23-record-btn:hover{border-color:#126b80;outline:2px solid #126b80;outline-offset:1px}

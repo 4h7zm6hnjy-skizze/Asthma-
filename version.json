@@ -1,5 +1,5 @@
 {
-  "version": "2.2.1",
-  "released": "2026-10-15",
-  "notes": "ePEF-XLSX-Korrektur: erkennt Datum und Uhrzeit gemeinsam in Spalte date (z. B. 2026/10/15 7:31 AM), automatisch zugeordnet; dieselbe verschlüsselte Duplikatprüfung und Startseiten-Diagramme bleiben erhalten."
+  "version": "2.3.0",
+  "released": "2026-10-16",
+  "notes": "Ärztliche Lungenfunktion getrennt vom ePEF-Tagebuch: Startseiten- und Detaildiagramme für FEV1/FVC in % Soll, Litern und FEV1/FVC-Verhältnis, Phasen-/Zeitraumfilter, antippbare Messwerte und vorsichtige Trend-/Ampelhinweise. Bestehender verschlüsselter Datenbestand unverändert."
 }

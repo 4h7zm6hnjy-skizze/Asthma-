@@ -1,7 +1,7 @@
 /* Bei jedem Release VERSION und version.json aktualisieren. */
-const VERSION='2.2.1';
+const VERSION='2.3.0';
 const CACHE=`asthma-static-${VERSION}`;
-const ASSETS=["./","./index.html","./styles.css","./content.js","./app.js","./antraege-data.js","./antraege.js","./meine-daten.js","./lungenprofil.js","./befundscan-parser.js","./befund18-parser.js","./befundscan.js","./foto19.js","./viewport192.js","./suite15.js","./region16.js","./secure17.js","./calendar17.js","./labor18.js","./hub20.js","./scanner20.js","./pdf20.js","./jszip.min.js","./epef21.js","./version.json","./manifest.webmanifest","./icon.svg"];
+const ASSETS=["./","./index.html","./styles.css","./content.js","./app.js","./antraege-data.js","./antraege.js","./meine-daten.js","./lungenprofil.js","./befundscan-parser.js","./befund18-parser.js","./befundscan.js","./foto19.js","./viewport192.js","./suite15.js","./region16.js","./secure17.js","./calendar17.js","./labor18.js","./hub20.js","./scanner20.js","./pdf20.js","./jszip.min.js","./epef21.js","./lufu23.js","./version.json","./manifest.webmanifest","./icon.svg"];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('asthma-static-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
 self.addEventListener('fetch',event=>{
