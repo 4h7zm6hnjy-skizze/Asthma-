@@ -1,4 +1,4 @@
-# Asthma 1.5.0 – Webapp für Asthma, Lungenwerte und Hilfen
+# Asthma 1.6.0 – Webapp für Asthma, Lungenwerte und Hilfen
 
 Installierbare, responsive Webapp für iPhone, Android und Desktop. Quelle: bestehendes Repository `4h7zm6hnjy-skizze/Asthma-`; alle bereits vorhandenen Module aus 1.4.0 bleiben im Paket.
 
@@ -47,3 +47,15 @@ Relevante Originalquellen und Antragswege: `QUELLEN.md`, `ANTRAEGE_QUELLEN.md`, 
 ## Grenzen der Prüfung
 
 Statische JavaScript-Syntax, referenzierte HTML-Elemente und Navigation der zwölf Ansichten sind geprüft. Die lokale Chromium-Testumgebung sperrt alle URL-Navigationen und gibt im isolierten `about:blank`-Modus keinen Zugriff auf IndexedDB oder WebCrypto frei. Deshalb sind **Kamera-/PDF-OCR, reale Speicherung, AES-Verschlüsselung/Restore sowie der neue Service-Worker auf einem echten iPhone und GitHub Pages nicht end-to-end getestet**. Sie dürfen nicht als vollständig verifiziert gelten. Siehe `PRUEFBERICHT.md`.
+
+
+## Neu 1.6.0: Region & Suche (Deutschland)
+- Separate Seite **Region & Suche** in der Hauptnavigation. Alle 16 Bundesländer auswählbar.
+- Landkreis/kreisfreie Stadt, PLZ und Ort frei eintragbar. Landkreis-Eingabe ist deutschlandweit offen; **keine vollständige oder amtlich geprüfte Kreis-/PLZ-Liste** und keine automatische geografische Plausibilitätsprüfung.
+- Suchbegriffe und Kategorien für offizielle, deutschlandweite Suchwege: Schwerbehindertenrecht (Bundesportal), EUTB, Lungensportregister, DRV-Beratungsstellen und Informationen zu Hilfsmitteln. Für NRW zusätzlich ELSA und für **Märkischer Kreis** die verifizierte offizielle Kreis-Seite.
+- Die Links führen zu echten amtlichen Stellen und Suchportalen. Dort muss ggf. der Wohnort erneut eingegeben werden; es werden keine fiktiven Kontaktstellen oder freien Termine ausgegeben.
+- Region nur lokal im bestehenden `asthma-v1-preferences`-Profil gespeichert. Auch die bestehende verschlüsselte Backupfunktion des Altbereichs enthält diese Profileinstellungen; das **aktive Browserprofil ist nicht verschlüsselt**.
+- Mit "Region zurücksetzen" wird nur die Region entfernt; GdB- und Lungenwerte bleiben bestehen.
+- Neue Datei `region16.js` wird vom Offline-Cache aufgenommen.
+- Vor einem Update bitte die persönliche Akte / lokalen App-Daten sichern.
+- Quellen siehe `REGION_QUELLEN.md`.

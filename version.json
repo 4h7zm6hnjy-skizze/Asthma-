@@ -1,5 +1,5 @@
 {
-  "version": "1.5.0",
+  "version": "1.6.0",
   "released": "2026-10-15",
-  "notes": "Neue getrennte Ansichten, Lungenfunktions-Verlauf, Medikamenten- und Therapieplan, Asthma-Selbstkontrolle, Aktionsplan, Arbeitsplatzprotokoll, Befundscanner-Werkzeuge, Arztbericht und optionale Verschlüsselung neuer Zusatzdaten. Frühere Datenbanken bleiben erhalten."
+  "notes": "Deutschlandweite Auswahl von Bundesland, Landkreis / kreisfreier Stadt, PLZ und Ort; regionale Behörden- und Unterstützungs-Suche über offizielle Quellen; verifizierter Märkischer-Kreis-/NRW-Antragsweg."
 }

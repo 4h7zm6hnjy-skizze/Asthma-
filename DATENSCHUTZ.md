@@ -10,3 +10,7 @@
 - **Scanner**: Foto wird im lokalen Browser verarbeitet. Zum Laden von OCR/PDF-Bibliotheken wird externe Software von CDN-Anbietern bezogen. Da sie extern eingebundener JavaScript-Code ist, kann dessen Verhalten ohne eigene Auditierung nicht abschließend verifiziert werden. Bei vertraulichen Arztunterlagen manuelle Eingabe als Alternative verwenden.
 
 Zum Schutz: Gerät und Browserprofil sperren, keine fremden Geräte verwenden, verschlüsselte Backups separat aufbewahren, aktuelle Originalbefunde nicht ausschließlich in der App ablegen. Keine automatisierten Frist- oder Medikamentenalarme im geschlossenen Browser.
+
+
+## Standortauswahl ab 1.6.0
+Die freiwillig eingegebenen Angaben zu Bundesland, Kreis, Ort und Postleitzahl werden nur in `asthma-v1-preferences` in `localStorage` gespeichert (unverschlüsselt). Die Webapp holt keine präzisen Gerätestandorte ab und versendet diese Eingaben nicht automatisch. Bei Klick auf einen externen offiziellen Link werden die dort geltenden Datenschutzbedingungen relevant; die Werte werden nicht in den Link eingebaut. Eine Speicherung in verschlüsselten Backup-Dateien erfolgt über den bisherigen Profilexport und ist keine Verschlüsselung des aktiven Browserprofils.

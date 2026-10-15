@@ -1,6 +1,6 @@
 'use strict';
 (() => {
-  const VERSION = '1.5.0';
+  const VERSION = '1.6.0';
   const STORAGE = 'asthma-v1-preferences';
   const sources = window.ASTHMA_SOURCES || {};
   const articles = window.ASTHMA_ARTICLES || [];
@@ -22,7 +22,7 @@
     saved: Array.isArray(stored.saved) ? stored.saved.filter(id=>articles.some(a=>a.id===id)).slice(0,200) : [],
     section:'all', query:'', all:false
   };
-  function persist(){try{localStorage.setItem(STORAGE,JSON.stringify({gdb:state.gdb,equal:state.equal,saved:state.saved,fev1:state.fev1,fvc:state.fvc,fev1Liters:state.fev1Liters,fvcLiters:state.fvcLiters,lungDate:state.lungDate,lungSymptoms:state.lungSymptoms}))}catch{}}
+  function persist(){try{localStorage.setItem(STORAGE,JSON.stringify({...JSON.parse(localStorage.getItem(STORAGE)||'{}'),gdb:state.gdb,equal:state.equal,saved:state.saved,fev1:state.fev1,fvc:state.fvc,fev1Liters:state.fev1Liters,fvcLiters:state.fvcLiters,lungDate:state.lungDate,lungSymptoms:state.lungSymptoms}))}catch{}}
   function eligibleForProtection(){return state.gdb>=50||((state.gdb===30||state.gdb===40)&&state.equal)}
   function getEligibility(card){
     const g=state.gdb;

@@ -1,27 +1,21 @@
-# Prüfbericht: Asthma 1.5.0 (15. Oktober 2026)
+# Prüfbericht Asthma 1.6.0 · 15.10.2026
 
-## Automatisch geprüft
+## Basis
+- Entwicklung auf Grundlage des bereits veröffentlichten Versionsstandes 1.5.0; Bestandsmodule erhalten.
+- Versionsnummer in `app.js`, `version.json`, `sw.js` und sichtbarer Oberfläche auf 1.6.0 aktualisiert.
 
-- Alle JavaScript-Dateien mit `node --check`: Syntax ohne Fehler.
-- Alle per `$("id")` fest referenzierten UI-Elemente gegen HTML-IDs geprüft: keine fehlenden Referenzen.
-- Isolierter Chromium-DOM-Test mit 390 px Breite: 12 Navigationsbereiche nacheinander geöffnet. Pro Klick sind nur die zugehörigen Hauptabschnitte sichtbar, Start/Unterseiten haben keine horizontale Gesamtseiten-Überläufe. Keine ungefangenen JavaScript-Fehler.
-- Versionsnummer `1.5.0` in `app.js`, `sw.js` und `version.json` übereinstimmend; `suite15.js` befindet sich in den statischen Service-Worker-Dateien.
-- Alte Komponenten und Datenbanknamen unverändert; die Zusatzdatenbank ist separat.
+## Regionalmodul
+- Alle 16 Bundesländer auswählbar; Eingabe von Landkreis/kreisfreier Stadt, PLZ, Ort.
+- Offizielle allgemeine bundesweite Suchwege und gesonderte NRW-/Märkischer-Kreis-Seiten.
+- Gespeicherter Eintrag bleibt bei Änderung des GdB erhalten (Test mit simuliertem `localStorage`).
+- Wechsel von NRW/Märkischer Kreis nach Bayern blendet NRW- und Märkischer-Kreis-spezifische Einträge aus.
+- Stichwortsuche, Kategoriefilter, fünfstellige PLZ-Validierung, Löschfunktion und getrennte Seitennavigation im isolierten Chromium-Browsertest erfolgreich.
+- Bei 390 px Browserbreite keine horizontale Seitenüberlaufbreite.
+- Keine ungefangenen JavaScript-Fehler im isolierten Test.
 
-## Noch nicht auf dem Endgerät verifiziert
-
-- Echte Bild- und PDF-Texterkennung (Tesseract.js / PDF.js über Drittanbieter-CDNs), iPhone-Kamera, PDF-Seitenauswahl auf Safari.
-- Echte IndexedDB-Transaktionen, datensichere AES-GCM-Verschlüsselung und Sicherungs-Wiederherstellung in einem Webbrowser mit sicherem Origin.
-- Service-Worker-Installation, Offline-Erststart und Update-Verhalten nach Bereitstellung über GitHub Pages.
-- Drucken/als PDF speichern und Kalenderimport auf iOS.
-- Barrierefreiheit mit Screen Reader und vollständige manuelle Fachprüfung aller externen Quellen.
-
-**Grund**: Die automatisierte Browserumgebung blockiert URL-Navigation; der erlaubte isolierte DOM-Modus unterstützt weder IndexedDB noch WebCrypto. Bei Aussagen zu diesen Funktionen daher nur 'implementiert, nicht vollständig verifiziert' angeben.
-
-## Datenerhalt
-
-Bestands-Datenbanken `asthma-local-1` und `asthma-v1-preferences` werden nicht gelöscht. Die App migriert/verschlüsselt Bestandsdaten nicht; sichere diese vorher. Neue Datensätze liegen im zusätzlichen Speicher `asthma-suite-1`. Bei Import eines 1.5.0-Backups wird die entsprechende Zusatzdatenbank nach Bestätigung ersetzt; die alte Antragsakte nicht.
-
-## Risiko / Hinweis
-
-Asthma 1.5.0 ist ein Informations- und Dokumentationswerkzeug. Keine Diagnose-Software oder automatische Behandlungsanweisung. Medizinische Angaben vor Übernahme prüfen; medikamentöse Pläne ausschließlich ärztlich vorgeben. Bei schwerer Atemnot 112.
+## Grenzen
+- Region wird vom Benutzer eingegeben, aber nicht extern geokodiert; **keine validierte deutschlandweite Liste aller Kreise**. Deutschlandweite lokale Dienste werden über geprüfte offizielle Suchportale erreicht, die PLZ/Ort bei Bedarf erneut abfragen.
+- Eine vollständige automatische Zuordnung jeder deutschen Kommune zur zuständigen Behörde ist nicht implementiert und wird nicht behauptet.
+- Live-Veröffentlichung auf GitHub Pages und iPhone-Safari wurden nicht geprüft.
+- `localStorage` enthält weiterhin unverschlüsselte aktive Profildaten.
+- Andere Bestandsspeicher- und Backupfunktionen wurden mit dieser Änderung nicht vollständig neu getestet.
