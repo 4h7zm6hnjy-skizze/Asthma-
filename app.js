@@ -1,13 +1,13 @@
 'use strict';
 (() => {
-  const VERSION = '1.0.0';
-  const STORAGE = 'asthmakompass-v1-preferences';
+  const VERSION = '1.0.2';
+  const STORAGE = 'asthma-v1-preferences';
   const sources = window.ASTHMA_SOURCES || {};
   const articles = window.ASTHMA_ARTICLES || [];
   const categories = {hilfsmittel:'Hilfsmittel',arbeit:'Arbeitsrecht',gdb:'GdB & Anträge',finanzen:'Steuern & Vorteile',wissen:'Asthma-Wissen'};
   const taxes = {20:384,30:620,40:860,50:1140,60:1440,70:1780,80:2120,90:2460,100:2840};
   const $ = (id) => document.getElementById(id);
-  const stored = (() => {try{return JSON.parse(localStorage.getItem(STORAGE)||'{}')}catch{return {}}})();
+  const stored = (() => {try{return JSON.parse(localStorage.getItem(STORAGE) || localStorage.getItem('asthmakompass-v1-preferences') || '{}')}catch{return {}}})();
   const state = {
     gdb: Number.isInteger(stored.gdb) && stored.gdb>=10 && stored.gdb<=100 && stored.gdb%10===0 ? stored.gdb : 30,
     equal: stored.equal === true,

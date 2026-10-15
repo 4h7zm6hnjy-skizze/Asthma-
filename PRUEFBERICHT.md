@@ -1,4 +1,4 @@
-# Technischer Prüfbericht – AsthmaKompass 1.0.0
+# Technischer Prüfbericht – Asthma 1.0.1
 
 Prüfung am 15.10.2026.
 
@@ -22,3 +22,8 @@ Prüfung am 15.10.2026.
 Der Test benutzt im Container absichtlich `page.set_content`, da der dortige Chromium-Browser lokale URLs aus Sicherheitsrichtlinien nicht direkt aufrufen durfte. Dies ist keine Einschränkung der fertig heruntergeladenen App.
 
 Test erneut ausführen: `python tests/browser_smoke.py` (Python Playwright und Chromium benötigt).
+
+
+## Zusatzprüfung Version 1.0.2
+
+App-Symbol-Pfade auf `icon.svg` im Hauptverzeichnis vereinheitlicht, Service-Worker-Offline-Cache und Versionsdatei angepasst; lokale Funktionstests ergänzt. GitHub Pages selbst konnte nicht live aufgerufen werden.

@@ -1,4 +1,4 @@
-# AsthmaKompass · Version 1.0.0
+# Asthma · Version 1.0.2
 
 Responsives, deutschsprachiges Informationsangebot zu Asthma, Hilfsmitteln, Schwerbehinderung und Arbeitsrecht in Deutschland. Veröffentlicht am 15. Oktober 2026.
 
@@ -16,12 +16,12 @@ Responsives, deutschsprachiges Informationsangebot zu Asthma, Hilfsmitteln, Schw
 
 **GitHub Pages** (empfohlen):
 
-1. In GitHub ein Repository erstellen und **den gesamten Inhalt dieses Ordners** ins Hauptverzeichnis des Repositorys hochladen (nicht nur die `index.html`).
+1. Im vorhandenen Repository **Add file → Upload files** öffnen und **alle Dateien dieser ZIP** direkt ins Hauptverzeichnis hochladen. Gleichnamige Dateien ersetzen. `icon.svg` muss im Hauptverzeichnis neben `index.html` liegen.
 2. Unter **Settings → Pages → Build and deployment** `Deploy from a branch`, anschließend `main` und `/ (root)` einstellen und speichern.
-3. GitHub erzeugt die Adresse `https://BENUTZERNAME.github.io/REPOSITORY/` (je nach Repository und Pages-Konfiguration kann die Adresse anders sein). Die echte Adresse unter Settings → Pages ablesen.
+3. GitHub erzeugt die Adresse `https://4h7zm6hnjy-skizze.github.io/Asthma-/` (je nach Repository und Pages-Konfiguration kann die Adresse anders sein). Die echte Adresse unter Settings → Pages ablesen.
 4. Auf dem iPhone in Safari öffnen → Teilen → **Zum Home-Bildschirm**.
 
-**Lokal:** `index.html` im Browser öffnen; Filter, Suche und Texte funktionieren auch ohne Server. Eine PWA-Installation und die Updateprüfung erfordern eine HTTPS-Webadresse oder geeigneten localhost-Testserver. Alternativ liegt die separat angebotene `AsthmaKompass_Standalone.html` für die lokale Lesefassung vor.
+**Lokal:** `index.html` im Browser öffnen; Filter, Suche und Texte funktionieren auch ohne Server. Eine PWA-Installation und die Updateprüfung erfordern eine HTTPS-Webadresse oder geeigneten localhost-Testserver. Alternativ liegt die separat angebotene `Asthma_Standalone.html` für die lokale Lesefassung vor.
 
 ## So funktioniert „Update suchen“
 
@@ -30,8 +30,8 @@ Der Button lädt bei Internetzugang `version.json` **von derselben Adresse**, un
 Für das nächste Release müssen alle folgenden Versionsangaben erhöht werden:
 
 - `version.json` – `version`, `released`, `notes`
-- `app.js` – `const VERSION = '1.0.0'`
-- `sw.js` – `const VERSION='1.0.0'` (WICHTIG: wechselt den Offline-Cache)
+- `app.js` – `const VERSION = '1.0.2'`
+- `sw.js` – `const VERSION='1.0.2'` (WICHTIG: wechselt den Offline-Cache)
 
 Anschließend aktualisierte Dateien hochladen. Beim Drücken von **Neue Version laden** wird eine Service-Worker-Aktualisierung angestoßen und die Seite neu geladen. Einmaliges weiteres Laden kann je nach Browser-Cache erforderlich sein. Das ist **keine automatische Recherche zu neuem Recht**, und der Button kann ohne bereits veröffentlichtes Update **keine neue Version erzeugen**.
 
@@ -49,4 +49,4 @@ Die Auswahl des GdB, ein ggf. bewilligter Gleichstellungsstatus und die Merklist
 
 Keine Bibliotheken, Frameworks, CDNs oder API-Schlüssel benötigt. HTML, CSS und JavaScript funktionieren statisch. `sw.js` speichert die App-Dateien lokal und versucht bei Seitenaufrufen zuerst das Netz; die Update-Versionsabfrage ist bewusst **nicht offline zwischengespeichert**, damit sie keine alte Version als „aktuell“ ausgibt.
 
-Der Funktionstest liegt unter `tests/browser_smoke.py`; er läuft mit Python Playwright und Chromium. Er testet die isolierte Oberfläche (ohne Netz-/Service-Worker-Zugriff) auf Desktop und Mobilgeräten, alle wichtigen GdB-Berechtigungsfälle, Gleichstellung, Suche, Favoriten und die simulierte Updateanzeige. Der Live-Betrieb nach GitHub-Pages-Veröffentlichung und die Service-Worker-Aktualisierung auf einem echten iPhone müssen gesondert geprüft werden.
+Der Funktionstest liegt unter `browser_smoke.py` (lokal geprüfte Testdatei, nicht zum Upload erforderlich); er läuft mit Python Playwright und Chromium. Er testet die isolierte Oberfläche (ohne Netz-/Service-Worker-Zugriff) auf Desktop und Mobilgeräten, alle wichtigen GdB-Berechtigungsfälle, Gleichstellung, Suche, Favoriten und die simulierte Updateanzeige. Der Live-Betrieb nach GitHub-Pages-Veröffentlichung und die Service-Worker-Aktualisierung auf einem echten iPhone müssen gesondert geprüft werden.
