@@ -461,3 +461,47 @@ body :is(input,select,textarea){font-size:max(16px,1rem)}
 .secure-card{width:min(100%,460px);max-width:100%;min-width:0;justify-self:center;overflow-wrap:anywhere}
 .secure-entry-choice{min-width:0;max-width:100%}
 .secure-card .secure-entry-choice button{min-width:0;white-space:normal;overflow-wrap:anywhere}
+
+/* Asthma 2.5: Kategorie-Farben und Drucklayout */
+.cal25-legend{border:1px solid #d7e5e8;border-radius:14px;background:#fff;padding:12px;margin:16px 0}
+.cal25-legend summary{font-weight:750;cursor:pointer;color:#123b52}
+.cal25-filters{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.cal25-filter{display:inline-flex;align-items:center;gap:7px;border:1px solid #dce7e9;border-radius:999px;padding:7px 11px;font-size:13px;cursor:pointer;background:white}
+.cal25-filter input{margin:0;min-width:18px;min-height:18px;accent-color:#176f83}
+.cal25-swatch{display:inline-block;width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.cal-au{background-color:#c53f49}.cal-labor{background-color:#8451c0}.cal-test{background-color:#1978c9}.cal-epef{background-color:#197da1}.cal-dokument{background-color:#727d88}.cal-termin{background-color:#23864f}.cal-medikament{background-color:#168d8d}.cal-antrag,.cal-genehmigt{background-color:#df8422}.cal-frist{background-color:#e5b520}
+.au25-stats,.stats25-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;margin:12px 0 20px}
+.au25-counter,.stats25-kpi{border:1px solid #d5e5e6;border-radius:12px;padding:12px;background:#fff;display:flex;flex-direction:column;gap:5px;min-width:0}
+.au25-counter strong,.stats25-figure{font-size:clamp(19px,3vw,26px);color:#123b52;line-height:1.2}
+.au25-counter span,.stats25-label,.stats25-kpi small{font-size:12px;color:#657783}
+.au25-confirm{display:flex;align-items:center;gap:8px}
+.au25-confirm input{width:19px;height:19px;flex:none}
+.stats25-controls{display:flex;align-items:end;flex-wrap:wrap;gap:10px}
+.stats25-controls label{min-width:130px;flex:1}
+.stats25-controls select,.stats25-controls input{width:100%;min-height:44px;font-size:16px}
+.stats25-report{background:white;border:1px solid #dce6e9;border-radius:16px;padding:clamp(12px,3vw,26px);margin-top:14px;overflow-wrap:anywhere}
+.stats25-heading{padding-bottom:12px;border-bottom:2px solid #176f83}
+.stats25-heading h2{margin:5px 0 8px;color:#123b52}
+.stats25-meta{font-size:12px;letter-spacing:0.06em;color:#176f83}
+.stats25-section{padding:10px 0;border-bottom:1px solid #d9e4e9;break-inside:avoid-page}
+.stats25-section h3{margin:8px 0;color:#123b52;font-size:17px}
+.stats25-line{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dotted #d9e4e9;padding:5px 0;font-size:13px;min-width:0}
+.stats25-line strong{text-align:right;overflow-wrap:anywhere;max-width:58%}
+.stats25-small-list{font-size:12px;line-height:1.6}
+.stats25-muted,.stats25-footer{font-size:11px;color:#657783;margin-top:8px}
+.med25-drafts{background:#f5fafa;border:1px solid #d7e7e9;border-radius:12px;padding:12px;margin:12px 0}
+.med25-drafts summary{font-weight:700;cursor:pointer}
+.med25-item{display:flex;align-items:start;gap:10px;margin:8px 0;padding:9px;background:#fff;border:1px solid #e2ebed;border-radius:9px}
+.med25-item input{margin-top:3px;flex:none;width:18px;height:18px}
+.med25-description{display:flex;flex-direction:column;gap:3px}
+.med25-description small{color:#657783;font-size:12px}
+@media(max-width:500px){.stats25-line{flex-direction:column;gap:2px}.stats25-line strong{text-align:left;max-width:none}.stats25-report{padding:12px}}
+@media print{
+ body.stats25-print{background:white!important;margin:0!important;padding:0!important;overflow:visible!important}
+ body.stats25-print *{visibility:hidden!important}
+ body.stats25-print #stats25-report,body.stats25-print #stats25-report *{visibility:visible!important}
+ body.stats25-print #stats25-report{position:absolute;left:0;top:0;width:100%!important;max-width:none!important;border:0!important;padding:0!important;margin:0!important;box-shadow:none!important;overflow:visible!important;display:block!important}
+ body.stats25-print #stats25-report .stats25-section{break-inside:avoid-page}
+ body.stats25-print .stats25-tiles{grid-template-columns:repeat(3,1fr)!important}
+ @page{margin:15mm;size:A4 portrait}
+}

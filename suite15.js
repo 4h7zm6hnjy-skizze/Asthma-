@@ -15,7 +15,7 @@
   const csv=(rows,filename)=>{if(!confirm('Diese CSV-Datei ist unverschlüsselt und kann private Gesundheitsangaben enthalten. Fortfahren?'))return;download(new Blob(['\uFEFF'+rows.map(row=>row.map(escCSV).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8'}),filename)};
   const uuid=()=>uid();
   // A. Navigation: jede Ansicht ist einzeln aufrufbar und direkt verlinkbar.
-  const allowed=new Set(['start','profil','region','kalender','lungenwerte','befunde','labor','therapie','hilfen','antraege','akte','arbeit','bericht','wissen','einstellungen','mehr']);
+  const allowed=new Set(['start','profil','region','kalender','lungenwerte','befunde','labor','therapie','hilfen','antraege','akte','arbeit','bericht','statistik','wissen','einstellungen','mehr']);
   function go(page,{scroll=true}={}){
     if(!allowed.has(page))page='start';
     qa('[data-nav-page]').forEach(el=>{el.hidden=el.dataset.navPage!==page});
@@ -142,7 +142,7 @@
 
   function updateDashboard(){const p=window.ASTHMA_PROFILE_BRIDGE?.get();if(p)$('dash-fev').textContent=p.fev1===null?'–':p.fev1+' %';if(!database||locked()){if(locked())$('dash-due').textContent='Gesperrt';return}Promise.all([entries('measurements'),entries('meds')]).then(([m,meds])=>{$('dash-measurements').textContent=m.length;$('dash-medications').textContent=meds.length;const next=meds.flatMap(x=>[x.next,x.refill]).filter(x=>x&&x>=today()).sort()[0];$('dash-due').textContent=next?fmt(next):'–'}).catch(()=>{});}
   // L. tests/diagnostics
-  async function diagnostics(){const out=[];out.push('Version der Oberfläche: 2.4.0');out.push('Verbindung: '+(navigator.onLine?'online':'offline'));out.push('Datenbank: '+(database?'erreichbar':'nicht verfügbar'));out.push('Gesamttresor: AES-GCM verschlüsselt');
+  async function diagnostics(){const out=[];out.push('Version der Oberfläche: 2.5.0');out.push('Verbindung: '+(navigator.onLine?'online':'offline'));out.push('Datenbank: '+(database?'erreichbar':'nicht verfügbar'));out.push('Gesamttresor: AES-GCM verschlüsselt');
     if('serviceWorker' in navigator){try{const r=await navigator.serviceWorker.getRegistration();out.push('Offline-Service-Worker: '+(r?.active?'aktiv':'nicht aktiv'))}catch{out.push('Offline-Service-Worker: Prüfung nicht möglich')}}
     try{const r=await fetch('./version.json?test='+Date.now(),{cache:'no-store'});const v=await r.json();out.push('Serverversion: '+v.version)}catch{out.push('Serverversion: offline/unbekannt')}
     flash('suite-diagnostic-status',out.join(' · '));}
