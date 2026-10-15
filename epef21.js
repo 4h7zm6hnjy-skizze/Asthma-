@@ -60,7 +60,11 @@
     (r.pef===null||Number.isFinite(r.pef)&&r.pef>=50&&r.pef<=1400)&&
     (r.fev1===null||Number.isFinite(r.fev1)&&r.fev1>=0.1&&r.fev1<=12);
   }
-  const fp=x=>[x.date,x.time,x.pef===null?'':Number(x.pef).toFixed(2),x.fev1===null?'':Number(x.fev1).toFixed(3)].join('|');
+  const fp=x=>[x.date,x.time,x.pef==null?'':Number(x.pef).toFixed(2),x.fev1==null?'':Number(x.fev1).toFixed(3)].join('|');
+  // Deduplication is intentionally strict: distinct PEF/FEV1 readings at the same minute are NOT merged.
+  // Source filename, export format and import timestamp do not affect the canonical identity.
+  const measurements=()=>all.filter(x=>x.kind==='measurement');
+  const duplicates=()=>{const seen=new Set(),items=[];for(const r of measurements()){const k=fp(r);if(seen.has(k))items.push(r);else seen.add(k)}return items};
   // Spreadsheet input is read as data, never evaluated as markup/code.
   const parseXml=source=>{const xml=new DOMParser().parseFromString(source,'application/xml');if(xml.getElementsByTagName('parsererror').length)throw Error('Die Excel-Datei enthält ungültiges XML.');return xml};
   const tags=(parent,name)=>Array.from(parent.getElementsByTagNameNS('*',name));
@@ -192,10 +196,10 @@
     const {parsed,errors,samples}=collect(sheet,header,map);const seen=new Set(),unique=[];let redundant=0;
     for(const r of parsed){const key=fp(r);if(seen.has(key)){redundant++;continue}seen.add(key);unique.push(r)}toImport=unique;
     showRows(unique);
-    const existing=new Set(all.filter(x=>x.kind==='measurement').map(fp));const news=unique.filter(x=>!existing.has(fp(x))).length;
+    const existing=new Set(all.filter(x=>x.kind==='measurement').map(fp));const news=unique.filter(x=>!existing.has(fp(x))).length, already=unique.length-news;
     $('epef-import-confirm').disabled=news===0;
     $('epef-import-confirm').textContent=`${news} neue Messungen verschlüsselt übernehmen`;
-    status(`${unique.length} gültige Messungen erkannt · ${news} neu · ${errors} unklare Zeilen · ${redundant} Duplikate innerhalb der Datei. ${samples.join('; ')}`,(unique.length===0));
+    status(`${unique.length} gültige Messungen erkannt · ${news} neu · ${already} bereits gespeichert · ${errors} unklare Zeilen · ${redundant} Duplikate innerhalb der Datei. ${samples.join('; ')}`,(unique.length===0));
   }
   async function loadFile(){const f=$('epef-file').files?.[0];if(!f)return;lastFile=f.name;workbook=null;toImport=[];preview.replaceChildren();$('epef-import-options').hidden=true;$('epef-import-confirm').disabled=true;status('Datei wird ausschließlich auf deinem Gerät geöffnet …');
     try{workbook=await getData(f);const s=$('epef-sheet');s.replaceChildren();workbook.forEach((w,i)=>s.add(new Option(`${w.name} (${w.rows.length} Zeilen)`,String(i))));s.value='0';$('epef-import-options').hidden=false;chooseSheet()}catch(e){status('Import nicht möglich: '+e.message,true)}
@@ -216,7 +220,7 @@
     if(value==='month')return ordered.filter(x=>x.date.startsWith($('epef-month').value));
     const days=Number(value),start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-(days-1));const cutoff=start.getFullYear()+'-'+String(start.getMonth()+1).padStart(2,'0')+'-'+String(start.getDate()).padStart(2,'0');return ordered.filter(x=>x.date>=cutoff);
   }
-  function chart(data,field,label,units,container){container.replaceChildren();const series=data.filter(x=>Number.isFinite(x[field]));
+  function chart(data,field,label,units,container,selectedId='epef-selected'){container.replaceChildren();const series=data.filter(x=>Number.isFinite(x[field]));
     if(!series.length){container.append(node('p','suite-msg',`Noch keine ${label}-Messungen für diesen Zeitraum.`));return}
     const val=series.map(x=>x[field]);if(field==='pef'&&referencePEF!==null)val.push(referencePEF);let min=Math.min(...val),max=Math.max(...val);if(max===min){const d=field==='pef'?40:.2;min=Math.max(0,min-d);max+=d;}else{const d=(max-min)*.15;min=Math.max(0,min-d);max+=d}
     const w=760,h=230,xl=58,xr=744,yt=20,yb=194;const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.setAttribute('role','img');svg.setAttribute('aria-label',`${label}: ${series.length} Messungen mit Uhrzeit-Farben`);svg.classList.add('epef-chart-svg');
@@ -224,8 +228,8 @@
     for(let i=0;i<5;i++){const y=yt+(yb-yt)*i/4;item('line',{x1:xl,x2:xr,y1:y,y2:y,stroke:'#dfecf0','stroke-width':1});item('text',{x:5,y:y+5,fill:'#637c87','font-size':14},(max-(max-min)*i/4).toFixed(field==='pef'?0:2))}
     if(field==='pef'&&referencePEF!==null){const refy=yb-(referencePEF-min)*(yb-yt)/(max-min);item('line',{x1:xl,x2:xr,y1:refy,y2:refy,stroke:'#8998a6','stroke-width':2,'stroke-dasharray':'6 6'});item('text',{x:xr-4,y:refy-5,fill:'#667681','font-size':12,'text-anchor':'end'},`Referenz ${referencePEF}`)}
     const xy=(r,i)=>[xl+(series.length===1?(xr-xl)/2:i*(xr-xl)/(series.length-1)),yb-(r[field]-min)*(yb-yt)/(max-min)];
-    for(let i=1;i<series.length;i++){const [x1,y1]=xy(series[i-1],i-1),[x2,y2]=xy(series[i],i),mx=(x1+x2)/2,my=(y1+y2)/2;item('line',{x1,y1,x2:mx,y2:my,stroke:colors[bucket(series[i-1].time)],'stroke-width':3.2,'stroke-linecap':'round'});item('line',{x1:mx,y1:my,x2,y2,stroke:colors[bucket(series[i-1].time)],'stroke-width':3.2,'stroke-linecap':'round'});}
-    series.forEach((r,i)=>{const [cx,cy]=xy(r,i);const cir=item('circle',{cx,cy,r:series.length>80?3.3:5,fill:colors[bucket(r.time)],stroke:'#fff','stroke-width':1.6});const tip=document.createElementNS(svg.namespaceURI,'title');tip.textContent=`${fmtDate(r.date)} ${r.time}: ${r[field]} ${units}`;cir.append(tip);cir.setAttribute('tabindex','0');cir.setAttribute('aria-label',tip.textContent);const show=()=>{$('epef-selected').textContent=`${fmtDate(r.date)} um ${r.time} Uhr · PEF ${r.pef??'–'} l/min · FEV₁ ${r.fev1??'–'} l${r.status?' · '+r.status:''}`};cir.addEventListener('click',show);cir.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show()}})});
+    for(let i=1;i<series.length;i++){const [x1,y1]=xy(series[i-1],i-1),[x2,y2]=xy(series[i],i),mx=(x1+x2)/2,my=(y1+y2)/2;item('line',{x1,y1,x2:mx,y2:my,stroke:colors[bucket(series[i-1].time)],'stroke-width':3.2,'stroke-linecap':'round'});item('line',{x1:mx,y1:my,x2,y2,stroke:colors[bucket(series[i].time)],'stroke-width':3.2,'stroke-linecap':'round'});}
+    series.forEach((r,i)=>{const [cx,cy]=xy(r,i);const cir=item('circle',{cx,cy,r:series.length>80?3.3:5,fill:colors[bucket(r.time)],stroke:'#fff','stroke-width':1.6});const tip=document.createElementNS(svg.namespaceURI,'title');tip.textContent=`${fmtDate(r.date)} ${r.time}: ${r[field]} ${units}`;cir.append(tip);cir.setAttribute('tabindex','0');cir.setAttribute('aria-label',tip.textContent);const show=()=>{$(selectedId).textContent=`${fmtDate(r.date)} um ${r.time} Uhr · PEF ${r.pef??'–'} l/min · FEV₁ ${r.fev1??'–'} l${r.status?' · '+r.status:''}`};cir.addEventListener('click',show);cir.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show()}})});
     for(const i of [...new Set([0,Math.floor((series.length-1)/2),series.length-1])]){const [cx]=xy(series[i],i);item('text',{x:cx,y:h-7,'text-anchor':i===0?'start':i===series.length-1?'end':'middle',fill:'#637c87','font-size':13},fmtDate(series[i].date).slice(0,6))}
     container.append(svg);
   }
@@ -241,21 +245,48 @@
     if(!count)table.append(node('p','suite-msg','In diesem Zeitraum sind noch keine ePEF-Messungen gespeichert.'));
     if(count>100)table.append(node('p','suite-msg',`Es werden die neuesten 100 von ${count} Einträgen gezeigt. Die Diagramme enthalten alle Messwerte des gewählten Zeitraums (maximal 400 Punkte).`));
   }
-  function redraw(){const visible=selectVisible();for(const [k,name,units,id] of [['pef','PEF','l/min','epef-chart-pef'],['fev1','FEV₁','l','epef-chart-fev1']]){
+  function drawHome(){
+    const section=$('home-epef');if(!section)return;
+    const ordered=measurements().slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+    const mode=$('home-epef-range').value;
+    let subset=ordered;
+    if(mode==='last30')subset=ordered.slice(-30);
+    else if(mode!=='all'){
+      const start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-(Number(mode)-1));
+      const cutoff=start.getFullYear()+'-'+String(start.getMonth()+1).padStart(2,'0')+'-'+String(start.getDate()).padStart(2,'0');
+      subset=ordered.filter(r=>r.date>=cutoff);
+    }
+    const chosen=subset.length>400?subset.filter((_,i)=>i%Math.ceil(subset.length/400)===0):subset;
+    $('home-epef-count').textContent=`${ordered.length} insgesamt · ${subset.length} angezeigt`;
+    $('home-epef-empty').hidden=ordered.length!==0;
+    for(const [metric,label,unit,id] of [['pef','PEF','l/min','home-epef-chart-pef'],['fev1','FEV₁','l','home-epef-chart-fev1']]){
+      chart(chosen,metric,label,unit,$(id),'home-epef-selected');
+    }
+    if(!ordered.length)$('home-epef-selected').textContent='Kein gespeicherter ePEF-Wert vorhanden. Bitte den Import auf der Lungenseite prüfen.';
+  }
+  function redraw(){drawHome();const visible=selectVisible();for(const [k,name,units,id] of [['pef','PEF','l/min','epef-chart-pef'],['fev1','FEV₁','l','epef-chart-fev1']]){
       const target=$(id),limit=400,part=visible.length>limit?visible.filter((x,i)=>i%Math.ceil(visible.length/limit)===0):visible;
       chart(part,k,name,units,target);}
     drawList(visible);
   }
-  async function refresh(){all=await SEC.list('epef');const setting=all.find(x=>x.kind==='setting'&&x.id==='reference');referencePEF=setting&&Number.isFinite(setting.pef)?setting.pef:null;$('epef-ref-value').value=referencePEF===null?'':String(referencePEF);redraw()}
+  async function refresh(){all=await SEC.list('epef');const oldDuplicates=duplicates();const fix=$('epef-clean-duplicates');if(fix){fix.hidden=oldDuplicates.length===0;fix.textContent=`${oldDuplicates.length} identische Alt-Einträge prüfen und löschen`;}const setting=all.find(x=>x.kind==='setting'&&x.id==='reference');referencePEF=setting&&Number.isFinite(setting.pef)?setting.pef:null;$('epef-ref-value').value=referencePEF===null?'':String(referencePEF);redraw()}
   function today(){const now=new Date();return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`}
   $('epef-month').value=today().slice(0,7);
+  $('home-epef-range')?.addEventListener('change',drawHome);
+  $('epef-clean-duplicates')?.addEventListener('click',async()=>{
+    if(busy)return;
+    const remove=duplicates();if(!remove.length){status('Keine identischen Alt-Einträge gefunden.');return;}
+    if(!confirm(`${remove.length} vollständig identische Alt-Einträge löschen? Unterschiedliche Messungen in derselben Minute bleiben erhalten.`))return;
+    busy=true;let count=0;
+    try{for(const item of remove){await SEC.del('epef',item.id);count++}await refresh();status(`${count} alte identische Doppeleinträge entfernt. Andere Messungen bleiben erhalten.`)}
+    catch(e){await refresh().catch(()=>{});status(`Bereinigung unvollständig: ${e.message}`,true)}finally{busy=false}
+  });
   $('epef-ref-save').addEventListener('click',async()=>{const raw=$('epef-ref-value').value.trim();const val=raw===''?null:decimal(raw);if(val!==null&&(!Number.isInteger(val)||val<50||val>1400)){status('Referenz-PEF muss zwischen 50 und 1400 l/min liegen.',true);return}try{if(val===null)await SEC.del('epef','reference');else await SEC.put('epef',{id:'reference',kind:'setting',pef:val});status(val===null?'Referenz entfernt.':'Referenzwert lokal verschlüsselt gespeichert.');await refresh()}catch(e){status('Referenz konnte nicht gespeichert werden: '+e.message,true)}});
   $('epef-manual-date').value=today();$('epef-manual-time').value=new Date().toTimeString().slice(0,5);
-  $('epef-manual').addEventListener('submit',async ev=>{ev.preventDefault();
+  $('epef-manual').addEventListener('submit',async ev=>{ev.preventDefault();if(busy){status('Bitte laufenden Import abwarten.');return;}
     const r={date:$('epef-manual-date').value,time:$('epef-manual-time').value,pef:decimal($('epef-manual-pef').value),fev1:decimal($('epef-manual-fev1').value),status:'',source:'Manuell'};
     if(!validRec(r)){status('Datum, Uhrzeit und mindestens ein plausibler Wert erforderlich (PEF 50–1400 l/min, FEV₁ 0,1–12 l).',true);return}
-    if(all.some(x=>x.kind==='measurement'&&fp(x)===fp(r))){status('Diese identische Messung ist bereits gespeichert.',true);return}
-    try{await SEC.put('epef',{...r,kind:'measurement',id:(crypto.randomUUID?crypto.randomUUID():`manual-${Date.now()}-${Math.floor(Math.random()*100000)}`),createdAt:new Date().toISOString()});status('Messung verschlüsselt gespeichert.');await refresh();$('epef-manual-pef').value='';$('epef-manual-fev1').value='';}catch(e){status('Speichern fehlgeschlagen: '+e.message,true)}
+    busy=true;try{const latest=await SEC.list('epef');if(latest.some(x=>x.kind==='measurement'&&fp(x)===fp(r))){status('Diese identische Messung ist bereits gespeichert.',true);return;}await SEC.put('epef',{...r,kind:'measurement',id:(crypto.randomUUID?crypto.randomUUID():`manual-${Date.now()}-${Math.floor(Math.random()*100000)}`),createdAt:new Date().toISOString()});status('Messung verschlüsselt gespeichert.');await refresh();$('epef-manual-pef').value='';$('epef-manual-fev1').value='';}catch(e){status('Speichern fehlgeschlagen: '+e.message,true)}finally{busy=false}
   });
   $('epef-file').addEventListener('change',loadFile);$('epef-sheet').addEventListener('change',chooseSheet);$('epef-header').addEventListener('change',updateColumns);
   mcols.forEach(k=>$('epef-col-'+k).addEventListener('change',checkImport));$('epef-import-confirm').addEventListener('click',importApproved);

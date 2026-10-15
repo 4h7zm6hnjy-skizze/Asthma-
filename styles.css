@@ -377,3 +377,24 @@ body :is(input,select,textarea){font-size:max(16px,1rem)}
 .epef-reference{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;font-size:12px;margin-top:11px}
 .epef-reference label{font-weight:750;color:#385d6b}.epef-reference input{width:125px}.epef-reference small{color:#6d8490;flex:1 1 230px}
 .epef-panel #epef-month{max-width:190px}.epef-chart-svg circle{cursor:pointer}.epef-panel #epef-selected{font-size:12px;margin:0 0 11px;color:#496975}
+
+/* 2.2.0: prominent secure Peak-Flow dashboard – all content stays within mobile viewport */
+.home-epef{margin:18px 0 24px;padding:18px 18px 20px;border:1px solid #c8dfe4;border-radius:19px;background:#f0f8f8;min-width:0;max-width:100%;box-sizing:border-box}
+.home-epef-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.home-epef-heading h3{font-size:clamp(20px,3vw,26px);margin:4px 0 6px;color:#183d50}
+.home-epef-heading p:not(.section-kicker){color:#59727d;font-size:14px;margin:0 0 5px;line-height:1.5}
+.home-epef-heading .version-chip{flex-shrink:0}
+.home-epef-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:16px 0 12px}
+.home-epef-toolbar label{font-weight:700;font-size:14px;color:#244b5d}
+.home-epef-toolbar select{font-size:16px;min-width:0;max-width:100%;border:1px solid #bdd6de;background:white;padding:10px 12px;border-radius:10px}
+.home-epef-count{font-size:13px;color:#56717e;flex:1 1 auto}
+.home-epef-charts{grid-template-columns:repeat(2,minmax(0,1fr));max-width:100%}
+.home-epef .epef-chart{min-width:0;overflow:hidden}
+.home-epef .epef-chart-svg{width:100%;height:auto}
+.home-epef-legend{margin:8px 0 13px;display:flex;flex-wrap:wrap;gap:8px 14px}
+.home-epef #home-epef-selected{margin:4px 0 12px;font-size:13px}
+.home-epef-empty{background:#fff;color:#516d79;border:1px solid #ccdfe4;padding:12px;border-radius:12px;margin:8px 0 15px;font-size:14px}
+.home-epef-open{display:inline-flex;justify-content:center;align-items:center;max-width:100%;white-space:normal;text-align:center}
+#epef-clean-duplicates{font-size:14px;margin:8px 0 12px;white-space:normal}
+@media(max-width:720px){.home-epef-charts{grid-template-columns:minmax(0,1fr)}.home-epef{padding:14px 12px;border-radius:14px}}
+@media(max-width:365px){.home-epef-toolbar select,.home-epef-open{width:100%}.home-epef-toolbar{align-items:stretch}}

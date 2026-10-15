@@ -1,5 +1,5 @@
 {
-  "version": "2.1.0",
+  "version": "2.2.0",
   "released": "2026-10-15",
-  "notes": "ePEF XLSX/CSV-Import mit Prüfvorschau, Zeitfarben vor 13 Uhr grün / 13–16:59 blau / ab 17 rot, separate PEF- und FEV1-Verläufe, lokal AES-GCM-verschlüsselt, keine externe Excel-Verarbeitung."
+  "notes": "Peak-Flow- und FEV1-Diagramme direkt auf der Startseite, aus demselben verschlüsselten ePEF-Datenbestand; robuste, idempotente Importvorschau und gezielte Bereinigung identischer Alt-Duplikate."
 }

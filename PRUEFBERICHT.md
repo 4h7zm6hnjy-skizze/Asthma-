@@ -1,3 +1,3 @@
-# Aktueller Prüfbericht
+# Prüfberichte
 
-Siehe `PRUEFBERICHT_2.0.0.md` für die aktuelle Version und deren ausdrücklich begrenzten Prüfumfang. Ältere Prüfberichte bleiben aus historischen Gründen erhalten.
+Aktuell: `PRUEFBERICHT_2.1.0.md`. Ältere Prüfberichte und Einschränkungen bleiben dokumentiert.
