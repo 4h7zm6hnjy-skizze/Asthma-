@@ -15,6 +15,7 @@
   <script defer src="app.js"></script>
   <script defer src="antraege-data.js"></script>
   <script defer src="antraege.js"></script>
+  <script defer src="meine-daten.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Zum Hauptinhalt springen</a>
@@ -22,7 +23,7 @@
     <div class="shell topbar-inner">
       <a class="brand" href="#start" aria-label="Asthma Startseite">
         <span class="brand-icon" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><path d="M20 7v11m0 0-5 5m5-5 5 5M15 23C9 18 5 23 5 30c0 5 7 7 12 1V22m8 1c6-5 10 0 10 7 0 5-7 7-12 1V22" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span><strong>Asthma</strong><small>Wissen · Rechte · Hilfsmittel</small></span>
+        <span><strong>Asthma</strong><small>Wissen · Rechte · Hilfsmittel · Mein Bereich</small></span>
       </a>
       <div class="top-actions"><span id="connection" class="connection" role="status">Lokal nutzbar</span><button class="btn btn-ghost compact" id="update-top" type="button">↻ <span>Update suchen</span></button></div>
     </div>
@@ -34,7 +35,7 @@
           <span class="eyebrow"><span class="tiny-dot"></span> Orientierung für Deutschland</span>
           <h1>Dein Wegweiser<br><em>rund um Asthma.</em></h1>
           <p>Welche Hilfsmittel kommen infrage? Welche Rechte gelten am Arbeitsplatz? Und was ändert sich mit deinem Grad der Behinderung? Hier findest du verständliche Antworten – mit überprüfbaren Quellen.</p>
-          <a class="btn btn-primary hero-apply" href="#antraege">Hilfen und Anträge entdecken →</a>
+          <a class="btn btn-primary hero-apply" href="#antraege">Hilfen und Anträge entdecken →</a> <a class="btn btn-outline hero-private" href="#mein-bereich">Meine Antragsakte öffnen</a>
           <div class="hero-meta"><span>Offizielle Rechtsgrundlagen</span><span>Individuell filterbar</span><span>Ohne Anmeldung</span></div>
         </div>
         <div class="hero-illustration" aria-hidden="true">
@@ -61,7 +62,7 @@
 
 
       <section class="applications panel" id="antraege" aria-labelledby="antraege-title">
-        <div class="section-heading"><div><p class="section-kicker">03 · Hilfen & direkte Antragswege</p><h2 id="antraege-title">Hilfsmittel, Physiotherapie und Anträge</h2><p>Wähle ein Thema. Du siehst die zuständige Stelle, den offiziellen Weg und eine eigene ausfüllbare Mustervorlage. Die App verschickt nichts automatisch.</p></div><span class="version-chip">29 Wege</span></div>
+        <div class="section-heading"><div><p class="section-kicker">02 · Hilfen & direkte Antragswege</p><h2 id="antraege-title">Hilfsmittel, Physiotherapie und Anträge</h2><p>Wähle ein Thema. Du siehst die zuständige Stelle, den offiziellen Weg und eine eigene ausfüllbare Mustervorlage. Die App verschickt nichts automatisch.</p></div><span class="version-chip">29 Wege</span></div>
         <div class="application-note" role="note"><strong>Wichtiger Unterschied:</strong> Ärztliche Verordnungen (z. B. Atemphysiotherapie) darf nur die behandelnde Praxis ausstellen. Die Mustervorlage ist eine Anfrage, kein ärztliches Rezept und kein amtlicher Antrag. GdB allein begründet keine Leistung.</div>
         <div class="application-tools">
           <label class="field">Thema suchen<input id="apply-search" type="search" placeholder="z. B. Atemphysio, Lungensport, Reha, BEM"></label>
@@ -86,8 +87,81 @@
         </div>
       </section>
 
+      <section class="my-area panel" id="mein-bereich" aria-labelledby="my-title">
+        <div class="section-heading"><div><p class="section-kicker">03 · Persönlicher Bereich</p><h2 id="my-title">Anträge, Dokumente & Asthma-Verlauf</h2><p>Deine Einträge und hochgeladenen Dateien bleiben in diesem Browser auf diesem Gerät. Keine Übertragung an GitHub oder die Betreiber der App.</p></div><span class="shield">Lokale Ablage</span></div>
+        <div class="application-note"><strong>Datenschutz:</strong> Lokale Daten sind nicht automatisch verschlüsselt. Andere Personen mit Zugriff auf dein Gerät oder Browserprofil können sie möglicherweise sehen. Sichere wichtige Daten regelmäßig mit dem <strong>verschlüsselten Backup</strong> unten. Private Browserfenster, Browserdaten-Löschung oder Gerätewechsel können Einträge löschen.</div>
+        <div id="private-unavailable" class="private-error" role="alert" hidden>Die lokale Datenbank ist nicht verfügbar. Bitte nutze einen aktuellen Browser ohne privaten Modus. Hier werden keine Daten gespeichert.</div>
+        <nav class="my-tabs" aria-label="Persönliche Bereiche">
+          <button type="button" data-my-tab="cases" class="my-tab active" aria-pressed="true">Antragsakte</button>
+          <button type="button" data-my-tab="documents" class="my-tab" aria-pressed="false">Dokumente</button>
+          <button type="button" data-my-tab="diary" class="my-tab" aria-pressed="false">Asthma-Tagebuch</button>
+          <button type="button" data-my-tab="backup" class="my-tab" aria-pressed="false">Datensicherung</button>
+        </nav>
+        <div id="my-cases" class="my-panel">
+          <div class="my-stats" id="case-stats" aria-live="polite"></div>
+          <div class="my-topline"><h3>Meine Anträge & Bescheide</h3><button type="button" class="btn btn-primary" id="case-new">+ Vorgang hinzufügen</button></div>
+          <p class="input-note">Notiere, was du eingereicht hast, wann der Bescheid kam und welche Frist du selbst anhand des Bescheids geprüft hast. Keine automatische Einreichung oder rechtsverbindliche Fristberechnung. CSV- und Kalenderdateien bleiben in deiner eigenen Verantwortung; sie werden nicht automatisch synchronisiert.</p>
+          <div class="my-actions my-export-tools"><button type="button" id="case-export" class="btn btn-outline">Antragsübersicht CSV</button><button type="button" id="case-calendar" class="btn btn-outline">Termine als Kalenderdatei</button></div><div class="my-filter-grid"><label>Vorgang suchen <input type="search" id="case-search" placeholder="z. B. Reha, Hilfsmittel, GdB"></label><label>Status filtern <select id="case-filter"><option value="all">Alle Status</option><option>Geplant</option><option>Eingereicht</option><option>Nachforderung</option><option>Bewilligt</option><option>Abgelehnt</option><option>Widerspruch</option><option>Abgeschlossen</option></select></label></div>
+          <div id="case-list" class="my-list" aria-live="polite"></div>
+          <form id="case-form" class="my-editor" hidden><div class="my-topline"><h3 id="case-form-title">Vorgang erfassen</h3><button type="button" class="btn btn-outline" id="case-cancel">Schließen</button></div>
+            <div class="my-grid">
+              <label class="wide">Bezeichnung des Vorgangs * <input id="case-title" maxlength="140" required placeholder="z. B. Atemphysiotherapie / GdB-Erhöhung"></label>
+              <label>Bereich <select id="case-category"><option>Hilfsmittel</option><option>Physio & Therapie</option><option>Rehabilitation</option><option>GdB & Gleichstellung</option><option>Arbeitsplatz</option><option>Krankenkasse</option><option>Andere Leistung</option></select></label>
+              <label>Status <select id="case-status"><option>Geplant</option><option>Eingereicht</option><option>Nachforderung</option><option>Bewilligt</option><option>Abgelehnt</option><option>Widerspruch</option><option>Abgeschlossen</option></select></label>
+              <label>Zuständige Stelle / Ansprechpartner <input id="case-authority" maxlength="160" placeholder="z. B. Krankenkasse"></label>
+              <label>Aktenzeichen (optional) <input id="case-reference" maxlength="100"></label>
+              <label>Eingereicht am <input type="date" id="case-submitted"></label>
+              <label>Bescheid / Bekanntgabe am (selbst eintragen) <input type="date" id="case-received"></label>
+              <label>Geprüfte Frist / Wiedervorlage <input type="date" id="case-due"></label>
+              <label class="wide">Notizen / benötigte Unterlagen <textarea id="case-notes" rows="3" maxlength="4000"></textarea></label>
+            </div>
+            <div class="application-note"><strong>Fristen:</strong> Ein Widerspruch im Sozialrecht ist regelmäßig innerhalb eines Monats nach Bekanntgabe einzulegen. Abweichungen sind möglich, etwa bei fehlender Rechtsbehelfsbelehrung, im Ausland oder aufgrund besonderer Verfahrensregeln. Entscheidend sind der Bescheid und die Rechtsbehelfsbelehrung. <a href="https://www.gesetze-im-internet.de/sgg/__84.html" target="_blank" rel="noopener noreferrer">§ 84 SGG</a>, <a href="https://www.gesetze-im-internet.de/sgg/__66.html" target="_blank" rel="noopener noreferrer">§ 66 SGG</a>, <a href="https://www.gesetze-im-internet.de/sgb_10/__26.html" target="_blank" rel="noopener noreferrer">§ 26 SGB X</a>. Diese App berechnet keine rechtsverbindlichen Fristen. Trage dein selbst geprüftes Datum ein.</div>
+            <div class="my-actions"><button class="btn btn-primary" type="submit">Vorgang speichern</button><button type="button" class="btn btn-text" id="case-delete" hidden>Vorgang löschen</button></div>
+          </form>
+        </div>
+        <div id="my-documents" class="my-panel" hidden>
+          <h3>Meine Unterlagen</h3><p class="muted">Fotos von Verordnungen, Anträge, Arztbriefe, Nachweise und Bescheide. Dateitypen: PDF, JPG, PNG, WebP, HEIC, DOC, DOCX und TXT. Je Datei höchstens 12 MB. Kein automatisches Auslesen oder KI-Analysieren.</p>
+          <form id="document-form" class="my-grid my-editor">
+            <label class="wide">Dokumente auswählen * <input id="document-files" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.doc,.docx,.txt,image/jpeg,image/png,image/webp,application/pdf" multiple required></label>
+            <label>Zu einem Antrag zuordnen <select id="document-case"><option value="">Ohne Zuordnung</option></select></label>
+            <label>Dokumentart <select id="document-kind"><option>Arztbrief</option><option>Verordnung</option><option>Bescheid</option><option>Antrag</option><option>Nachweis</option><option>Sonstiges</option></select></label>
+            <div class="wide my-actions"><button class="btn btn-primary" type="submit">Dateien lokal speichern</button></div>
+          </form>
+          <p id="document-storage-note" class="input-note">Dateien bleiben im Browserspeicher. Die verfügbare Speichermenge hängt vom Gerät ab.</p>
+          <div id="document-list" class="my-list"></div>
+        </div>
+        <div id="my-diary" class="my-panel" hidden>
+          <h3>Mein Asthma-Tagebuch</h3><p class="muted">Dokumentiere Symptome, Peak-Flow, Bedarfsmedikation und Auslöser für das Gespräch mit der behandelnden Praxis. Die App stellt keine Diagnose und legt keine individuellen Ampelgrenzen fest.</p>
+          <div class="application-note"><strong>Achtung:</strong> Bei schwerer Atemnot oder Warnzeichen unverzüglich die individuell vereinbarten Notfallmaßnahmen befolgen und im Notfall <strong>112</strong> anrufen. Aus einem einzelnen Peak-Flow-Wert ist keine sichere Behandlungsempfehlung ableitbar. <a href="https://www.lungeninformationsdienst.de/krankheiten/asthma/therapien" target="_blank" rel="noopener noreferrer">Quelle: Lungeninformationsdienst</a>.</div>
+          <form id="diary-form" class="my-editor">
+            <div class="my-grid">
+              <label>Datum * <input type="date" id="diary-date" required></label>
+              <label>Uhrzeit <input type="time" id="diary-time"></label>
+              <label>Peak-Flow (L/min; optional) <input type="number" inputmode="numeric" id="diary-peak" min="50" max="1000" step="1" placeholder="z. B. 430"></label>
+              <label>Beschwerden <select id="diary-symptoms"><option value="0">Keine</option><option value="1">Leicht</option><option value="2">Mittel</option><option value="3">Stark</option></select></label>
+              <label>Bedarfsmedikation: Anwendungen heute (optional) <input type="number" id="diary-rescue" min="0" max="99" step="1" placeholder="Anzahl"></label>
+              <label>Nachts durch Beschwerden aufgewacht? <select id="diary-night"><option value="no">Nein</option><option value="yes">Ja</option></select></label>
+              <label class="wide">Mögliche Auslöser / Belastung / freie Notizen <textarea id="diary-notes" rows="2" maxlength="1500" placeholder="z. B. Sport, Pollen, Wärme, Arbeit"></textarea></label>
+            </div>
+            <div class="my-actions"><button type="submit" class="btn btn-primary">Eintrag speichern</button><button type="button" id="diary-cancel" class="btn btn-outline" hidden>Bearbeitung abbrechen</button><button type="button" id="diary-export" class="btn btn-outline">CSV exportieren</button></div>
+          </form>
+          <div class="diary-chart" id="diary-chart" aria-label="Peak-Flow-Verlauf der letzten Messungen"></div>
+          <div id="diary-stats" class="my-stats"></div>
+          <div id="diary-list" class="my-list"></div>
+        </div>
+        <div id="my-backup" class="my-panel" hidden>
+          <h3>Verschlüsselte Datensicherung</h3><p>Exportiere Anträge, Dokumente, Asthma-Einträge und dein GdB-Profil als <strong>passwortgeschützte AES-GCM-Sicherungsdatei</strong>. Das Passwort wird nicht gespeichert. Ohne dieses Passwort kann die Sicherung nicht entschlüsselt werden. Sichere die Datei außerhalb des Browsers.</p>
+          <form id="backup-export-form" class="my-editor"><label>Passwort für die Datensicherung (mindestens 12 Zeichen) <input type="password" id="backup-password" required minlength="12" autocomplete="new-password"></label><label>Passwort wiederholen <input type="password" id="backup-confirm" required minlength="12" autocomplete="new-password"></label><button class="btn btn-primary" type="submit">Verschlüsseltes Backup herunterladen</button></form>
+          <div class="my-divider"></div><h3>Backup wiederherstellen</h3><p class="muted">Die Wiederherstellung <strong>ersetzt alle bestehenden privaten Einträge, Dokumente und Tagebuchdaten</strong> auf diesem Gerät. Vorher eine eigene Sicherung erstellen!</p>
+          <form id="backup-import-form" class="my-editor"><label>Verschlüsselte Sicherungsdatei <input type="file" id="backup-file" accept=".asthma,.json,application/json" required></label><label>Passwort der Sicherung <input type="password" id="backup-import-password" required autocomplete="off"></label><button type="submit" class="btn btn-outline">Backup prüfen und wiederherstellen</button></form>
+          <div class="my-divider"></div><h3>Datenschutz & Zurücksetzen</h3><p class="muted">Die App speichert Daten in IndexedDB und LocalStorage deines Browsers. Ohne Passcode/verschlüsseltes Gerät sind sie möglicherweise für andere Nutzer dieses Browserprofils zugänglich. Eine Verteilung über Browserprofile oder Geräte findet nicht automatisch statt.</p>
+          <button type="button" id="private-delete-all" class="btn btn-text">Alle privaten Einträge, Dokumente und Tagebuchdaten löschen</button>
+        </div>
+        <p role="status" aria-live="polite" id="my-message" class="my-message"></p>
+      </section>
+
       <section class="explore" aria-labelledby="explore-title">
-        <div class="section-heading explore-heading"><div><p class="section-kicker">02 · Wissensbereich</p><h2 id="explore-title">Rechte und Möglichkeiten entdecken</h2><p>Jeder Beitrag enthält eine Quelle. Ansprüche sind nach ihrem rechtlichen Status gekennzeichnet.</p></div><button id="show-all" class="btn btn-outline" type="button" aria-pressed="false">Alle Themen anzeigen</button></div>
+        <div class="section-heading explore-heading"><div><p class="section-kicker">04 · Wissensbereich</p><h2 id="explore-title">Rechte und Möglichkeiten entdecken</h2><p>Jeder Beitrag enthält eine Quelle. Ansprüche sind nach ihrem rechtlichen Status gekennzeichnet.</p></div><button id="show-all" class="btn btn-outline" type="button" aria-pressed="false">Alle Themen anzeigen</button></div>
         <div class="controls panel-lite">
           <div class="search-wrap"><span aria-hidden="true">⌕</span><input type="search" id="search" placeholder="z. B. Urlaub, Inhalator, Kündigung, Antrag…" aria-label="Themen durchsuchen" autocomplete="off"><button type="button" id="clear-search" class="clear" aria-label="Suche löschen" hidden>×</button></div>
           <div class="tabs" role="group" aria-label="Themen filtern" id="tabs">
@@ -105,14 +179,14 @@
         <div class="empty" id="empty" hidden><h3>Keine passenden Themen gefunden.</h3><p>Versuche einen anderen Suchbegriff oder aktiviere „Alle Themen anzeigen“.</p><button class="btn btn-primary" id="reset-filters" type="button">Filter zurücksetzen</button></div>
       </section>
 
-      <section class="steps panel" aria-labelledby="steps-title"><div class="section-heading"><div><p class="section-kicker">03 · So gehst du vor</p><h2 id="steps-title">Hilfsmittel und Unterstützung beantragen</h2></div></div><div class="step-grid"><article><span>1</span><h3>Bedarf festhalten</h3><p>Symptome, Belastungen und konkrete Einschränkungen im Alltag oder Beruf beschreiben. Ärztliche Unterlagen sammeln.</p></article><article><span>2</span><h3>Stelle klären</h3><p>Medizinische Hilfsmittel: Krankenkasse. Arbeitsbezogene Hilfen: je nach Fall Arbeitgeber, Rehabilitationsträger oder Integrationsamt.</p></article><article><span>3</span><h3>Schriftlich beantragen</h3><p>Individuelle Notwendigkeit begründen lassen, Unterlagen einreichen und einen rechtsmittelfähigen Bescheid anfordern.</p></article><article><span>4</span><h3>Bescheid prüfen</h3><p>Bei Ablehnung Begründung und Rechtsbehelfsbelehrung beachten. Ggf. unabhängige Beratung nutzen.</p></article></div></section>
+      <section class="steps panel" aria-labelledby="steps-title"><div class="section-heading"><div><p class="section-kicker">05 · So gehst du vor</p><h2 id="steps-title">Hilfsmittel und Unterstützung beantragen</h2></div></div><div class="step-grid"><article><span>1</span><h3>Bedarf festhalten</h3><p>Symptome, Belastungen und konkrete Einschränkungen im Alltag oder Beruf beschreiben. Ärztliche Unterlagen sammeln.</p></article><article><span>2</span><h3>Stelle klären</h3><p>Medizinische Hilfsmittel: Krankenkasse. Arbeitsbezogene Hilfen: je nach Fall Arbeitgeber, Rehabilitationsträger oder Integrationsamt.</p></article><article><span>3</span><h3>Schriftlich beantragen</h3><p>Individuelle Notwendigkeit begründen lassen, Unterlagen einreichen und einen rechtsmittelfähigen Bescheid anfordern.</p></article><article><span>4</span><h3>Bescheid prüfen</h3><p>Bei Ablehnung Begründung und Rechtsbehelfsbelehrung beachten. Ggf. unabhängige Beratung nutzen.</p></article></div></section>
 
-      <section class="sources panel" id="quellen" aria-labelledby="sources-title"><div class="section-heading"><div><p class="section-kicker">04 · Transparenz</p><h2 id="sources-title">Quellen & Aktualität</h2><p>Gesetzestexte vom Bundesrecht-Portal sowie Informationen öffentlicher Stellen. Die App überprüft Gesetzesänderungen nicht automatisch.</p></div></div><div id="source-list" class="source-list"></div><p class="muted note">Rechtsstand der eingebauten Erläuterungen: Recherche am 15.10.2026. Spätere Gesetzesänderungen können Abweichungen verursachen. Prüfe vor wichtigen Entscheidungen stets den verlinkten aktuellen Originaltext.</p></section>
+      <section class="sources panel" id="quellen" aria-labelledby="sources-title"><div class="section-heading"><div><p class="section-kicker">06 · Transparenz</p><h2 id="sources-title">Quellen & Aktualität</h2><p>Gesetzestexte vom Bundesrecht-Portal sowie Informationen öffentlicher Stellen. Die App überprüft Gesetzesänderungen nicht automatisch.</p></div></div><div id="source-list" class="source-list"></div><p class="muted note">Rechtsstand der eingebauten Erläuterungen: Recherche am 15.10.2026. Spätere Gesetzesänderungen können Abweichungen verursachen. Prüfe vor wichtigen Entscheidungen stets den verlinkten aktuellen Originaltext.</p></section>
 
-      <section class="app-settings panel" id="app-settings" aria-labelledby="settings-title"><div class="section-heading"><div><p class="section-kicker">05 · App-Einstellungen</p><h2 id="settings-title">Version & Updates</h2></div><span class="version-chip" id="version-chip">v1.1.0</span></div><div class="settings-row"><div><strong>Asthma</strong><p>Updateprüfung auf dem Server, auf dem diese App veröffentlicht ist (z. B. GitHub Pages). Kein App-Store und kein externer Update-Dienst erforderlich.</p><p class="muted">Installationshinweis für iPhone: In Safari „Teilen“ → „Zum Home-Bildschirm“.</p></div><button type="button" id="check-update" class="btn btn-primary">Nach Updates suchen</button></div><p class="update-status" id="update-status" role="status" aria-live="polite">Installierte Version: 1.1.0</p><div class="settings-actions"><button type="button" id="reload-app" class="btn btn-outline" hidden>Neue Version laden</button><button type="button" id="forget" class="btn btn-text">Gespeichertes Profil und Merkliste löschen</button></div><p class="muted privacy">Datenschutz: GdB-Auswahl, Gleichstellungsstatus und Merkliste werden ausschließlich im lokalen Browserspeicher abgelegt. Die App verwendet keine Trackingdienste und sendet keine Profildaten an einen Server. Externe Quellen werden erst geöffnet, wenn du den Link anklickst. Die Updateprüfung fordert nur die Versionsdatei vom Hosting-Server an.</p></section>
+      <section class="app-settings panel" id="app-settings" aria-labelledby="settings-title"><div class="section-heading"><div><p class="section-kicker">07 · App-Einstellungen</p><h2 id="settings-title">Version & Updates</h2></div><span class="version-chip" id="version-chip">v1.2.0</span></div><div class="settings-row"><div><strong>Asthma</strong><p>Updateprüfung auf dem Server, auf dem diese App veröffentlicht ist (z. B. GitHub Pages). Kein App-Store und kein externer Update-Dienst erforderlich.</p><p class="muted">Installationshinweis für iPhone: In Safari „Teilen“ → „Zum Home-Bildschirm“.</p></div><button type="button" id="check-update" class="btn btn-primary">Nach Updates suchen</button></div><p class="update-status" id="update-status" role="status" aria-live="polite">Installierte Version: 1.2.0</p><div class="settings-actions"><button type="button" id="reload-app" class="btn btn-outline" hidden>Neue Version laden</button><button type="button" id="forget" class="btn btn-text">Gespeichertes Profil und Merkliste löschen</button></div><p class="muted privacy">Datenschutz: Die Profil- und Merklisten-Daten werden in LocalStorage, persönliche Anträge, Dokumente und Tagebucheinträge in IndexedDB dieses Browsers gespeichert. Diese lokalen Daten sind nicht automatisch verschlüsselt; nur exportierte Sicherungsdateien werden mit Passwort verschlüsselt. Die App verwendet keine Trackingdienste und sendet keine Profildaten an einen Server. Externe Quellen werden erst geöffnet, wenn du den Link anklickst. Die Updateprüfung fordert nur die Versionsdatei vom Hosting-Server an.</p></section>
     </div>
   </main>
-  <footer><div class="shell footer-inner"><div><strong>Asthma</strong><p>Informationsangebot – keine medizinische Diagnostik und keine individuelle Rechtsberatung. Bei schwerer akuter Atemnot: 112.</p></div><div><a href="#antraege">Anträge</a><a href="#quellen">Quellen</a><a href="#app-settings">Updates</a><span>Version <span id="footer-version">1.1.0</span></span></div></div></footer>
+  <footer><div class="shell footer-inner"><div><strong>Asthma</strong><p>Informationsangebot – keine medizinische Diagnostik und keine individuelle Rechtsberatung. Bei schwerer akuter Atemnot: 112.</p></div><div><a href="#antraege">Anträge</a><a href="#mein-bereich">Mein Bereich</a><a href="#quellen">Quellen</a><a href="#app-settings">Updates</a><span>Version <span id="footer-version">1.2.0</span></span></div></div></footer>
   <section id="antrag-print" aria-label="Druckansicht Mustervorlage" hidden></section>
   <template id="card-template"><article class="card"><div class="card-top"><span class="category-tag"></span><button class="save-btn" type="button" aria-label="Zur Merkliste hinzufügen" title="Merkliste">☆</button></div><h3 class="card-title"></h3><p class="card-summary"></p><span class="status"></span><details class="card-detail"><summary>Details und Voraussetzungen <span aria-hidden="true">⌄</span></summary><div class="details-body"><p class="card-body"></p><div class="card-sources"><strong>Quellen</strong><div class="links"></div></div></div></details></article></template>
 </body>

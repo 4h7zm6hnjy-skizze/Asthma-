@@ -1,1 +1,5 @@
-{"version": "1.1.0", "released": "2026-10-15", "notes": "29 Hilfsmittel-, Therapie- und Antragswege mit offiziellen Quellen, persönlichen Druckvorlagen und direktem Zugriff."}
+{
+  "version": "1.2.0",
+  "released": "2026-10-15",
+  "notes": "Antragsakte, manuelle Fristen, lokales Dokumentenarchiv, Asthma-Tagebuch, CSV-Export und passwortverschlüsselte Backups; weiterhin GdB, Hilfsmittel und Anträge."
+}
