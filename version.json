@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0",
+  "version": "1.7.0",
   "released": "2026-10-15",
-  "notes": "Deutschlandweite Auswahl von Bundesland, Landkreis / kreisfreier Stadt, PLZ und Ort; regionale Behörden- und Unterstützungs-Suche über offizielle Quellen; verifizierter Märkischer-Kreis-/NRW-Antragsweg."
+  "notes": "Passwortgeschützter lokaler Gesamttresor AES-GCM, verschlüsselte Datenmigration, privater Monatskalender und feste Schnellwahl unten; externe OCR/PDF-Code-Nachladung deaktiviert."
 }

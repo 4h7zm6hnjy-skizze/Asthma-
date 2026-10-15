@@ -1,61 +1,40 @@
-# Asthma 1.6.0 – Webapp für Asthma, Lungenwerte und Hilfen
+# Asthma 1.7.0 – Lokal, verschlüsselt, übersichtlich
 
-Installierbare, responsive Webapp für iPhone, Android und Desktop. Quelle: bestehendes Repository `4h7zm6hnjy-skizze/Asthma-`; alle bereits vorhandenen Module aus 1.4.0 bleiben im Paket.
+**Webapp für den persönlichen Gebrauch – kein Medizinprodukt und keine Rechtsberatung.**
 
-## NEU: aufgeräumte Navigation
+## Neue Funktionen
 
-Die bisherige sehr lange Startseite ist in einzelne Ansichten aufgeteilt: Übersicht, Mein Profil, Lungenwerte, Befunde, Therapie, Hilfsmittel, Anträge, Meine Akte, Arbeit, Arztbericht, Wissen und Einstellungen. Die Startseite zeigt wenige Kennzahlen und sechs Schnellzugriffe. Auf schmalen Bildschirmen kann die Navigationsleiste horizontal gewischt werden. Frühere interne `#`-Links führen weiterhin in den passenden Bereich.
+- **Lokaler Gesundheitsdatentresor** mit Passwortpflicht beim Öffnen: PBKDF2-HMAC-SHA-256 (450.000 Iterationen, zufälliger 16-Byte-Salt) und AES-GCM-256 (zufälliger IV je Datensatz). Das Passwort wird nicht auf den Server übertragen. Die verschlüsselten Daten bleiben in der lokalen IndexedDB-Datenbank des Browsers. Der Browser lädt die App-Dateien von GitHub Pages, nicht die Gesundheitsdaten.
+- **Einmalige Migration** der bisherigen Profile, Anträge, Tagebücher, Dokumente und des Gesundheitsmanagers in den Tresor. Nach erfolgreicher Verschlüsselung und Prüfung werden die alten lokalen Datenspeicher logisch gelöscht. Bestehende verschlüsselte Zusatzakten benötigen beim ersten Umzug ihr bisheriges Passwort. Wenn die Bereinigung durch einen offenen alten Tab blockiert ist, erscheint eine Warnung und ein manueller Bereinigungs-Button.
+- **Passwort ändern, App sperren**, automatische Sperre nach 10 Minuten Inaktivität und nach Rückkehr von längerer Hintergrundnutzung.
+- **Vollständiges verschlüsseltes Backup** mit gesondertem Passwort (.asthma17) und Wiederherstellungsprüfung. Falsche Passwörter verändern vorhandene Daten nicht. Zusätzlich bleiben ältere Teil-Backupformate für ausgewählte Bereiche vorhanden.
+- **Feste Schnellwahl unten:** Start, Lungenwerte, Kalender, Anträge, Akte und Mehr. Auf dem Smartphone ersetzen die Buttons die lange obere Navigation.
+- **Privater Monatskalender** mit Arzt-/Therapieterminen, Lungenfunktionsprüfungen, Antragsstellung, Bewilligungen, selbst hinterlegten Fristen und Behandlungen. Lungenfunktionsmessungen, relevante Behandlungstermine, Anträge und Tagebucheinträge aus anderen Modulen werden im Kalender angezeigt. Manuell ergänzte Termine sind bearbeitbar und löschbar.
+- **ICS-Export** für bewusste Übernahme in andere Kalender. ACHTUNG: Die exportierte ICS-Datei ist unverschlüsselt. Es gibt keine automatische externe Kalendersynchronisierung und keine zuverlässigen Push-Benachrichtigungen bei geschlossener App.
+- **Keine extern nachgeladenen OCR-/PDF-Bibliotheken mehr.** Fotoaufnahme und Bildauswahl, Bilddrehung, Zuschnitt und manuelle Datenprüfung bleiben möglich. Bisherige automatische Texterkennung aus Fotos und PDF-Inhaltsauslesung sind aus Datenschutzgründen vorübergehend deaktiviert. Eine Rückkehr wäre erst mit lokal mitgelieferter, getesteter OCR-Software vertretbar.
+- **Content-Security-Policy:** Skripte, Bilder und Netzanfragen der App sind auf denselben Host bzw. lokale Blob-/Datenbilder beschränkt. Externe amtliche Links werden nur durch bewusstes Öffnen besucht.
 
-## Die zwölf Weiterentwicklungen
+## Installation auf GitHub Pages
 
-1. **Befunde**: Fotos per Kamera/Bibliothek wie bisher; zusätzlich PDF-Seite (Auswahl), Bild um 90° drehen, per Ziehen zuschneiden, Originalbild separat in die ältere Dokumentenablage übernehmen. OCR erfolgt weiterhin erst nach explizitem Start und mit manueller Überprüfung.
-2. **Lungenverlauf**: persönlich bestätigte FEV₁- und FVC-Sollwertprozente sowie Literwerte mit Datum, Bronchodilatationsphase und Diagramm speichern, ohne frühere Untersuchungen zu überschreiben. Berechnetes FEV₁/FVC-Verhältnis nur aus Litern.
-3. **Arztbericht**: ausgewählte bestätigte Untersuchungen, Medikamente, altes Tagebuch, Selbstbeobachtung und Arbeitsplatzprotokoll zusammenstellen und über den Browser drucken oder als PDF speichern.
-4. **Therapie**: persönliche Liste von Medikamenten, ärztlicher Dosisangabe, Behandlungsterminen, Rezeptterminen und Notizen. ICS-Kalenderexport. Keine Vorschläge für Dosierungen.
-5. **Hilfen**: verbesserter Einstieg nach Atemnot, Sekretproblemen, Arbeitsplatz und Rehabilitation, direkt verbunden mit den bestehenden 29 Antrags-/Informationswegen und amtlichen Quellen.
-6. **Selbstbeobachtung**: vier einfache Fragen zu Tag-/Nachtsymptomen, Aktivitäten und Bedarfsmedikation mit Verlauf. **Kein** lizenzierter ACT und keine Diagnose.
-7. **Ärztlicher Aktionsplan**: Felder für ausschließlich ärztlich vorgegebene Maßnahmen und persönlichen PEF-Bestwert. Keine automatisch erzeugten Notfall-Schwellen oder Dosierungen.
-8. **Arbeitsbelastungen**: Schicht, Hitze, Staub, Dämpfe, Beschwerden und Notizen dokumentieren und als CSV exportieren.
-9. **Anträge**: persönliche Profildaten nach ausdrücklicher Bestätigung in einen Entwurf übernehmen; Einreichung ist weiterhin manuell und erfolgt nicht automatisch.
-10. **Datenschutz**: optionale AES-GCM-Verschlüsselung mit abgeleitetem Schlüssel für die **neue Zusatzdatenbank**; passwortgeschützte getrennte Exporte für neue und ältere Datensätze.
-11. **Plausibilitätsprüfung**: Zahlen, Einheiten und Lungenvolumen vor Übernahme prüfen, identische Messungen nicht doppelt speichern, bei großen Änderungen Rückfrage. Medizinische Interpretation bleibt ärztliche Aufgabe.
-12. **Wartung**: v1.5.0 auf Versionsanzeige, Update-Datei, Service Worker und Diagnosefunktion abgestimmt. Auf Updates prüfen und Cache aktualisieren bleibt vorhanden.
+1. **Vor dem Update aus der bisherigen App ein vollständiges verschlüsseltes Backup erstellen und sicher aufbewahren.** Unter Umständen enthält es mehrere Teilbestände. Notiere das Passwort separat.
+2. ZIP entpacken und **nur die enthaltenen App-Dateien direkt in das Wurzelverzeichnis** des Repositorys `4h7zm6hnjy-skizze/Asthma-` hochladen, vorhandene gleichnamige Dateien ersetzen. Nicht die ZIP selbst hochladen und keinesfalls persönliche Backups/Befundbilder zu GitHub hochladen.
+3. Unter GitHub `Settings → Pages` ggf. `main / (root)` verwenden. Auf den erfolgreichen Pages-Workflow warten.
+4. App-Link `https://4h7zm6hnjy-skizze.github.io/Asthma-/` öffnen, Version 1.7.0 kontrollieren.
+5. Beim ersten Start neues Tresor-Passwort mit **mindestens 12 Zeichen** eingeben, bestätigen. Falls schon eine ältere **verschlüsselte** Zusatzakte eingerichtet wurde, zusätzlich das alte Passwort eingeben.
+6. Prüfen, ob bisherige Werte, Befunde, Anträge und Termine vorhanden sind. Auf Warnungen zur Bereinigung alter Daten achten und alte App-Tabs schließen.
+7. Ein neues vollständiges `.asthma17`-Backup erstellen, **eigenständig prüfen und extern sicher verwahren**. Das Browser-Storage kann durch Löschen von Websitedaten, Speicherbereinigung, Privatmodus oder einen Gerätewechsel verloren gehen.
 
-## Datenschutz – vor Verwendung lesen
+## Datenschutzgrenzen
 
-- Alte Einträge (`asthma-local-1`, `localStorage`) werden **nicht** migriert oder nachträglich verschlüsselt. Das alte Dokumentenarchiv bleibt lokal unverschlüsselt. Die zusätzliche Verschlüsselung umfasst nur neue Messreihen, Medikamente, Selbstkontrollen, Aktionspläne und Arbeitsbeobachtungen im Speicher `asthma-suite-1`.
-- Bei aktivierter Verschlüsselung wird ein Passwort von mindestens 12 Zeichen benötigt; der App-Anbieter kennt es nicht. Ohne Passwort können diese Daten nicht wiederhergestellt werden. Die exportierten Backup-Dateien sind verschlüsselt, **nicht** die ursprüngliche Download-Ordnerablage.
-- **Zwei getrennte Backups nötig**: Das bisherige unter „Meine Akte“ (inkl. vorhandener Unterlagen/Profile) und zusätzlich das neue unter „Einstellungen“. Keines der Backups darf als vollständige Gesamtsicherung aller Daten missverstanden werden.
-- Der Scanner lädt Tesseract.js und beim PDF-Einlesen PDF.js von einem externen CDN. Die App sendet Bilder nicht absichtlich an einen Bildserver; durch Drittanbieter-Code und die Internetabhängigkeit kann nicht garantiert werden, dass der Scanner offline oder für streng vertrauliche Dokumente geeignet ist.
-- Ohne ausdrücklich gespeicherten Termin können keine verlässlichen Erinnerungen erfolgen; bei geschlossener Webapp funktionieren keine Push-Benachrichtigungen. Der Kalenderexport benötigt die eigene Kalender-App.
-- Browser-Speicher, Private-Browsing, Geräteverlust oder das Entfernen der Website-Daten können persönliche Einträge löschen. Sicherungen regelmäßig extern verwahren und Wiederherstellung testen.
+- Die App enthält keine eigenen Analyse-/Trackingdienste und keine automatische Synchronisierung. **Das bedeutet nicht, dass absolute Vertraulichkeit garantiert ist:** GitHub und das Netz können normale Website-Aufrufe sehen, das Betriebssystem oder ein kompromittiertes Gerät können Daten gefährden; ein manipuliertes GitHub-Update könnte theoretisch ebenfalls Daten auslesen. Nur App-Dateien sind öffentlich auf GitHub, keine persönlichen Inhalte (solange niemand selbst Dateien/Backups hochlädt).
+- Die Webapp ist kein Ersatz für ein unabhängig geprüftes Medizinprodukte- oder Hochsicherheits-System. Es gibt keine unabhängige Sicherheitszertifizierung und keine Ende-zu-Ende-Verschlüsselung mit einem separaten vertrauenswürdigen Server; die App betreibt bewusst keinen eigenen Datenspeicherserver.
+- Die „Löschen“-Funktion entfernt Daten logisch aus dem Browserspeicher, keine forensische Löschgarantie.
+- Die AES-GCM-Verschlüsselung schützt gespeicherte Datensätze, solange die App gesperrt ist und Passwort/Browser/Endgerät nicht kompromittiert wurden. Während der Benutzung liegen entschlüsselte Daten und der Schlüssel vorübergehend im RAM.
+- Beim Teilen/Exportieren von Arztberichten, CSV oder ICS entstehen **unverschlüsselte Dateien**. Nur der ausdrücklich als verschlüsselt gekennzeichnete Komplett-Backup-Export ist geschützt.
+- Für intensive medizinische Nutzung ist es wichtig, original Befundunterlagen zu kontrollieren. Die App erstellt keine Diagnose, keinen automatischen Leistungsanspruch und keine rechtsverbindliche Fristberechnung.
 
-## Hinweise zur Gesundheit und zum Recht
+## Wichtige Dateistruktur
 
-Diese App gibt keine Diagnosen, Therapieänderungen oder garantierte Leistungszusagen. Ein FEV₁-Prozentwert allein reicht weder zur Diagnose noch zur Zuerkennung eines bestimmten GdB oder eines Hilfsmittels. Asthma-Aktionspläne müssen individuell ärztlich festgelegt werden. Bei schwerer akuter Atemnot 112 wählen.
+`index.html`, `styles.css`, `secure17.js`, `calendar17.js`, `content.js`, `app.js`, `antraege-data.js`, `antraege.js`, `meine-daten.js`, `lungenprofil.js`, `befundscan-parser.js`, `befundscan.js`, `suite15.js`, `region16.js`, `sw.js`, `version.json`, `manifest.webmanifest`, `icon.svg` sowie Dokumentationsdateien.
 
-Relevante Originalquellen und Antragswege: `QUELLEN.md`, `ANTRAEGE_QUELLEN.md`, `LUNGENFUNKTION_QUELLEN.md`, `BEFUNDSCANNER_QUELLEN.md`, `QUELLEN_RECHT_1.2.0.md`, `NEUE_QUELLEN.md`.
-
-## Installation / Aktualisierung
-
-1. In der bestehenden App vor dem Upgrade **beide angebotenen Backups sichern**, sofern bereits Daten erfasst sind. Das zweite Backup für die neuen Funktionen gibt es erst nach 1.5.0; ältere Daten müssen weiterhin über „Meine Akte“ gesichert werden.
-2. Inhalt dieser ZIP-Datei **entpackt direkt in das Wurzelverzeichnis** des GitHub-Repositories `https://github.com/4h7zm6hnjy-skizze/Asthma-` laden und gleichnamige Dateien ersetzen.
-3. GitHub Pages in Einstellungen → Pages auf `main` und `/ (root)` belassen; erfolgreichen Build bei Actions kontrollieren.
-4. App öffnen unter `https://4h7zm6hnjy-skizze.github.io/Asthma-/`. Bei alter Anzeige einmal über „Update suchen“ oder neues Laden aktualisieren.
-5. In Safari mit „Teilen“ → „Zum Home-Bildschirm“ installieren.
-
-## Grenzen der Prüfung
-
-Statische JavaScript-Syntax, referenzierte HTML-Elemente und Navigation der zwölf Ansichten sind geprüft. Die lokale Chromium-Testumgebung sperrt alle URL-Navigationen und gibt im isolierten `about:blank`-Modus keinen Zugriff auf IndexedDB oder WebCrypto frei. Deshalb sind **Kamera-/PDF-OCR, reale Speicherung, AES-Verschlüsselung/Restore sowie der neue Service-Worker auf einem echten iPhone und GitHub Pages nicht end-to-end getestet**. Sie dürfen nicht als vollständig verifiziert gelten. Siehe `PRUEFBERICHT.md`.
-
-
-## Neu 1.6.0: Region & Suche (Deutschland)
-- Separate Seite **Region & Suche** in der Hauptnavigation. Alle 16 Bundesländer auswählbar.
-- Landkreis/kreisfreie Stadt, PLZ und Ort frei eintragbar. Landkreis-Eingabe ist deutschlandweit offen; **keine vollständige oder amtlich geprüfte Kreis-/PLZ-Liste** und keine automatische geografische Plausibilitätsprüfung.
-- Suchbegriffe und Kategorien für offizielle, deutschlandweite Suchwege: Schwerbehindertenrecht (Bundesportal), EUTB, Lungensportregister, DRV-Beratungsstellen und Informationen zu Hilfsmitteln. Für NRW zusätzlich ELSA und für **Märkischer Kreis** die verifizierte offizielle Kreis-Seite.
-- Die Links führen zu echten amtlichen Stellen und Suchportalen. Dort muss ggf. der Wohnort erneut eingegeben werden; es werden keine fiktiven Kontaktstellen oder freien Termine ausgegeben.
-- Region nur lokal im bestehenden `asthma-v1-preferences`-Profil gespeichert. Auch die bestehende verschlüsselte Backupfunktion des Altbereichs enthält diese Profileinstellungen; das **aktive Browserprofil ist nicht verschlüsselt**.
-- Mit "Region zurücksetzen" wird nur die Region entfernt; GdB- und Lungenwerte bleiben bestehen.
-- Neue Datei `region16.js` wird vom Offline-Cache aufgenommen.
-- Vor einem Update bitte die persönliche Akte / lokalen App-Daten sichern.
-- Quellen siehe `REGION_QUELLEN.md`.
+Informationen zu bestehenden medizinischen und rechtlichen Quellen siehe `QUELLEN.md`, `ANTRAEGE_QUELLEN.md`, `LUNGENFUNKTION_QUELLEN.md`, `REGION_QUELLEN.md` und die weiteren Quellenübersichten.

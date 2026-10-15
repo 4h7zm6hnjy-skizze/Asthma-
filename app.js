@@ -1,13 +1,13 @@
 'use strict';
 (() => {
-  const VERSION = '1.6.0';
+  const VERSION = '1.7.0';
   const STORAGE = 'asthma-v1-preferences';
   const sources = window.ASTHMA_SOURCES || {};
   const articles = window.ASTHMA_ARTICLES || [];
   const categories = {hilfsmittel:'Hilfsmittel',arbeit:'Arbeitsrecht',gdb:'GdB & Anträge',finanzen:'Steuern & Vorteile',wissen:'Asthma-Wissen'};
   const taxes = {20:384,30:620,40:860,50:1140,60:1440,70:1780,80:2120,90:2460,100:2840};
   const $ = (id) => document.getElementById(id);
-  const stored = (() => {try{return JSON.parse(localStorage.getItem(STORAGE) || localStorage.getItem('asthmakompass-v1-preferences') || '{}')}catch{return {}}})();
+  const stored = window.ASTHMA_SECURITY.profileGet();
   const validPercentage = value => value!==null && value!==undefined && value!=='' && Number.isFinite(Number(value)) && Number(value)>=0 && Number(value)<=100 ? Number(value) : null;
   const validLiters = value => value!==null && value!==undefined && value!=='' && Number.isFinite(Number(value)) && Number(value)>=0 && Number(value)<=12 ? Number(value) : null;
   const state = {
@@ -22,7 +22,7 @@
     saved: Array.isArray(stored.saved) ? stored.saved.filter(id=>articles.some(a=>a.id===id)).slice(0,200) : [],
     section:'all', query:'', all:false
   };
-  function persist(){try{localStorage.setItem(STORAGE,JSON.stringify({...JSON.parse(localStorage.getItem(STORAGE)||'{}'),gdb:state.gdb,equal:state.equal,saved:state.saved,fev1:state.fev1,fvc:state.fvc,fev1Liters:state.fev1Liters,fvcLiters:state.fvcLiters,lungDate:state.lungDate,lungSymptoms:state.lungSymptoms}))}catch{}}
+  function persist(){window.ASTHMA_SECURITY.updateProfile({gdb:state.gdb,equal:state.equal,saved:state.saved,fev1:state.fev1,fvc:state.fvc,fev1Liters:state.fev1Liters,fvcLiters:state.fvcLiters,lungDate:state.lungDate,lungSymptoms:state.lungSymptoms}).catch(e=>alert('Profilspeicherung fehlgeschlagen: '+e.message))}
   function eligibleForProtection(){return state.gdb>=50||((state.gdb===30||state.gdb===40)&&state.equal)}
   function getEligibility(card){
     const g=state.gdb;
@@ -125,12 +125,12 @@
     $('check-update').addEventListener('click',checkUpdate);
     $('update-top').addEventListener('click',()=>{window.ASTHMA_NAV?.go('einstellungen');checkUpdate()});
     $('reload-app').addEventListener('click',async()=>{ $('update-status').textContent='Aktualisiere die App-Dateien…';if('serviceWorker' in navigator){try{const reg=await navigator.serviceWorker.getRegistration();if(reg){await reg.update();if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});}}catch{}}location.reload()});
-    $('forget').addEventListener('click',()=>{if(!confirm('GdB-Auswahl, Gleichstellung und Merkliste auf diesem Gerät wirklich löschen?'))return;try{localStorage.removeItem(STORAGE)}catch{}state.gdb=30;state.equal=false;state.fev1=null;state.fvc=null;state.fev1Liters=null;state.fvcLiters=null;state.lungDate='';state.lungSymptoms=[];state.saved=[];state.section='all';state.query='';state.all=false;$('search').value='';render();window.dispatchEvent(new Event('asthma:profile-reset'));$('update-status').textContent='Lokale Profildaten wurden gelöscht.'});
+    $('forget').addEventListener('click',()=>{if(!confirm('GdB-Auswahl, Gleichstellung und Merkliste auf diesem Gerät wirklich löschen?'))return;window.ASTHMA_SECURITY.profileClear().catch(e=>alert(e.message));state.gdb=30;state.equal=false;state.fev1=null;state.fvc=null;state.fev1Liters=null;state.fvcLiters=null;state.lungDate='';state.lungSymptoms=[];state.saved=[];state.section='all';state.query='';state.all=false;$('search').value='';render();window.dispatchEvent(new Event('asthma:profile-reset'));$('update-status').textContent='Lokale Profildaten wurden gelöscht.'});
     window.addEventListener('online',updateConnection);window.addEventListener('offline',updateConnection);
   }
   function setupOffline(){
     if(!('serviceWorker' in navigator)||location.protocol==='file:')return;
-    window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).catch(()=>{}));
+    navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).catch(()=>{});
   }
   Object.defineProperty(window,'ASTHMA_PROFILE_BRIDGE',{value:Object.freeze({
     get:()=>({gdb:state.gdb,equal:state.equal,fev1:state.fev1,fvc:state.fvc,fev1Liters:state.fev1Liters,fvcLiters:state.fvcLiters,lungDate:state.lungDate,lungSymptoms:[...state.lungSymptoms]}),

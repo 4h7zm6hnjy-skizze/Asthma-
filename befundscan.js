@@ -6,7 +6,7 @@
   if(!$('scan-panel'))return;
   const parser=window.ASTHMA_OCR_PARSER,profile=window.ASTHMA_PROFILE_BRIDGE;
   if(!parser||!profile){$('scan-progress').textContent='Scanner konnte nicht initialisiert werden.';return;}
-  const cdn='https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.1/tesseract.min.js';
+  // Keine externen OCR-Abhängigkeiten.
   const fieldIDs=['fev1Percent','fvcPercent','fev1Liters','fvcLiters','ratio'];
   const fields={fev1Percent:'scan-fev1-percent',fvcPercent:'scan-fvc-percent',fev1Liters:'scan-fev1-liters',fvcLiters:'scan-fvc-liters',ratio:'scan-ratio'};
   let file=null,objectURL=null,parsed=null,busy=false,worker=null;
@@ -14,17 +14,8 @@
   function releaseImage(){if(objectURL){URL.revokeObjectURL(objectURL);objectURL=null;}file=null;$('scan-preview').removeAttribute('src');$('scan-gallery').value='';$('scan-camera').value='';$('scan-picked').hidden=true;}
   function resetReview(){parsed=null;$('scan-review').hidden=true;$('scan-raw').value='';for(const id of Object.values(fields))$(id).value='';$('scan-date').value='';$('scan-review-warnings').textContent='';}
   function validateFile(f){if(!f)return 'Keine Datei ausgewählt.';if(!(f.type.startsWith('image/')||/\.(jpe?g|png|webp|heic|heif)$/i.test(f.name)))return 'Bitte ein Bild wählen (JPG, PNG, HEIC oder WebP).';if(f.size>15*1024*1024)return 'Bilddatei ist größer als 15 MB. Bitte verkleinern.';return '';}
-  function chosen(f){if(busy)return;const error=validateFile(f);if(error){note(error,true);return;}resetReview();releaseImage();file=f;objectURL=URL.createObjectURL(f);$('scan-preview').src=objectURL;$('scan-filename').textContent=f.name+' · '+(f.size/1024/1024).toFixed(1)+' MB';$('scan-picked').hidden=false;note('Bild ausgewählt. „Werte aus Bild erkennen“ startet die lokale Texterkennung.');}
-  async function loadOCR(){
-    if(window.Tesseract?.createWorker)return window.Tesseract;
-    await new Promise((resolve,reject)=>{
-      let script=document.querySelector('script[data-asthma-ocr]');
-      if(script){script.addEventListener('load',resolve,{once:true});script.addEventListener('error',()=>reject(new Error('OCR-Bibliothek nicht erreichbar')),{once:true});return;}
-      script=document.createElement('script');script.src=cdn;script.async=true;script.dataset.asthmaOcr='1';script.referrerPolicy='no-referrer';script.onload=resolve;script.onerror=()=>{script.remove();reject(Error('OCR-Bibliothek konnte nicht geladen werden'));};document.head.append(script);
-    });
-    if(!window.Tesseract?.createWorker)throw Error('OCR-Bibliothek ist nicht initialisiert');
-    return window.Tesseract;
-  }
+  function chosen(f){if(busy)return;const error=validateFile(f);if(error){note(error,true);return;}resetReview();releaseImage();file=f;objectURL=URL.createObjectURL(f);$('scan-preview').src=objectURL;$('scan-filename').textContent=f.name+' · '+(f.size/1024/1024).toFixed(1)+' MB';$('scan-picked').hidden=false;note('Bild ausgewählt. Die Kontrollfelder lassen sich zur manuellen Übernahme öffnen.');}
+  async function loadOCR(){throw Error('Lokale OCR-Bibliothek fehlt. Keine Drittanbieter-Aufrufe erlaubt.')}
   async function canvasFromImage(f){
     const u=URL.createObjectURL(f);
     try{
@@ -52,30 +43,7 @@
   function parseText(raw){parsed=parser.extractReportValues(raw);const ph=phases(parsed);
     $('scan-phase').value=ph.size===1?[...ph][0]:'unbekannt';fillFromParsed();$('scan-review').hidden=false;
   }
-  async function run(){
-    if(!file||busy)return;busy=true;$('scan-start').disabled=true;const scanned=file;
-    try{
-      if(!navigator.onLine&&!window.Tesseract?.createWorker)throw Error('Für den ersten Start der OCR-Texterkennung wird eine Internetverbindung benötigt.');
-      note('Bild wird vorbereitet …');const canvas=await canvasFromImage(scanned);const api=await loadOCR();
-      note('OCR-Modul wird geladen …');
-      worker=await api.createWorker('eng',1,{workerPath:'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.1/worker.min.js',logger:m=>{
-        if(typeof m.progress==='number')note('Texterkennung: '+Math.round(100*m.progress)+' % · '+(m.status||''));
-      }});
-      const result=await worker.recognize(canvas);
-      const recognized=String(result?.data?.text||'').slice(0,25000);
-      $('scan-raw').value=recognized;
-      parseText(recognized);
-      if(recognized.trim())note('Texterkennung abgeschlossen. Bitte alle Zahlen mit dem Originalbild vergleichen.');
-      else note('Keine lesbaren Zeichen erkannt. Du kannst die Werte in der Kontrollansicht manuell eintragen.',true);
-    }catch(e){
-      // Auch bei Fehlern bleibt die manuelle Eingabe erreichbar.
-      $('scan-raw').value='';parsed=parser.extractReportValues('');$('scan-review').hidden=false;fillFromParsed();
-      note('Scan fehlgeschlagen: '+(e?.message||'Unbekannter Fehler')+'. Du kannst Werte trotzdem manuell eintragen.',true);
-    }finally{
-      if(worker){try{await worker.terminate();}catch{}worker=null;}
-      busy=false;$('scan-start').disabled=false;
-    }
-  }
+  async function run(){parsed=parser.extractReportValues('');$('scan-review').hidden=false;fillFromParsed();note('Bitte alle FEV₁-/FVC-Werte manuell anhand des Fotos eingeben und anschließend bestätigen. Automatische Texterkennung ohne sichere lokale Bibliothek derzeit deaktiviert.');}
   function numeric(id,max){const value=$(id).value.trim().replace(',','.');if(value==='')return null;const n=Number(value);
     if(!/^(?:\d+(?:\.\d+)?|\.\d+)$/.test(value)||!Number.isFinite(n)||n<0||n>max)throw Error('Ungültiger Wert im Feld '+id.replace('scan-','')+' (0 bis '+max+').' );
     return n;
@@ -107,7 +75,7 @@
   }
   $('scan-gallery').addEventListener('change',e=>chosen(e.target.files?.[0]));
   $('scan-camera').addEventListener('change',e=>chosen(e.target.files?.[0]));
-  $('scan-start').addEventListener('click',run);
+  $('scan-start').textContent='Werte aus Foto übernehmen';$('scan-start').addEventListener('click',run);
   $('scan-clear').addEventListener('click',()=>{resetReview();releaseImage();note('Bild verworfen, nichts gespeichert.');});
   $('scan-discard').addEventListener('click',()=>{resetReview();releaseImage();note('Scan abgebrochen, keine Profilwerte verändert.');});
   $('scan-phase').addEventListener('change',fillFromParsed);

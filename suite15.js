@@ -12,15 +12,16 @@
   const flash=(id,text,bad=false)=>{const x=$(id);if(x){x.textContent=text;x.classList.toggle('suite-error',bad)}};
   const button=(name,cb,cl='btn btn-outline')=>{const b=make('button',cl,name);b.type='button';b.addEventListener('click',cb);return b};
   const download=(blob,name)=>{const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),15000)};
-  const csv=(rows,filename)=>download(new Blob(['\uFEFF'+rows.map(row=>row.map(escCSV).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8'}),filename);
+  const csv=(rows,filename)=>{if(!confirm('Diese CSV-Datei ist unverschlüsselt und kann private Gesundheitsangaben enthalten. Fortfahren?'))return;download(new Blob(['\uFEFF'+rows.map(row=>row.map(escCSV).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8'}),filename)};
   const uuid=()=>uid();
   // A. Navigation: jede Ansicht ist einzeln aufrufbar und direkt verlinkbar.
-  const allowed=new Set(['start','profil','region','lungenwerte','befunde','therapie','hilfen','antraege','akte','arbeit','bericht','wissen','einstellungen']);
+  const allowed=new Set(['start','profil','region','kalender','lungenwerte','befunde','therapie','hilfen','antraege','akte','arbeit','bericht','wissen','einstellungen']);
   function go(page,{scroll=true}={}){
     if(!allowed.has(page))page='start';
     qa('[data-nav-page]').forEach(el=>{el.hidden=el.dataset.navPage!==page});
     qa('[data-goto].nav-item').forEach(el=>{const active=el.dataset.goto===page;el.classList.toggle('nav-active',active);el.setAttribute('aria-current',active?'page':'false')});
     document.body.dataset.page=page;
+    document.querySelectorAll('.bottom-dock button').forEach(b=>{const on=b.dataset.goto===page;b.classList.toggle('dock-active',on);b.setAttribute('aria-current',on?'page':'false')});
     if(location.hash!=='#'+page)history.replaceState(null,'','#'+page);
     if(scroll)window.scrollTo({top:0,behavior:'instant'});
     if(page==='bericht'&&database&&!locked())renderDoctor().catch(()=>{});
@@ -39,32 +40,24 @@
     let id=location.hash.slice(1),node=$(id);go(allowed.has(id)?id:node?.closest('[data-nav-page]')?.dataset.navPage||'start',{scroll:false});
     if(node && !allowed.has(id))node.scrollIntoView();
   });
-  // B. New data only. Prior application's legacy stores are deliberately untouched.
-  let database,meta=null,secretKey=null;
-  const dbOpen=()=>new Promise((res,rej)=>{const r=indexedDB.open('asthma-suite-1',1);r.onupgradeneeded=()=>{const db=r.result;if(!db.objectStoreNames.contains('rows'))db.createObjectStore('rows',{keyPath:'key'});if(!db.objectStoreNames.contains('meta'))db.createObjectStore('meta',{keyPath:'key'})};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
-  function transaction(store,mode,work){return new Promise((res,rej)=>{const tx=database.transaction(store,mode);let req;try{req=work(tx.objectStore(store))}catch(e){rej(e);return}tx.oncomplete=()=>res(req?.result);tx.onerror=()=>rej(tx.error);tx.onabort=()=>rej(tx.error)})}
-  const getMeta=()=>transaction('meta','readonly',s=>s.get('vault'));
-  const listRaw=()=>transaction('rows','readonly',s=>s.getAll());
-  const b64=b=>{let out='';for(let i=0;i<b.length;i+=16384)out+=String.fromCharCode(...b.subarray(i,i+16384));return btoa(out)};
+  // B. Gemeinsamer AES-GCM-Tresor. Alle Module nutzen denselben verschlüsselten Speicher.
+  const SEC=window.ASTHMA_SECURITY;
+  let database=true,meta={secure:true},secretKey=true;
+  const locked=()=>!SEC.state().unlocked;
+  const assertUnlocked=()=>{if(locked())throw Error('App gesperrt')};
+  const listRaw=()=>SEC.list('suite');
+  const getMeta=async()=>null;
+  async function entries(type){return (await listRaw()).filter(x=>x.type===type).map(x=>x.value)}
+  async function save(type,item){return SEC.put('suite',{key:type+'/'+item.id,type,value:item},type+'/'+item.id)}
+  async function remove(type,id){return SEC.del('suite',type+'/'+id)}
+  async function enableVault(pass){return SEC.changePassword(pass)}
+  const b64=b=>{let s='';for(let i=0;i<b.length;i+=8192)s+=String.fromCharCode(...b.subarray(i,i+8192));return btoa(s)};
   const ub64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-  async function derive(password,salt){const imported=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',hash:'SHA-256',iterations:310000,salt},imported,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);}
-  async function encryptObj(item,key=secretKey){const iv=crypto.getRandomValues(new Uint8Array(12));const bytes=new TextEncoder().encode(JSON.stringify(item));const cy=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,bytes);return {iv:b64(iv),cipher:b64(new Uint8Array(cy))};}
-  async function decryptObj(row,key=secretKey){const bytes=await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(row.iv)},key,ub64(row.cipher));return JSON.parse(new TextDecoder().decode(bytes));}
-  const locked=()=>Boolean(meta&&!secretKey);
-  const assertUnlocked=()=>{if(locked())throw new Error('Zusatzakte gesperrt. Bitte unter Einstellungen entsperren.')};
-  async function entries(type){assertUnlocked();const rows=await listRaw();const found=[];for(const row of rows.filter(x=>x.type===type))found.push(row.cipher?await decryptObj(row):row.value);return found;}
-  async function save(type,item){assertUnlocked();const row={key:type+'/'+item.id,type};if(meta)Object.assign(row,await encryptObj(item));else row.value=item;await transaction('rows','readwrite',s=>s.put(row));return item;}
-  async function remove(type,id){assertUnlocked();await transaction('rows','readwrite',s=>s.delete(type+'/'+id));}
-  async function enableVault(pass){if(pass.length<12)throw Error('Mindestens 12 Zeichen erforderlich');if(meta){const k=await derive(pass,ub64(meta.salt));const verifier=await decryptObj(meta.verify,k);if(verifier?.check!=='Asthma-vault-v1')throw Error('Ungültiges Passwort');secretKey=k;return;}
-    const salt=crypto.getRandomValues(new Uint8Array(16)),key=await derive(pass,salt),all=await listRaw();const converted=[];
-    for(const row of all){const data=row.cipher?await decryptObj(row):row.value;converted.push({key:row.key,type:row.type,...await encryptObj(data,key)})}
-    // All records + vault settings commit atomically. No plaintext data is deleted before encrypted writes succeed.
-    const settings={key:'vault',salt:b64(salt),verify:await encryptObj({check:'Asthma-vault-v1'},key)};
-    await new Promise((res,rej)=>{const tx=database.transaction(['rows','meta'],'readwrite');for(const r of converted)tx.objectStore('rows').put(r);tx.objectStore('meta').put(settings);tx.oncomplete=res;tx.onerror=()=>rej(tx.error);tx.onabort=()=>rej(tx.error)});
-    meta=settings;secretKey=key;
-  }
-  function setVaultMessage(){const m=meta?(locked()?'Zusatzakte ist gesperrt. Neue Daten bleiben verschlüsselt.':'Zusatzakte ist entsperrt und lokal verschlüsselt.'):'Zusatzakte noch unverschlüsselt. Verschlüsselung ist freiwillig und betrifft neue Module.';flash('vault-state',m)}
-  async function refreshAll(){if(locked()){for(const id of ['measurement-list','report-list','med-list','work-list','control-history'])if($(id))$(id).replaceChildren(make('p','suite-msg','Zusatzakte gesperrt. Unter Einstellungen entsperren.'));setVaultMessage();return}await Promise.all([renderMeasurements(),renderMeds(),renderControls(),renderWork(),renderAction(),renderReports()]);updateDashboard();setVaultMessage();}
+  async function derive(password,salt){const imported=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',hash:'SHA-256',iterations:310000,salt},imported,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+  async function encryptObj(item,key){const iv=crypto.getRandomValues(new Uint8Array(12));const bytes=new TextEncoder().encode(JSON.stringify(item));const data=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,bytes);return{iv:b64(iv),cipher:b64(new Uint8Array(data))}}
+  async function decryptObj(row,key){const data=await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(row.iv)},key,ub64(row.cipher));return JSON.parse(new TextDecoder().decode(data))}
+  function setVaultMessage(){flash('vault-state','Gesamte Gesundheitsakte ist mit Passwort verschlüsselt. Der Tresor schützt auch Lungenwerte, Dokumente und Anträge.')}
+  async function refreshAll(){if(locked()){setVaultMessage();return;}await Promise.all([renderMeasurements(),renderMeds(),renderControls(),renderWork(),renderAction(),renderReports()]);updateDashboard();setVaultMessage();}
   // C. Measurements with phase and manual validation. No artificial clinical thresholds.
   async function saveCurrentMeasurement(source='manuell'){
     const p=window.ASTHMA_PROFILE_BRIDGE?.get();if(!p)throw Error('Lungenprofil ist nicht verfügbar');
@@ -99,7 +92,8 @@
   async function renderWork(){const list=$('work-list');list.replaceChildren();const vals=(await entries('work')).sort((a,b)=>b.date.localeCompare(a.date));for(const x of vals.slice(0,80)){const row=make('article','suite-record');row.append(make('strong','',fmt(x.date)+' · '+x.shift+' · '+x.exposure),make('p','',`${x.temperature===null?'Temperatur nicht erfasst':x.temperature+' °C'} · Beschwerden ${x.symptoms}/3${x.notes?' · '+x.notes:''}`));row.append(button('Löschen',async()=>{if(!confirm('Eintrag löschen?'))return;await remove('work',x.id);await refreshAll();},'btn btn-text'));list.append(row)}if(!vals.length)list.append(make('p','suite-msg','Noch keine Arbeitsplatzbelastungen erfasst.'))}
   async function renderReports(){const list=$('report-list');list.replaceChildren();const r=(await entries('measurements')).filter(x=>x.source==='scanner').sort((a,b)=>b.date.localeCompare(a.date));for(const x of r.slice(0,30))list.append(make('p','suite-record',`${fmt(x.date)} · FEV₁ ${x.fev1??'–'} % · FVC ${x.fvc??'–'} % · bestätigte Werte`));if(!r.length)list.append(make('p','suite-msg','Noch keine aus dem Scanner in den Verlauf übernommenen Messungen.'))}
   // H. Doctor report, printable browser PDF
-  async function legacyDiary(){return new Promise((resolve)=>{const r=indexedDB.open('asthma-local-1');r.onerror=()=>resolve([]);r.onsuccess=()=>{const db=r.result;if(!db.objectStoreNames.contains('diary')){db.close();resolve([]);return}const t=db.transaction('diary');const z=t.objectStore('diary').getAll();z.onsuccess=()=>{db.close();resolve(z.result||[])};z.onerror=()=>{db.close();resolve([])}}})}
+  async function legacyDiary(){return SEC.list('diary')}
+
   async function renderDoctor(){if(locked())return;const box=$('medical-report');if(!box)return;box.replaceChildren();box.append(make('h2','','Asthma – Gesprächsvorbereitung'),make('p','',`Erstellt am ${fmt(today())}. Angaben aus lokalen Einträgen, keine ärztliche Diagnose.`));const groups=[];
     if($('report-measurements').checked){const ms=(await entries('measurements')).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,12);groups.push(['Untersuchungen',ms.map(x=>`${fmt(x.date)} (${x.phase||'nicht angegeben'}): FEV₁ ${x.fev1??'–'} %, FVC ${x.fvc??'–'} %, FEV₁ ${x.fev1Liters??'–'} L, FVC ${x.fvcLiters??'–'} L`)])}
     if($('report-meds').checked){const m=await entries('meds');groups.push(['Medikamente und Termine',m.map(x=>`${x.name} (${x.kind}) · eingetragene Dosis: ${x.dose||'–'} · Termin: ${fmt(x.next)}`)])}
@@ -118,14 +112,10 @@
   function updateScanFile(file){const transfer=new DataTransfer();transfer.items.add(file);$('scan-gallery').files=transfer.files;$('scan-gallery').dispatchEvent(new Event('change',{bubbles:true}));current=file}
   async function transformed(file,angle=0){const bmp=await createImageBitmap(file);let w=bmp.width,h=bmp.height;const canvas=document.createElement('canvas');if(angle%180){canvas.width=h;canvas.height=w}else{canvas.width=w;canvas.height=h};const ctx=canvas.getContext('2d');ctx.translate(canvas.width/2,canvas.height/2);ctx.rotate(angle*Math.PI/180);ctx.drawImage(bmp,-w/2,-h/2);bmp.close();return canvas}
   const asFile=canvas=>new Promise(resolve=>canvas.toBlob(b=>resolve(b?new File([b],'Asthma_Befund_bearbeitet.png',{type:'image/png'}):null),'image/png'));
-  async function pdfPick(file){if(!file||!file.name.toLowerCase().endsWith('.pdf'))return;if(file.size>20*1024*1024){flash('scan-enhance-status','PDF zu groß (maximal 20 MB).',true);return;}flash('scan-enhance-status','PDF-Komponenten werden geladen …');try{const pdfjs=await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs');pdfjs.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';const doc=await pdfjs.getDocument({data:await file.arrayBuffer()}).promise;const n=Math.min(doc.numPages,15);const choice=doc.numPages===1?1:Number(prompt(`Der Bericht enthält ${doc.numPages} Seiten. Welche Seite (1–${n}) soll ausgelesen werden?`,1));if(!Number.isInteger(choice)||choice<1||choice>n){flash('scan-enhance-status','PDF-Auswahl abgebrochen.');return}const page=await doc.getPage(choice);const view=page.getViewport({scale:2});const scale=Math.min(1,2500/Math.max(view.width,view.height));const viewport=page.getViewport({scale:2*scale});const canvas=document.createElement('canvas');canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;const img=await asFile(canvas);if(!img)throw Error('PDF-Seite konnte nicht in ein Bild umgewandelt werden');updateScanFile(img);flash('scan-enhance-status',`Seite ${choice} von ${doc.numPages} bereit. Jetzt Werte aus Bild erkennen.`)}catch(e){flash('scan-enhance-status','PDF konnte nicht verarbeitet werden. PDF.js benötigt beim ersten Einsatz Internet. Alternativ Screenshot als Bild einfügen. '+e.message,true)}}
-  async function archiveOriginal(){
-    const f=current;if(!f){flash('scan-enhance-status','Bitte erst ein Befundbild auswählen.',true);return}
-    if(f.size>12*1024*1024){flash('scan-enhance-status','Bild über 12 MB: bitte extern sichern oder verkleinern.',true);return}
-    if(!confirm('Ausgewähltes Bild in der bisherigen Dokumentenablage speichern? Diese ältere Ablage ist nicht zusätzlich verschlüsselt.'))return;
-    try{await new Promise((resolve,reject)=>{const req=indexedDB.open('asthma-local-1');req.onerror=()=>reject(req.error);req.onsuccess=()=>{const db=req.result;if(!db.objectStoreNames.contains('documents')){db.close();reject(Error('Dokumentenarchiv fehlt'));return}const tx=db.transaction('documents','readwrite');tx.objectStore('documents').put({id:uuid(),name:f.name.slice(0,180)||'Befundbild.png',size:f.size,mime:f.type||'image/png',blob:f,caseId:'',kind:'Lungenfunktion',createdAt:new Date().toISOString()});tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();reject(tx.error)}}});flash('scan-enhance-status','Bild in Meine Akte → Dokumente gespeichert. Bitte dort kontrollieren. Die Dokumentenliste ggf. durch Neuöffnen der App aktualisieren.');}
-    catch(e){flash('scan-enhance-status','Bild konnte nicht archiviert werden: '+e.message,true)}
-  }
+  async function pdfPick(file){if(!file)return;flash('scan-enhance-status','Zum Schutz deiner Daten ist der externe PDF-Reader deaktiviert. Bitte eine PDF-Seite auf deinem Gerät als Screenshot speichern und als Bild öffnen. Es werden keine PDF-Dateien an Fremdserver gesendet.',true)}
+
+  async function archiveOriginal(){const f=$('scan-gallery')?.files?.[0]||$('scan-camera')?.files?.[0];if(!f){flash('scan-enhance-status','Bitte erst ein Bild auswählen.',true);return}try{await SEC.put('documents',{id:uuid(),name:f.name,size:f.size,mime:f.type||'image/png',blob:f,caseId:'',kind:'Lungenfunktion',createdAt:new Date().toISOString()});flash('scan-enhance-status','Befundbild verschlüsselt gespeichert. Zur Ansicht „Meine Akte“ öffnen.')}catch(e){flash('scan-enhance-status','Speichern fehlgeschlagen: '+e.message,true)}}
+
   async function rotateImage(){if(!current){flash('scan-enhance-status','Zuerst ein Bild wählen.',true);return}try{const canvas=await transformed(current,90);const file=await asFile(canvas);if(file){updateScanFile(file);flash('scan-enhance-status','Bild wurde gedreht. Erkennung bei Bedarf erneut starten.')}}catch(e){flash('scan-enhance-status',e.message,true)}}
   async function startCrop(){if(!current){flash('scan-enhance-status','Zuerst ein Bild auswählen.',true);return}try{const bmp=await createImageBitmap(current);cropImage=bmp;const max=1000;const ratio=Math.min(1,max/Math.max(bmp.width,bmp.height));const canvas=$('crop-canvas');canvas.width=Math.round(bmp.width*ratio);canvas.height=Math.round(bmp.height*ratio);canvas.getContext('2d').drawImage(bmp,0,0,canvas.width,canvas.height);cropStart=null;cropEnd=null;$('crop-workspace').hidden=false;}catch(e){flash('scan-enhance-status',e.message,true)}}
   function cropOverlay(){const canvas=$('crop-canvas'),ctx=canvas.getContext('2d');if(!cropImage)return;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(cropImage,0,0,canvas.width,canvas.height);if(!cropStart||!cropEnd)return;const x=Math.min(cropStart.x,cropEnd.x),y=Math.min(cropStart.y,cropEnd.y),w=Math.abs(cropStart.x-cropEnd.x),h=Math.abs(cropStart.y-cropEnd.y);ctx.strokeStyle='#145a72';ctx.lineWidth=4;ctx.strokeRect(x,y,w,h);}
@@ -136,17 +126,11 @@
   async function deriveBackup(pass,salt){return derive(pass,salt)}
   async function backupPackage(pass){const rows=await listRaw(),mt=await getMeta();return {schema:1,app:'Asthma Suite',exported:new Date().toISOString(),rows,meta:mt||null};}
   async function secureExport(pass){const info=await backupPackage();const salt=crypto.getRandomValues(new Uint8Array(16));const key=await deriveBackup(pass,salt);const packed=await encryptObj(info,key);return{type:'Asthma15-Backup',version:1,salt:b64(salt),...packed}}
-  async function secureImport(bytes,pass){const pack=JSON.parse(bytes);if(pack.type!=='Asthma15-Backup'||pack.version!==1||typeof pack.salt!=='string'||!pack.iv||!pack.cipher)throw Error('Falsches Backup-Format');const decoded=await decryptObj(pack,await deriveBackup(pass,ub64(pack.salt)));
-    if(decoded.schema!==1||decoded.app!=='Asthma Suite'||!Array.isArray(decoded.rows)||decoded.rows.length>50000)throw Error('Backup-Struktur ungültig');const uniq=new Set();for(const r of decoded.rows){if(!r||typeof r.key!=='string'||r.key.length>200||typeof r.type!=='string'||r.type.length>40||(!r.cipher&&!r.value)||uniq.has(r.key))throw Error('Backup enthält ungültige Datensätze');uniq.add(r.key)}
-    if(decoded.meta!==null&&(!decoded.meta||typeof decoded.meta.salt!=='string'||!decoded.meta.verify))throw Error('Ungültige Verschlüsselungsdaten');for(const row of decoded.rows){if(!row.key.startsWith(row.type+'/')||row.key!==row.type+'/'+row.key.slice(row.type.length+1)||(decoded.meta&&(!row.cipher||!row.iv))||(!decoded.meta&&row.cipher))throw Error('Inkonsistente Sicherungsdaten');}
-    // Restore additional stores only. Existing 1.4 records are never modified.
-    if(!confirm(`Zusatzdaten aus Backup (${decoded.rows.length} Einträge) ersetzen? Die alte Antragsakte bleibt unverändert.`))return false;
-    await new Promise((res,rej)=>{const tx=database.transaction(['rows','meta'],'readwrite');tx.objectStore('rows').clear();tx.objectStore('meta').clear();for(const r of decoded.rows)tx.objectStore('rows').put(r);if(decoded.meta)tx.objectStore('meta').put(decoded.meta);tx.oncomplete=res;tx.onerror=()=>rej(tx.error);tx.onabort=()=>rej(tx.error)});
-    meta=decoded.meta;secretKey=null;return true;
-  }
+  async function secureImport(bytes,pass){const pack=JSON.parse(bytes);if(pack.type!=='Asthma15-Backup'||pack.version!==1||!pack.salt)throw Error('Unbekanntes altes Backupformat');const decoded=await decryptObj(pack,await derive(pass,ub64(pack.salt)));if(decoded.schema!==1||!Array.isArray(decoded.rows)||decoded.meta)throw Error('Verschlüsselte alte Zusatzbackups vor dem Import gesondert prüfen. Aktuelle v1.7-Gesamtsicherung verwenden.');if(!confirm('Zusatzdaten aus älterem Backup ersetzen?'))return false;await SEC.replace('suite',decoded.rows);return true}
+
   function updateDashboard(){const p=window.ASTHMA_PROFILE_BRIDGE?.get();if(p)$('dash-fev').textContent=p.fev1===null?'–':p.fev1+' %';if(!database||locked()){if(locked())$('dash-due').textContent='Gesperrt';return}Promise.all([entries('measurements'),entries('meds')]).then(([m,meds])=>{$('dash-measurements').textContent=m.length;$('dash-medications').textContent=meds.length;const next=meds.flatMap(x=>[x.next,x.refill]).filter(x=>x&&x>=today()).sort()[0];$('dash-due').textContent=next?fmt(next):'–'}).catch(()=>{});}
   // L. tests/diagnostics
-  async function diagnostics(){const out=[];out.push('Version der Oberfläche: 1.6.0');out.push('Verbindung: '+(navigator.onLine?'online':'offline'));out.push('Datenbank: '+(database?'erreichbar':'nicht verfügbar'));out.push('Zusatzakte: '+(meta?(locked()?'gesperrt':'verschlüsselt / entsperrt'):'unverschlüsselt'));
+  async function diagnostics(){const out=[];out.push('Version der Oberfläche: 1.7.0');out.push('Verbindung: '+(navigator.onLine?'online':'offline'));out.push('Datenbank: '+(database?'erreichbar':'nicht verfügbar'));out.push('Gesamttresor: AES-GCM verschlüsselt');
     if('serviceWorker' in navigator){try{const r=await navigator.serviceWorker.getRegistration();out.push('Offline-Service-Worker: '+(r?.active?'aktiv':'nicht aktiv'))}catch{out.push('Offline-Service-Worker: Prüfung nicht möglich')}}
     try{const r=await fetch('./version.json?test='+Date.now(),{cache:'no-store'});const v=await r.json();out.push('Serverversion: '+v.version)}catch{out.push('Serverversion: offline/unbekannt')}
     flash('suite-diagnostic-status',out.join(' · '));}
@@ -169,15 +153,15 @@
     $('crop-cancel').addEventListener('click',cancelCrop);$('crop-apply').addEventListener('click',()=>applyCrop().catch(e=>flash('scan-enhance-status',e.message,true)));
     // A scanner scan can be added to the longitudinal history after manual checking.
     window.addEventListener('asthma:lung-imported',()=>{const p=window.ASTHMA_PROFILE_BRIDGE?.get();if(!p)return;updateDashboard();if(confirm('Erkannte und bestätigte Werte zusätzlich dauerhaft im Untersuchungsverlauf speichern?')){if($('scan-phase'))$('measurement-phase').value=['vor','nach'].includes($('scan-phase').value)?$('scan-phase').value:'unbekannt';saveCurrentMeasurement('scanner').catch(e=>flash('scan-enhance-status',e.message,true))}});
-    $('vault-form').addEventListener('submit',async e=>{e.preventDefault();try{await enableVault($('vault-pass').value);$('vault-pass').value='';await refreshAll();setVaultMessage()}catch(e){flash('vault-state','Verschlüsselung/Entsperren fehlgeschlagen: '+e.message,true)}});
-    $('vault-lock').addEventListener('click',()=>{secretKey=null;refreshAll().catch(()=>{});setVaultMessage()});
+    $('vault-form').addEventListener('submit',async e=>{e.preventDefault();try{if(!confirm('Gesamtes Tresor-Passwort ändern? Das bisherige Passwort funktioniert anschließend nicht mehr.'))return;await enableVault($('vault-pass').value);$('vault-pass').value='';setVaultMessage()}catch(e){flash('vault-state','Passwortwechsel fehlgeschlagen: '+e.message,true)}});
+    $('vault-lock').addEventListener('click',()=>SEC.lock());
     $('suite-export').addEventListener('submit',async e=>{e.preventDefault();try{const pass=$('suite-backup-pass').value;if(pass.length<12)throw Error('Passwort zu kurz');const obj=await secureExport(pass);download(new Blob([JSON.stringify(obj)],{type:'application/json'}),`Asthma_Zusatzdaten_${today()}.asthma15`);$('suite-backup-pass').value='';flash('suite-backup-message','Verschlüsseltes Zusatzdaten-Backup erstellt. Die ältere Antragsakte wird weiterhin separat über „Meine Akte“ gesichert.')}catch(e){flash('suite-backup-message','Backup fehlgeschlagen: '+e.message,true)}});
     $('suite-import').addEventListener('submit',async e=>{e.preventDefault();try{const f=$('suite-backup-file').files[0];if(!f||f.size>12*1024*1024)throw Error('Datei fehlt oder ist zu groß (max. 12 MB)');const success=await secureImport(await f.text(),$('suite-import-pass').value);if(!success)return;$('suite-import').reset();await refreshAll();flash('suite-backup-message','Zusatzdaten wiederhergestellt. Bei verschlüsseltem Tresor Passwort erneut eingeben.')}catch(e){flash('suite-backup-message','Import abgelehnt. Vorhandene Daten blieben erhalten: '+e.message,true)}});
     $('suite-diagnostics').addEventListener('click',diagnostics);
     $('update-top').addEventListener('click',()=>go('einstellungen'));
     window.addEventListener('asthma:profile-reset',updateDashboard);window.addEventListener('storage',updateDashboard);
   }
-  async function init(){bind();helpWizard();go(allowed.has(location.hash.slice(1))?location.hash.slice(1):($(location.hash.slice(1))?.closest('[data-nav-page]')?.dataset.navPage||'start'),{scroll:false});try{database=await dbOpen();meta=await getMeta();await refreshAll()}catch(e){flash('vault-state','Lokale Zusatzdatenbank nicht verfügbar: '+e.message,true)}}
+  async function init(){bind();helpWizard();go(allowed.has(location.hash.slice(1))?location.hash.slice(1):($(location.hash.slice(1))?.closest('[data-nav-page]')?.dataset.navPage||'start'),{scroll:false});try{database=true;meta={secure:true};await refreshAll()}catch(e){flash('vault-state','Lokale Zusatzdatenbank nicht verfügbar: '+e.message,true)}}
   window.__asthmaSuiteTest=Object.freeze({go,chartSVG,safeNum,fmt});
   init();
 })();

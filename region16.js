@@ -15,7 +15,7 @@
   const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ß/g,'ss').toLowerCase().trim();
   const validCode=s=>stateNames.has(s)?s:'';
   const clean=s=>String(s||'').trim().slice(0,90);
-  const safeStore=()=>{try {return JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('asthmakompass-v1-preferences')||'{}')||{};}catch{return {};}};
+  const safeStore=()=>window.ASTHMA_SECURITY.profileGet();
   const read=()=>{
     const x=safeStore().region||{};
     return {state:validCode(x.state),district:clean(x.district),zip:/^\d{5}$/.test(x.zip||'')?x.zip:'',city:clean(x.city)};
@@ -65,7 +65,7 @@
   }
   function save(info){
     const data=safeStore();data.region=info;
-    localStorage.setItem(KEY,JSON.stringify(data));current=info;
+    window.ASTHMA_SECURITY.updateProfile({region:info}).catch(e=>message("Region konnte nicht gespeichert werden: "+e.message,true));current=info;
     window.dispatchEvent(new CustomEvent('asthma:region-changed',{detail:{...info}}));
   }
   states.forEach(([code,title])=>{const option=node('option','',title);option.value=code;$('region-state').append(option);});
@@ -82,7 +82,7 @@
     catch(e){message('Speichern im Browser ist nicht möglich. Bitte Browserspeicher-Einstellungen prüfen.',true);}
   });
   $('region-clear').addEventListener('click',()=>{
-    try{const data=safeStore();delete data.region;localStorage.setItem(KEY,JSON.stringify(data));current={state:'',district:'',zip:'',city:''};fill();message('Region zurückgesetzt.');render();}
+    try{const data=safeStore();delete data.region;window.ASTHMA_SECURITY.updateProfile({region:null}).catch(e=>message(e.message,true));current={state:'',district:'',zip:'',city:''};fill();message('Region zurückgesetzt.');render();}
     catch{message('Die Region konnte nicht gelöscht werden.',true);}
   });
   $('region-category').addEventListener('change',render);
