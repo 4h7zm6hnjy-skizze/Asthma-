@@ -1,0 +1,28 @@
+# Quellenübersicht
+
+Die Quelle ist jeweils zusätzlich direkt im Wissensbeitrag verlinkt. Recherchetermin: 15.10.2026. Der aktuelle Gesetzestext kann von der redaktionellen Fassung abweichen.
+
+- [SGB IX § 2 – Schwerbehinderung und Gleichstellung](https://www.gesetze-im-internet.de/sgb_9_2018/__2.html)
+- [SGB IX § 151 – Gleichstellung](https://www.gesetze-im-internet.de/sgb_9_2018/__151.html)
+- [SGB IX § 152 – Feststellung des GdB](https://www.gesetze-im-internet.de/sgb_9_2018/__152.html)
+- [SGB IX § 164 – Pflichten des Arbeitgebers](https://www.gesetze-im-internet.de/sgb_9_2018/__164.html)
+- [SGB IX § 167 – Prävention und BEM](https://www.gesetze-im-internet.de/sgb_9_2018/__167.html)
+- [SGB IX § 168 – Zustimmung vor Kündigung](https://www.gesetze-im-internet.de/sgb_9_2018/__168.html)
+- [SGB IX § 173 – Ausnahmen beim Kündigungsschutz](https://www.gesetze-im-internet.de/sgb_9_2018/__173.html)
+- [SGB IX § 207 – Befreiung von Mehrarbeit](https://www.gesetze-im-internet.de/sgb_9_2018/__207.html)
+- [SGB IX § 208 – Zusatzurlaub](https://www.gesetze-im-internet.de/sgb_9_2018/__208.html)
+- [SGB IX § 49 – Teilhabe am Arbeitsleben](https://www.gesetze-im-internet.de/sgb_9_2018/__49.html)
+- [SGB IX § 185 – Aufgaben des Integrationsamtes](https://www.gesetze-im-internet.de/sgb_9_2018/__185.html)
+- [SGB IX § 178 – Schwerbehindertenvertretung](https://www.gesetze-im-internet.de/sgb_9_2018/__178.html)
+- [SGB V § 33 – Medizinische Hilfsmittel](https://www.gesetze-im-internet.de/sgb_5/__33.html)
+- [G-BA – Hilfsmittel und Kostenübernahme](https://www.g-ba.de/themen/veranlasste-leistungen/hilfsmittel/)
+- [G-BA – Hilfsmittel-Richtlinie](https://www.g-ba.de/richtlinien/13/)
+- [GewO § 106 – Weisungsrecht des Arbeitgebers](https://www.gesetze-im-internet.de/gewo/__106.html)
+- [ArbSchG § 5 – Gefährdungsbeurteilung](https://www.gesetze-im-internet.de/arbschg/__5.html)
+- [AGG § 7 – Benachteiligungsverbot](https://www.gesetze-im-internet.de/agg/__7.html)
+- [VersMedV Anlage Teil B Nr. 8.3, 8.5, 8.6 – Asthma und Lungenfunktion](https://www.gesetze-im-internet.de/versmedv/anlage.html)
+- [EStG § 33b – Behinderten-Pauschbetrag](https://www.gesetze-im-internet.de/estg/__33b.html)
+- [EStG § 33 Abs. 2a – Fahrtkostenpauschale](https://www.gesetze-im-internet.de/estg/__33.html)
+- [Bundesagentur für Arbeit – Gleichstellungsantrag](https://www.arbeitsagentur.de/menschen-mit-behinderungen/spezielle-hilfe-und-unterstuetzung/gleichstellung)
+- [IQWiG – Gesundheitsinformation.de: Asthma](https://www.gesundheitsinformation.de/asthma.html)
+- [Bundesgesundheitsportal – ICD J45 Asthma](https://gesund.bund.de/icd-code-suche/j45)

@@ -1,0 +1,131 @@
+'use strict';
+(() => {
+  const VERSION = '1.0.0';
+  const STORAGE = 'asthmakompass-v1-preferences';
+  const sources = window.ASTHMA_SOURCES || {};
+  const articles = window.ASTHMA_ARTICLES || [];
+  const categories = {hilfsmittel:'Hilfsmittel',arbeit:'Arbeitsrecht',gdb:'GdB & Anträge',finanzen:'Steuern & Vorteile',wissen:'Asthma-Wissen'};
+  const taxes = {20:384,30:620,40:860,50:1140,60:1440,70:1780,80:2120,90:2460,100:2840};
+  const $ = (id) => document.getElementById(id);
+  const stored = (() => {try{return JSON.parse(localStorage.getItem(STORAGE)||'{}')}catch{return {}}})();
+  const state = {
+    gdb: Number.isInteger(stored.gdb) && stored.gdb>=10 && stored.gdb<=100 && stored.gdb%10===0 ? stored.gdb : 30,
+    equal: stored.equal === true,
+    saved: Array.isArray(stored.saved) ? stored.saved.filter(id=>articles.some(a=>a.id===id)).slice(0,200) : [],
+    section:'all', query:'', all:false
+  };
+  function persist(){try{localStorage.setItem(STORAGE,JSON.stringify({gdb:state.gdb,equal:state.equal,saved:state.saved}))}catch{}}
+  function eligibleForProtection(){return state.gdb>=50||((state.gdb===30||state.gdb===40)&&state.equal)}
+  function getEligibility(card){
+    const g=state.gdb;
+    switch(card.condition){
+      case 'all': return {ok:true,type:'info',text:'Gilt unabhängig vom GdB'};
+      case 'assessment': return {ok:true,type:'check',text:'Individuelle Prüfung nötig'};
+      case 'gdb20': return g>=20?{ok:true,type:'eligible',text:'Ab GdB 20 – steuerliche Voraussetzungen prüfen'}:{ok:false,type:'not',text:'Erst ab festgestelltem GdB 20'};
+      case 'gdb30_40': return (g===30||g===40)?{ok:true,type:'check',text:state.equal?'Gleichstellung laut Auswahl bewilligt':'Antrag auf Gleichstellung möglich'}:{ok:false,type:'not',text:'Relevant bei GdB 30 oder 40'};
+      case 'severe': return g>=50?{ok:true,type:'eligible',text:'Grundsätzlich ab GdB 50'}:{ok:false,type:'not',text:'Nur bei Schwerbehinderung ab GdB 50'};
+      case 'severe_or_equal': return eligibleForProtection()?{ok:true,type:'eligible',text:'Grundsätzlich anwendbar – Ausnahmen beachten'}:{ok:false,type:'not',text:'Ab GdB 50 oder mit bewilligter Gleichstellung'};
+      case 'gdb80': return g>=80?{ok:true,type:'check',text:'Ab GdB 80 – steuerlich prüfen'}:{ok:false,type:'not',text:'Ab GdB 80; alternativ GdB 70 + Merkzeichen G'};
+      case 'gdb70_g': return g===70?{ok:true,type:'check',text:'Nur mit zusätzlich festgestelltem Merkzeichen G'}:{ok:false,type:'not',text:'Zusatzbedingung bei GdB 70'};
+      default: return {ok:true,type:'info',text:'Allgemeine Information'};
+    }
+  }
+  function profile(){
+    $('gdb').value=String(state.gdb);
+    $('equal').value=state.equal?'yes':'no';
+    $('equal-field').hidden = !(state.gdb===30||state.gdb===40);
+    const g=state.gdb;
+    let head='', body='';
+    if(g===10){head='GdB 10 – Orientierungswert';body='Eine behördliche GdB-Feststellung erfolgt gesetzlich erst ab GdB 20. Medizinische Hilfen und Arbeitsschutz können dennoch relevant sein.';}
+    else if(g===20){head='GdB 20 – feststellbarer GdB';body='Der steuerliche Behinderten-Pauschbetrag kann infrage kommen. Gleichstellung nach § 2 Abs. 3 SGB IX ist damit regelmäßig nicht möglich.';}
+    else if(g===30||g===40){head=state.equal?'Gleichstellung ausgewählt':'Gleichstellung kann geprüft werden';body=state.equal?'Mit einer tatsächlich bewilligten Gleichstellung gelten zahlreiche besondere Arbeitsrechte, jedoch kein gesetzlicher Zusatzurlaub nach § 208 SGB IX.':'GdB 30 oder 40 führt nicht automatisch zum besonderen Kündigungsschutz. Bei Gefährdung des Arbeitsplatzes kannst du die Gleichstellung bei der Arbeitsagentur beantragen.';}
+    else{head='Schwerbehinderung ab GdB 50';body='Besondere arbeitsrechtliche Schutzregeln und Zusatzurlaub können greifen. Für einzelne Leistungen gelten weitere Voraussetzungen und Ausnahmen.';}
+    const box=$('profile-result');box.replaceChildren();
+    const h=document.createElement('strong');h.textContent=head;box.append(h);
+    const p=document.createElement('p');p.textContent=body;box.append(p);
+    if(g>=20){const tax=document.createElement('span');tax.className='tax';tax.textContent='Steuerlicher Jahres-Pauschbetrag nach § 33b EStG: '+taxes[g].toLocaleString('de-DE')+' € (kein Auszahlungsbetrag)';box.append(tax);}
+  }
+  function searchMatch(card,needle){
+    if(!needle)return true;
+    const haystack=[card.title,card.short,card.body,categories[card.section],...card.sources.map(s=>sources[s]?.label||'')].join(' ').normalize('NFKD').toLocaleLowerCase('de-DE');
+    return haystack.includes(needle);
+  }
+  function sourceLink(id){
+    const s=sources[id];if(!s)return null;
+    const a=document.createElement('a');a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent=s.label;return a;
+  }
+  function cardNode(card){
+    const node=$('card-template').content.firstElementChild.cloneNode(true);
+    node.dataset.id=card.id;
+    node.querySelector('.category-tag').textContent=categories[card.section];
+    node.querySelector('.card-title').textContent=card.title;
+    node.querySelector('.card-summary').textContent=card.short;
+    node.querySelector('.card-body').textContent=card.body;
+    const info=getEligibility(card),status=node.querySelector('.status');status.className='status '+info.type;status.textContent=info.text;
+    const links=node.querySelector('.links');card.sources.map(sourceLink).filter(Boolean).forEach(a=>links.append(a));
+    const save=node.querySelector('.save-btn');const isSaved=state.saved.includes(card.id);save.classList.toggle('saved',isSaved);save.textContent=isSaved?'★':'☆';save.title=isSaved?'Aus Merkliste entfernen':'Zur Merkliste hinzufügen';save.setAttribute('aria-label',save.title);save.setAttribute('aria-pressed',String(isSaved));
+    save.addEventListener('click',()=>{state.saved=state.saved.includes(card.id)?state.saved.filter(id=>id!==card.id):[...state.saved,card.id];persist();if(state.section==='saved'){render()}else{const now=state.saved.includes(card.id);save.classList.toggle('saved',now);save.textContent=now?'★':'☆';save.title=now?'Aus Merkliste entfernen':'Zur Merkliste hinzufügen';save.setAttribute('aria-label',save.title);save.setAttribute('aria-pressed',String(now));$('saved-count').textContent=state.saved.length;}});
+    return node;
+  }
+  function render(){
+    profile();
+    document.querySelectorAll('.tab').forEach(tab=>{const active=tab.dataset.section===state.section;tab.classList.toggle('active',active);tab.setAttribute('aria-pressed',String(active))});
+    $('show-all').setAttribute('aria-pressed',String(state.all));$('show-all').textContent=state.all?'Nur passende Themen anzeigen':'Alle Themen anzeigen';
+    $('clear-search').hidden=!state.query;
+    $('saved-count').textContent=String(state.saved.length);
+    const term=state.query.trim().normalize('NFKD').toLocaleLowerCase('de-DE');
+    const selected=articles.filter(a=>(state.section==='all'||a.section===state.section||(state.section==='saved'&&state.saved.includes(a.id)))&&searchMatch(a,term)&&(state.all||state.section==='saved'||getEligibility(a).ok));
+    const list=$('cards');const fragment=document.createDocumentFragment();selected.forEach(a=>fragment.append(cardNode(a)));list.replaceChildren(fragment);
+    $('result-count').textContent=`${selected.length} von ${articles.length} Themen ${state.all?'angezeigt':'für deine Auswahl sichtbar'}`;
+    $('empty').hidden=selected.length!==0;
+  }
+  function installSourceList(){const list=$('source-list');const fragment=document.createDocumentFragment();Object.values(sources).forEach(s=>{const a=document.createElement('a');a.className='source-item';a.textContent=s.label;a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';const x=document.createElement('span');x.textContent='↗';x.setAttribute('aria-hidden','true');a.append(x);fragment.append(a)});list.replaceChildren(fragment)}
+  function compareVersions(a,b){
+    const parse=v=>String(v).replace(/^v/i,'').split('.').slice(0,3).map(x=>Number.parseInt(x,10));
+    if(!/^v?\d+\.\d+\.\d+$/.test(a)||!/^v?\d+\.\d+\.\d+$/.test(b))return null;
+    const x=parse(a),y=parse(b);for(let i=0;i<3;i++){if(x[i]>y[i])return 1;if(x[i]<y[i])return -1;}return 0;
+  }
+  async function checkUpdate(){
+    const button=$('check-update');button.disabled=true;button.textContent='Prüfe…';
+    $('update-status').textContent='Versionsdatei auf deinem Hosting-Server wird geprüft…';
+    try{
+      if(location.protocol==='file:')throw new Error('file');
+      const response=await fetch('./version.json?check='+Date.now(),{cache:'no-store'});
+      if(!response.ok)throw new Error('http');
+      const data=await response.json();
+      const comparison=compareVersions(data.version,VERSION);
+      if(comparison===null)throw new Error('version');
+      if(comparison>0){
+        $('update-status').textContent=`Neue Version ${data.version} verfügbar (installiert: ${VERSION}). ${data.notes||''}`;
+        $('reload-app').hidden=false;
+        if('serviceWorker' in navigator)navigator.serviceWorker.getRegistration().then(reg=>reg?.update()).catch(()=>{});
+      }else if(comparison===0){$('update-status').textContent=`Du verwendest die aktuell auf diesem Server veröffentlichte Version ${VERSION}. Das ist keine automatische Prüfung von Gesetzesänderungen.`;$('reload-app').hidden=true;}
+      else{$('update-status').textContent=`Dieser Server meldet Version ${data.version}; geöffnet ist Version ${VERSION}. Bitte Hosting und Browser-Cache prüfen.`;$('reload-app').hidden=false;}
+    }catch(error){
+      $('update-status').textContent=location.protocol==='file:'?'Updateprüfung nur nach Veröffentlichung auf einem Webserver (z. B. GitHub Pages) möglich. Die heruntergeladene HTML-Datei funktioniert als Lesefassung auch ohne Server.':'Updateprüfung aktuell nicht möglich (offline oder Versionsdatei nicht erreichbar). Versuche es später bei bestehender Internetverbindung.';
+    }finally{button.disabled=false;button.textContent='Nach Updates suchen';}
+  }
+  function updateConnection(){const el=$('connection');el.textContent=navigator.onLine?'Online · Offline-Inhalte vorhanden':'Offline · Inhalte verfügbar';}
+  function bindEvents(){
+    $('gdb').addEventListener('change',e=>{const next=Number(e.target.value);if(next!==state.gdb)state.equal=false;state.gdb=next;persist();render()});
+    $('equal').addEventListener('change',e=>{state.equal=e.target.value==='yes';persist();render()});
+    $('search').addEventListener('input',e=>{state.query=e.target.value;render()});
+    $('clear-search').addEventListener('click',()=>{state.query='';$('search').value='';render();$('search').focus()});
+    $('tabs').addEventListener('click',e=>{const b=e.target.closest('button[data-section]');if(!b)return;state.section=b.dataset.section;render()});
+    $('show-all').addEventListener('click',()=>{state.all=!state.all;render()});
+    $('reset-filters').addEventListener('click',()=>{state.all=true;state.section='all';state.query='';$('search').value='';render()});
+    $('check-update').addEventListener('click',checkUpdate);
+    $('update-top').addEventListener('click',()=>{$('app-settings').scrollIntoView({behavior:'smooth'});checkUpdate()});
+    $('reload-app').addEventListener('click',async()=>{ $('update-status').textContent='Aktualisiere die App-Dateien…';if('serviceWorker' in navigator){try{const reg=await navigator.serviceWorker.getRegistration();if(reg){await reg.update();if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});}}catch{}}location.reload()});
+    $('forget').addEventListener('click',()=>{if(!confirm('GdB-Auswahl, Gleichstellung und Merkliste auf diesem Gerät wirklich löschen?'))return;try{localStorage.removeItem(STORAGE)}catch{}state.gdb=30;state.equal=false;state.saved=[];state.section='all';state.query='';state.all=false;$('search').value='';render();$('update-status').textContent='Lokale Profildaten wurden gelöscht.'});
+    window.addEventListener('online',updateConnection);window.addEventListener('offline',updateConnection);
+  }
+  function setupOffline(){
+    if(!('serviceWorker' in navigator)||location.protocol==='file:')return;
+    window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).catch(()=>{}));
+  }
+  $('version-chip').textContent='v'+VERSION;$('footer-version').textContent=VERSION;
+  bindEvents();installSourceList();render();updateConnection();setupOffline();
+  // Für prüfbare Funktionstests ohne Zugriff auf private Profildaten.
+  Object.defineProperty(window,'__asthmaAppTest',{value:Object.freeze({compareVersions,articleCount:articles.length,getEligibility}),enumerable:false});
+})();
