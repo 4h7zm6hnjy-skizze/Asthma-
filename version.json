@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "released": "2026-10-15",
-  "notes": "Antragsakte, manuelle Fristen, lokales Dokumentenarchiv, Asthma-Tagebuch, CSV-Export und passwortverschlüsselte Backups; weiterhin GdB, Hilfsmittel und Anträge."
+  "notes": "Zwei unabhängig einstellbare Lungenfunktionswerte (FEV1/FVC 0–100 % vom Soll), getrennt vom GdB; automatisch passende Orientierung zu Hilfsmitteln, Physio, Reha und Antragswegen."
 }

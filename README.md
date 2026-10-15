@@ -1,8 +1,8 @@
-# Asthma – Version 1.2.0
+# Asthma – Version 1.3.0
 
 Webapp für Asthma, Hilfsmittel, Antragswege, GdB und Arbeitsrecht, ergänzt um einen privaten, lokalen Bereich für Anträge, Unterlagen und einen Symptomverlauf.
 
-## Neu in 1.2.0
+## Neu in 1.3.0
 
 - **Meine Antragsakte:** Vorgänge aus dem Antragszentrum übernehmen oder selbst erstellen; Status (geplant, eingereicht, Nachforderung, bewilligt, abgelehnt, Widerspruch, abgeschlossen), zuständige Stelle, Aktenzeichen, Einreichdatum, Bescheid-Datum, Notizen und selbst geprüftes Fristdatum. Filter und Fristübersicht beim Öffnen der App.
 - **Dokumente:** Lokal PDF, Bilder und einige Office-/Textformate bis 12 MB je Datei hinterlegen und einem Antrag zuordnen; Einzeldateien öffnen/exportieren oder löschen. Kein OCR, kein Upload an einen Cloud-Server.
@@ -38,3 +38,13 @@ Die App ist kein Medizinprodukt, erhebt keinen Anspruch auf medizinische Diagnos
 ## Dateien
 
 `index.html`, `styles.css`, `content.js`, `app.js`, `antraege-data.js`, `antraege.js`, `meine-daten.js`, `sw.js`, `version.json`, `manifest.webmanifest`, `icon.svg`, `QUELLEN.md`, `ANTRAEGE_QUELLEN.md`, `NEUE_QUELLEN.md`, `DATENSCHUTZ.md`, `PRUEFBERICHT.md`, `browser_smoke.py` (älterer Beispieltest).
+
+
+## Neue Funktionen 1.3.0: Lungenfunktions-Profil
+- GdB-Auswahl (10–100), FEV1 (0–100 % vom Soll) und optionale FVC (0–100 % vom Soll) getrennt veränderbar.
+- Sowohl Zahleneingabe als auch Schieberegler, jeweils mit Zurücksetzen; auch der Wert **0 %** ist technisch erlaubt, wird aber mit Verifikationshinweis ausgegeben.
+- Optionales Befunddatum und vier freiwillige Angaben zur Alltagsbelastung.
+- Automatisch aktualisierte Hilfsangebote aus dem vorhandenen Katalog mit passenden offiziellen Quellen und Weiterleitung zu Antragsvorlagen.
+- Automatische Einstufung in einen Bewilligungsanspruch erfolgt **nicht**; insbesondere kein Rückschluss auf Sauerstoffbedarf, GdB, Asthma-Schweregrad oder Therapie aus FEV1/FVC-Sollprozenten allein.
+- Speicherung im bestehenden lokalen Profil: enthalten im passwortverschlüsselten Export der Version 1.2.0; bisherige Profildaten bleiben beim Update erhalten.
+- GINA 2026 stuft FEV1 < 60 % vom Soll als Risikofaktor für Exazerbationen ein. Kein eigenständiges Akut-Notfallkriterium.

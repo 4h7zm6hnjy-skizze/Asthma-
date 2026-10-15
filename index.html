@@ -16,6 +16,7 @@
   <script defer src="antraege-data.js"></script>
   <script defer src="antraege.js"></script>
   <script defer src="meine-daten.js"></script>
+  <script defer src="lungenprofil.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Zum Hauptinhalt springen</a>
@@ -46,12 +47,45 @@
 
     <div class="shell main-layout">
       <section class="profile panel" aria-labelledby="profil-title">
-        <div class="section-heading"><div><p class="section-kicker">01 · Dein Profil</p><h2 id="profil-title">Informationen auf dich abstimmen</h2><p>Die Auswahl steuert die Reihenfolge und Kennzeichnung der Themen, ersetzt aber keine Einzelfallprüfung.</p></div><span class="shield">Privat auf diesem Gerät</span></div>
+        <div class="section-heading"><div><p class="section-kicker">01 · Dein Profil</p><h2 id="profil-title">Informationen auf dich abstimmen</h2><p>GdB und Lungenfunktion sind getrennt einstellbar. Die Eingaben steuern passende Hinweise, keine automatische Bewilligung.</p></div><span class="shield">Privat auf diesem Gerät</span></div>
         <div class="profile-grid">
           <div class="field"><label for="gdb">Grad der Behinderung (GdB)</label><div class="select-wrap"><select id="gdb" aria-describedby="gdb-note"><option value="10">GdB 10</option><option value="20">GdB 20</option><option value="30" selected>GdB 30</option><option value="40">GdB 40</option><option value="50">GdB 50</option><option value="60">GdB 60</option><option value="70">GdB 70</option><option value="80">GdB 80</option><option value="90">GdB 90</option><option value="100">GdB 100</option></select></div><p class="input-note" id="gdb-note">GdB 10 ist als Vergleichswert wählbar; ein behördlicher GdB wird ab 20 festgestellt.</p></div>
           <div class="field" id="equal-field"><label for="equal">Gleichstellung mit schwerbehinderten Menschen</label><div class="select-wrap"><select id="equal"><option value="no">Nein / noch nicht bewilligt</option><option value="yes">Ja, bewilligt</option></select></div><p class="input-note">Bei GdB 30/40 nur nach Antrag und positiver Entscheidung; nicht automatisch.</p></div>
+          <div class="lung-field" id="lung-fieldset">
+            <div class="lung-head"><h3>Lungenfunktionswerte individuell einstellen</h3><span class="version-chip">0–100 %</span></div>
+            <p class="input-note">Beide Werte lassen sich unabhängig voneinander per Schieberegler oder Zahleneingabe verändern. Werte aus deinem Spirometrie-Befund übernehmen – nicht mit Sauerstoffsättigung oder GdB verwechseln.</p>
+            <div class="lung-values">
+              <div class="lung-control">
+                <label for="lung-fev1-number">FEV₁ – Prozent vom Sollwert</label>
+                <div class="lung-number-wrap"><input type="number" id="lung-fev1-number" min="0" max="100" step="1" inputmode="numeric" placeholder="Noch kein Wert" aria-describedby="lung-fev1-help"><span>%</span><button class="lung-clear" id="lung-fev1-clear" type="button">Löschen</button></div>
+                <input type="range" id="lung-fev1-range" min="0" max="100" value="100" step="1" aria-label="FEV1 in Prozent des Sollwerts einstellen">
+                <p class="input-note" id="lung-fev1-help">FEV₁: ausgeatmetes Volumen in einer Sekunde, als Anteil am persönlichen Referenz-Sollwert.</p>
+              </div>
+              <div class="lung-control">
+                <label for="lung-fvc-number">FVC – Prozent vom Sollwert (optional)</label>
+                <div class="lung-number-wrap"><input type="number" id="lung-fvc-number" min="0" max="100" step="1" inputmode="numeric" placeholder="Noch kein Wert" aria-describedby="lung-fvc-help"><span>%</span><button class="lung-clear" id="lung-fvc-clear" type="button">Löschen</button></div>
+                <input type="range" id="lung-fvc-range" min="0" max="100" value="100" step="1" aria-label="FVC in Prozent des Sollwerts einstellen">
+                <p class="input-note" id="lung-fvc-help">FVC: forcierte Vitalkapazität. Die Sollwert-Prozente sind nicht der FEV₁/FVC-Quotient.</p>
+              </div>
+            </div>
+            <div class="lung-extra"><label for="lung-date">Datum der Messung (optional)</label><input type="date" id="lung-date"></div>
+            <fieldset class="lung-symptoms"><legend>Was ist im Alltag zusätzlich ein Problem? (freiwillig)</legend>
+              <label><input type="checkbox" value="dyspnea" name="lung-symptom"> Atemnot bei Belastung</label>
+              <label><input type="checkbox" value="night" name="lung-symptom"> Nächtliche Beschwerden</label>
+              <label><input type="checkbox" value="mucus" name="lung-symptom"> Schleim / schwieriges Abhusten</label>
+              <label><input type="checkbox" value="work" name="lung-symptom"> Belastung am Arbeitsplatz</label>
+            </fieldset>
+            <div id="lung-profile-status" class="lung-profile-status" role="status" aria-live="polite"></div>
+          </div>
           <div class="profile-result" id="profile-result" aria-live="polite"></div>
         </div>
+      </section>
+
+      <section class="lung-recommendations panel" id="lung-empfehlungen" aria-labelledby="lung-recommendations-title">
+        <div class="section-heading"><div><p class="section-kicker">02a · Persönliche Orientierung</p><h2 id="lung-recommendations-title">Welche Unterstützung könnte zu deinen Werten passen?</h2><p>Die Vorschläge berücksichtigen FEV₁, weitere Angaben und deinen GdB unabhängig voneinander. Je Vorschlag erreichst du direkt den passenden Antrag oder die offizielle Informationsseite.</p></div><span class="version-chip" id="lung-match-count">Wird geladen</span></div>
+        <p class="lung-legal-note">Diese Vorschläge sind <strong>keine Diagnose, Bewilligung oder Therapieentscheidung</strong>. Ein niedriger FEV₁-Wert bedeutet nicht automatisch, dass du ein Hilfsmittel oder Sauerstoff benötigst. Medizinische Notwendigkeit und Kostenübernahme werden individuell geprüft.</p>
+        <div id="lung-recommendation-results" class="lung-recommendation-results" aria-live="polite"></div>
+        <p class="lung-sources"><strong>Grundlagen:</strong> <a href="https://ginasthma.org/2026-gina-strategy-report/" target="_blank" rel="noopener noreferrer">GINA 2026</a> · <a href="https://www.nvl-programm.de/themen/asthma" target="_blank" rel="noopener noreferrer">NVL Asthma</a> · <a href="https://www.g-ba.de/themen/veranlasste-leistungen/hilfsmittel/" target="_blank" rel="noopener noreferrer">G-BA Hilfsmittel</a> · <a href="https://www.g-ba.de/themen/veranlasste-leistungen/heilmittel/" target="_blank" rel="noopener noreferrer">G-BA Heilmittel</a></p>
       </section>
 
       <section class="facts-strip" aria-label="Wichtige Hinweise">
@@ -183,10 +217,10 @@
 
       <section class="sources panel" id="quellen" aria-labelledby="sources-title"><div class="section-heading"><div><p class="section-kicker">06 · Transparenz</p><h2 id="sources-title">Quellen & Aktualität</h2><p>Gesetzestexte vom Bundesrecht-Portal sowie Informationen öffentlicher Stellen. Die App überprüft Gesetzesänderungen nicht automatisch.</p></div></div><div id="source-list" class="source-list"></div><p class="muted note">Rechtsstand der eingebauten Erläuterungen: Recherche am 15.10.2026. Spätere Gesetzesänderungen können Abweichungen verursachen. Prüfe vor wichtigen Entscheidungen stets den verlinkten aktuellen Originaltext.</p></section>
 
-      <section class="app-settings panel" id="app-settings" aria-labelledby="settings-title"><div class="section-heading"><div><p class="section-kicker">07 · App-Einstellungen</p><h2 id="settings-title">Version & Updates</h2></div><span class="version-chip" id="version-chip">v1.2.0</span></div><div class="settings-row"><div><strong>Asthma</strong><p>Updateprüfung auf dem Server, auf dem diese App veröffentlicht ist (z. B. GitHub Pages). Kein App-Store und kein externer Update-Dienst erforderlich.</p><p class="muted">Installationshinweis für iPhone: In Safari „Teilen“ → „Zum Home-Bildschirm“.</p></div><button type="button" id="check-update" class="btn btn-primary">Nach Updates suchen</button></div><p class="update-status" id="update-status" role="status" aria-live="polite">Installierte Version: 1.2.0</p><div class="settings-actions"><button type="button" id="reload-app" class="btn btn-outline" hidden>Neue Version laden</button><button type="button" id="forget" class="btn btn-text">Gespeichertes Profil und Merkliste löschen</button></div><p class="muted privacy">Datenschutz: Die Profil- und Merklisten-Daten werden in LocalStorage, persönliche Anträge, Dokumente und Tagebucheinträge in IndexedDB dieses Browsers gespeichert. Diese lokalen Daten sind nicht automatisch verschlüsselt; nur exportierte Sicherungsdateien werden mit Passwort verschlüsselt. Die App verwendet keine Trackingdienste und sendet keine Profildaten an einen Server. Externe Quellen werden erst geöffnet, wenn du den Link anklickst. Die Updateprüfung fordert nur die Versionsdatei vom Hosting-Server an.</p></section>
+      <section class="app-settings panel" id="app-settings" aria-labelledby="settings-title"><div class="section-heading"><div><p class="section-kicker">07 · App-Einstellungen</p><h2 id="settings-title">Version & Updates</h2></div><span class="version-chip" id="version-chip">v1.3.0</span></div><div class="settings-row"><div><strong>Asthma</strong><p>Updateprüfung auf dem Server, auf dem diese App veröffentlicht ist (z. B. GitHub Pages). Kein App-Store und kein externer Update-Dienst erforderlich.</p><p class="muted">Installationshinweis für iPhone: In Safari „Teilen“ → „Zum Home-Bildschirm“.</p></div><button type="button" id="check-update" class="btn btn-primary">Nach Updates suchen</button></div><p class="update-status" id="update-status" role="status" aria-live="polite">Installierte Version: 1.3.0</p><div class="settings-actions"><button type="button" id="reload-app" class="btn btn-outline" hidden>Neue Version laden</button><button type="button" id="forget" class="btn btn-text">Gespeichertes Profil und Merkliste löschen</button></div><p class="muted privacy">Datenschutz: Die Profil-, Lungenfunktions- und Merklisten-Daten werden in LocalStorage, persönliche Anträge, Dokumente und Tagebucheinträge in IndexedDB dieses Browsers gespeichert. Diese lokalen Daten sind nicht automatisch verschlüsselt; nur exportierte Sicherungsdateien werden mit Passwort verschlüsselt. Die App verwendet keine Trackingdienste und sendet keine Profildaten an einen Server. Externe Quellen werden erst geöffnet, wenn du den Link anklickst. Die Updateprüfung fordert nur die Versionsdatei vom Hosting-Server an.</p></section>
     </div>
   </main>
-  <footer><div class="shell footer-inner"><div><strong>Asthma</strong><p>Informationsangebot – keine medizinische Diagnostik und keine individuelle Rechtsberatung. Bei schwerer akuter Atemnot: 112.</p></div><div><a href="#antraege">Anträge</a><a href="#mein-bereich">Mein Bereich</a><a href="#quellen">Quellen</a><a href="#app-settings">Updates</a><span>Version <span id="footer-version">1.2.0</span></span></div></div></footer>
+  <footer><div class="shell footer-inner"><div><strong>Asthma</strong><p>Informationsangebot – keine medizinische Diagnostik und keine individuelle Rechtsberatung. Bei schwerer akuter Atemnot: 112.</p></div><div><a href="#lung-empfehlungen">Empfehlungen</a><a href="#antraege">Anträge</a><a href="#mein-bereich">Mein Bereich</a><a href="#quellen">Quellen</a><a href="#app-settings">Updates</a><span>Version <span id="footer-version">1.3.0</span></span></div></div></footer>
   <section id="antrag-print" aria-label="Druckansicht Mustervorlage" hidden></section>
   <template id="card-template"><article class="card"><div class="card-top"><span class="category-tag"></span><button class="save-btn" type="button" aria-label="Zur Merkliste hinzufügen" title="Merkliste">☆</button></div><h3 class="card-title"></h3><p class="card-summary"></p><span class="status"></span><details class="card-detail"><summary>Details und Voraussetzungen <span aria-hidden="true">⌄</span></summary><div class="details-body"><p class="card-body"></p><div class="card-sources"><strong>Quellen</strong><div class="links"></div></div></div></details></article></template>
 </body>
