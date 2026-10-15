@@ -4,7 +4,7 @@
  const $=id=>document.getElementById(id), SEC=window.ASTHMA_SECURITY;
  const input=$('private-search20'),result=$('private-search-results20'),status=$('private-search-status20');
  if(!input||!SEC)return;
- const category={cases:['Anträge','akte'],documents:['Dokumente','akte'],diary:['Tagebuch','akte'],suite:['Lungenwerte / Therapie','lungenwerte'],calendar:['Kalender','kalender'],labs:['Blutwerte','labor']};
+ const category={cases:['Anträge','akte'],documents:['Dokumente','akte'],diary:['Tagebuch','akte'],suite:['Lungenwerte / Therapie','lungenwerte'],calendar:['Kalender','kalender'],labs:['Blutwerte','labor'],epef:['Peak-Flow / ePEF','lungenwerte']};
  const strings=(v,depth=0)=>{if(depth>3||v==null)return '';if(typeof v==='string')return v.slice(0,1000);if(typeof v==='number')return String(v);if(Array.isArray(v))return v.slice(0,15).map(x=>strings(x,depth+1)).join(' ');if(typeof v==='object'){if(v instanceof Blob||v.$kind==='blob')return '';return Object.entries(v).filter(([k])=>!['data','bytes','blob','cipher','iv','salt','password'].includes(k)).slice(0,30).map(([k,x])=>strings(x,depth+1)).join(' ')}return ''};
  let timer=null,serial=0;
  async function search(){const q=input.value.trim().toLocaleLowerCase('de-DE');const seq=++serial;result.replaceChildren();status.textContent='';if(q.length<2){status.textContent='Mindestens zwei Zeichen eingeben.';return}

@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
+  "version": "2.1.0",
   "released": "2026-10-15",
-  "notes": "Neu geordnete Bereiche, FEV1/FVC-Karten mit Prozent und Litern zusammen, direkter Dokumentenassistent für iPhone Live Text und Text-PDF, lokale Suche in verschlüsselter Akte, korrigierter Passwortwechsel und Funktionstests. Für automatische Foto-OCR auf iPhone-Safari wird weiterhin eine lokal gebündelte OCR-Engine benötigt."
+  "notes": "ePEF XLSX/CSV-Import mit Prüfvorschau, Zeitfarben vor 13 Uhr grün / 13–16:59 blau / ab 17 rot, separate PEF- und FEV1-Verläufe, lokal AES-GCM-verschlüsselt, keine externe Excel-Verarbeitung."
 }

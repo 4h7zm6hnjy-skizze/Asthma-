@@ -322,3 +322,58 @@ body :is(input,select,textarea){font-size:max(16px,1rem)}
 @media (max-width:850px){nav.app-nav{display:none}.bottom-dock{width:100vw;max-width:100%;left:0;right:0}body{overflow-x:clip}}
 @media (max-width:700px){.lung-values.lung-cards-20{grid-template-columns:minmax(0,1fr)}.scan-steps20{grid-template-columns:minmax(0,1fr)}.scan-steps20 li{flex-direction:row;gap:10px;align-items:baseline}}
 @media (max-width:360px){.home20-quick,.hub20-grid{grid-template-columns:minmax(0,1fr)}.lung-unified-grid{grid-template-columns:minmax(0,1fr)}}
+
+
+/* Asthma 2.1: ePEF private import and time-colored charts */
+.epef-panel{margin:30px 0 8px;padding:24px;border:1px solid #d5e8e7;background:linear-gradient(160deg,#f4faf9,#fff 58%);border-radius:18px;min-width:0;overflow:hidden}
+.epef-panel *{box-sizing:border-box;min-width:0}
+.epef-heading{display:flex;align-items:start;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.epef-heading h3{font-size:23px;line-height:1.25;margin:1px 0 7px;color:#153d51}
+.epef-heading p:not(.section-kicker){margin:0;font-size:13px;color:#607985;max-width:640px}
+.epef-legend{display:flex;flex-wrap:wrap;gap:9px 19px;margin:17px 0;font-size:12px;color:#365c69}
+.epef-legend span{display:flex;align-items:center;gap:7px}
+.epef-dot{width:12px;height:12px;display:inline-block;border-radius:50%;flex-shrink:0}
+.epef-green{background:#20865a}.epef-blue{background:#276ac9}.epef-red{background:#c63e4c}
+.epef-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:9px 15px;padding:13px 0;border-block:1px solid #ddebec}
+.epef-toolbar label{font-size:13px;font-weight:750}
+.epef-toolbar select,.epef-panel input,.epef-import-mapping select{min-width:0;max-width:100%;padding:11px 12px;border:1px solid #c9dce1;border-radius:10px;background:#fff;color:#153d51;font-size:16px}
+.epef-stats{font-size:12px;color:#607985;flex:1 1 230px}
+.epef-charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:15px 0}
+.epef-chart{border:1px solid #dce8eb;padding:15px 11px 8px;background:#fff;border-radius:14px;min-width:0}
+.epef-chart h4{font-size:15px;color:#19485a;margin:0 0 6px}
+.epef-chart h4 small{font-size:12px;font-weight:500;color:#738c98}
+.epef-chart-svg{display:block;width:100%;height:auto;max-height:240px;touch-action:pan-y}
+.epef-panel details{background:#fff;border-radius:12px;border:1px solid #d8e6e9;margin:12px 0;padding:14px;max-width:100%}
+.epef-panel details summary{cursor:pointer;font-weight:760;font-size:14px;color:#176879;line-height:1.5}
+.epef-panel details[open]>summary{margin-bottom:15px}
+.epef-panel details p{font-size:13px;color:#566e7d;line-height:1.6}
+.epef-label{font-size:13px;font-weight:700;display:block;margin:12px 0 7px}
+.epef-panel #epef-file{width:100%;font-size:14px;overflow-wrap:anywhere}
+.epef-import-mapping{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+.epef-import-mapping label,.epef-manual-form label{font-size:12px;font-weight:700;color:#375d6b;display:grid;gap:6px}
+.epef-import-mapping select{width:100%;min-width:0}
+.epef-note{font-size:12px!important;color:#647e87!important}
+.epef-scroll{max-width:100%;overflow-x:auto;border:1px solid #d8e5ea;border-radius:10px;margin:12px 0}
+.epef-table{border-collapse:collapse;width:100%;min-width:480px;font-size:12px}
+.epef-table th,.epef-table td{padding:9px 10px;text-align:left;border-bottom:1px solid #e5eef0;white-space:nowrap}
+.epef-table th{background:#edf6f6;color:#254d60}
+.epef-panel button:disabled{opacity:.5;cursor:not-allowed}
+.epef-manual-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.epef-manual-form button{grid-column:1 / -1;justify-self:start}
+.epef-message{padding:10px 14px;background:#e6f5f2;color:#226074;border-radius:9px;font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.epef-message.suite-error{color:#963e36;background:#fff0ed}
+.epef-record-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:14px 0}
+.epef-record-heading h4{margin:0;font-size:16px}
+.epef-history{display:grid;gap:7px}
+.epef-row{display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid #deebee;border-radius:10px;background:#fff}
+.epef-time-mark{width:5px;min-height:39px;border-radius:4px;flex:0 0 5px}
+.epef-row-info{display:grid;gap:2px;flex:1;overflow-wrap:anywhere}
+.epef-row-info strong{font-size:13px;color:#214a5c}
+.epef-row-info span{font-size:12px;color:#627d87}
+.epef-row .btn{font-size:12px;padding:8px;flex-shrink:0}
+@media(max-width:650px){.epef-panel{padding:14px 12px;margin:25px 0}.epef-heading h3{font-size:20px}.epef-charts{grid-template-columns:minmax(0,1fr)}.epef-panel details{padding:12px}.epef-import-mapping{grid-template-columns:1fr}.epef-manual-form{grid-template-columns:repeat(2,minmax(0,1fr))}.epef-row .btn{padding:7px}.lung-quick-actions{flex-wrap:wrap}}
+@media(max-width:365px){.epef-manual-form{grid-template-columns:minmax(0,1fr)}.epef-row{flex-wrap:wrap}}
+
+.epef-reference{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;font-size:12px;margin-top:11px}
+.epef-reference label{font-weight:750;color:#385d6b}.epef-reference input{width:125px}.epef-reference small{color:#6d8490;flex:1 1 230px}
+.epef-panel #epef-month{max-width:190px}.epef-chart-svg circle{cursor:pointer}.epef-panel #epef-selected{font-size:12px;margin:0 0 11px;color:#496975}

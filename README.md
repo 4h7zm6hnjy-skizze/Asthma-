@@ -1,4 +1,8 @@
-# Asthma 2.0.0 – Gesamtupdate
+# Asthma 2.1.0 – Gesamtupdate
+
+**Neu:** ePEF-Peak-Flow-Tagebuch mit lokalem XLSX-/CSV-Import, PEF/FEV₁-Zeitdiagrammen und unveränderter verschlüsselter Datenbank. Weitere Details und Installationsschritte: [`README_EPEF_2.1.0.md`](README_EPEF_2.1.0.md).
+
+# Vorherige Funktionen aus Version 2.0.0
 
 Private, lokal gespeicherte Asthma-Webapp für iPhone/Android/Desktop. **Die bisherigen Daten bleiben in derselben verschlüsselten Datenbank `asthma-secure-17`.** Keine Migration oder Umbenennung des Tresors in diesem Update. **Vor jedem Update ein vollständiges, verschlüsseltes Backup der bisherigen App erstellen.**
 
