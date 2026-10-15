@@ -135,3 +135,30 @@ body .hero[data-nav-page="start"]{display:none!important}
 .cal-events{display:grid;gap:10px;margin-bottom:24px}.cal-event{background:#f7fafb;border:1px solid #d9e6eb;border-radius:12px;padding:12px;display:grid;gap:7px}.cal-event strong{font-size:.95rem}.cal-pill{border-radius:8px;align-self:start;justify-self:start;padding:4px 8px;background:#e2f1f3;color:#265569;font-size:.76rem;font-weight:700}.cal-pill.cal-genehmigt{background:#daf1e5;color:#216348}.cal-pill.cal-frist{background:#fff0d8;color:#805820}.cal-muted{color:#586d75;font-size:.88rem;margin:0}.cal-detail .suite-form{margin-bottom:8px}
 @media(max-width:850px){.calendar-layout{grid-template-columns:1fr}.cal-day{min-height:54px}.bottom-dock{display:grid}.app-nav{display:none!important}}
 @media print{.bottom-dock,.secure-gate{display:none!important}#secure-application{padding-bottom:0}}
+
+/* 1.8.0 · Befundtabellen und lokale Laborakte */
+.scan-privacy{margin:16px 0;padding:14px 16px;background:#eff8f9;border:1px solid #cde5e8;border-radius:14px;color:#254c5e;line-height:1.6}
+#scan-panel .scan-actions{min-width:0;flex-wrap:wrap}
+#scan-paste{max-width:100%;min-width:0;white-space:normal;overflow-wrap:anywhere;line-height:1.45;text-align:center}
+.scan-full-report{margin:16px 0;border-top:1px solid #d8e6ed;padding-top:16px}
+.scan-full-report h4{margin:0 0 8px}
+#scan-extended-rows{display:grid;gap:12px;margin-top:15px}
+.scan-metric-row{border:1px solid #d9e7ec;border-radius:12px;background:#fcfefe;padding:12px;min-width:0}
+.scan-metric-head{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:9px;flex-wrap:wrap}
+.scan-checkline{display:flex;align-items:center;gap:9px;margin:0;font-weight:700}
+.scan-checkline input{width:19px;height:19px;accent-color:#176f83}
+.scan-confidence{border-radius:100px;padding:4px 9px;font-size:12px;font-weight:700;max-width:100%}
+.scan-high{background:#ecf8ed;color:#286143}
+.scan-uncertain{background:#fff2e3;color:#8c510c}
+.scan-metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.scan-metric-grid label{display:flex;flex-direction:column;gap:5px;min-width:0;color:#3c6673;font-size:12px}
+.scan-metric-grid input{min-width:0;width:100%;padding:10px 6px;font-size:15px;border:1px solid #b9d4dd;border-radius:8px;background:#fff;color:#203b4b}
+.scan-original-line{display:block;margin-top:8px;overflow-wrap:anywhere;color:#657d87;font-size:11px;line-height:1.5}
+#labor .suite-subpanel{margin-top:18px}
+#labor .lab-text-label{display:block;margin-top:15px;color:#315469;font-weight:600}
+#labor .lab-text-label textarea{display:block;box-sizing:border-box;width:100%;min-height:110px;margin-top:8px;padding:12px;border:1px solid #bed7e0;border-radius:12px;background:#fff;color:#1b3e50;font-size:14px;line-height:1.5}
+.lab-preview{display:block;width:100%;max-height:380px;object-fit:contain;margin:12px auto;border:1px solid #d2e5eb;border-radius:12px;background:#fff}
+.lab-candidates{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.lab-candidates button{max-width:100%;overflow-wrap:anywhere;white-space:normal}
+#labor .suite-form input,#labor .suite-form select,#labor .suite-form textarea{max-width:100%;box-sizing:border-box}
+@media(max-width:420px){.scan-metric-row{padding:10px}.scan-metric-grid{gap:6px}.scan-metric-grid input{font-size:14px}.scan-privacy{padding:12px}}

@@ -1,22 +1,19 @@
-# Prüfbericht – Asthma 1.7.0
+# Prüfbericht: Asthma 1.8.0 – Befundtabellen und Laborakte
 
-Datum: 15. Oktober 2026. Stand: fertiges ZIP für GitHub Pages, **noch nicht live hochgeladen**.
+Stand: 15.10.2026
 
-| Test | Ergebnis | Einschränkung |
-| --- | --- | --- |
-| Versionsdatei, Script-Einbindungen, Service Worker | bestanden | Live-Cache muss nach Veröffentlichung geprüft werden |
-| JavaScript-Syntax der gelieferten Module | bestanden | Keine vollständige medizinische Fachprüfung |
-| 6 Schnellwahl-Buttons, Navigationswechsel, Kalenderanzeige auf 390px | bestanden | Isolierter Chromium-Browsertest, nicht iOS Safari |
-| Kalendertermin erstellen, verschlüsselte Daten-API verwenden | bestanden | UI-Test mit gemocktem Tresor; reale Browserpersistenz nicht auf iPhone geprüft |
-| Migration alter Profildaten, Anträge, Dokumente und Messwerte | bestanden | Isolierter kryptografischer Test mit künstlichen Daten |
-| Verschlüsselung neuer Einträge AES-GCM / keine Klartextdatensätze | bestanden | Simulierter IndexedDB-Test, keine externe Sicherheitsprüfung |
-| Passwortgeschützter Gesamtexport und Restore | bestanden | Simulierter DB-Test; große echte Backups nicht getestet |
-| Falsches Backup-Passwort verändert keine Daten | bestanden | Simulierter Test |
-| Mobile Darstellung ohne horizontales Scrollen | bestanden | Chromium 390px breit |
-| OCR-/PDF-Drittanbieter-Code | automatische Nachladung entfernt | OCR und PDF-Textauslesen vorübergehend **nicht verfügbar** |
-| Netzwerk-Datenschutz | statische Prüfung der App-Dateien und CSP | Keine Garantie gegen kompromittierten Host/Browsersystem |
-| iPhone/Safari, GitHub-Pages-Live-Deployment | offen | Nutzertest nach Upload erforderlich |
+## Durchgeführt
+- Basis: vollständige Quelldateien von Version 1.7.0, bestehende Passwort- und Dateistrukturen beibehalten.
+- Syntaxprüfung aller ausgelieferten JavaScript-Dateien mit Node.js ohne Fehler.
+- Isolierter Chromium-Test bei 390 px Breite: Navigation, neue Laboransicht, 18 wählbare Labor-/Atemtest-Parameter, Speichern eines Laborwerts (Testdatum), Auswertung der synthetisch transkribierten Geratherm-Messwerttabelle, manuelle Freigabe, Speicherung einer Verlaufsmessung, Kalender, Arztbericht, kein horizontaler Überlauf, keine ungefangenen JavaScript-Fehler.
+- Testfall aus dem Tabellenmuster des Nutzers: FEV1 2,52 l/54 % Soll, FVCex 2,95 l/51 % Soll, FVCin 3,06 l/53 % Soll, VC 3,06 l/51 % Soll, PEF 4,93 l/s/48 % Soll, TLC 4,19 l/51 % Soll, FEV1/FVC 85 %, Untersuchung 17.09.2026, Qualitätswarnung (A). Die **Transkription** wurde getestet, nicht eine stets korrekte automatische Erkennung des Originalfotos im iPhone-Browser.
+- Echter WebCrypto-AES-GCM-Modultest gegen simulierte IndexedDB: verschlüsselte Migration vorhandener Fälle, Dokumente und Messungen, neuer Labor-Datensatz, verschlüsselte Backupdatei, Ablehnung falscher Backupkennwörter, vollständige Wiederherstellung inklusive neuer Laborwerte.
+- Datenschutz: kein externer OCR-/PDF-Dienst eingebunden. Neue persönliche Werte gehen ausschließlich über das bestehende verschlüsselte Datenspeichermodul. Originalfoto ist **nicht** in der GitHub-ZIP enthalten.
 
-**Tests:** `node --check` der JS-Dateien, `node test17_crypto.cjs`, `python test17_ui.py`. Einige End-to-End-Live-Tests in dieser Umgebung schlugen schon beim Navigationszugriff mit `ERR_BLOCKED_BY_ADMINISTRATOR` fehl. Dies ist kein Nachweis eines Fehlers der Webapp, aber beschränkt die Testabdeckung.
-
-**Sicherheitsrelevante Einschränkungen:** Verschlüsselung schützt bei verschlossenem Tresor die lokalen gespeicherten Inhalte, nicht gegen kompromittierte Geräte oder vom Benutzer bewusst exportierte unverschlüsselte Dateien. Browserpersistenz, die Datenmigration einer tatsächlich genutzten älteren Version und die Wiederherstellung großer Dokumente müssen vor alleiniger Nutzung mit einem iPhone überprüft werden. Frühere Daten vor dem Update separat sichern.
+## Nicht vollständig geprüft / bekannte Grenzen
+- **Keine allgemeine 100-%-Foto-OCR:** Ein vollwertiger lokal gebündelter OCR-Motor konnte hier nicht bereitgestellt werden. Native Browsererkennung über `TextDetector` funktioniert nur in Browsern, die diese API anbieten. iPhone Safari unterstützt diese Schnittstelle typischerweise nicht; daher iPhone Live Text -> lokal kopierter Text -> Parser -> manuelle Kontrolle. Kein stilles Hochladen an fremde OCR-Server.
+- Fehler in Fotoqualität, OCR-Ziffern, Zeilen, Layout oder Messphasen sind auch bei sichtbaren Zahlen möglich. Vor Speicherung immer anhand des Originalberichts vergleichen. Bei unklaren oder widersprüchlichen Angaben wird gewarnt. Andere Arztsoftware und exakte prä/post-Spalten sind nicht vollständig abgedeckt.
+- Die Beibehaltung der originalen Befunddatei benötigt wie bisher den separaten Button „Originalbild archivieren“; die Analyse speichert die bestätigten Zahlen/Qualitätshinweise verschlüsselt.
+- Live-Safari/iPhone-Kamera, iOS Live Text, Live-PWA-GitHub-Pages-Aktualisierung und echte vorhandene lokale Patientendaten konnten nicht getestet werden.
+- Ein vollständiges unabhängiges Sicherheits-Audit und eine forensische Prüfung der Datenträger finden nicht statt. Der Hosting-Anbieter sieht übliche HTTP-Aufrufe, jedoch keine durch die App absichtlich übertragenen Gesundheitsdaten.
+- Verschlüsselter Browser-Speicher bleibt bei Browserdatenlöschung oder Gerätewechsel ohne Backup nicht erhalten. Das Passwort selbst kann nicht rekonstruiert werden.

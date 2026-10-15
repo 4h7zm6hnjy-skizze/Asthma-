@@ -1,5 +1,5 @@
 {
-  "version": "1.7.0",
+  "version": "1.8.0",
   "released": "2026-10-15",
-  "notes": "Passwortgeschützter lokaler Gesamttresor AES-GCM, verschlüsselte Datenmigration, privater Monatskalender und feste Schnellwahl unten; externe OCR/PDF-Code-Nachladung deaktiviert."
+  "notes": "Befundscanner mit spaltenweiser Auswertung von Spirometrietabellen, lokaler Browser-OCR soweit unterstützt, iPhone Live Text, vollständigen überprüfbaren Messwerten; asthma-relevante Laborwerte verschlüsselt im Kalender und Arztbericht."
 }

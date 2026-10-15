@@ -1,13 +1,7 @@
-# Befundscanner – Technik und medizinische Einordnung
+# Quellen zur Spirometrie-Auswertung
 
-- ATS: Standardisierte Lungenfunktions-Berichte: https://doi.org/10.1164/rccm.201710-1981ST – Messwerte, Sollwerte, FEV1, FVC und FEV1/FVC getrennt darstellen.
-- ATS/ERS Spirometry Standardization 2019: https://pmc.ncbi.nlm.nih.gov/articles/PMC6794117/ – Prä- und Postbronchodilatator-Werte getrennt angeben und Qualitätsmerkmale berücksichtigen.
-- ERS/ATS Interpretation 2022: https://publications.ersnet.org/content/erj/60/1/2101499 – Befundinterpretation gehört in klinischen Kontext; Werte allein liefern keine Diagnose.
-- OCR-Bibliothek: https://github.com/naptha/tesseract.js – Open-Source-Projekt (Apache-2.0), per CDN mit fixierter Version 5.1.1 eingebunden.
-- API/Technik: https://app.unpkg.com/tesseract.js@5.1.1/files/docs/api.md – `createWorker`, Erkennung clientseitig.
+- ATS/ERS Spirometry Standardization 2019 Update (Standardisierung, Qualität): https://erj.ersjournals.com/content/53/3/1801217
+- Geratherm Respiratory – Blue Cherry (Gerätehersteller; Messkurven, Qualitätskontrollen und anpassbare Druckberichte): https://www.geratherm-respiratory.com/our-products/blue-cherry
+- GINA 2026: https://ginasthma.org/2026-gina-strategy-report/
 
-## Funktionsgrenzen
-
-Die automatische Zuordnung ist eine Zeichen- und Tabellenheuristik. Vor allem unscharfe Fotos, falsche Spalten, mehrfache prä-/post-Messungen und ungewöhnliche Messgeräte-Layouts können zu falschen oder fehlenden Zahlen führen. Ein erkannter Wert ist **niemals** ohne Prüfung ein verlässlicher Messwert. Die App schreibt deshalb erst nach einer ausdrücklichen Bestätigung ins Profil und weist widersprüchliche gemessene Literwerte zurück.
-
-Die OCR-Funktion benötigt beim ersten Start Netzwerkkonnektivität; die externe Bibliothek ist nicht im ZIP enthalten. Nicht getestete Aussage: iPhone-Safari-End-to-End mit echter Kamera und tatsächlicher CDN-Ausführung.
+Die App trennt Sollwert, Messwert, % Soll und den gemessenen Quotienten FEV₁/FVC. Bei getrennten FVCin/FVCex-Messwerten wird **FVCex** für den gewöhnlichen FEV₁/FVC-Vergleich bevorzugt. Tabellen können einzelne Parameter und Qualifikationskennzeichen enthalten, die eine ärztliche Qualitätsbewertung erfordern. Die App kennzeichnet Auffälligkeiten und überträgt nur nach ausdrücklicher manueller Bestätigung. Die Tests mit nachgebildeten Beispielzeilen beweisen **keine 100-%-Erkennung sämtlicher Arztbefunde**.
