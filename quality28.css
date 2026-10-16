@@ -1,0 +1,33 @@
+/* Asthma 2.8.0 professional iPhone usability module */
+.a28-card{border:1px solid #daebee;background:#fff;border-radius:20px;padding:20px;margin:16px 0 21px;box-shadow:0 7px 24px #11506b0d;min-width:0}
+.a28-header{display:flex;justify-content:space-between;align-items:start;gap:13px;margin-bottom:13px}
+.a28-header h2,.a28-header h3{font-size:clamp(20px,3vw,25px);line-height:1.25;color:#0c2849;margin:3px 0 7px}
+.a28-header p:not(.section-kicker){color:#5e7686;font-size:12px;margin:0}
+.a28-version{color:#0b7287;background:#e3f5f7;padding:6px 10px;border-radius:30px;white-space:nowrap;font-size:11px;font-weight:750}
+.a28-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0 19px}
+.a28-kpis>div{border:1px solid #e2edf0;border-radius:14px;padding:13px 12px;min-width:0;background:#f8fcfd;display:flex;flex-direction:column;gap:5px}
+.a28-kpis span{font-size:11px;font-weight:720;color:#526e7e;line-height:1.4}
+.a28-kpis strong{font-size:clamp(18px,3vw,24px);color:#0c4f69;line-height:1.2;overflow-wrap:anywhere}
+.a28-kpis small{font-size:10px;color:#607888;line-height:1.4}
+.a28-form-details{border:1px solid #d9ebef;border-radius:15px;padding:11px 13px;background:#f4fafb;margin:0 0 15px}
+.a28-form-details>summary{cursor:pointer;min-height:39px;font-size:13px;font-weight:790;color:#15566b;display:flex;align-items:center}
+.a28-form-details[open]>summary{margin-bottom:11px}
+.a28-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:11px}
+.a28-grid label,.a28-backup label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:750;color:#345a6e}
+.a28-grid input,.a28-grid select,.a28-grid textarea,.a28-backup input{box-sizing:border-box;width:100%;max-width:100%;min-height:43px;border:1px solid #cadee5;border-radius:10px;padding:9px 10px;font:inherit;font-size:14px;background:white;color:#153f58}
+.a28-grid .a28-check{flex-direction:row;align-items:center;gap:8px}.a28-check input{min-height:20px;width:20px;flex:none}
+.a28-grid .a28-wide{grid-column:1/-1}
+.a28-actions{display:flex;gap:8px;flex-wrap:wrap}.a28-actions .btn{flex:1 1 140px;white-space:normal;font-size:12px}
+.a28-feedback{font-size:12px;color:#216d6b;line-height:1.5;min-height:18px}
+.a28-period{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;color:#416276}.a28-period select{background:#fff;border:1px solid #bfdfe4;border-radius:10px;padding:8px;color:#0e4c62}
+.a28-backup{padding:16px;margin:12px 0;border:1px solid #cde4e9;background:#f7fbfc;border-radius:14px}
+.a28-backup h3{font-size:17px;margin:0 0 8px;color:#174461}
+.a28-backup p{font-size:12px;line-height:1.6}
+.a28-backup form{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:13px}
+.a28-backup form button,.a28-backup form p{grid-column:1/-1;margin:0}
+.a28-back-home{margin:0 0 13px;min-height:41px}
+#a28-diagnostics-status{overflow-wrap:anywhere;font-size:12px;line-height:1.6}
+@media(max-width:580px){.a28-card{padding:14px;margin:12px 0 16px}.a28-kpis{grid-template-columns:1fr;gap:8px}.a28-kpis>div{padding:10px 12px}.a28-kpis strong{font-size:21px}.a28-grid,.a28-backup form{grid-template-columns:1fr}.a28-grid .a28-wide{grid-column:auto}.a28-backup form button,.a28-backup form p{grid-column:auto}.a28-version{font-size:10px}.a28-actions{flex-direction:column}.a28-actions .btn{flex:0 1 auto;width:100%}}
+@media print{.a28-back-home,.a28-actions,.a28-form-details,.a28-backup{display:none!important}}
+
+.a28-doc-search{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#365870;margin:14px 0 10px}.a28-doc-search input{min-height:43px;border:1px solid #c6e0e5;border-radius:11px;padding:9px 12px;font:inherit;background:#fff;color:#184c63}

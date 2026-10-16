@@ -1,5 +1,5 @@
 {
-  "version": "2.7.0",
+  "version": "2.8.0",
   "released": "2026-10-16",
-  "notes": "Peak-Flow und Spirometrie auf eigenen Seiten; privates Patientenprofil, Arzt-Aktionsplan, lokale Messübersicht und Navigation. Bestehende verschlüsselte Gesundheitsdaten bleiben unverändert."
+  "notes": "iPhone-Bedienung, Tages-Schnelleintrag, Lungenverlaufs-Übersicht, Dokumentensuche, lesende verschlüsselte Backup-Prüfung und lokale Diagnose. Keine Änderung des verschlüsselten Datenformats."
 }

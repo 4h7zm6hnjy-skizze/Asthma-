@@ -1,6 +1,6 @@
 'use strict';
 (() => {
-  const VERSION = '2.7.0';
+  const VERSION = '2.8.0';
   const STORAGE = 'asthma-v1-preferences';
   const sources = window.ASTHMA_SOURCES || {};
   const articles = window.ASTHMA_ARTICLES || [];
@@ -125,7 +125,7 @@
     $('check-update').addEventListener('click',checkUpdate);
     $('update-top').addEventListener('click',()=>{window.ASTHMA_NAV?.go('einstellungen');checkUpdate()});
     $('reload-app').addEventListener('click',async()=>{ $('update-status').textContent='Aktualisiere die App-Dateien…';if('serviceWorker' in navigator){try{const reg=await navigator.serviceWorker.getRegistration();if(reg){await reg.update();if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});}}catch{}}location.reload()});
-    $('forget').addEventListener('click',()=>{if(!confirm('GdB-Auswahl, Gleichstellung und Merkliste auf diesem Gerät wirklich löschen?'))return;window.ASTHMA_SECURITY.profileClear().catch(e=>alert(e.message));state.gdb=30;state.equal=false;state.fev1=null;state.fvc=null;state.fev1Liters=null;state.fvcLiters=null;state.lungDate='';state.lungSymptoms=[];state.saved=[];state.section='all';state.query='';state.all=false;$('search').value='';render();window.dispatchEvent(new Event('asthma:profile-reset'));$('update-status').textContent='Lokale Profildaten wurden gelöscht.'});
+    $('forget').addEventListener('click',async()=>{if(!confirm('Achtung: Gesamtes gespeichertes Profil einschließlich persönlicher Angaben (Name, Adresse, Geburtsdatum, Gewicht) sowie GdB und Merkliste löschen? Vorher vollständiges Backup erstellen.'))return;try{await window.ASTHMA_SECURITY.profileClear()}catch(e){$('update-status').textContent='Löschen fehlgeschlagen: '+e.message;return;}state.gdb=30;state.equal=false;state.fev1=null;state.fvc=null;state.fev1Liters=null;state.fvcLiters=null;state.lungDate='';state.lungSymptoms=[];state.saved=[];state.section='all';state.query='';state.all=false;$('search').value='';render();window.dispatchEvent(new Event('asthma:profile-reset'));$('update-status').textContent='Lokale Profildaten wurden gelöscht.'});
     window.addEventListener('online',updateConnection);window.addEventListener('offline',updateConnection);
   }
   function setupOffline(){

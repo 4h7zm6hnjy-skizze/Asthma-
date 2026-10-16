@@ -1,0 +1,13 @@
+ASTHMA 2.8.0 – INSTALLATION NUR MIT iPHONE
+
+1. In deiner bisherigen App vollständiges verschlüsseltes .asthma17-Backup erstellen und in der Dateien-App außerhalb der App sicher aufbewahren.
+2. ZIP in der Dateien-App öffnen und entpacken.
+3. GitHub im Browser öffnen: https://github.com/4h7zm6hnjy-skizze/Asthma-
+4. "Add file" > "Upload files"; ALLE Dateien aus dem entpackten Ordner im ROOT hochladen (neben index.html). Nicht die ZIP selbst hochladen und keine Unterordner erstellen.
+5. Auf "Commit changes" tippen und Veröffentlichung abwarten.
+6. Bisherige App auf demselben iPhone/Safari-/Homescreen-Speicher öffnen, mit dem bisherigen Passwort anmelden und die Version 2.8.0 prüfen.
+7. Bestehende persönliche Daten, Medikamente, Kalender und Dokumente kontrollieren. In Einstellungen eine gespeicherte Sicherung LESEND auf Korrektheit prüfen.
+
+WICHTIG: NICHT die alte Home-Bildschirm-App löschen. KEINE Safari-Websitedaten löschen. Ein leerer Tresor in einer anderen iPhone-App-Installation enthält nicht deine früheren Daten.
+
+Die neue Version wurde nicht erfolgreich Ende-zu-Ende auf echtem iPhone-Safari getestet. Prüfbericht beachten.

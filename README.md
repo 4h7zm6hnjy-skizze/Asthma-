@@ -1,3 +1,7 @@
+# Asthma 2.8.0 – Professional für iPhone
+
+Neue Schnelleingabe, Langzeitübersichten, sichere lesende Backup-Prüfung und lokale iPhone-Diagnose. Siehe `README_2.8.0.md` und `PRUEFBERICHT_2.8.0.md`.
+
 # Asthma 2.7.0 Professional
 
 **Home-Bildschirm:** Das freigegebene blau-türkise Lungenlogo wurde als neue PNG-Datei für 180, 192 und 512 Pixel integriert. Bestehende iOS-Home-Screen-Icons können trotz neuer Dateien zwischengespeichert bleiben. Deshalb die alte Installation mit gespeicherten Gesundheitsdaten nicht allein für den Iconwechsel löschen.

@@ -33,11 +33,19 @@
     if(selected.includes('profile'))await initProfile();for(const group of selected)window.dispatchEvent(new CustomEvent('asthma:secure-change',{detail:{group}}));
   }
   async function replace(group,objs){return batchReplace({[group]:objs})}
-  async function profileSave(p){profile={...p};await put('profile',{id:'current',value:profile})}
+  // Serialize all profile modifications to prevent lost updates between modules.
+  // Only update the in-memory profile after the encrypted database commit succeeds.
+  async function profileSave(p){return queued('profile/serialized',async()=>{
+    const next={...p};await put('profile',{id:'current',value:next});profile=next;
+  })}
   const profileGet=()=>({...profile});
   async function initProfile(){const value=await findOne('profile','current');profile=value?.value||{};}
-  const updateProfile=async patch=>profileSave({...profile,...patch});
-  const profileClear=async()=>{profile={};await remove('profile','current')};
+  const updateProfile=async patch=>queued('profile/serialized',async()=>{
+    const next={...profile,...patch};await put('profile',{id:'current',value:next});profile=next;
+  });
+  const profileClear=async()=>queued('profile/serialized',async()=>{
+    await remove('profile','current');profile={};
+  });
   async function getLegacyDB(name,stores){return new Promise(resolve=>{let created=false;const r=indexedDB.open(name);r.onupgradeneeded=()=>{created=true};r.onerror=()=>resolve({});r.onsuccess=async()=>{const old=r.result;const result={};try{if(!created){for(const name of stores){if(old.objectStoreNames.contains(name)){const t=old.transaction(name,'readonly');result[name]=await req(t.objectStore(name).getAll());}}}}catch(e){result._error=e.message}old.close();resolve(result)}})}
   async function decipherSuite(row,meta,oldPass){if(!row.cipher)return row.value;if(!meta||!oldPass)throw Error('Für die alte verschlüsselte Zusatzakte wird das bisherige Tresor-Passwort benötigt.');const oldKey=await crypto.subtle.importKey('raw',encoder.encode(oldPass),'PBKDF2',false,['deriveKey']);const derived=await crypto.subtle.deriveKey({name:'PBKDF2',hash:'SHA-256',iterations:310000,salt:un64(meta.salt)},oldKey,{name:'AES-GCM',length:256},false,['decrypt']);try{const clear=await crypto.subtle.decrypt({name:'AES-GCM',iv:un64(row.iv)},derived,un64(row.cipher));return JSON.parse(decoder.decode(clear))}catch{throw Error('Altes Tresor-Passwort falsch oder alter Datensatz beschädigt.')}}
   async function migrationBundle(oldPass){const legacyProfile=localStorage.getItem('asthma-v1-preferences')||localStorage.getItem('asthmakompass-v1-preferences');let profileObj={};if(legacyProfile){try{profileObj=JSON.parse(legacyProfile)}catch{throw Error('Das alte Profil ist beschädigt. Keine Daten wurden gelöscht.')}}
@@ -90,9 +98,25 @@
   // Backups are encrypted with same account password by re-encrypting the whole vault archive.
   async function exportVault(pass){requireUnlock();await pending();if(pass.length<12)throw Error('Backup-Passwort mindestens 12 Zeichen');const rows=await rawAll(),salt=crypto.getRandomValues(new Uint8Array(16)),backupKey=await derive(pass,salt),plain=[];for(const row of rows)plain.push({id:row.id,value:await unseal(row)});const envelope=await sealed('archive',{app:'Asthma',schema:17,rows:plain},backupKey);return {kind:'Asthma-v17-Vault',salt:b64(salt),data:envelope};}
   async function importVault(archive,pass){requireUnlock();await pending();if(archive?.kind!=='Asthma-v17-Vault'||!archive.salt||!archive.data)throw Error('Unbekanntes Sicherungsformat');const temp=await derive(pass,un64(archive.salt));let data;try{data=await unseal(archive.data,temp)}catch{throw Error('Passwort falsch / Backup beschädigt')}if(data?.app!=='Asthma'||data?.schema!==17||!Array.isArray(data.rows)||data.rows.length>100000)throw Error('Ungültiger Sicherungsinhalt');const ids=new Set();const prepared=[];for(const v of data.rows){if(!v||typeof v.id!=='string'||!/^(profile|cases|documents|diary|suite|calendar|labs|epef|au)\/[\w.\-\/]+$/.test(v.id)||ids.has(v.id))throw Error('Ungültiger oder doppelter Eintrag');ids.add(v.id);prepared.push(await sealed(v.id,v.value));}const existing=await rawAll();const t=db.transaction('items','readwrite'),done=txComplete(t);const s=t.objectStore('items');existing.forEach(r=>s.delete(r.id));prepared.forEach(r=>s.put(r));await done;await initProfile();location.reload();}
-  const API={list:find,get:findOne,put,del:remove,replace,batchReplace,profileGet,profileSave,updateProfile,profileClear,state,lock,changePassword,exportVault,importVault};
+  // 2.8.0: backup integrity check only. No IndexedDB transactions with write access.
+  async function verifyVaultBackup(archive,pass){
+    requireUnlock();
+    if(typeof pass!=='string'||!pass)throw Error('Backup-Passwort fehlt');
+    if(archive?.kind!=='Asthma-v17-Vault'||typeof archive.salt!=='string'||!archive.data||archive.data.id!=='archive')throw Error('Keine vollständige Asthma-Sicherung');
+    const backupKey=await derive(pass,un64(archive.salt));
+    let data;
+    try{data=await unseal(archive.data,backupKey)}catch{throw Error('Passwort falsch oder Sicherung beschädigt')}
+    if(data?.app!=='Asthma'||data?.schema!==17||!Array.isArray(data.rows)||data.rows.length>100000)throw Error('Inhalt nicht kompatibel');
+    const seen=new Set(),groups=new Set();
+    for(const row of data.rows){
+      if(!row||typeof row.id!=='string'||!/^(profile|cases|documents|diary|suite|calendar|labs|epef|au)\/[\w.\-\/]+$/.test(row.id)||seen.has(row.id)||!('value' in row))throw Error('Beschädigter oder doppelter Datensatz');
+      seen.add(row.id);groups.add(row.id.split('/')[0]);
+    }
+    return {count:seen.size,groups:groups.size};
+  }
+  const API={list:find,get:findOne,put,del:remove,replace,batchReplace,profileGet,profileSave,updateProfile,profileClear,state,lock,changePassword,exportVault,importVault,verifyVaultBackup};
   window.ASTHMA_SECURITY=API;
-  const scripts=['content.js','app.js','antraege-data.js','antraege.js','meine-daten.js','lungenprofil.js','befundscan-parser.js','befund18-parser.js','befundscan.js','foto19.js','suite15.js','region16.js','calendar17.js','labor18.js','hub20.js','scanner20.js','pdf20.js','jszip.min.js','epef21.js','lufu23.js','medplan24.js','gdb24.js','au25.js','stats25.js','medpref25.js','hilfsmittel251.js','design26.js','professional27.js'];
+  const scripts=['content.js','app.js','antraege-data.js','antraege.js','meine-daten.js','lungenprofil.js','befundscan-parser.js','befund18-parser.js','befundscan.js','foto19.js','suite15.js','region16.js','calendar17.js','labor18.js','hub20.js','scanner20.js','pdf20.js','jszip.min.js','epef21.js','lufu23.js','medplan24.js','gdb24.js','au25.js','stats25.js','medpref25.js','hilfsmittel251.js','design26.js','professional27.js','quality28.js'];
   async function startApp(){const app=$('secure-application');app.hidden=false;app.inert=false;$('secure-gate').hidden=true;for(const src of scripts){await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=()=>reject(Error(src+' konnte nicht geladen werden'));document.body.append(s)})}document.documentElement.classList.add('app-unlocked');bindBackupAndLock();if(window.__asthmaCleanupWarning){alert(window.__asthmaCleanupWarning+' Bitte unter Einstellungen → Alte Speicherreste bereinigen.');window.ASTHMA_NAV?.go('einstellungen')}let last=Date.now();const touch=()=>{last=Date.now()};['pointerdown','keydown','touchstart','scroll'].forEach(ev=>document.addEventListener(ev,touch,{passive:true}));window.setInterval(()=>{if(unlocked&&Date.now()-last>10*60*1000)lock()},60*1000);let hiddenAt=null;document.addEventListener('visibilitychange',()=>{if(document.hidden){hiddenAt=Date.now()}else if(hiddenAt!==null){const elapsed=Date.now()-hiddenAt;hiddenAt=null;if(elapsed>2*60*1000&&unlocked)lock()}});}
   function bindBackupAndLock(){
     const status=$('secure-backup-status');if(window.__asthmaCleanupWarning){status.textContent=window.__asthmaCleanupWarning;status.classList.add('suite-error')}const cleanup=$('secure-cleanup');if(cleanup)cleanup.addEventListener('click',async()=>{if(!confirm('Alte lokale Datenbankreste nach Prüfung der neuen Tresor-Daten löschen?'))return;try{await eraseLegacy();status.textContent='Alte Speicherbereiche logisch gelöscht.'}catch(e){status.textContent='Bereinigung fehlgeschlagen: '+e.message}});

@@ -1,0 +1,11 @@
+# Asthma 2.8.0 – iPhone Alltag und Sicherheit
+
+**Gesamtupdate für den iPhone-Upload** (alle vorhandenen App-Dateien enthalten): Tages-Schnelleingabe im bestehenden verschlüsselten Asthma-Tagebuch, kompakte Werteübersicht ohne Risiko-Klassifizierung, Vergleich von 7/30/90/365 Tagen, lokale Dokumentensuche, lesende Prüfung einer vollständigen verschlüsselten `.asthma17`-Sicherungsdatei ohne Wiederherstellung, lokale Systemdiagnose und einheitlicher Weg zurück zur Übersicht. Das bisherige App-Symbol, die persönliche Akte und die 2.7.0-Module bleiben erhalten.
+
+**Unverändert:** Datenbankname und Schema, AES-GCM/PBKDF2, bestehende Gesundheitsdaten, Passwortanmeldung, ePEF-/Spirometrieverwaltung, Kalender, Medikamente, Asthma-AUs, Monats-/Jahresstatistik und Dokumentenspeicher. Profil-Schreibvorgänge werden nun serialisiert, um konkurrierende Änderungen nicht zu verlieren.
+
+**Sichere Installation:** 1. Zuerst in der laufenden App eine vollständige verschlüsselte `.asthma17`-Sicherung erstellen und in „Dateien“ getrennt aufbewahren. 2. Die heruntergeladene ZIP in iOS Dateien entpacken. 3. **Dateien aus dem ZIP-Hauptverzeichnis** in das GitHub-Repository-Hauptverzeichnis hochladen (nicht die ZIP selbst; keine Unterordner). 4. „Commit changes“ bestätigen. 5. Nach GitHub-Pages-Veröffentlichung denselben bisherigen Safari-/Homescreen-Kontext öffnen und mit dem bisherigen Passwort anmelden. 6. Neue Version, vorhandene Messungen und Sicherungsprüfung testen. Die vorhandene Homescreen-Installation NICHT löschen und Safari-Daten NICHT zurücksetzen.
+
+**Grenzen:** Es gab lokale statische Prüfungen der JavaScript-Syntax, Dateiverweise und Offline-Liste. Die hier verwendete automatisierte Browserumgebung blockiert Navigation sogar zu lokalen Dateien, daher wurde **kein echter Safari-iPhone-Ende-zu-Ende-Test** durchgeführt. Eine lesbare Sicherung ist noch kein Nachweis für eine erfolgreich abgeschlossene Wiederherstellung. PDF- und CSV-Dateien außerhalb des Tresors sind nicht verschlüsselt. Eine Browser-WebApp kann keine verlässlichen Hintergrund-Push- oder Medikamentenerinnerungen auf jedem iPhone garantieren; solche Funktionen werden hier nicht behauptet.
+
+**Keine automatischen Therapieanweisungen:** Die neuen Übersichten sind rein beschreibend und ersetzen weder Diagnose noch ärztlichen Aktionsplan.
