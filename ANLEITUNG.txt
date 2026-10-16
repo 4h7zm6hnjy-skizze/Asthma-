@@ -3,8 +3,8 @@ ASTHMA 2.7.0 PROFESSIONAL – UPDATE-GENERATOR
 
 STATUS: Dieses Paket ist der Generator, NICHT die bereits aktualisierte App.
 Die 2.7.0-Version wird erst auf deinem Mac aus dem vollständigen bisherigen
-GitHub-Quellstand erzeugt. Grund: GitHub-Connector hat derzeit Fehler 403
-beim Schreiben und der Quellstand konnte hier nicht als ZIP geladen werden.
+GitHub-Quellstand erzeugt. Grund: Das vollständige GitHub-Quellarchiv lässt sich in dieser
+Arbeitsumgebung nicht herunterladen. Der Generator erstellt es auf dem Mac.
 
 SCHRITT 1 – MAC (mit Internetverbindung)
 1. Dieses Paket als ZIP laden und vollständig entpacken.
@@ -19,12 +19,21 @@ SCHRITT 1 – MAC (mit Internetverbindung)
    - Asthma_2.7.0_GitHub_UPLOAD.zip
    - Asthma_2.7.0_GitHub_DATEIEN (vollständiger entpackter Update-Ordner)
 
+NEUES HOME-BILDSCHIRM-SYMBOL
+- Das freigegebene blau-türkise Lungenlogo ist bereits im Generator enthalten.
+- Das fertige Uploadpaket ersetzt logo-192.png und logo-512.png.
+- Die neue Apple-Touch-Datei logo-home-v270.png wird zusätzlich erzeugt.
+- Für neue Home-Bildschirm-Installationen wird das neue Symbol verwendet.
+- Bereits installierte iPhone-Symbole können bisweilen zwischengespeichert bleiben.
+- Auf keinen Fall nur wegen des Symbols die alte App löschen: lokale Daten könnten verloren gehen.
+
 SCHRITT 2 – GITHUB
 1. ZUERST in der bisherigen App eine vollständige .asthma17-Sicherung anlegen.
 2. Bei GitHub im Repository 4h7zm6hnjy-skizze/Asthma- "Add file -> Upload files".
 3. ALLE DATEIEN aus Asthma_2.7.0_GitHub_DATEIEN auswählen und hochladen.
    Dateien MÜSSEN im ROOT liegen (neben index.html), NICHT in Unterordnern.
 4. "Commit changes" bestätigen, GitHub Pages aktualisieren lassen.
+   Die hochgeladenen Dateien ersetzen bestehende Dateien gleichen Namens.
 5. Im bestehenden Safari-/Homescreen-Kontext anmelden, Update prüfen.
 6. Startseite > Peak-Flow und Lungenfunktion getrennt testen.
 7. "Mein Profil" > eigene persönliche Angaben EINTRAGEN und SPEICHERN.

@@ -112,6 +112,11 @@ def patch_project(root: Path)-> dict:
     index=need_once(index,'<link rel="stylesheet" href="./design26.css"/>',
       '<link rel="stylesheet" href="./design26.css"/>\n<link rel="stylesheet" href="./professional27.css"/>',
       'index.html Professional Stylesheet')
+    # Distinct Apple Touch icon URL helps avoid reusing an older cached PNG.
+    index=need_once(index,
+      '<link rel="apple-touch-icon" href="./logo-192.png"/>',
+      '<link rel="apple-touch-icon" sizes="180x180" href="./logo-home-v270.png"/>',
+      'index.html Home-Bildschirm-Icon')
     index=index.replace('2.6.0','2.7.0')
     put('index.html',index)
 
@@ -133,7 +138,7 @@ def patch_project(root: Path)-> dict:
     put('app.js',app)
     worker=get('sw.js')
     worker=need_once(worker,"const VERSION='2.6.0'","const VERSION='2.7.0'",'sw.js Versionscache')
-    worker=need_once(worker,'"./logo-512.png"]','"./logo-512.png","./professional27.js","./professional27.css"]','sw.js Offlinedateien')
+    worker=need_once(worker,'"./logo-512.png"]','"./logo-512.png","./logo-home-v270.png","./professional27.js","./professional27.css"]','sw.js Offlinedateien')
     put('sw.js',worker)
 
     for file in ASSETS.iterdir():
@@ -141,7 +146,7 @@ def patch_project(root: Path)-> dict:
     meta.update(version=VERSION,released='2026-10-16',notes='Peak-Flow und Spirometrie auf eigenen Seiten; privates Patientenprofil, Arzt-Aktionsplan, lokale Messübersicht und Navigation. Bestehende verschlüsselte Gesundheitsdaten bleiben unverändert.')
     put('version.json',json.dumps(meta,ensure_ascii=False,indent=2)+'\n')
 
-    readme='''# Asthma 2.7.0 Professional\n\n**Neue Ansichten:** Peak-Flow und Lungenfunktion führen zu unterschiedlichen Seiten. Die ePEF-Aufzeichnungen bleiben im bestehenden verschlüsselten Speicher, genau wie Spirometrie, Labor, Medikamente, AU und Dokumente.\n\n**Persönliches Profil:** Unter „Mein Profil“ können Name, Anschrift, Geburtsdatum, Gewicht, optional behandelnde Praxis und Notfallkontakt sowie ein ausschließlich ärztlich festgelegter Asthma-Aktionsplan gespeichert werden. Diese Werte sind NICHT in den öffentlichen Quellcode aufgenommen. Jeder Benutzer muss sie erst nach dem Entsperren auf seinem Gerät eintragen.\n\n**Schnellübersicht:** 30-Tage-Zähler für Peak-Flow und Tagebucheinträge sowie Gesamtzahl der gespeicherten Lungenuntersuchungen (keine medizinische Bewertung).\n\n**Datenschutz:** Keine neuen externen Tracker oder Netzwerkdienste durch das Professional-Modul; keine geänderten Verschlüsselungsfunktionen, keine automatisch übermittelten Gesundheitsdaten. Persönliche Daten stehen im bestehenden verschlüsselten Profil. Unverschlüsselte PDF-/CSV-Exporte weiterhin vertraulich behandeln.\n\n**Vor dem Update:** Im bisherigen iPhone/Safari-Kontext eine vollständige `.asthma17`-Datensicherung erstellen und extern sicher aufbewahren. Den alten Homescreen-Eintrag NICHT löschen und KEINE Website-Daten löschen. Nach vollständigem GitHub-Upload Updateprüfung starten und die App im selben Browser-Kontext öffnen.\n\n**Grenzen:** Der Builder prüft Dateistruktur und JavaScript-Syntax, aber nicht alle Funktionen auf einem echten iPhone. Scanner/OCR, IndexedDB-Backup/Wiederherstellung und Safari-Offlinestatus sind weiterhin praktisch zu testen. Dieses Update enthält keinen automatischen klinischen Risikowert. Die zehn weitergehenden Verbesserungsziele aus der Roadmap bleiben teilweise offen; siehe PRUEFBERICHT_2.7.0.md.\n\n'''
+    readme='''# Asthma 2.7.0 Professional\n\n**Home-Bildschirm:** Das freigegebene blau-türkise Lungenlogo wurde als neue PNG-Datei für 180, 192 und 512 Pixel integriert. Bestehende iOS-Home-Screen-Icons können trotz neuer Dateien zwischengespeichert bleiben. Deshalb die alte Installation mit gespeicherten Gesundheitsdaten nicht allein für den Iconwechsel löschen.\n\n**Neue Ansichten:** Peak-Flow und Lungenfunktion führen zu unterschiedlichen Seiten. Die ePEF-Aufzeichnungen bleiben im bestehenden verschlüsselten Speicher, genau wie Spirometrie, Labor, Medikamente, AU und Dokumente.\n\n**Persönliches Profil:** Unter „Mein Profil“ können Name, Anschrift, Geburtsdatum, Gewicht, optional behandelnde Praxis und Notfallkontakt sowie ein ausschließlich ärztlich festgelegter Asthma-Aktionsplan gespeichert werden. Diese Werte sind NICHT in den öffentlichen Quellcode aufgenommen. Jeder Benutzer muss sie erst nach dem Entsperren auf seinem Gerät eintragen.\n\n**Schnellübersicht:** 30-Tage-Zähler für Peak-Flow und Tagebucheinträge sowie Gesamtzahl der gespeicherten Lungenuntersuchungen (keine medizinische Bewertung).\n\n**Datenschutz:** Keine neuen externen Tracker oder Netzwerkdienste durch das Professional-Modul; keine geänderten Verschlüsselungsfunktionen, keine automatisch übermittelten Gesundheitsdaten. Persönliche Daten stehen im bestehenden verschlüsselten Profil. Unverschlüsselte PDF-/CSV-Exporte weiterhin vertraulich behandeln.\n\n**Vor dem Update:** Im bisherigen iPhone/Safari-Kontext eine vollständige `.asthma17`-Datensicherung erstellen und extern sicher aufbewahren. Den alten Homescreen-Eintrag NICHT löschen und KEINE Website-Daten löschen. Nach vollständigem GitHub-Upload Updateprüfung starten und die App im selben Browser-Kontext öffnen.\n\n**Grenzen:** Der Builder prüft Dateistruktur und JavaScript-Syntax, aber nicht alle Funktionen auf einem echten iPhone. Scanner/OCR, IndexedDB-Backup/Wiederherstellung und Safari-Offlinestatus sind weiterhin praktisch zu testen. Dieses Update enthält keinen automatischen klinischen Risikowert. Die zehn weitergehenden Verbesserungsziele aus der Roadmap bleiben teilweise offen; siehe PRUEFBERICHT_2.7.0.md.\n\n'''
     put('README_2.7.0.md',readme)
     oldreadme=get('README.md')
     put('README.md',readme+'\n---\n\n'+oldreadme)
@@ -162,6 +167,15 @@ def verify(root:Path) -> list[str]:
     assert "'Peak-Flow','peakflow','ePEF-Tagebuch'" in design
     assert 'professional27.js' in script
     assert 'professional27.css' in html
+    assert 'logo-home-v270.png' in html
+    assert 'logo-home-v270.png' in worker
+    manifest=json.loads((root/'manifest.webmanifest').read_text(encoding='utf-8'))
+    assert {x['src'] for x in manifest['icons']}=={'logo-192.png','logo-512.png'}
+    from struct import unpack
+    for name,sz in [('logo-192.png',192),('logo-512.png',512),('logo-home-v270.png',180)]:
+        b=(root/name).read_bytes()
+        assert b[:8]==b'\x89PNG\r\n\x1a\n' and unpack('>II',b[16:24])==(sz,sz),f'{name}: PNG-Abmessungen falsch'
+    report.append('Neues App-Symbol in 192, 512 und Apple-Touch-180 Pixeln als echte PNG-Dateien geprüft.')
     assert json.loads((root/'version.json').read_text(encoding='utf-8'))['version']==VERSION
     report.append('Navigationsziele, Seitenstruktur, Komponenten, Versionsangaben: statisch überprüft.')
     found=re.search(r'const ASSETS=(\[[^;]+?\]);',worker,re.S)
@@ -190,6 +204,8 @@ def build(root:Path,destination:Path) -> Path:
     patch_project(upload)
     checks=verify(upload)
     checks+=[
+      'Vorhandene Datensätze werden vom ZIP-Build nicht gelesen oder verändert.',
+      'Alle App-Dateien liegen für GitHub-Upload im ZIP-Root; neue iPhone-Icons sind enthalten.',
       'Bestehende Datei- und Messgruppenschlüssel nicht absichtlich verändert.',
       'Bestehende medizinische Berechnungen nicht überarbeitet.',
       'Noch offen: vollständige 2.7-Roadmap mit komplexen Kalender-/Dokumenten-/Therapietests und iPhone-E2E-Verifikation.',
