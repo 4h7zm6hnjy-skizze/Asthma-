@@ -1,0 +1,18 @@
+Prüfbericht – Quellenfix 3
+
+Geprüft lokal:
+- python -m py_compile build_rechtsmonitor_feed.py: bestanden.
+- node --check rechtsmonitor.js sowie sw.js: bestanden.
+- Test-XML, offizielle HTML-Ersatzseite (synthetische HTML-Daten): bestanden.
+- Ausfall nur des Bundes-RSS, verbleibende Feeds erfolgreich: Archiv-Inhalte bleiben sichtbar und sind als archiviert gekennzeichnet.
+- Fehlerhafte GdB-Treffer zu Zeugnis-Gleichstellung/Tierarzneimitteln werden ausgeschlossen.
+- Frühere Filterversion 1: unsicheres RSS-Datum wird verworfen und ehemaliger Treffer auf „allgemein/Archiv“ herabgestuft.
+- Historische Wiederherstellung aus lokaler Git-Historie bei zuvor leerer JSON-Datei: bestanden.
+- Wenn ALLE Quellen ausfallen: bereits gespeicherte Feed-Datei wird nicht überschrieben.
+- G-BA-„Arzneimittel-Richtlinie“ mit Bindestrich erkannt.
+
+Nicht in der lokalen Testumgebung verifizierbar:
+- Tatsächliche Erreichbarkeit der Bundes- und G-BA-Webseiten aus GitHub Actions.
+- Tiefe der Git-Historie und die Wiederherstellung im echten GitHub-Runner nach einem flachen Checkout.
+- Echtes iPhone-Safari-Rendering und der private Passworttresor.
+- Rechtliche Vollständigkeit oder Aktualität von Meldungen.

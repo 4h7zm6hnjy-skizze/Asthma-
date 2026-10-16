@@ -120,12 +120,12 @@
       const card=make('article','rechtsmonitor-item');
       const heading=make('div','rechtsmonitor-item-header');
       heading.append(make('span','rechtsmonitor-date','RSS-Meldedatum: '+cleanDate(entry.date)));
-      const state=entry.relevance==='possible'?'Möglicher Themenbezug':'Allgemeine amtliche Meldung';
-      heading.append(make('span',entry.relevance==='possible'?'rechtsmonitor-level possible':'rechtsmonitor-level general',state));
+      const state=entry.archived?'Archiv – nicht neu geprüft':(entry.relevance==='possible'?'Möglicher Themenbezug':'Allgemeine amtliche Meldung');
+      heading.append(make('span',entry.archived?'rechtsmonitor-level archived':(entry.relevance==='possible'?'rechtsmonitor-level possible':'rechtsmonitor-level general'),state));
       if(!seen.includes(entry.id))heading.append(make('span','rechtsmonitor-new','Noch nicht gelesen'));
       card.append(heading);
       card.append(make('strong','rechtsmonitor-title',entry.title.slice(0,230)));
-      const description=(entry.relevance==='possible'? 'Kann thematisch zu deiner Situation passen. ':'Nur allgemeiner Themenbezug. ')+
+      const description=(entry.archived?'Archivmeldung, deren Quelle beim letzten Abruf ausgefallen ist. Rechtsstand nicht neu geprüft. ':(entry.relevance==='possible'? 'Kann thematisch zu deiner Situation passen. ':'Nur allgemeiner Themenbezug. '))+
         (typeof entry.reason==='string'?entry.reason+' ':'')+
         'Bereiche: '+entry.categories.map(x=>categories[x]||x).join(', ')+'.';
       card.append(make('p','rechtsmonitor-summary',description));
@@ -165,6 +165,9 @@
       if(age>7)msg+=' ACHTUNG: Abruf ist älter als sieben Tage – nicht als aktuell behandeln.';
       if(working<all)msg+=' Einzelne Quellen waren nicht erreichbar; Ergebnisse sind unvollständig.';
       if(data.items.length===0)msg+=' Keine passenden Treffer – keine Entwarnung.';
+      const archivedCount=data.items.filter(x=>x&&x.archived===true).length;
+      if(archivedCount)msg+=` ${archivedCount} ältere Meldung(en) nur als Archiv – keine erneute amtliche Prüfung.`;
+      if(data.sources?.some(x=>x.fallbackUsed))msg+=' Bundesquelle über amtliche Ersatzseite gelesen.';
       if(!Number.isInteger(data.classifierVersion)||data.classifierVersion<2)msg+=' Der neue Filter greift nach dem nächsten erfolgreichen Workflow-Lauf.';
       status.textContent=msg;render(data);
     }catch(e){

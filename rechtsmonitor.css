@@ -35,3 +35,5 @@
 #rechtsmonitor-app .rechtsmonitor-source-health summary{font-weight:700;cursor:pointer}
 #rechtsmonitor-app .rechtsmonitor-source-health p{margin:7px 0;line-height:1.5}
 @media(max-width:600px){#rechtsmonitor-app .rechtsmonitor-filter{flex:1 1 100%;text-align:center}}
+
+#rechtsmonitor-app .rechtsmonitor-level.archived{background:#fff5e0!important;color:#805200!important;border:1px solid #eac17a!important}
