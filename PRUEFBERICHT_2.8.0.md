@@ -1,24 +1,38 @@
-# Asthma 2.8.0 – Prüfbericht, 16.10.2026
+# PRÜFBERICHT: Asthma 2.8.0 Professional
 
-## Implementiert
-- Vorhandene 2.7.0-Dateien übernommen, keine medizinischen Datensätze aus dem iPhone gelesen.
-- `quality28.js` und `quality28.css` als neue Module nur nach Entsperren eingebunden.
-- Tages-Schnellerfassung schreibt in den vorhandenen verschlüsselten `diary`-Bereich und verwendet die bisherigen Feldnamen.
-- 7/30/90/365-Tage-Übersicht liest bestehende Datensätze (`diary`, `epef`, `suite`); kein automatisches Krankheitsrisiko.
-- Dokumentensuche lokal im aktuellen Browser, keine zusätzliche Suche im Netzwerk.
-- Lesende `.asthma17`-Sicherungsprüfung entschlüsselt im Speicher und prüft Datensatz-IDs auf Konsistenz; sie ruft keinerlei Restore- oder Schreibvorgang auf.
-- Diagnostik für Online/Offline, aktive Service-Worker-Registrierung, lokalen Speicher. Keine Telemetrie.
-- Bestehendes Profil beim Speichern durch serialisierte Updates gegen konkurrierende Schreibvorgänge abgesichert.
-- Fehlleitende Datenschutzbeschreibung der Aktenseite an die bereits vorhandene lokale Verschlüsselung angepasst.
+Datum: 16.10.2026
 
-## Tests und Grenzen
-- Alle JavaScript-Dateien wurden mit `node --check` syntaktisch geprüft.
-- Die JSON-Version, der SW-Cache, die Referenzlisten und HTML-Dateiverweise wurden abgeglichen.
-- Mehrere Dateien, darunter Startseite, Profil, Datenspeicherung und SW, wurden statisch geprüft.
-- Chromium/Playwright blockiert in dieser Umgebung lokale und Datei-URLs mit `ERR_BLOCKED_BY_ADMINISTRATOR`. Daher **kein erfolgreicher Browser- bzw. iPhone-Ende-zu-Ende-Test** von Anmeldung, Datensicherung, Offline-Cache, Navigation oder Tagebucheinträgen. Diese Funktionen müssen auf dem eigenen Gerät geprüft werden.
-- Die Backup-Prüfung bestätigt ausschließlich entschlüsselbare Datei-Inhalte, nicht die dauerhafte Speicherung in iOS „Dateien“ und nicht die tatsächliche Wiederherstellbarkeit in jeder Browserinstallation.
-- Noch nicht umgesetzt: lückenlose iOS-Hintergrunderinnerungen, vollständige eigene Arztbrief-Generierung, automatisches ACT-Scoring, Diagnose- oder Ampelautomatik. Vorhandene Arztbericht-/Medikamentenfunktionen bleiben unverändert.
-- Persönliche Stammdaten werden nicht öffentlich im Repository vorbelegt. Exportierte PDFs/CSVs sind unverschlüsselt und müssen geschützt werden.
+## Lieferumfang
+- Vollständige WebApp mit **83 Dateien** inklusive Dokumentation und bisherigen Modulen, neues Modul `quality28.js`, Stylesheet `quality28.css`.
+- Weiterhin das blau-türkise 180/192/512-Pixel-Logo. PWA-Manifest und HTML-Verknüpfungen unverändert kompatibel.
+- Version 2.8.0 in Oberfläche (`index.html`), `app.js`, Service Worker, `version.json` und dem neuen Modul.
 
-## Vorsicht bei Updates
-Vor der Veröffentlichung verschlüsseltes `.asthma17`-Backup extern speichern; bisherige Safari- oder Home-Bildschirm-Installation nicht löschen, Website-Daten nicht zurücksetzen. Versionsstand nach dem GitHub-Commit in `version.json` und Startseite prüfen.
+## Umgesetzte Funktionen
+1. Tagesübersicht mit letztem dokumentierten PEF, Bedarfsanwendungen in sieben Tagen und dokumentierten Beschwerde-Nächten in 30 Tagen.
+2. Schnelleintrag ins bestehende **verschlüsselte** Asthma-Tagebuch, ohne Änderung der Datensatzfelder. Nutzer entscheidet selbst, wann gespeichert wird.
+3. Separate Trendanzeige über 7/30/90/365 Tage mit Tagebuch-PEF-Mittelwert, dokumentierten Tagen und Anzahl ärztlicher Untersuchungen; keine klinische Bewertung.
+4. Lesende Prüfung einer vollständigen `.asthma17`-Sicherungsdatei mit Passwort (Formintegrität + AES-GCM-Entschlüsselung + Duplikat-Prüfung), **ohne Datenbank-Zurücksetzung oder Import**.
+5. Dokumentenablage nach Dateiname, Dokumentart und Datum lokal filtern.
+6. Name/Geburtsdatum aus dem verschlüsselten Profil optional im bereits vorhandenen Monats-/Jahres-PDF-Bericht; unverschlüsselten Druck ausdrücklich kennzeichnen.
+7. Lokale Online-/Offline-, Service-Worker- und Speicher-Diagnose, Zurück-zur-Übersicht-Schaltflächen.
+8. Sicherere Profilbearbeitung und Löschbestätigung. Vorherige persönliche Daten bleiben bis zu erfolgreicher Speichertransaktion bestehen.
+
+## Durchgeführte Prüfungen
+- `node --check`: **32 JavaScript-Dateien ohne Syntaxfehler**.
+- Service-Worker-Vollständigkeit: **43 Cache-Ressourcen** referenziert; **0 fehlend**.
+- HTML-Verknüpfungen: **10 eindeutige lokale Verweise**, **0 fehlend**.
+- Logos: 180×180, 192×192, 512×512 Pixel geprüft.
+- Simulierter DOM-/Formulartest in Headless Chromium auf **320, 390, 430, 768 px**: Tages-Schnelleintrag mit 3 Bedarfsanwendungen und Beschwerdegrad 2 schreibt kompatiblen Tagebuchdatensatz, keine ungefangenen Fehler und kein horizontaler Überlauf.
+- AES-GCM-Backupprüfung mit generierter Testdatei: lesbares Archiv und zwei Gruppen erkannt; falsches Passwort wurde abgelehnt.
+- Die bisherigen Datenbank-Gruppen und das Passwortformat (Asthma-v17-Vault) wurden nicht absichtlich verändert.
+
+## Nicht als bestanden bestätigt
+- Vollständiger **Live-Start** der App in Chromium: Lokale Navigation wurde mit `ERR_BLOCKED_BY_ADMINISTRATOR` durch die Testumgebung blockiert. Kein Ende-zu-Ende-Test möglich.
+- Safari auf echtem iPhone: Anmeldung, tatsächliches Archiv-Downloadverhalten, Backup-Import/Wiederherstellung, Offline-Start nach Netzverlust, PDF-Speicherung und Kamera/OCR nicht geprüft.
+- Keine vollständige unabhängige Sicherheitsanalyse, keine medizinische Bewertung von Messwerten und keine Garantie gegen Datenverlust.
+- Keine automatische Erinnerung im Hintergrund: iPhone-WebApps unterliegen Browser-/iOS-Grenzen.
+
+## Sicherheit & Installation
+- Erst vollständige Sicherung erstellen, dann alle ZIP-Dateien **direkt** in das GitHub-Repository-Hauptverzeichnis laden und committen.
+- Bereits installierte iPhone-WebApp **nicht löschen** und **keine Safari-Website-Daten löschen**.
+- Namen, Adressen und Gesundheitswerte werden **nicht** im öffentlichen GitHub-Quellcode gespeichert.

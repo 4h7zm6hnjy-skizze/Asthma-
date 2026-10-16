@@ -1,13 +1,14 @@
-ASTHMA 2.8.0 – INSTALLATION NUR MIT iPHONE
+ASTHMA 2.8.0 PROFESSIONAL – iPhone-Installation
 
-1. In deiner bisherigen App vollständiges verschlüsseltes .asthma17-Backup erstellen und in der Dateien-App außerhalb der App sicher aufbewahren.
-2. ZIP in der Dateien-App öffnen und entpacken.
-3. GitHub im Browser öffnen: https://github.com/4h7zm6hnjy-skizze/Asthma-
-4. "Add file" > "Upload files"; ALLE Dateien aus dem entpackten Ordner im ROOT hochladen (neben index.html). Nicht die ZIP selbst hochladen und keine Unterordner erstellen.
-5. Auf "Commit changes" tippen und Veröffentlichung abwarten.
-6. Bisherige App auf demselben iPhone/Safari-/Homescreen-Speicher öffnen, mit dem bisherigen Passwort anmelden und die Version 2.8.0 prüfen.
-7. Bestehende persönliche Daten, Medikamente, Kalender und Dokumente kontrollieren. In Einstellungen eine gespeicherte Sicherung LESEND auf Korrektheit prüfen.
+1. In der alten WebApp mit deinem bisherigen Passwort anmelden und unter Einstellungen eine vollständige .asthma17-Datensicherung erzeugen. In „Dateien“ speichern; Backup-Passwort sichern.
+2. ZIP im iPhone unter „Dateien“ antippen und entpacken.
+3. Auf https://github.com/4h7zm6hnjy-skizze/Asthma- gehen.
+4. Code -> Add file -> Upload files. ALLE Dateien aus dem entpackten Ordner auswählen; NICHT die ZIP und NICHT den übergeordneten Ordner hochladen. Neue und alte Dateien müssen direkt neben index.html liegen.
+5. Commit directly to main -> Commit changes. GitHub kann etwas Zeit brauchen, bis Pages aktualisiert ist.
+6. Bestehende Asthma-WebApp auf dem iPhone wie bisher öffnen und mit deinem bisherigen Passwort anmelden. NICHT löschen, keine Website-Daten löschen, kein neues leeres Profil erstellen.
+7. Neue Startseite, Tages-Eintrag, Verlauf, Profil, Dokumentensuche und Backup-Prüfung kontrollieren.
+8. Beim fehlenden Update die bestehende App schließen, wieder öffnen und in den Einstellungen „Nach Updates suchen“. Kein Löschen von Safari-Speichern.
 
-WICHTIG: NICHT die alte Home-Bildschirm-App löschen. KEINE Safari-Websitedaten löschen. Ein leerer Tresor in einer anderen iPhone-App-Installation enthält nicht deine früheren Daten.
+WICHTIG: Eine fehlende alte Gesundheitsakte kann an getrennter Safari- und Home-Bildschirm-App-Speicherung liegen. Sicherung wiederherstellen nur aus einer selbst geprüften .asthma17 und mit klarer Bestätigung; nie blind überschreiben.
 
-Die neue Version wurde nicht erfolgreich Ende-zu-Ende auf echtem iPhone-Safari getestet. Prüfbericht beachten.
+Hinweis: Das Paket ist eine vollständige WebApp, kein Mac-Programm. Auf echtem iPhone wurde kein vollständiger Ende-zu-Ende-Test durchgeführt.

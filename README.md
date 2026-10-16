@@ -1,3 +1,7 @@
+# Asthma 2.8.1 – Logo & persönliches Profil
+
+Neuer Markenauftritt mit durchgängigem Lungenlogo. Vorhandenes persönliches Profil von Version 2.7.0 (Name, Anschrift, Geburtsdatum, Gewicht) wird auf der Startseite besser angezeigt. PDF-Berichte können Anschrift und Gewicht **nur nach Auswahl** ausgeben. Keine persönlichen Daten im öffentlichen Quellcode. Vollständige Anleitung: `README_2.8.1.md`.
+
 # Asthma 2.8.0 – Professional für iPhone
 
 Neue Schnelleingabe, Langzeitübersichten, sichere lesende Backup-Prüfung und lokale iPhone-Diagnose. Siehe `README_2.8.0.md` und `PRUEFBERICHT_2.8.0.md`.

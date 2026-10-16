@@ -1,5 +1,5 @@
 'use strict';
-/* Asthma 2.8.0: iPhone quality-of-life UI; reads/writes existing encrypted groups only. */
+/* Asthma 2.8.1: iPhone quality-of-life UI; reads/writes existing encrypted groups only. */
 (()=>{
  const SEC=window.ASTHMA_SECURITY;
  const $=id=>document.getElementById(id);
@@ -13,7 +13,7 @@
  const summary=document.createElement('section');summary.className='a28-card';summary.id='a28-daily';
  summary.setAttribute('aria-labelledby','a28-title');
  summary.innerHTML=`
- <div class="a28-header"><div><p class="section-kicker">Tagesübersicht · Lokal gespeichert</p><h2 id="a28-title">Heute im Blick</h2><p>Einfach dokumentieren, ohne medizinische Beurteilung.</p></div><span class="a28-version">v2.8.0</span></div>
+ <div class="a28-header"><div><p class="section-kicker">Tagesübersicht · Lokal gespeichert</p><h2 id="a28-title">Heute im Blick</h2><p>Einfach dokumentieren, ohne medizinische Beurteilung.</p></div><span class="a28-version">v2.8.1</span></div>
  <div class="a28-kpis" aria-label="Deine dokumentierten Werte">
   <div><span>Letzter PEF</span><strong id="a28-last-pef">–</strong><small id="a28-pef-date">Noch keine Messung</small></div>
   <div><span>Bedarfsanwendungen · 7 Tage</span><strong id="a28-rescue">–</strong><small>Nur dokumentierte Angaben</small></div>
@@ -107,7 +107,7 @@
  diagnostics.innerHTML='<div class="a28-header"><div><h3>iPhone- und Offline-Prüfung</h3><p>Prüfung dieser Browser-Installation; keine Datenübertragung.</p></div></div><button type="button" class="btn btn-outline" id="a28-diagnose">Jetzt prüfen</button><p role="status" aria-live="polite" id="a28-diagnostics-status">Noch nicht geprüft.</p>';
  settings.append(diagnostics);
  $('a28-diagnose').addEventListener('click',async()=>{
-  const result=['App-Code: 2.8.0','Tresor: '+(SEC.state().unlocked?'entsperrt':'gesperrt'),'Internet: '+(navigator.onLine?'verbunden':'offline')];
+  const result=['App-Code: 2.8.1','Tresor: '+(SEC.state().unlocked?'entsperrt':'gesperrt'),'Internet: '+(navigator.onLine?'verbunden':'offline')];
   if('serviceWorker' in navigator){try{const reg=await navigator.serviceWorker.getRegistration();result.push('Offline-Service-Worker: '+(reg?.active?'aktiv':'nicht aktiv'));}catch{result.push('Offline-Service-Worker: unbekannt')}}else result.push('Offline-Service-Worker: nicht unterstützt');
   if(navigator.storage?.estimate){try{const est=await navigator.storage.estimate();if(Number.isFinite(est.usage)&&Number.isFinite(est.quota))result.push('Geschätzter Browser-Speicher: '+(est.usage/1048576).toFixed(1)+' / '+(est.quota/1048576).toFixed(1)+' MB');}catch{}}
   $('a28-diagnostics-status').textContent=result.join(' · ');

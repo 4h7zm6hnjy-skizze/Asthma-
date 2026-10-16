@@ -1,5 +1,5 @@
 {
-  "version": "2.8.0",
+  "version": "2.8.1",
   "released": "2026-10-16",
-  "notes": "iPhone-Bedienung, Tages-Schnelleintrag, Lungenverlaufs-Übersicht, Dokumentensuche, lesende verschlüsselte Backup-Prüfung und lokale Diagnose. Keine Änderung des verschlüsselten Datenformats."
+  "notes": "Neues Asthma-App-Logo und Markenbild auf dem iPhone, bei Anmeldung, in Navigation und PDF-Berichten; verbesserte Übersicht bestehender verschlüsselter persönlicher Stammdaten. Vollständig lokal, ohne Datenmigration."
 }

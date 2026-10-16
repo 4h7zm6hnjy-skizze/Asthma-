@@ -1,0 +1,12 @@
+ASTHMA 2.8.1 – INSTALLATION MIT iPHONE
+
+1. VORHER die aktuelle Asthma-App öffnen und eine komplette verschlüsselte .asthma17-Sicherung in Dateien speichern.
+2. Die ZIP in iOS Dateien entpacken.
+3. GitHub-Repository Asthma- öffnen. "Add file" > "Upload files".
+4. Alle Dateien aus dem ZIP-Ordner direkt ins HAUPTVERZEICHNIS hochladen. Die ZIP selbst NICHT hochladen.
+5. "Commit changes" bestätigen, dann GitHub Pages abwarten.
+6. Über das BISHERIGE Home-Bildschirm-Symbol oder Safari-Profil öffnen und mit dem bisherigen Passwort anmelden.
+7. Unter Mein Profil Name, Adresse, Geburtsdatum und Gewicht eingeben oder kontrollieren und speichern.
+8. Startseite auf Profilanzeige, neues Logo und Datenbestand prüfen.
+
+WICHTIG: Keine Safari-Daten löschen, App nicht deinstallieren, keinen neuen Tresor erstellen. Wenn das App-Symbol alt bleibt, nicht aus diesem Grund die App löschen.

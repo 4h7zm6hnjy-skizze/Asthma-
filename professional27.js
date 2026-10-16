@@ -111,7 +111,10 @@
   // Single-source dashboard: display only stored personal name, never demo or guessed values.
   const dash=$('a27-personal-summary')||document.createElement('div');
   dash.id='a27-personal-summary';dash.className='a27-identity';
-  const greeting=document.createElement('span');dash.append(greeting);
+  const overview=document.createElement('div');overview.className='a281-profile-overview';
+  const greeting=document.createElement('span');overview.append(greeting);
+  const patientDetails=document.createElement('small');overview.append(patientDetails);
+  dash.append(overview);
   const link=document.createElement('button');link.type='button';link.className='btn btn-outline';
   link.textContent='Profil bearbeiten';link.dataset.goto='profil';dash.append(link);
   const hero=start.querySelector('.d26-dashboard')||start;
@@ -119,6 +122,18 @@
   function refreshName(){
     const p=readPersonal(),name=String(p.fullName||'').trim();
     greeting.textContent=name?`Patientenprofil: ${name}`:'Persönliches Profil noch nicht ausgefüllt';
+    const details=[];
+    if(/^\d{4}-\d{2}-\d{2}$/.test(p.birthDate||'')&&safeDate(p.birthDate)){
+      details.push('Geboren: '+p.birthDate.slice(8)+'.'+p.birthDate.slice(5,7)+'.'+p.birthDate.slice(0,4));
+    }
+    const kg=p.weightKg===null||p.weightKg===undefined||p.weightKg===''?null:Number(p.weightKg);
+    if(kg!==null&&Number.isFinite(kg)&&kg>=1&&kg<=500){
+      details.push('Gewicht: '+kg.toLocaleString('de-DE',{maximumFractionDigits:1})+' kg');
+    }
+    const city=String(p.city||'').trim();
+    if(city)details.push('Wohnort: '+city.slice(0,120));
+    patientDetails.textContent=details.join(' · ');
+    patientDetails.hidden=details.length===0;
   }
 
   // Read-only measurement summary; no interpretation of clinical severity.
