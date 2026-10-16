@@ -1,7 +1,144 @@
 {
   "schema": 1,
-  "generatedAt": null,
-  "status": "not_yet_checked",
-  "sources": [],
-  "items": []
+  "generatedAt": "2026-10-16T19:27:04+00:00",
+  "status": "ok",
+  "sources": [
+    {
+      "name": "Gesetze im Internet – Aktualitätendienst",
+      "ok": true,
+      "count": 12
+    },
+    {
+      "name": "G-BA – Letzte Änderungen",
+      "ok": true,
+      "count": 0
+    },
+    {
+      "name": "G-BA – Beschlüsse",
+      "ok": true,
+      "count": 0
+    }
+  ],
+  "items": [
+    {
+      "id": "be7b231574d72f0e7741",
+      "title": "BGBl. 2026 I Nr. 263 – Neunte Verordnung zur Änderung der Winterbeschäftigungs-Verordnung vom 10. September 2026",
+      "date": "2026-10-16",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/263",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "arbeit"
+      ]
+    },
+    {
+      "id": "2de9a6b591e54ec9d8d6",
+      "title": "BGBl. 2026 I Nr. 247 – Zweite Verordnung zur Änderung der Teilhabeberatungsverordnung vom 01. September 2026",
+      "date": "2026-10-16",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/247",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "reha"
+      ]
+    },
+    {
+      "id": "16b7ebc73ac697b5b869",
+      "title": "BGBl. 2026 I Nr. 228 – Gesetz zur Stabilisierung der Beitragssätze in der gesetzlichen Krankenversicherung vom 24. Juli 2026",
+      "date": "2026-10-16",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/228",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "gesundheit"
+      ]
+    },
+    {
+      "id": "3d96e4e0d496410688ca",
+      "title": "BGBl. 2026 I Nr. 210 – Siebte Verordnung zur Änderung der Berufskrankheiten-Verordnung vom 16. Juli 2026",
+      "date": "2026-10-16",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/210",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "arbeit"
+      ]
+    },
+    {
+      "id": "18ea17edfd6ea03937bf",
+      "title": "BGBl. 2026 I Nr. 206 – Verordnung zur Gleichstellung von Prüfungszeugnissen der Hiberniaschule Herne mit den Zeugnissen über das Bestehen der Gesellenprüfung in handwerklichen Ausbildungsberufe",
+      "date": "2026-10-16",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/206",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "gdb"
+      ]
+    },
+    {
+      "id": "1e0acc4c01e61e22de34",
+      "title": "BGBl. 2026 I Nr. 186 – Siebte Verordnung über eine Lohnuntergrenze in der Arbeitnehmerüberlassung vom 19. Juni 2026",
+      "date": "2026-10-16",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/186",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "arbeit"
+      ]
+    },
+    {
+      "id": "f460cdbb6bbc03597968",
+      "title": "BGBl. 2026 I Nr. 178 – Verordnung zur Bestimmung des Rentenwerts in der gesetzlichen Rentenversicherung und zur Bestimmung weiterer Werte zum 1. Juli 2026 vom 16. Juni 2026",
+      "date": "2026-10-16",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/178",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "reha"
+      ]
+    },
+    {
+      "id": "57b971afa1754d74a771",
+      "title": "BGBl. 2026 I Nr. 173 – Dritte Verordnung zur Änderung der Arzneimittelpreisverordnung vom 09. Juni 2026",
+      "date": "2026-10-16",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/173",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "gesundheit"
+      ]
+    },
+    {
+      "id": "a085b2d17cc10d2097b3",
+      "title": "BGBl. 2026 I Nr. 160 – Bekanntmachung der Neufassung des Tierarzneimittelgesetzes vom 21. Mai 2026",
+      "date": "2026-10-16",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/160",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "gesundheit"
+      ]
+    },
+    {
+      "id": "23a43b2639ff8bb5277a",
+      "title": "BGBl. 2026 I Nr. 149 – Vierundzwanzigste Verordnung zur Änderung der Arzneimittelverschreibungsverordnung vom 19. Mai 2026",
+      "date": "2026-10-16",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/149",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "gesundheit"
+      ]
+    },
+    {
+      "id": "e1e943d1007345cebebf",
+      "title": "BGBl. 2026 I Nr. 131 – Verordnung zur Gleichstellung von Prüfungszeugnissen der Glasfachschule NRW Berufskolleg Glas.Technik.Medien.Design mit den Zeugnissen über das Bestehen der Abschluss- un",
+      "date": "2026-10-16",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/131",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "gdb"
+      ]
+    },
+    {
+      "id": "f0db85ade504ff5f935b",
+      "title": "BGBl. 2026 I Nr. 130 – Zweite Verordnung zur Änderung der Verordnung zur Gleichstellung von Prüfungszeugnissen der Staatlichen Zeichenakademie Hanau mit den Zeugnissen über das Bestehen der Abs",
+      "date": "2026-10-16",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/130",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "gdb"
+      ]
+    }
+  ]
 }
