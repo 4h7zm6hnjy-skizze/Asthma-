@@ -4,7 +4,7 @@
  const $=id=>document.getElementById(id),SEC=window.ASTHMA_SECURITY;if(!$('med25-proposals'))return;
  const historical=[
   {name:'Trimbow 172/5/9',dose:'2 Hübe morgens und 2 Hübe abends',kind:'Dauermedikation',route:'Inhalation',slots:['morgens','abends'],notes:'Eigene Angabe vom 01.10.2026. Verordnung/Präparatestärke und Dosis bitte vor Übernahme prüfen.'},
-  {name:'Nucala 100 mg',dose:'100 mg als Injektion; laut eigener Angabe alle 4 Wochen',kind:'Biologikum / Injektion',route:'Injektion',slots:[],interval:28,notes:'Eigene Angabe vom 01.10.2026. Der genannte 17. des Monats ist nicht automatisch alle 28 Tage; nächsten Termin ausdrücklich bestätigen.'},
+  {name:'Nucala 100 mg',dose:'100 mg als Injektion; laut eigener Angabe alle 28 Tage',kind:'Biologikum / Injektion',route:'Injektion',slots:[],interval:28,notes:'Eigene Angabe vom 01.10.2026. Der genannte 17. des Monats ist nicht automatisch alle 28 Tage; nächsten Termin ausdrücklich bestätigen.'},
   {name:'Citalopram 20 mg',dose:'1 Tablette täglich, Uhrzeit nicht bestätigt',kind:'Dauermedikation',route:'Tablette/Kapsel',slots:[],notes:'Zuletzt am 08.10.2026 genannt; aktuelle Verordnung und Einnahme bitte prüfen.'},
   {name:'Ramipril 2,5 mg',dose:'2,5 mg morgens',kind:'Dauermedikation',route:'Tablette/Kapsel',slots:['morgens'],notes:'Eigene Angabe vom 01.10.2026. Aktuelle Verordnung bestätigen.'},
   {name:'Berodual N',dose:'Bei Bedarf 2 Hübe; zuletzt 3–5 Anwendungen/Tag berichtet',kind:'Bedarfsmedikation',route:'Inhalation',slots:[],notes:'Eigene Angabe vom 01.10.2026; keine feste Einnahmeempfehlung. Häufiger Bedarf sollte ärztlich überprüft werden.'}
