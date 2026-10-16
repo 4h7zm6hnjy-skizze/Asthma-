@@ -20,3 +20,7 @@ Die Anmeldung mit bestehendem Passwort ist ein eigener Einstieg. Wird kein lokal
 ## Version 2.5.0
 
 Siehe `README_2.5.0.md`: Asthma-AU, farbiger Kalender, Monats-/Jahresbericht, PDF-Druckdialog sowie editierbare Vorschlagsliste zuvor genannter Medikamente.
+
+## Version 2.5.1
+
+Hilfsmittel jetzt ausdrücklich nach Krankenkasse prüfen, Privatzahlung/Selbstzahler und möglicher Eigenleistung gekennzeichnet (Such-/Filterfunktion). Siehe `README_2.5.1.md`.

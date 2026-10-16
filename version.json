@@ -1,5 +1,5 @@
 {
-  "version": "2.5.0",
+  "version": "2.5.1",
   "released": "2026-10-16",
-  "notes": "Asthma-AU mit Tages-/Mo–Fr-Zähler, Dokumentarten Lungenfunktion/Bluttest, farbiger Kalender, lokale Monats- und Jahresstatistiken mit Druck/PDF-Dialog, editierbare Medikamentenvorschläge. Lokal verschlüsselt; keine Daten an Fremdserver."
+  "notes": "Hilfsmittel zusätzlich klar nach Krankenkasse prüfen, Privatzahlung/Selbstzahler und Einzelfall/Mehrkosten gekennzeichnet; Filter und Suche, offizielle Hinweise. Alle privaten Datenformate unverändert."
 }
