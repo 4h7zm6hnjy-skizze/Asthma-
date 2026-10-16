@@ -1,0 +1,32 @@
+ASTHMA 2.7.0 PROFESSIONAL — INSTALLATION NUR MIT DEM IPHONE
+===========================================================
+
+Vorbereitung:
+1. Öffne deine bisherige Asthma-App dort, wo deine Daten bisher vorhanden sind.
+2. Erstelle eine vollständige verschlüsselte .asthma17-Sicherung und bewahre die Datei sicher auf.
+3. Die bestehende App und Safari-Website-Daten NICHT löschen. Kein neuer Tresor anlegen.
+
+Upload auf GitHub direkt vom iPhone:
+1. Die Datei Asthma_2.7.0_GitHub_UPLOAD.zip in der iPhone-App „Dateien“ speichern.
+2. Einmal auf die ZIP tippen: iOS entpackt sie zu einem Ordner.
+3. Öffne https://github.com/4h7zm6hnjy-skizze/Asthma- in Safari.
+4. Auf „Add file“ / „Upload files“ tippen.
+5. Aus dem ENTPACKTEN Ordner alle Dateien auswählen – inklusive index.html,
+   app.js, sw.js, professional27.js, professional27.css, logo-home-v270.png,
+   logo-192.png, logo-512.png und version.json.
+   Wichtig: Dateien müssen direkt im Repository-Hauptverzeichnis liegen.
+   Nicht die ZIP als einzelne Datei und keinen verschachtelten Ordner hochladen.
+6. „Commit changes“ für den Branch main bestätigen.
+7. Die GitHub-Pages-Aktualisierung abwarten.
+8. Die bisherige App im gleichen Safari-/Home-Bildschirm-Kontext öffnen,
+   mit dem bisherigen Passwort entsperren und auf Version 2.7.0 prüfen.
+9. Unter „Mein Profil“ persönliche Angaben lokal eingeben und speichern.
+
+Hinweise:
+- Deine persönliche Adresse, Geburtsdatum, Name oder Gewicht werden
+  NICHT in einem öffentlichen GitHub-Repository vorbefüllt.
+- Das neue blau-türkise App-Symbol ist enthalten. Bereits installierte iPhone-Icons
+  können wegen iOS-Cache vorübergehend unverändert bleiben.
+  Die alte App deswegen nicht löschen (lokale Daten könnten verloren gehen).
+- Dies ist eine funktional erweiterte Vollversion 2.7.0, keine automatische
+  Installation über den App Store. iPhone-Safari-Ende-zu-Ende-Tests stehen noch aus.

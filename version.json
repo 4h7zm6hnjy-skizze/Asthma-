@@ -1,5 +1,5 @@
 {
-  "version": "2.6.0",
+  "version": "2.7.0",
   "released": "2026-10-16",
-  "notes": "Professionelle Neugestaltung von Start, Lunge, Kalender, Akte und Navigation im bestätigten blau-türkisen Design; neues App-Logo und dynamische Übersicht aus den vorhandenen verschlüsselten Daten. Keine Änderungen an Datenmodell, Passwort oder Messwertberechnung."
+  "notes": "Peak-Flow und Spirometrie auf eigenen Seiten; privates Patientenprofil, Arzt-Aktionsplan, lokale Messübersicht und Navigation. Bestehende verschlüsselte Gesundheitsdaten bleiben unverändert."
 }

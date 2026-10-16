@@ -22,7 +22,7 @@
  dashboard.innerHTML=`<div class="d26-greeting"><div><p class="d26-kicker">ASTHMA · PRIVATER GESUNDHEITSMANAGER</p><h1>Deine Gesundheit im Blick.</h1><p>Messwerte, Befunde und Termine. Übersichtlich und lokal verwaltet.</p></div><img src="./logo-192.png" alt="Asthma-Lungenlogo" width="72" height="72"></div>
  <div class="d26-hero-card"><img src="./logo-192.png" alt="" width="78" height="78"><div><span>Ärztliche Lungenfunktion</span><strong id="d26-main-fev">Werte werden geladen …</strong><small id="d26-main-date">Nur bestätigte Messungen im Verlauf</small></div><button type="button" data-goto="lungenwerte" aria-label="Lungenfunktion öffnen">›</button></div>
  <div class="d26-section-title"><h2>Schnellzugriff</h2><button type="button" data-goto="mehr">Alle Funktionen ›</button></div>
- <div class="d26-actions">${btn('▣','Befund scannen','befunde','Foto und PDF')}${btn('∿','Peak-Flow','lungenwerte','ePEF-Tagebuch')}${btn('♧','Lungenfunktion','lungenwerte','FEV₁ und FVC')}${btn('▦','Kalender','kalender','Termine')}</div>
+ <div class="d26-actions">${btn('▣','Befund scannen','befunde','Foto und PDF')}${btn('∿','Peak-Flow','peakflow','ePEF-Tagebuch')}${btn('♧','Lungenfunktion','lungenwerte','FEV₁ und FVC')}${btn('▦','Kalender','kalender','Termine')}</div>
  <div class="d26-metrics"><div class="d26-metric"><span>FEV₁ · % vom Soll</span><strong id="d26-fev-value">–</strong><small id="d26-fev-liter">Noch kein bestätigter Wert</small></div><div class="d26-metric"><span>FVC · % vom Soll</span><strong id="d26-fvc-value">–</strong><small id="d26-fvc-liter">Noch kein bestätigter Wert</small></div><div class="d26-metric"><span>Peak-Flow · zuletzt</span><strong id="d26-peak-value">–</strong><small id="d26-peak-date">Noch keine Messung</small></div></div>
  <div class="d26-section-title"><h2>Deine Verläufe</h2><button type="button" data-goto="lungenwerte">Details ›</button></div>`;
  home.prepend(dashboard);
@@ -75,5 +75,5 @@
  window.addEventListener('asthma:meds-change',()=>setTimeout(refresh,100));
  document.addEventListener('click',e=>{if(e.target.closest('[data-goto="start"],[data-goto="lungenwerte"]'))setTimeout(refresh,140);});
  refresh();
- window.__ASTHMA_DESIGN26_TEST=Object.freeze({refresh,version:'2.6.0'});
+ window.__ASTHMA_DESIGN26_TEST=Object.freeze({refresh,version:'2.7.0'});
 })();

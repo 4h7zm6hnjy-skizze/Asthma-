@@ -1,1 +1,3 @@
-Aktueller Prüfbericht: PRUEFBERICHT_2.6.0.md
+# Aktueller Prüfbericht
+
+Siehe `PRUEFBERICHT_2.7.0.md` für die nachgewiesenen Prüfungen und die offenen Grenzen.
