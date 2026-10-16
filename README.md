@@ -1,3 +1,25 @@
+# Asthma 2.6.0 – modernes Gesundheitsdesign
+
+Das bestätigte blau-türkise Design ist in der **echten WebApp** eingebaut, nicht nur eine Designzeichnung. Es enthält die neue Startseite, Lungenwerte-Karten, den weiterhin voll nutzbaren ePEF-/Spirometrie-Verlauf, den farbigen Kalender, die Akten-Schnellwahl sowie das neue Logo und iPhone-App-Symbol.
+
+## Installation
+1. Zuerst eine vollständige verschlüsselte `.asthma17`-Datensicherung in der bisherigen App erstellen.
+2. Dieses ZIP vollständig entpacken und **alle Dateien aus dem Hauptverzeichnis** in den Root des GitHub-Repositories `4h7zm6hnjy-skizze/Asthma-` hochladen.
+3. `Commit changes` bestätigen und die GitHub-Pages-Veröffentlichung abwarten.
+4. Im bereits verwendeten Safari-/Homescreen-Kontext öffnen und mit dem alten Passwort entsperren. Website-Daten nicht löschen.
+5. Startseite, Lunge, Kalender, Akte und Medikamente prüfen; bei Cacheproblemen die App schließen und erneut öffnen.
+
+Wichtig: Das Design zeigt nur bestätigte Messwerte aus dem verschlüsselten Tresor; manuell ausgefüllte aber nicht gespeicherte Lungenwerte werden als solche nicht in der Startseite oder Statistik gezählt. Das alte Passwort-/Datenformat bleibt unverändert.
+
+## Datenschutz und Grenzen
+Die neuen Assets werden lokal geliefert. Der Passwort-Tresor wird weder neu angelegt noch konvertiert. Bei iOS kann das bereits installierte Home-Bildschirm-Icon zwischengespeichert sein. Zum Iconwechsel nicht die bisherige App-Installation löschen, wenn dort Gesundheitsdaten gespeichert sind.
+
+Der lokale Scanner bleibt auf die bisher verfügbaren Safari/iOS-Texterkennungswege beschränkt; keine vollautomatische Bild-OCR in dieser Version. Monats-PDFs sind außerhalb des Tresors nicht verschlüsselt.
+
+Ausführliche technische Nachweise: `PRUEFBERICHT_2.6.0.md`.
+
+---
+
 # Asthma 2.4.1 – WebApp
 
 Privater verschlüsselter Gesundheitsmanager mit PEF-/FEV₁-Diagrammen, ärztlichen Spirometrie-Verläufen, Laborwerten, Befundscanner, Medikamentenplan, Kalender, Anträgen, regionaler Suche und GdB-Orientierung.

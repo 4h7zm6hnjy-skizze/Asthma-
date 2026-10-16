@@ -1,5 +1,5 @@
 {
-  "version": "2.5.1",
+  "version": "2.6.0",
   "released": "2026-10-16",
-  "notes": "Hilfsmittel zusätzlich klar nach Krankenkasse prüfen, Privatzahlung/Selbstzahler und Einzelfall/Mehrkosten gekennzeichnet; Filter und Suche, offizielle Hinweise. Alle privaten Datenformate unverändert."
+  "notes": "Professionelle Neugestaltung von Start, Lunge, Kalender, Akte und Navigation im bestätigten blau-türkisen Design; neues App-Logo und dynamische Übersicht aus den vorhandenen verschlüsselten Daten. Keine Änderungen an Datenmodell, Passwort oder Messwertberechnung."
 }

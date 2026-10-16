@@ -1,0 +1,144 @@
+/* ASTHMA 2.6.0 – modern design layer; originals remain functional. */
+:root{--d26-blue:#0c466e;--d26-navy:#0c2849;--d26-teal:#0e96a2;--d26-mint:#4bc7b0;--d26-bg:#f2fafd;--d26-line:#dfeef1;--d26-shadow:0 10px 30px rgba(14,76,105,.065)}
+html[data-design26] body{background:linear-gradient(150deg,#f7fcfd 0%,#eef9fb 48%,#f9fcfd 100%);color:var(--d26-navy);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+html[data-design26] .topbar{height:76px;border-bottom:1px solid #e2eff1;box-shadow:0 2px 17px rgba(26,82,100,.035)}
+html[data-design26] .brand strong{font-size:23px;color:var(--d26-navy);font-weight:790;letter-spacing:-.7px}
+html[data-design26] .brand small{font-size:10px;color:#587389}
+html[data-design26] .brand-icon{background:transparent;overflow:hidden;border-radius:13px;width:46px;height:46px}
+html[data-design26] .brand-icon img{width:100%;height:100%;object-fit:cover}
+html[data-design26] .panel{background:#fff;border:1px solid #e5eff2;border-radius:23px;box-shadow:var(--d26-shadow)}
+html[data-design26] .btn-primary{background:linear-gradient(110deg,#0b506c,#136783);border-radius:13px}
+html[data-design26] .btn-outline{border-color:#c6dfe4;color:#305c72;border-radius:13px}
+html[data-design26] .bottom-dock{background:rgba(253,254,255,.97);border-top:1px solid #e3edf1;box-shadow:0 -10px 24px rgba(20,66,87,.075)}
+html[data-design26] .bottom-dock button{border-radius:15px;min-height:51px;color:#3a617b}
+html[data-design26] .bottom-dock button.dock-active{background:linear-gradient(130deg,#e2f6f6,#e5f4fb);color:#045c7d}
+html[data-design26] #start.hero{display:none!important}
+html[data-design26] #uebersicht{padding:0;margin:0;background:transparent;border:0;box-shadow:none}
+html[data-design26] #uebersicht>.home20-heading,html[data-design26] #uebersicht>.home20-quick,html[data-design26] #uebersicht>.section-heading,html[data-design26] #uebersicht>.recovery24-shortcut,html[data-design26] #uebersicht>.suite-stats,html[data-design26] #uebersicht>.suite-launcher,html[data-design26] #uebersicht>h3{display:none!important}
+.d26-dashboard,.d26-dashboard *{min-width:0}
+.d26-greeting{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 9px 19px;background:radial-gradient(ellipse at right bottom,#d9f3f5,#ffffff00 45%)}
+.d26-kicker{font-size:10px;font-weight:850;letter-spacing:1.5px;color:#0c8999;margin:0 0 5px}
+.d26-greeting h1{font-size:clamp(25px,4vw,36px);line-height:1.15;letter-spacing:-1.1px;font-weight:800;color:var(--d26-navy);margin:0 0 7px}
+.d26-greeting p:not(.d26-kicker){margin:0;font-size:13px;color:#60798a;max-width:650px;line-height:1.5}
+.d26-greeting>img,.d26-title-row>img{border-radius:19px;box-shadow:0 8px 24px #13728a1c;flex:none}
+.d26-hero-card{display:flex;align-items:center;gap:18px;border:1px solid #e6eff2;border-radius:24px;background:white;padding:20px 22px;box-shadow:var(--d26-shadow);min-height:130px;margin-bottom:25px}
+.d26-hero-card>img{flex:0 0 auto;border-radius:21px}
+.d26-hero-card>div{display:flex;flex:1;flex-direction:column;gap:5px}
+.d26-hero-card span{font-weight:760;color:#345c71;font-size:14px}
+.d26-hero-card strong{font-size:clamp(18px,3vw,25px);line-height:1.3;color:#086a73;overflow-wrap:anywhere}
+.d26-hero-card small{font-size:12px;color:#627b8c;line-height:1.5}
+.d26-hero-card>button{border:0;background:#e3f5fa;color:#105e78;font-size:28px;font-weight:500;width:37px;height:37px;border-radius:50%;flex:0 0 auto}
+.d26-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:19px 2px 13px}
+.d26-section-title h2{font-size:clamp(19px,3vw,23px);letter-spacing:-.6px;margin:0;font-weight:790;color:var(--d26-navy)}
+.d26-section-title button{border:0;background:transparent;color:#087e9e;font-size:13px;font-weight:700;white-space:nowrap}
+.d26-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.d26-action{border:1px solid #e0eef1;background:linear-gradient(155deg,#e7f5fc,#f0fbf9);border-radius:19px;min-height:123px;padding:16px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#173b58;text-align:center;white-space:normal;box-shadow:0 4px 14px #124e6710;transition:transform .16s}
+.d26-action:nth-child(even){background:linear-gradient(150deg,#def5f0,#f4fcfc)}
+.d26-action:hover{transform:translateY(-2px)}
+.d26-action strong{font-size:13px;line-height:1.25;font-weight:780}
+.d26-action small{font-size:11px;line-height:1.25;color:#547787}
+.d26-symbol{font-size:24px;font-weight:700;color:#0e7996;width:47px;height:47px;display:grid;place-items:center;border-radius:50%;background:#ffffffb3;flex:none}
+.d26-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:13px 0 24px}
+.d26-metric{background:white;border:1px solid #e1eff1;border-radius:18px;padding:15px 17px;box-shadow:var(--d26-shadow);display:flex;flex-direction:column;gap:6px}
+.d26-metric>span{font-size:12px;color:#557689;font-weight:720}
+.d26-metric>strong{font-size:clamp(19px,3vw,27px);color:#133f62;line-height:1.2;font-weight:800}
+.d26-metric>small{font-size:11px;color:#607e90;overflow-wrap:anywhere}
+.d26-chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;align-items:start;margin-bottom:16px}
+.d26-chart-grid>.home-epef,.d26-chart-grid>.home-lufu23{background:white;border:1px solid #e5eff2;border-radius:21px;box-shadow:var(--d26-shadow);padding:17px;min-width:0;margin:0;max-width:100%;overflow:hidden}
+.d26-chart-grid .home-epef-heading,.d26-chart-grid .lufu23-heading{display:flex;flex-wrap:wrap;gap:6px;align-items:start}
+.d26-chart-grid h3{font-size:18px;color:#123c58;letter-spacing:-.3px;line-height:1.35}
+.d26-chart-grid .section-kicker,.d26-chart-grid .version-chip{font-size:10px;letter-spacing:.4px}
+.d26-chart-grid p{font-size:12px;color:#617c89;line-height:1.5}
+.d26-chart-grid svg{max-width:100%;height:auto;min-width:0}
+.d26-chart-grid .epef-charts{display:grid;grid-template-columns:1fr;gap:12px;min-width:0}
+.d26-chart-grid .home-epef-toolbar,.d26-chart-grid .lufu23-controls{display:flex;flex-wrap:wrap;align-items:center;min-width:0;gap:7px}
+.d26-chart-grid .home-epef-count,.d26-chart-grid .lufu23-caption{font-size:11px}
+.d26-chart-grid select{min-width:0;max-width:100%}
+.d26-more-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:12px 0 10px}
+.d26-more-tiles>button{border:1px solid #e2edf0;background:white;border-radius:19px;padding:15px;display:flex;align-items:center;gap:12px;text-align:left;color:#173d57;box-shadow:var(--d26-shadow)}
+.d26-more-tiles>button>span:nth-child(2){display:flex;flex:1;flex-direction:column;gap:5px}
+.d26-more-tiles strong{font-size:13px;line-height:1.4}
+.d26-more-tiles small{font-size:11px;line-height:1.4;color:#627d8c;overflow-wrap:anywhere}
+.d26-more-tiles b{font-size:24px;color:#137f97}
+.d26-more-tiles>p{grid-column:1/-1;color:#637c8b;font-size:11px;line-height:1.6;background:#eaf6f7;padding:11px 15px;border-radius:12px;margin:3px 0}
+.d26-lung-heading,.d26-akte-hub{background:linear-gradient(135deg,#f8fdfd,#eff9fb);border:1px solid #e5eff2;border-radius:20px;padding:22px;margin-bottom:21px}
+.d26-title-row{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:17px}
+.d26-title-row h2{color:var(--d26-navy);font-size:clamp(22px,3.5vw,30px);line-height:1.25;margin:0 0 6px}
+.d26-title-row p:not(.d26-kicker){font-size:13px;color:#637d8d;margin:0}
+.d26-lung-rings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.d26-lung-rings>div{border-radius:20px;border:1px solid #e0ebee;padding:18px;background:#fff;text-align:center;box-shadow:0 5px 18px #16456c0b}
+.d26-lung-rings h3{font-size:16px;color:#155071;margin:0 0 10px}
+.d26-ring{--progress:0;width:135px;max-width:100%;aspect-ratio:1;border-radius:50%;margin:0 auto 12px;background:conic-gradient(#29b9af calc(var(--progress)*1%),#e2f2f8 0);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;isolation:isolate}
+.d26-ring:before{content:"";position:absolute;inset:11px;border-radius:50%;background:#fff;z-index:-1}
+.d26-ring strong{font-size:24px;line-height:1.2;color:#123e5d}
+.d26-ring small{font-size:11px;color:#607a89}
+.d26-lung-rings p{font-size:13px;font-weight:720;color:#20465f;margin:0}
+.d26-hint{font-size:12px!important;color:#59788b!important;background:#e7f6f7;padding:11px 12px;border-radius:12px;margin:12px 0 0;line-height:1.5}
+html[data-design26] #lungenwerte>.section-heading{margin-bottom:14px}
+html[data-design26] #lungenwerte>.section-heading>.section-kicker{display:none}
+html[data-design26] #lungenwerte #lufu23-detail{border-radius:21px;box-shadow:var(--d26-shadow);background:white;padding:20px;border:1px solid #e2edf0;margin-bottom:20px}
+html[data-design26] #lungenwerte .lung-field{border-radius:20px}
+html[data-design26] #kalender>.section-heading h2{font-size:27px}
+html[data-design26] #kalender .calendar-layout{gap:18px}
+html[data-design26] #kalender .cal-board{background:#f9fdfd;border:1px solid #e1eef1;border-radius:21px}
+html[data-design26] #kalender .cal-day{border-radius:10px}
+html[data-design26] #kalender .cal25-legend{border-radius:17px}
+.d26-akte-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.d26-akte-grid .d26-action{min-height:119px;background:white;border-radius:16px}
+html[data-design26] #mein-bereich>.section-heading h2{font-size:21px}
+html[data-design26] .app-nav{background:#fff}
+html[data-design26] .topbar #update-top{border-radius:14px}
+@media(max-width:850px){.d26-chart-grid{grid-template-columns:1fr}.d26-more-tiles{grid-template-columns:1fr 1fr}.d26-more-tiles>button:last-of-type{grid-column:1/-1}.d26-akte-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){
+ html[data-design26] .main-layout{padding-top:12px}
+ html[data-design26] .topbar{height:67px}
+ html[data-design26] .brand strong{font-size:20px}
+ .d26-greeting{padding:14px 2px 17px}
+ .d26-greeting h1{font-size:25px}
+ .d26-greeting>img{width:54px;height:54px;border-radius:15px}
+ .d26-hero-card{gap:10px;padding:13px;min-height:99px;border-radius:19px}
+ .d26-hero-card>img{width:55px;height:55px;border-radius:15px}
+ .d26-hero-card strong{font-size:17px}
+ .d26-hero-card span,.d26-hero-card small{font-size:11px}
+ .d26-actions{gap:7px}
+ .d26-action{min-height:111px;padding:11px 5px;border-radius:13px}
+ .d26-action .d26-symbol{font-size:22px;width:39px;height:39px}
+ .d26-action strong{font-size:11px;line-height:1.3;hyphens:auto;overflow-wrap:anywhere}
+ .d26-action small{font-size:10px;line-height:1.2}
+ .d26-metrics{gap:6px}
+ .d26-metric{padding:12px 8px;border-radius:14px}
+ .d26-metric>span{font-size:10px;line-height:1.3}
+ .d26-metric>strong{font-size:19px;overflow-wrap:anywhere}
+ .d26-metric>small{font-size:10px}
+ .d26-chart-grid>.home-epef,.d26-chart-grid>.home-lufu23{padding:12px}
+ .d26-more-tiles{grid-template-columns:1fr;gap:8px}
+ .d26-more-tiles>button:last-of-type{grid-column:auto}
+ .d26-lung-heading,.d26-akte-hub{padding:14px}
+ .d26-lung-rings{gap:7px}
+ .d26-lung-rings>div{padding:12px 5px;border-radius:14px}
+ .d26-ring{width:105px}
+ .d26-ring:before{inset:9px}
+ .d26-ring strong{font-size:20px}
+ .d26-akte-grid{gap:8px}
+ .d26-akte-grid .d26-action{min-height:120px}
+}
+@media(max-width:350px){.d26-metrics{grid-template-columns:1fr 1fr}.d26-metric:last-child{grid-column:1/-1}.d26-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.d26-action{min-height:94px}}
+@media print{.d26-dashboard,.d26-lung-heading,.d26-akte-hub{display:none!important}}
+
+/* Final usability refinements; keep all underlying controls intact. */
+#secure-gate .secure-icon{width:69px;height:69px;padding:0;background:transparent;border-radius:18px;overflow:hidden;display:grid;place-items:center}
+#secure-gate .secure-icon img{width:64px;height:64px;border-radius:17px}
+#secure-gate .secure-card{border-radius:27px;box-shadow:0 16px 46px rgba(13,77,104,.095)}
+#secure-gate .secure-card h1{color:#153d55}
+html[data-design26] #lungenwerte>.section-heading,html[data-design26] #mein-bereich>.section-heading{display:none!important}
+html[data-design26] #kalender>.section-heading h2{font-size:clamp(23px,4vw,28px)}
+html[data-design26] #kalender .cal25-legend summary{color:#154e6a}
+html[data-design26] #kalender .cal-day.cal-selected{background:#107e95;color:white}
+html[data-design26] #kalender #calendar-grid{max-width:100%;min-width:0}
+.d26-chart-grid .home-epef-heading p:not(.section-kicker),.d26-chart-grid .lufu23-heading p:not(.section-kicker){font-size:11px;line-height:1.45}
+@media(min-width:851px){.d26-lung-rings{max-width:580px}}
+
+html[data-design26] #kalender .cal-board .cal25-legend{margin:13px 0;border-radius:13px;background:#fff;padding:9px 12px}
+
+.d26-symbol svg{width:27px;height:27px;display:block;stroke:currentColor}
+.d26-symbol img{width:31px;height:31px;border-radius:9px;object-fit:cover}

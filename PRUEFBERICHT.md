@@ -1,1 +1,1 @@
-Aktueller Testbericht: PRUEFBERICHT_2.5.0.md
+Aktueller Prüfbericht: PRUEFBERICHT_2.6.0.md
