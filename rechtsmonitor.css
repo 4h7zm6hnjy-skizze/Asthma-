@@ -22,3 +22,16 @@
 .rechtsmonitor-shortcut strong{display:block;font-size:14px;color:#17445a}
 .rechtsmonitor-shortcut small{display:block;font-size:12px;color:#557381;line-height:1.5;margin-top:3px}
 @media(max-width:600px){#rechtsmonitor-app{padding:14px}#rechtsmonitor-app #rechtsmonitor-official-links{grid-template-columns:minmax(0,1fr)}#rechtsmonitor-app .rechtsmonitor-actions .btn{width:100%}.rechtsmonitor-shortcut{flex-wrap:wrap}.rechtsmonitor-shortcut .btn{width:100%}}
+/* Filter und eindeutige Kennzeichnung; niemals Rechtsanspruch suggerieren. */
+#rechtsmonitor-app .rechtsmonitor-filters{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+#rechtsmonitor-app .rechtsmonitor-filter{border:1px solid #c2dce3;border-radius:99px;padding:9px 12px;background:#fff;color:#275064;font-size:12px;font-weight:650;line-height:1.35;cursor:pointer}
+#rechtsmonitor-app .rechtsmonitor-filter[aria-pressed=true]{background:#145971;color:white;border-color:#145971}
+#rechtsmonitor-app .rechtsmonitor-count{font-size:12px;color:#3c6070;line-height:1.5;margin:9px 0 13px}
+#rechtsmonitor-app .rechtsmonitor-level{font-size:10px;border-radius:99px;padding:4px 8px;font-weight:750}
+#rechtsmonitor-app .rechtsmonitor-level.possible{background:#ddf6ef;color:#146f60}
+#rechtsmonitor-app .rechtsmonitor-level.general{background:#eaf0f5;color:#405d72}
+#rechtsmonitor-app .rechtsmonitor-legal-stage{font-size:12px;margin:5px 0;line-height:1.45;color:#715227}
+#rechtsmonitor-app .rechtsmonitor-source-health{font-size:12px;color:#3a6370;border-top:1px solid #d7e8eb;margin-top:14px;padding-top:10px}
+#rechtsmonitor-app .rechtsmonitor-source-health summary{font-weight:700;cursor:pointer}
+#rechtsmonitor-app .rechtsmonitor-source-health p{margin:7px 0;line-height:1.5}
+@media(max-width:600px){#rechtsmonitor-app .rechtsmonitor-filter{flex:1 1 100%;text-align:center}}
