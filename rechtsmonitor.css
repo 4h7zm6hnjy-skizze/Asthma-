@@ -1,0 +1,24 @@
+#rechtsmonitor-app{margin:16px 0 24px;padding:18px;border:1px solid #cde4e8;border-radius:17px;background:#f7fcfd;color:#153c51;scroll-margin-top:90px}
+#rechtsmonitor-app *,.rechtsmonitor-shortcut *{box-sizing:border-box}
+#rechtsmonitor-app .rechtsmonitor-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+#rechtsmonitor-app h3{color:#07374e;font-size:20px;line-height:1.4;margin:4px 0}
+#rechtsmonitor-app .rechtsmonitor-heading p:not(.section-kicker){font-size:13px;color:#526d7a;margin:3px 0 13px}
+#rechtsmonitor-app .rechtsmonitor-official{padding:6px 10px;border-radius:22px;background:#e3f5f1;color:#0e6c68;font-size:11px;font-weight:700;white-space:nowrap}
+#rechtsmonitor-app .rechtsmonitor-actions{display:flex;gap:9px;flex-wrap:wrap;margin:6px 0 9px}
+#rechtsmonitor-app .rechtsmonitor-status{padding:10px 12px;background:#e6f3f6;border-radius:9px;color:#225669;font-size:12px;line-height:1.55}
+#rechtsmonitor-app .rechtsmonitor-item{border:1px solid #dbe7ed;background:white;border-radius:11px;padding:13px;margin:10px 0}
+#rechtsmonitor-app .rechtsmonitor-item-header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:7px}
+#rechtsmonitor-app .rechtsmonitor-date{font-size:11px;color:#637c87}
+#rechtsmonitor-app .rechtsmonitor-new{border-radius:15px;background:#e5f6ee;color:#087252;font-size:10px;font-weight:700;padding:3px 8px}
+#rechtsmonitor-app .rechtsmonitor-title{display:block;color:#14374b;font-size:14px;line-height:1.5}
+#rechtsmonitor-app .rechtsmonitor-summary{font-size:12px;color:#617484;margin:7px 0;line-height:1.5}
+#rechtsmonitor-app .rechtsmonitor-link{display:inline-block;margin-top:4px;color:#047886;font-weight:700;font-size:12px;text-decoration:underline}
+#rechtsmonitor-app .rechtsmonitor-details{border-top:1px solid #d5e7eb;padding-top:12px;margin-top:14px}
+#rechtsmonitor-app .rechtsmonitor-details summary{font-size:13px;font-weight:700;cursor:pointer;color:#15435a}
+#rechtsmonitor-app #rechtsmonitor-official-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0 0}
+#rechtsmonitor-app .rechtsmonitor-source{font-size:12px;color:#136f79;text-decoration:underline;padding:7px 0;line-height:1.4}
+#rechtsmonitor-app .rechtsmonitor-note,#rechtsmonitor-app .rechtsmonitor-muted{font-size:12px;color:#586e7b;line-height:1.7;margin:12px 0 0}
+.rechtsmonitor-shortcut{margin:14px 0;padding:15px;border:1px solid #cde4e8;background:linear-gradient(125deg,#f0fbfc,#eaf7f4);border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.rechtsmonitor-shortcut strong{display:block;font-size:14px;color:#17445a}
+.rechtsmonitor-shortcut small{display:block;font-size:12px;color:#557381;line-height:1.5;margin-top:3px}
+@media(max-width:600px){#rechtsmonitor-app{padding:14px}#rechtsmonitor-app #rechtsmonitor-official-links{grid-template-columns:minmax(0,1fr)}#rechtsmonitor-app .rechtsmonitor-actions .btn{width:100%}.rechtsmonitor-shortcut{flex-wrap:wrap}.rechtsmonitor-shortcut .btn{width:100%}}
