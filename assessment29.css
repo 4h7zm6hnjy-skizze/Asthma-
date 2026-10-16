@@ -1,0 +1,21 @@
+.a29-evaluation{margin:18px 0 24px;padding:18px;border:1px solid #cadfe7;border-radius:18px;background:#f7fcfd;color:#173f54;scroll-margin-top:80px}
+.a29-evaluation *{box-sizing:border-box}
+.a29-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.a29-head h2{font-size:21px;color:#0e3850;margin:2px 0 6px}
+.a29-head p{font-size:13px;line-height:1.55;margin:2px 0 12px}
+.a29-marker{font-size:11px;font-weight:600;color:#16706b;background:#e4f3f0;padding:7px 10px;border-radius:16px}
+.a29-status{padding:11px 12px;font-size:13px;font-weight:650;border-radius:9px;margin:11px 0}
+.a29-neutral{background:#e5f1f7;color:#104e6c}.a29-attention{background:#fff2df;color:#794606;border-left:4px solid #d58a1c}
+.a29-lead{font-weight:750;font-size:17px;line-height:1.5;margin:12px 0}
+.a29-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0}
+.a29-kpi{display:flex;flex-direction:column;gap:5px;padding:12px;background:#fff;border:1px solid #d9eaf0;border-radius:12px;min-width:0}
+.a29-kpi small{font-size:12px;color:#546f7e}.a29-kpi strong{font-size:19px;color:#0a4b68;overflow-wrap:anywhere}.a29-kpi span{font-size:11px;color:#667e87;line-height:1.45}
+.a29-details{border-radius:10px;background:#fff;padding:11px 13px;border:1px solid #dce9ee}.a29-details summary{font-weight:750;cursor:pointer}.a29-details ul{padding-left:19px;margin:12px 0 2px}.a29-details li{font-size:13px;line-height:1.5;margin:7px 0}
+.a29-action{padding:11px 12px;background:#e8f4f7;border-radius:10px;font-size:13px;line-height:1.55;font-weight:600}
+.a29-actions{display:flex;flex-wrap:wrap;gap:8px}.a29-actions button{flex:1 1 190px}
+.a29-emergency{font-size:13px;line-height:1.6;padding:10px 12px;border-left:4px solid #bf343d;background:#fff3f3;border-radius:8px;margin:14px 0;color:#832027}
+.a29-emergency a{font-weight:800;color:#a31925;text-decoration:underline}
+.a29-small,.a29-sources{font-size:12px;color:#5c7380;line-height:1.55;margin:12px 0 2px}
+.a29-sources a{color:#126b94;text-decoration:underline}
+@media(max-width:380px){.a29-evaluation{padding:13px}.a29-kpis{gap:7px}.a29-kpi{padding:9px}.a29-head h2{font-size:19px}}
+@media print{.a29-actions{display:none!important}.a29-evaluation{break-inside:avoid;background:#fff}}
