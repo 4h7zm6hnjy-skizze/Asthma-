@@ -1,0 +1,49 @@
+#v30-panel{border:1px solid #c9e1e8;border-radius:18px;background:linear-gradient(180deg,#f5fbfc,#fff);padding:18px;margin:22px 0;color:#1a4054;scroll-margin-top:80px}
+#v30-panel *{box-sizing:border-box}
+#v30-panel h3{font-size:21px;color:#103b51;margin:4px 0 9px}
+#v30-panel h4{font-size:16px;color:#123d50;margin:0}
+#v30-panel p{line-height:1.5}
+.v30-head p{font-size:13px;color:#536a77;margin:3px 0 12px}
+.v30-settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 14px;align-items:end;padding:14px;background:#e9f4f7;border-radius:13px}
+.v30-settings label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#21485b}
+.v30-settings select{width:100%;min-width:0;background:#fff;border:1px solid #bcd6de;border-radius:10px;padding:10px;color:#163c52;font-size:14px}
+.v30-settings .btn{width:100%;white-space:normal;min-height:42px;font-size:13px}
+.v30-radius-label{grid-column:1/-1;display:flex!important;justify-content:space-between;flex-direction:row!important}
+#v30-radius{grid-column:1/-1;width:100%;accent-color:#0b6981;min-height:30px}
+.v30-fieldset{grid-column:1/-1;min-width:0;border:0;margin:0;padding:0}
+.v30-fieldset legend{font-size:13px;font-weight:700;margin-bottom:6px}
+.v30-costs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.v30-cost-btn{border:1px solid #bdd4db;border-radius:9px;padding:9px 4px;background:white;color:#28576c;font-size:11px;font-weight:700;min-height:42px;cursor:pointer;overflow-wrap:anywhere}
+.v30-cost-btn[aria-pressed="true"]{background:#0b5970;color:#fff;border-color:#0b5970}
+.v30-check{align-self:center;flex-direction:row!important;align-items:center;grid-column:1/-1;font-size:12px!important}
+.v30-check input{width:17px;height:17px;accent-color:#0b7189;flex:none}
+.v30-info{font-size:12px;background:#dfeff5;padding:10px 12px;border-radius:9px;margin:14px 0;color:#28586d}
+.v30-results-head{display:flex;justify-content:space-between;align-items:center;gap:7px;margin-bottom:12px}
+.v30-results-head strong{font-size:12px;white-space:nowrap}
+.v30-result{border:1px solid #d6e6eb;border-radius:13px;background:#fff;padding:13px;margin:0 0 10px;overflow-wrap:anywhere}
+.v30-result-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.v30-result-head strong{font-size:15px;line-height:1.4;flex:1}
+.v30-distance{white-space:nowrap;font-size:11px;color:#116984;background:#e7f5f8;padding:4px 7px;border-radius:8px}
+.v30-line{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:9px 0}
+.v30-line small{font-size:12px;color:#526b76}
+.v30-cost{border-radius:8px;padding:5px 8px;font-size:11px;font-weight:800;white-space:nowrap}
+.v30-cost-free{background:#e5f4ee;color:#175a3a}
+.v30-cost-paid{background:#fbefe4;color:#795113}
+.v30-cost-unknown{background:#eaeef1;color:#4c5a62}
+.v30-help,.v30-address,.v30-form-hint{font-size:12px;margin:7px 0;color:#344f5a}
+.v30-form-hint{font-weight:650}
+.v30-source{display:block;color:#71828a;font-size:11px;margin-top:9px}
+.v30-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.v30-actions a{font-size:12px!important;min-height:36px;padding:8px 10px!important}
+.v30-empty{color:#5c6c76;font-size:13px}
+.v30-checklist{margin:15px 0;background:#f3f7f9;border-radius:10px;padding:12px;font-size:13px}
+.v30-checklist summary{font-weight:700;cursor:pointer}
+.v30-checklist li{margin:7px 0}
+.v30-directories{margin:18px 0 0;border-top:1px solid #d8e9ed;padding-top:14px}
+.v30-directories>p{font-size:12px;color:#61737b}
+.v30-directory{display:flex;flex-direction:column;gap:4px;padding:9px 0;border-bottom:1px solid #e7eff2;font-size:13px}
+.v30-directory a{font-weight:700;color:#135b75}
+.v30-directory small{font-size:11px;color:#5a6f7c}
+.v30-note{font-size:11px;color:#657e89;margin-top:18px}
+#v30-home-link{margin:12px 0;max-width:100%;white-space:normal}
+@media(max-width:480px){#v30-panel{padding:13px;margin:16px 0}.v30-settings{grid-template-columns:1fr;gap:11px;padding:11px}.v30-costs{grid-template-columns:repeat(2,minmax(0,1fr))}.v30-cost-btn{font-size:12px}.v30-settings label{grid-column:1/-1}.v30-settings>.btn{grid-column:1/-1}.v30-actions a{flex:1 1 110px;text-align:center}.v30-result-head strong{font-size:14px}}
