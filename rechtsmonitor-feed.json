@@ -1,25 +1,146 @@
 {
   "schema": 1,
-  "classifierVersion": 2,
-  "generatedAt": "2026-10-16T19:57:22+00:00",
-  "status": "partial",
+  "classifierVersion": 3,
+  "generatedAt": "2026-10-17T06:51:18+00:00",
+  "status": "ok",
   "sources": [
     {
       "name": "Gesetze im Internet – Aktualitätendienst",
-      "ok": false,
-      "count": 0,
-      "error": "URLError"
+      "ok": true,
+      "count": 9,
+      "fallbackUsed": false
     },
     {
       "name": "G-BA – Letzte Änderungen",
       "ok": true,
-      "count": 0
+      "count": 0,
+      "fallbackUsed": false
     },
     {
       "name": "G-BA – Beschlüsse",
       "ok": true,
-      "count": 0
+      "count": 0,
+      "fallbackUsed": false
     }
   ],
-  "items": []
+  "archivedCount": 0,
+  "items": [
+    {
+      "id": "2de9a6b591e54ec9d8d6",
+      "title": "BGBl. 2026 I Nr. 247 – Zweite Verordnung zur Änderung der Teilhabeberatungsverordnung vom 01. September 2026",
+      "date": "2026-10-17",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/247",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "reha"
+      ],
+      "relevance": "possible",
+      "reason": "Die Überschrift nennt einen Themenbereich, der für deinen Fall wichtig sein könnte.",
+      "stage": "unbestimmt"
+    },
+    {
+      "id": "3d96e4e0d496410688ca",
+      "title": "BGBl. 2026 I Nr. 210 – Siebte Verordnung zur Änderung der Berufskrankheiten-Verordnung vom 16. Juli 2026",
+      "date": "2026-10-17",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/210",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "arbeit"
+      ],
+      "relevance": "possible",
+      "reason": "Die Überschrift nennt einen Themenbereich, der für deinen Fall wichtig sein könnte.",
+      "stage": "unbestimmt"
+    },
+    {
+      "id": "d0a7de946b534f24d651",
+      "title": "BGBl. 2026 I Nr. 58 – Siebte Verordnung über zwingende Arbeitsbedingungen für die Pflegebranche vom 03. März 2026",
+      "date": "2026-10-17",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/58",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "arbeit"
+      ],
+      "relevance": "general",
+      "reason": "Allgemeine amtliche Meldung zu einem angrenzenden Themenbereich.",
+      "stage": "unbestimmt"
+    },
+    {
+      "id": "be7b231574d72f0e7741",
+      "title": "BGBl. 2026 I Nr. 263 – Neunte Verordnung zur Änderung der Winterbeschäftigungs-Verordnung vom 10. September 2026",
+      "date": "2026-10-17",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/263",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "arbeit"
+      ],
+      "relevance": "general",
+      "reason": "Allgemeine amtliche Meldung zu einem angrenzenden Themenbereich.",
+      "stage": "unbestimmt"
+    },
+    {
+      "id": "16b7ebc73ac697b5b869",
+      "title": "BGBl. 2026 I Nr. 228 – Gesetz zur Stabilisierung der Beitragssätze in der gesetzlichen Krankenversicherung vom 24. Juli 2026",
+      "date": "2026-10-17",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/228",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "gesundheit"
+      ],
+      "relevance": "general",
+      "reason": "Allgemeine amtliche Meldung zu einem angrenzenden Themenbereich.",
+      "stage": "unbestimmt"
+    },
+    {
+      "id": "1e0acc4c01e61e22de34",
+      "title": "BGBl. 2026 I Nr. 186 – Siebte Verordnung über eine Lohnuntergrenze in der Arbeitnehmerüberlassung vom 19. Juni 2026",
+      "date": "2026-10-17",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/186",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "arbeit"
+      ],
+      "relevance": "general",
+      "reason": "Allgemeine amtliche Meldung zu einem angrenzenden Themenbereich.",
+      "stage": "unbestimmt"
+    },
+    {
+      "id": "f460cdbb6bbc03597968",
+      "title": "BGBl. 2026 I Nr. 178 – Verordnung zur Bestimmung des Rentenwerts in der gesetzlichen Rentenversicherung und zur Bestimmung weiterer Werte zum 1. Juli 2026 vom 16. Juni 2026",
+      "date": "2026-10-17",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/178",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "reha"
+      ],
+      "relevance": "general",
+      "reason": "Allgemeine amtliche Meldung zu einem angrenzenden Themenbereich.",
+      "stage": "unbestimmt"
+    },
+    {
+      "id": "57b971afa1754d74a771",
+      "title": "BGBl. 2026 I Nr. 173 – Dritte Verordnung zur Änderung der Arzneimittelpreisverordnung vom 09. Juni 2026",
+      "date": "2026-10-17",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/173",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "gesundheit"
+      ],
+      "relevance": "general",
+      "reason": "Allgemeine amtliche Meldung zu einem angrenzenden Themenbereich.",
+      "stage": "unbestimmt"
+    },
+    {
+      "id": "23a43b2639ff8bb5277a",
+      "title": "BGBl. 2026 I Nr. 149 – Vierundzwanzigste Verordnung zur Änderung der Arzneimittelverschreibungsverordnung vom 19. Mai 2026",
+      "date": "2026-10-17",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/149",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "gesundheit"
+      ],
+      "relevance": "general",
+      "reason": "Allgemeine amtliche Meldung zu einem angrenzenden Themenbereich.",
+      "stage": "unbestimmt"
+    }
+  ]
 }
