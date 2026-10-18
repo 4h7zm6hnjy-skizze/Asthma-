@@ -1,14 +1,14 @@
 {
   "schema": 1,
   "classifierVersion": 3,
-  "generatedAt": "2026-10-17T06:51:18+00:00",
-  "status": "ok",
+  "generatedAt": "2026-10-18T06:51:44+00:00",
+  "status": "partial",
   "sources": [
     {
       "name": "Gesetze im Internet – Aktualitätendienst",
-      "ok": true,
-      "count": 9,
-      "fallbackUsed": false
+      "ok": false,
+      "count": 0,
+      "error": "URLError"
     },
     {
       "name": "G-BA – Letzte Änderungen",
@@ -23,34 +23,8 @@
       "fallbackUsed": false
     }
   ],
-  "archivedCount": 0,
+  "archivedCount": 9,
   "items": [
-    {
-      "id": "2de9a6b591e54ec9d8d6",
-      "title": "BGBl. 2026 I Nr. 247 – Zweite Verordnung zur Änderung der Teilhabeberatungsverordnung vom 01. September 2026",
-      "date": "2026-10-17",
-      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/247",
-      "source": "Gesetze im Internet – Aktualitätendienst",
-      "categories": [
-        "reha"
-      ],
-      "relevance": "possible",
-      "reason": "Die Überschrift nennt einen Themenbereich, der für deinen Fall wichtig sein könnte.",
-      "stage": "unbestimmt"
-    },
-    {
-      "id": "3d96e4e0d496410688ca",
-      "title": "BGBl. 2026 I Nr. 210 – Siebte Verordnung zur Änderung der Berufskrankheiten-Verordnung vom 16. Juli 2026",
-      "date": "2026-10-17",
-      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/210",
-      "source": "Gesetze im Internet – Aktualitätendienst",
-      "categories": [
-        "arbeit"
-      ],
-      "relevance": "possible",
-      "reason": "Die Überschrift nennt einen Themenbereich, der für deinen Fall wichtig sein könnte.",
-      "stage": "unbestimmt"
-    },
     {
       "id": "d0a7de946b534f24d651",
       "title": "BGBl. 2026 I Nr. 58 – Siebte Verordnung über zwingende Arbeitsbedingungen für die Pflegebranche vom 03. März 2026",
@@ -61,8 +35,10 @@
         "arbeit"
       ],
       "relevance": "general",
-      "reason": "Allgemeine amtliche Meldung zu einem angrenzenden Themenbereich.",
-      "stage": "unbestimmt"
+      "reason": "Frühere amtliche Meldung; Quelle beim letzten Abruf nicht erreichbar. Aktuellen Rechtsstand selbst prüfen.",
+      "stage": "unbestimmt",
+      "archived": true,
+      "lastVerifiedAt": "2026-10-17T06:51:18+00:00"
     },
     {
       "id": "be7b231574d72f0e7741",
@@ -74,8 +50,25 @@
         "arbeit"
       ],
       "relevance": "general",
-      "reason": "Allgemeine amtliche Meldung zu einem angrenzenden Themenbereich.",
-      "stage": "unbestimmt"
+      "reason": "Frühere amtliche Meldung; Quelle beim letzten Abruf nicht erreichbar. Aktuellen Rechtsstand selbst prüfen.",
+      "stage": "unbestimmt",
+      "archived": true,
+      "lastVerifiedAt": "2026-10-17T06:51:18+00:00"
+    },
+    {
+      "id": "2de9a6b591e54ec9d8d6",
+      "title": "BGBl. 2026 I Nr. 247 – Zweite Verordnung zur Änderung der Teilhabeberatungsverordnung vom 01. September 2026",
+      "date": "2026-10-17",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/247",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "reha"
+      ],
+      "relevance": "general",
+      "reason": "Frühere amtliche Meldung; Quelle beim letzten Abruf nicht erreichbar. Aktuellen Rechtsstand selbst prüfen.",
+      "stage": "unbestimmt",
+      "archived": true,
+      "lastVerifiedAt": "2026-10-17T06:51:18+00:00"
     },
     {
       "id": "16b7ebc73ac697b5b869",
@@ -87,8 +80,25 @@
         "gesundheit"
       ],
       "relevance": "general",
-      "reason": "Allgemeine amtliche Meldung zu einem angrenzenden Themenbereich.",
-      "stage": "unbestimmt"
+      "reason": "Frühere amtliche Meldung; Quelle beim letzten Abruf nicht erreichbar. Aktuellen Rechtsstand selbst prüfen.",
+      "stage": "unbestimmt",
+      "archived": true,
+      "lastVerifiedAt": "2026-10-17T06:51:18+00:00"
+    },
+    {
+      "id": "3d96e4e0d496410688ca",
+      "title": "BGBl. 2026 I Nr. 210 – Siebte Verordnung zur Änderung der Berufskrankheiten-Verordnung vom 16. Juli 2026",
+      "date": "2026-10-17",
+      "url": "https://www.recht.bund.de/eli/bund/BGBl_1/2026/210",
+      "source": "Gesetze im Internet – Aktualitätendienst",
+      "categories": [
+        "arbeit"
+      ],
+      "relevance": "general",
+      "reason": "Frühere amtliche Meldung; Quelle beim letzten Abruf nicht erreichbar. Aktuellen Rechtsstand selbst prüfen.",
+      "stage": "unbestimmt",
+      "archived": true,
+      "lastVerifiedAt": "2026-10-17T06:51:18+00:00"
     },
     {
       "id": "1e0acc4c01e61e22de34",
@@ -100,8 +110,10 @@
         "arbeit"
       ],
       "relevance": "general",
-      "reason": "Allgemeine amtliche Meldung zu einem angrenzenden Themenbereich.",
-      "stage": "unbestimmt"
+      "reason": "Frühere amtliche Meldung; Quelle beim letzten Abruf nicht erreichbar. Aktuellen Rechtsstand selbst prüfen.",
+      "stage": "unbestimmt",
+      "archived": true,
+      "lastVerifiedAt": "2026-10-17T06:51:18+00:00"
     },
     {
       "id": "f460cdbb6bbc03597968",
@@ -113,8 +125,10 @@
         "reha"
       ],
       "relevance": "general",
-      "reason": "Allgemeine amtliche Meldung zu einem angrenzenden Themenbereich.",
-      "stage": "unbestimmt"
+      "reason": "Frühere amtliche Meldung; Quelle beim letzten Abruf nicht erreichbar. Aktuellen Rechtsstand selbst prüfen.",
+      "stage": "unbestimmt",
+      "archived": true,
+      "lastVerifiedAt": "2026-10-17T06:51:18+00:00"
     },
     {
       "id": "57b971afa1754d74a771",
@@ -126,8 +140,10 @@
         "gesundheit"
       ],
       "relevance": "general",
-      "reason": "Allgemeine amtliche Meldung zu einem angrenzenden Themenbereich.",
-      "stage": "unbestimmt"
+      "reason": "Frühere amtliche Meldung; Quelle beim letzten Abruf nicht erreichbar. Aktuellen Rechtsstand selbst prüfen.",
+      "stage": "unbestimmt",
+      "archived": true,
+      "lastVerifiedAt": "2026-10-17T06:51:18+00:00"
     },
     {
       "id": "23a43b2639ff8bb5277a",
@@ -139,8 +155,10 @@
         "gesundheit"
       ],
       "relevance": "general",
-      "reason": "Allgemeine amtliche Meldung zu einem angrenzenden Themenbereich.",
-      "stage": "unbestimmt"
+      "reason": "Frühere amtliche Meldung; Quelle beim letzten Abruf nicht erreichbar. Aktuellen Rechtsstand selbst prüfen.",
+      "stage": "unbestimmt",
+      "archived": true,
+      "lastVerifiedAt": "2026-10-17T06:51:18+00:00"
     }
   ]
 }
