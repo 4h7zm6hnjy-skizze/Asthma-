@@ -1,5 +1,5 @@
 {
-  "version": "2.9.0",
+  "version": "2.9.1",
   "released": "2026-10-21",
-  "notes": "Neue Diagramme fuer SpO2 (Apple Watch/Finger/Ohr), Blutdruck und Puls; 5 Zeitansichten, bearbeitbare persoenliche Vergleichslinien; automatisch neu berechnete begrenzte Medikamentenrisikohinweise; erweiterte Lungenfunktions- und PEF-Charts. Kein automatischer Apple Health Zugriff; keine Datenmigration."
+  "notes": "iPhone-Fix: Vitalwerte Eingabefelder auch bei älterem Offline-Cache zuverlässig nachladen. Keine Änderung der verschlüsselten Gesundheitsdaten. Weitere Messwerte und Diagramme unverändert."
 }
