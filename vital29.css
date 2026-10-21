@@ -1,0 +1,25 @@
+/* Asthma 2.9: responsive, no horizontal scroll, iPhone-safe. */
+.v29-root{max-width:100%;overflow:hidden;padding:16px 0}
+.v29-root *{box-sizing:border-box}
+.v29-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.v29-tabs button{flex:1;min-width:130px;white-space:normal;text-align:center}
+.v29-panel{padding:18px;border:1px solid #ccdde4;border-radius:18px;background:#fff;margin:12px 0 18px;min-width:0}
+.v29-panel[hidden]{display:none!important}
+.v29-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}
+.v29-fields label{min-width:0;display:flex;flex-direction:column;gap:6px;font-weight:600}
+.v29-fields input,.v29-fields select,.v29-filter select{min-width:0;width:100%;max-width:100%;font:inherit;padding:10px;border:1px solid #c5d6de;border-radius:10px;background:#fff;color:#173b4c}
+.v29-actions{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
+.v29-filter{display:block;margin:14px 0;font-weight:600}
+.v29-filter select{display:block;max-width:240px;margin-top:5px}
+.v29-plot{min-height:120px;min-width:0;overflow:hidden}
+.v29-plot svg{width:100%;height:auto;max-height:340px;display:block}
+.v29-record{padding:12px 0;border-top:1px solid #dce9ed;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.v29-record small{display:block;margin:5px 0;color:#5c7180}
+.v29-references{margin:20px 0;padding:16px;border:1px solid #cbdfe4;border-radius:14px;background:#f4f9fa}
+.v29-references summary{cursor:pointer;font-weight:750}
+.v29-warning{padding:13px;margin-top:15px;border-left:4px solid #ae6c26;background:#fff6e8}
+.v29-med-review{padding:16px;margin-top:24px;border:1px solid #ccdde4;border-radius:15px;background:#f6f9fb}
+.v29-drug-risk{border-left:4px solid #c58024;background:#fff7ec;padding:12px;margin:10px 0}
+.v29-unchecked{font-weight:700;color:#994820}
+@media(max-width:510px){.v29-panel{padding:12px}.v29-fields{grid-template-columns:1fr}.v29-tabs button{min-width:110px}}
+@media print{.v29-tabs,.v29-fields button,.v29-record .v29-actions{display:none!important}}
