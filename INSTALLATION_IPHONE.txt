@@ -1,0 +1,11 @@
+ASTHMA 2.9.3 – iPhone-Update: Dokumente/Befunde und einheitliche Versionsanzeige
+
+1. In der bestehenden Asthma-WebApp zuerst eine verschlüsselte .asthma17-Sicherung erstellen.
+2. Diese ZIP über die Dateien-App auf dem iPhone entpacken.
+3. Auf https://github.com/4h7zm6hnjy-skizze/Asthma- in Safari gehen.
+4. Add file > Upload files auswählen. Die NEUN Dateien aus dem ZIP direkt ins Repository-Hauptverzeichnis hochladen, vorhandene gleichnamige Dateien ersetzen und Commit changes wählen.
+5. Die Datei INSTALLATION_IPHONE.txt ist nur eine Anleitung und muss nicht zu GitHub hochgeladen werden.
+6. Die bestehende Asthma-WebApp neu öffnen, anmelden und prüfen: Start > Heute im Blick, Akte > Dokumente, Akte > Befunde scannen, Statistik & PDF.
+WICHTIG: App nicht löschen, keine Website-Daten löschen, nicht neu registrieren.
+Dieses Update ändert weder deine verschlüsselten Gesundheitsdaten noch die alte Statistik.
+Ein echter iPhone-Live-Test ist nur auf deinem Gerät möglich.

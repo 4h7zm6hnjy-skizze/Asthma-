@@ -35,8 +35,22 @@
  lung.insertBefore(lt,lung.querySelector('.section-heading'));
  const chart=$('lufu23-detail'),form=$('lung-fieldset');if(chart&&form)lung.insertBefore(chart,form);
  // Akte & Mehr teaser before existing tabs; original forms are preserved.
- const ah=document.createElement('div');ah.className='d26-akte-hub';ah.innerHTML=`<div class="d26-title-row"><div><p class="d26-kicker">DEINE PRIVATE AKTE</p><h2>Akte & Mehr</h2><p>Dokumente, Medikamente und weitere Funktionen.</p></div><img src="./logo-192-v281.png" alt="" width="56" height="56"></div><div class="d26-akte-grid">${btn('▤','Dokumente & Befunde','akte','Arztbriefe / Tests')}${btn('✚','Medikamentenplan','therapie','Bearbeiten & drucken')}${btn('♙','Sicherer Tresor','einstellungen','Datensicherung')}${btn('♡','Hilfsmittel','hilfen','Gesetzlich / Privatzahlung')}${btn('▥','Statistik & PDF','statistik','Monat und Jahr')}${btn('⌁','GdB & Anträge','profil','Antragshilfe')}</div><p class="d26-hint">Deine bisherigen Dokumente, Asthma-AUs, das Tagebuch und die Datensicherung findest du weiterhin darunter.</p>`;
+ const ah=document.createElement('div');ah.className='d26-akte-hub';ah.innerHTML=`<div class="d26-title-row"><div><p class="d26-kicker">DEINE PRIVATE AKTE</p><h2>Akte & Mehr</h2><p>Dokumente, Medikamente und weitere Funktionen.</p></div><img src="./logo-192-v281.png" alt="" width="56" height="56"></div><div class="d26-akte-grid"><button type="button" class="d26-action" id="d293-open-documents" aria-label="Dokumentenablage öffnen"><span class="d26-symbol" aria-hidden="true">${symbol('▤')}</span><strong>Dokumente</strong><small>Arztbriefe und Unterlagen</small></button>${btn('▣','Befunde scannen','befunde','Foto, PDF und Tests')}${btn('✚','Medikamentenplan','therapie','Bearbeiten & drucken')}${btn('♙','Sicherer Tresor','einstellungen','Datensicherung')}${btn('♡','Hilfsmittel','hilfen','Gesetzlich / Privatzahlung')}${btn('▥','Statistik & PDF','statistik','Monat und Jahr')}${btn('⌁','GdB & Anträge','profil','Antragshilfe')}</div><p class="d26-hint">Deine bisherigen Dokumente, Asthma-AUs, das Tagebuch und die Datensicherung findest du weiterhin darunter.</p>`;
  akte.insertBefore(ah,akte.querySelector('.section-heading'));
+ // 2.9.3: The old combined tile navigated to the already open "Akte" page,
+ // but never switched from "Antragsakte" to the hidden documents panel.
+ // Open the existing documents tab via its own original click handler;
+ // this does not touch or recreate any personal records.
+ ah.querySelector('#d293-open-documents')?.addEventListener('click',()=>{
+   window.ASTHMA_NAV?.go('akte');
+   const tab=akte.querySelector('.my-tab[data-my-tab="documents"]');
+   if(!tab){alert('Die Dokumentenablage konnte nicht geöffnet werden.');return;}
+   tab.click();
+   requestAnimationFrame(()=>{
+     const panel=$('my-documents');
+     if(panel&&!panel.hidden)panel.scrollIntoView({block:'start',behavior:'instant'});
+   });
+ });
  // Put the filter legend after the month grid, so the calendar opens first.
  const calendar=document.getElementById('kalender'),legend=calendar?.querySelector('.cal25-legend'),monthGrid=calendar?.querySelector('#calendar-grid');
  if(legend&&monthGrid){legend.open=false;monthGrid.insertAdjacentElement('afterend',legend);}

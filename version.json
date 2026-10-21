@@ -1,5 +1,5 @@
 {
-  "version": "2.9.2",
-  "released": "2026-10-21",
-  "notes": "Bestehende Monats-/Jahresstatistik bleibt unverändert. Zusätzliche druckbare Messwerttabellen und SVG-Verlaufsdiagramme für SpO2, Blutdruck, Puls, Gewicht, PEF/ePEF und ärztliche Lungenfunktion mit getrennt auswählbaren Druckbereichen; neue datierte Gewichtsaufzeichnung. Alle Werte bleiben lokal verschlüsselt; keine Migration."
+  "version": "2.9.3",
+  "released": "2026-10-22",
+  "notes": "iPhone-Fix: Dokumentenablage und Befundscanner getrennt erreichbar; einheitliche Versionsanzeige aus App-Version in Tagesübersicht, Diagnose und PDF. Keine Änderung an Tresor, Messwerten, Datenbankschema oder bestehender Statistik."
 }
