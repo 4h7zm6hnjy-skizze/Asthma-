@@ -1,9 +1,9 @@
-Asthma 2.9.4 – Korrektur von Vitalwerte und Lungenfunktionsdiagrammen
+Asthma 2.9.5 – Klickbare Bedarfsanwendungen und Beschwerde-Nächte (nur iPhone)
 
-1. In der bisherigen Asthma-App ein vollständiges verschlüsseltes .asthma17-Backup erstellen und in Dateien sichern.
-2. ZIP in der iPhone-App Dateien entpacken.
-3. In deinem bestehenden GitHub-Repository Asthma-: Add file -> Upload files; nur die 7 Projektdateien aus dem Ordner wählen (nicht dieses Textdokument, nicht die ZIP).
-4. Alle gleichnamigen Dateien im Repository-Hauptverzeichnis ersetzen; Commit changes bestätigen.
-5. Bereits installierte Asthma-App erneut öffnen (nicht löschen!) und Version 2.9.4, Vitalwerte, Lungenfunktion sowie Dokumentenablage prüfen.
-
-Änderungen: Suite-Navigation für Vitalwerte und Referenzlinien/Zeitraumwahl Lungenfunktion wiederhergestellt. Keine Änderung an medizinischen Daten und lokalen Verschlüsselungsschlüsseln.
+1. In der bisherigen App eine verschlüsselte .asthma17-Sicherung erstellen und in iPhone Dateien ablegen.
+2. ZIP in Dateien entpacken.
+3. Die sieben Projektdateien (NICHT die Textanleitung und NICHT das ZIP selbst) in das HAUPTVERZEICHNIS des bestehenden GitHub-Repositories Asthma- hochladen und Commit changes bestätigen.
+4. Die bisherige WebApp öffnen, anmelden, Tagesübersicht Heute im Blick aufsuchen.
+5. Auf Bedarfsanwendungen oder Nächte mit Beschwerden tippen: Das bereits vorhandene Eingabeformular klappt auf, die entsprechende Eingabe erhält Fokus. Erst nach explizitem Speichern entstehen verschlüsselte Tagebucheinträge.
+6. App NICHT löschen, Safari-/Website-Daten NICHT löschen.
+Hinweis: Die Felder zeigen die Summe der dokumentierten vergangenen 7 Tage bzw. Anzahl der dokumentierten Nächte über 30 Tage. Für einen heutigen Eintrag kann die Tagesübersicht benutzt werden. Kein Zugriff auf echte iPhone-Daten in Tests.

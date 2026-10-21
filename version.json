@@ -1,5 +1,5 @@
 {
-  "version": "2.9.4",
+  "version": "2.9.5",
   "released": "2026-10-22",
-  "notes": "Hotfix: Wiederherstellung der Vitalwerte-Navigation und der persönlichen Lungenfunktionsdiagramme nach versehentlichem Rückstand in 2.9.3. Korrektur für Dokumente/Befunde und Statistik bleiben erhalten. Gesundheitsdaten und Verschlüsselung unverändert."
+  "notes": "Bedarfsanwendungen und Nächte mit Beschwerden auf der Startseite direkt antippbar; öffnet das vorhandene verschlüsselte Tagesformular. Altes Tagebuch, Statistik und Gesundheitsdaten unverändert."
 }

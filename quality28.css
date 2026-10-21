@@ -31,3 +31,12 @@
 @media print{.a28-back-home,.a28-actions,.a28-form-details,.a28-backup{display:none!important}}
 
 .a28-doc-search{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#365870;margin:14px 0 10px}.a28-doc-search input{min-height:43px;border:1px solid #c6e0e5;border-radius:11px;padding:9px 12px;font:inherit;background:#fff;color:#184c63}
+
+/* 2.9.5: two accessible, touch-friendly quick-entry cards; read-only PEF stays passive. */
+.a28-kpis>.a28-kpi-action{border:1px solid #b8d8df;border-radius:14px;padding:13px 12px;min-width:0;min-height:92px;background:#f2fafb;color:inherit;display:flex;flex-direction:column;gap:5px;text-align:left;font:inherit;cursor:pointer;touch-action:manipulation;appearance:none;-webkit-appearance:none}
+.a28-kpis>.a28-kpi-action:hover,.a28-kpis>.a28-kpi-action:active{background:#e3f3f6;border-color:#69aebb}
+.a28-kpis>.a28-kpi-action:focus-visible{outline:3px solid #31aeaa;outline-offset:2px}
+.a28-kpis>.a28-kpi-action[aria-expanded="true"]{border-color:#1d8296}
+.a28-kpis>.a28-kpi-action small{font-weight:700;color:#17677d}
+@media(max-width:580px){.a28-kpis>.a28-kpi-action{min-height:78px;padding:12px}}
+@media print{.a28-kpis>.a28-kpi-action{background:#fff;border-color:#e2edf0}}

@@ -17,8 +17,8 @@
  <div class="a28-header"><div><p class="section-kicker">Tagesübersicht · Lokal gespeichert</p><h2 id="a28-title">Heute im Blick</h2><p>Einfach dokumentieren, ohne medizinische Beurteilung.</p></div><span class="a28-version">v${releaseVersion()}</span></div>
  <div class="a28-kpis" aria-label="Deine dokumentierten Werte">
   <div><span>Letzter PEF</span><strong id="a28-last-pef">–</strong><small id="a28-pef-date">Noch keine Messung</small></div>
-  <div><span>Bedarfsanwendungen · 7 Tage</span><strong id="a28-rescue">–</strong><small>Nur dokumentierte Angaben</small></div>
-  <div><span>Nächte mit Beschwerden · 30 Tage</span><strong id="a28-nights">–</strong><small>Nur dokumentierte Nächte</small></div>
+  <button type="button" class="a28-kpi-action" id="a28-open-rescue" aria-controls="a28-entry-details" aria-expanded="false"><span>Bedarfsanwendungen · 7 Tage</span><strong id="a28-rescue">–</strong><small>Antippen und Anwendungen eintragen ↗</small></button>
+  <button type="button" class="a28-kpi-action" id="a28-open-nights" aria-controls="a28-entry-details" aria-expanded="false"><span>Nächte mit Beschwerden · 30 Tage</span><strong id="a28-nights">–</strong><small>Antippen und Beschwerden eintragen ↗</small></button>
  </div>
  <details class="a28-form-details" id="a28-entry-details"><summary>Beschwerden heute schnell eintragen</summary>
  <form id="a28-form">
@@ -37,6 +37,23 @@
  if(personal&&personal.parentNode===inside)personal.after(summary);else inside.prepend(summary);
  const form=$('a28-form'),save=$('a28-save'),msg=$('a28-status');
  const field=k=>form.elements.namedItem(k);
+ // 2.9.5: the two summary tiles used to be passive DIVs.
+ // Both now open the existing encrypted quick-entry form. No second data store.
+ const details=$('a28-entry-details');
+ const actionButtons=[$('a28-open-rescue'),$('a28-open-nights')];
+ const syncExpanded=()=>actionButtons.forEach(b=>b?.setAttribute('aria-expanded',String(details.open)));
+ details.addEventListener('toggle',syncExpanded);
+ function openDailyField(name){
+   details.open=true;syncExpanded();
+   const input=field(name);
+   requestAnimationFrame(()=>{
+     if(!input)return;
+     try{input.focus({preventScroll:true})}catch{input.focus()}
+     input.scrollIntoView({block:'center',behavior:'smooth'});
+   });
+ }
+ $('a28-open-rescue').addEventListener('click',()=>openDailyField('rescue'));
+ $('a28-open-nights').addEventListener('click',()=>openDailyField('night'));
  form.addEventListener('submit',async event=>{
    event.preventDefault();if(save.disabled)return;
    const symptoms=Number(field('symptoms').value);
