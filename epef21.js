@@ -234,15 +234,15 @@
   function selectVisible(){const value=$('epef-range').value;const ordered=all.filter(x=>x.kind==='measurement').sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
     if(value==='all')return ordered;
     if(value==='month')return ordered.filter(x=>x.date.startsWith($('epef-month').value));
-    const days=Number(value),start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-(days-1));const cutoff=start.getFullYear()+'-'+String(start.getMonth()+1).padStart(2,'0')+'-'+String(start.getDate()).padStart(2,'0');return ordered.filter(x=>x.date>=cutoff);
+    const days=Number(value),start=new Date();start.setHours(0,0,0,0);if(days===3652||days===365){start.setFullYear(start.getFullYear()-(days===3652?10:1));start.setDate(start.getDate()+1)}else start.setDate(start.getDate()-(days-1));const cutoff=start.getFullYear()+'-'+String(start.getMonth()+1).padStart(2,'0')+'-'+String(start.getDate()).padStart(2,'0');return ordered.filter(x=>x.date>=cutoff);
   }
   function chart(data,field,label,units,container,selectedId='epef-selected'){container.replaceChildren();const series=data.filter(x=>Number.isFinite(x[field]));
     if(!series.length){container.append(node('p','suite-msg',`Noch keine ${label}-Messungen für diesen Zeitraum.`));return}
-    const val=series.map(x=>x[field]);if(field==='pef'&&referencePEF!==null)val.push(referencePEF);let min=Math.min(...val),max=Math.max(...val);if(max===min){const d=field==='pef'?40:.2;min=Math.max(0,min-d);max+=d;}else{const d=(max-min)*.15;min=Math.max(0,min-d);max+=d}
+    const customRef=window.ASTHMA_VITAL29?.getRef?.(field==='pef'?'pef':'epefFev1');const displayRef=Number.isFinite(customRef)?customRef:(field==='pef'?referencePEF:null);const val=series.map(x=>x[field]);if(displayRef!==null)val.push(displayRef);let min=Math.min(...val),max=Math.max(...val);if(max===min){const d=field==='pef'?40:.2;min=Math.max(0,min-d);max+=d;}else{const d=(max-min)*.15;min=Math.max(0,min-d);max+=d}
     const w=760,h=230,xl=58,xr=744,yt=20,yb=194;const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.setAttribute('role','img');svg.setAttribute('aria-label',`${label}: ${series.length} Messungen mit Uhrzeit-Farben`);svg.classList.add('epef-chart-svg');
     const item=(tag,attrs={},txt)=>{const e=document.createElementNS(svg.namespaceURI,tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,String(v));if(txt!=null)e.textContent=txt;svg.append(e);return e};
     for(let i=0;i<5;i++){const y=yt+(yb-yt)*i/4;item('line',{x1:xl,x2:xr,y1:y,y2:y,stroke:'#dfecf0','stroke-width':1});item('text',{x:5,y:y+5,fill:'#637c87','font-size':14},(max-(max-min)*i/4).toFixed(field==='pef'?0:2))}
-    if(field==='pef'&&referencePEF!==null){const refy=yb-(referencePEF-min)*(yb-yt)/(max-min);item('line',{x1:xl,x2:xr,y1:refy,y2:refy,stroke:'#8998a6','stroke-width':2,'stroke-dasharray':'6 6'});item('text',{x:xr-4,y:refy-5,fill:'#667681','font-size':12,'text-anchor':'end'},`Referenz ${referencePEF}`)}
+    if(displayRef!==null){const refy=yb-(displayRef-min)*(yb-yt)/(max-min);item('line',{x1:xl,x2:xr,y1:refy,y2:refy,stroke:'#8998a6','stroke-width':2,'stroke-dasharray':'6 6'});item('text',{x:xr-4,y:refy-5,fill:'#667681','font-size':12,'text-anchor':'end'},`Persönliche Referenz ${displayRef}`)}
     const xy=(r,i)=>[xl+(series.length===1?(xr-xl)/2:i*(xr-xl)/(series.length-1)),yb-(r[field]-min)*(yb-yt)/(max-min)];
     for(let i=1;i<series.length;i++){const [x1,y1]=xy(series[i-1],i-1),[x2,y2]=xy(series[i],i),mx=(x1+x2)/2,my=(y1+y2)/2;item('line',{x1,y1,x2:mx,y2:my,stroke:colors[bucket(series[i-1].time)],'stroke-width':3.2,'stroke-linecap':'round'});item('line',{x1:mx,y1:my,x2,y2,stroke:colors[bucket(series[i].time)],'stroke-width':3.2,'stroke-linecap':'round'});}
     series.forEach((r,i)=>{const [cx,cy]=xy(r,i);const cir=item('circle',{cx,cy,r:series.length>80?3.3:5,fill:colors[bucket(r.time)],stroke:'#fff','stroke-width':1.6});const tip=document.createElementNS(svg.namespaceURI,'title');tip.textContent=`${fmtDate(r.date)} ${r.time}: ${r[field]} ${units}`;cir.append(tip);cir.setAttribute('tabindex','0');cir.setAttribute('aria-label',tip.textContent);const show=()=>{$(selectedId).textContent=`${fmtDate(r.date)} um ${r.time} Uhr · PEF ${r.pef??'–'} l/min · FEV₁ ${r.fev1??'–'} l${r.status?' · '+r.status:''}`};cir.addEventListener('click',show);cir.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show()}})});
@@ -268,7 +268,7 @@
     let subset=ordered;
     if(mode==='last30')subset=ordered.slice(-30);
     else if(mode!=='all'){
-      const start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-(Number(mode)-1));
+      const start=new Date();start.setHours(0,0,0,0);if(Number(mode)===3652||Number(mode)===365){start.setFullYear(start.getFullYear()-(Number(mode)===3652?10:1));start.setDate(start.getDate()+1)}else start.setDate(start.getDate()-(Number(mode)-1));
       const cutoff=start.getFullYear()+'-'+String(start.getMonth()+1).padStart(2,'0')+'-'+String(start.getDate()).padStart(2,'0');
       subset=ordered.filter(r=>r.date>=cutoff);
     }
@@ -288,7 +288,7 @@
   async function refresh(){all=await SEC.list('epef');const oldDuplicates=duplicates();const fix=$('epef-clean-duplicates');if(fix){fix.hidden=oldDuplicates.length===0;fix.textContent=`${oldDuplicates.length} identische Alt-Einträge prüfen und löschen`;}const setting=all.find(x=>x.kind==='setting'&&x.id==='reference');referencePEF=setting&&Number.isFinite(setting.pef)?setting.pef:null;$('epef-ref-value').value=referencePEF===null?'':String(referencePEF);redraw()}
   function today(){const now=new Date();return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`}
   $('epef-month').value=today().slice(0,7);
-  $('home-epef-range')?.addEventListener('change',drawHome);
+  $('home-epef-range')?.addEventListener('change',drawHome);window.addEventListener('asthma:vital29-refs',redraw);window.addEventListener('asthma:vital29-ready',redraw);
   $('epef-clean-duplicates')?.addEventListener('click',async()=>{
     if(busy)return;
     const remove=duplicates();if(!remove.length){status('Keine identischen Alt-Einträge gefunden.');return;}

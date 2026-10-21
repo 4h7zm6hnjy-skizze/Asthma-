@@ -25,7 +25,7 @@
   const phaseName=r=>r.phase==='vor'?'vor Bronchodilatation':r.phase==='nach'?'nach Bronchodilatation':'Messphase nicht angegeben';
   const score=fev=>fev===null||fev<0||fev>200?{label:'Keine FEV₁-Orientierung',tone:'neutral'}:fev<60?{label:'FEV₁-Sollwert <60 %',tone:'red'}:fev<80?{label:'FEV₁-Sollwert 60–79 %',tone:'yellow'}:{label:'FEV₁-Sollwert ≥80 %',tone:'green'};
   const datesort=(a,b)=>a.date.localeCompare(b.date)||String(a.phase).localeCompare(String(b.phase))||String(a.createdAt||'').localeCompare(String(b.createdAt||''))||String(a.id||'').localeCompare(String(b.id||''));
-  function filterPeriod(rows,period){if(period==='all')return rows.slice();const n=Number(period);if(!Number.isInteger(n)||n<1)return rows.slice();const now=new Date(),cut=new Date(now.getFullYear(),now.getMonth(),now.getDate());cut.setDate(cut.getDate()-(n-1));const bound=[cut.getFullYear(),String(cut.getMonth()+1).padStart(2,'0'),String(cut.getDate()).padStart(2,'0')].join('-');return rows.filter(x=>x.date>=bound)}
+  function filterPeriod(rows,period){if(period==='all')return rows.slice();const n=Number(period);if(!Number.isInteger(n)||n<1)return rows.slice();const now=new Date(),cut=new Date(now.getFullYear(),now.getMonth(),now.getDate());if(n===3652||n===365){cut.setFullYear(cut.getFullYear()-(n===3652?10:1));cut.setDate(cut.getDate()+1)}else cut.setDate(cut.getDate()-(n-1));const bound=[cut.getFullYear(),String(cut.getMonth()+1).padStart(2,'0'),String(cut.getDate()).padStart(2,'0')].join('-');return rows.filter(x=>x.date>=bound)}
   async function readAll(){
     if(!SEC.state().unlocked)throw Error('Gesundheitsakte ist gesperrt');
     const rows=await SEC.list('suite');
@@ -51,7 +51,7 @@
     const available=fields.filter(f=>rows.some(r=>r[f]!==null));
     if(!available.length){host.append(el('p','lufu23-empty','Für diesen Zeitraum sind keine passenden bestätigten Untersuchungen gespeichert. Erfasse einen Lungenfunktionstest und wähle „Aktuelle Werte in Verlauf speichern“.'));return}
     const mobile=window.innerWidth<600;const W=mobile?420:760,H=270,left=mobile?54:64,right=mobile?12:24,top=18,bottom=43;
-    const values=rows.flatMap(r=>available.map(k=>r[k])).filter(x=>x!==null);
+    const references=available.map(k=>({field:k,value:window.ASTHMA_VITAL29?.getRef?.(k)})).filter(r=>Number.isFinite(r.value));const values=rows.flatMap(r=>available.map(k=>r[k])).filter(x=>x!==null).concat(references.map(r=>r.value));
     let lo=Math.min(...values),hi=Math.max(...values);
     const spread=Math.max(hi-lo,Math.max(2,hi*.06));
     lo=Math.max(0,lo-spread*.26);hi=hi+spread*.26;
@@ -63,6 +63,7 @@
       const y=top+j*(H-top-bottom)/4; svgEl('line',{x1:left,y1:y,x2:W-right,y2:y,stroke:'#dfebed','stroke-width':1},svg);
       const tick=svgEl('text',{x:left-12,y:y+5,'text-anchor':'end',fill:'#55717b','font-size':16},svg);tick.textContent=nr(hi-(hi-lo)*j/4,hi<20?1:0);
     }
+    for(const ref of references){const ry=top+(hi-ref.value)/span*(H-top-bottom);svgEl('line',{x1:left,x2:W-right,y1:ry,y2:ry,stroke:colors[ref.field]||'#856a40','stroke-width':2,'stroke-dasharray':'7 6'},svg);svgEl('text',{x:W-right-3,y:Math.max(12,ry-5),'text-anchor':'end',fill:colors[ref.field]||'#856a40','font-size':13},svg).textContent='Referenz '+names[ref.field]+' '+nr(ref.value);}
     const indices=[0,Math.floor((rows.length-1)/2),rows.length-1].filter((x,i,a)=>a.indexOf(x)===i);
     for(const index of indices){const x=xy(0,index)[0];const tick=svgEl('text',{x,y:H-11,'text-anchor':'middle',fill:'#516c76','font-size':16},svg);tick.textContent=rows[index].date.slice(8)+'.'+rows[index].date.slice(5,7)+'.'+rows[index].date.slice(2,4)}
     const fmtUnit=available.length===1?units[available[0]]:units[available[0]];
@@ -119,7 +120,7 @@
     else summary.append(el('p','','Für einen Vergleich werden zwei Untersuchungen mit FEV₁-%-Wert aus derselben Messphase benötigt.'));
     summary.append(el('p','lufu23-muted','Ein höherer Messwert bedeutet nicht automatisch eine bessere Asthmakontrolle. Nur mit ärztlicher Beurteilung vergleichbar.'));
   }
-  for(const id of ['lufu23-home-period'])$(id).addEventListener('change',drawHome);
+  for(const id of ['lufu23-home-period'])$(id).addEventListener('change',drawHome);window.addEventListener('asthma:vital29-refs',()=>{drawHome();drawDetail();});window.addEventListener('asthma:vital29-ready',()=>{drawHome();drawDetail();});
   for(const id of ['lufu23-mode','lufu23-period','lufu23-phase'])$(id).addEventListener('change',drawDetail);
   let timer;
   window.addEventListener('asthma:secure-change',e=>{if(e.detail?.group==='suite'){clearTimeout(timer);timer=setTimeout(()=>refresh().catch(()=>{}),80)}});

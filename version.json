@@ -1,5 +1,5 @@
 {
-  "version": "2.8.1",
-  "released": "2026-10-16",
-  "notes": "Neues Asthma-App-Logo und Markenbild auf dem iPhone, bei Anmeldung, in Navigation und PDF-Berichten; verbesserte Übersicht bestehender verschlüsselter persönlicher Stammdaten. Vollständig lokal, ohne Datenmigration."
+  "version": "2.9.0",
+  "released": "2026-10-21",
+  "notes": "Neue Diagramme fuer SpO2 (Apple Watch/Finger/Ohr), Blutdruck und Puls; 5 Zeitansichten, bearbeitbare persoenliche Vergleichslinien; automatisch neu berechnete begrenzte Medikamentenrisikohinweise; erweiterte Lungenfunktions- und PEF-Charts. Kein automatischer Apple Health Zugriff; keine Datenmigration."
 }
