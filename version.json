@@ -1,5 +1,5 @@
 {
-  "version": "2.9.3",
+  "version": "2.9.4",
   "released": "2026-10-22",
-  "notes": "iPhone-Fix: Dokumentenablage und Befundscanner getrennt erreichbar; einheitliche Versionsanzeige aus App-Version in Tagesübersicht, Diagnose und PDF. Keine Änderung an Tresor, Messwerten, Datenbankschema oder bestehender Statistik."
+  "notes": "Hotfix: Wiederherstellung der Vitalwerte-Navigation und der persönlichen Lungenfunktionsdiagramme nach versehentlichem Rückstand in 2.9.3. Korrektur für Dokumente/Befunde und Statistik bleiben erhalten. Gesundheitsdaten und Verschlüsselung unverändert."
 }

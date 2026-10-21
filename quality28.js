@@ -2,7 +2,7 @@
 /* Asthma 2.8.1: iPhone quality-of-life UI; reads/writes existing encrypted groups only. */
 (()=>{
  const SEC=window.ASTHMA_SECURITY;
- const releaseVersion=()=>window.ASTHMA_APP_VERSION||document.getElementById('footer-version')?.textContent?.trim()||'2.9.3';
+ const releaseVersion=()=>window.ASTHMA_APP_VERSION||document.getElementById('footer-version')?.textContent?.trim()||'2.9.4';
  const $=id=>document.getElementById(id);
  const root=$('uebersicht'),nav=window.ASTHMA_NAV;
  if(!SEC||!SEC.state?.().unlocked||!root||!nav||$('a28-daily'))return;
