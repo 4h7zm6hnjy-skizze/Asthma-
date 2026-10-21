@@ -1,0 +1,61 @@
+/* Asthma 2.9.2 – additional print charts and independent print choices */
+.s292-controls{margin:14px 0;padding:14px;border:1px solid #bfd7dc;border-radius:12px;background:#f6fbfb;min-width:0}
+.s292-controls legend{font-weight:700;color:#16485e;padding:0 6px}
+.s292-choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(146px,1fr));gap:10px}
+.s292-option{display:flex;gap:8px;align-items:center;background:#fff;padding:8px;border:1px solid #d9e8eb;border-radius:8px;font-size:13px;min-height:44px}
+.s292-option input{width:19px;height:19px;flex-shrink:0;accent-color:#186e84}
+.s292-note{font-size:12px;color:#526f7c;line-height:1.5}
+.s292-appendix{display:block;margin-top:28px;padding-top:16px;border-top:3px solid #176f83;color:#123b52}
+.s292-appendix h2{font-size:21px;margin:0 0 12px}
+.s292-category{break-before:page;page-break-before:always;margin:20px 0 28px;min-width:0}
+.s292-category h3{margin:5px 0 12px;font-size:18px;color:#123b52}
+.s292-category h4{font-size:14px;margin:12px 0 4px;color:#245d72}
+.s292-summary{display:flex;flex-wrap:wrap;gap:5px 18px;border-radius:8px;background:#eef6f7;padding:10px;margin:10px 0;font-size:12px}
+.s292-summary>*{flex:1 1 180px;min-width:0}
+.s292-chart-box{border:1px solid #d5e5e9;border-radius:9px;padding:5px;break-inside:avoid;page-break-inside:avoid;margin-bottom:12px}
+.s292-chart-box svg{display:block;width:100%;height:auto;max-height:280px}
+.s292-legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:11px;color:#3d5d6d}
+.s292-legend>span{display:flex;gap:5px;align-items:center}
+.s292-dot{height:8px;width:8px;display:inline-block;border-radius:50%}
+.s292-table-wrap{width:100%;overflow:auto}
+.s292-table{width:100%;border-collapse:collapse;font-size:11px;color:#234352}
+.s292-table th,.s292-table td{text-align:left;padding:5px 6px;border-bottom:1px solid #d9e7eb;overflow-wrap:anywhere}
+.s292-table thead{background:#eaf5f6}
+.s292-empty{padding:10px;background:#f6f8f8;font-size:12px;color:#52707b}
+.s292-disclaimer{border-top:1px solid #cedfe2;font-size:11px;padding-top:12px}
+.s292-weight{margin:20px 0;padding:15px;border:1px solid #d4e4e8;border-radius:12px}
+.s292-weight form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:10px}
+.s292-weight label{display:flex;flex-direction:column;gap:5px;font-size:13px}
+.s292-weight input{min-height:44px;min-width:0;font:inherit;padding:8px;border:1px solid #b7d2d8;border-radius:8px}
+.s292-weight .s292-actions{display:flex;align-items:end;gap:8px;flex-wrap:wrap}
+.s292-weight table{border-collapse:collapse;font-size:12px;width:100%}
+.s292-weight th,.s292-weight td{text-align:left;padding:6px;border-bottom:1px solid #d9e7eb}
+@media print{
+ .s292-controls,.s292-weight{display:none!important}
+ body.stats25-print[data-s292-old="off"] #stats25-report>:not(#statsplus292-appendix){display:none!important}
+ body.stats25-print #statsplus292-appendix[data-print-enabled="false"]{display:none!important}
+ body.stats25-print .s292-category[data-print-enabled="false"]{display:none!important}
+ body.stats25-print .s292-category{break-before:page!important;page-break-before:always!important}
+ body.stats25-print .s292-chart-box{break-inside:avoid!important;page-break-inside:avoid!important}
+ body.stats25-print .s292-appendix{break-before:page;page-break-before:always}
+ body.stats25-print .s292-table{font-size:9pt}
+ body.stats25-print .s292-table thead{display:table-header-group}
+ body.stats25-print .s292-table tr{break-inside:avoid;page-break-inside:avoid}
+ body.stats25-print #stats25-report{color:#000!important}
+}
+
+@media print{
+ body.stats25-print[data-s292-old="off"] #statsplus292-appendix{break-before:auto!important;page-break-before:auto!important}
+ body.stats25-print .s292-category[data-print-first="true"]{break-before:auto!important;page-break-before:auto!important}
+}
+/* Override a legacy generic @print selector hiding all direct body children.
+   This is necessary for the existing (unchanged) statistics report to print. */
+@media print{
+ body.stats25-print > #secure-application{display:block!important;visibility:visible!important;position:static!important;padding:0!important;margin:0!important}
+ body.stats25-print #secure-application > :not(main){display:none!important}
+ body.stats25-print #secure-application > main{display:block!important;visibility:visible!important;padding:0!important;margin:0!important;max-width:none!important}
+ body.stats25-print #main > :not(#statistik){display:none!important}
+ body.stats25-print #statistik{display:block!important;visibility:visible!important;border:0!important;margin:0!important;padding:0!important;max-width:none!important;box-shadow:none!important}
+ body.stats25-print #statistik > :not(#stats25-report){display:none!important}
+ body.stats25-print #stats25-report{position:static!important;left:auto!important;top:auto!important}
+}

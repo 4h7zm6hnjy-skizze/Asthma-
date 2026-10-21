@@ -1,7 +1,7 @@
 /* Bei jeder inhaltlichen Änderung: CACHE_VERSION ändern. */
-const VERSION='2.9.1-vitalwerte-ios-ladefix';
+const VERSION='2.9.2-statistik-anhaenge';
 const CACHE=`asthma-static-${VERSION}`;
-const ASSETS=["./","./index.html","./styles.css","./content.js","./app.js","./antraege-data.js","./antraege.js","./meine-daten.js","./lungenprofil.js","./befundscan-parser.js","./befund18-parser.js","./befundscan.js","./foto19.js","./viewport192.js","./suite15.js","./region16.js","./secure17.js","./calendar17.js","./nucala282.js","./assessment29.js","./assessment29.css","./versorgung30.js","./versorgung30.css","./labor18.js","./hub20.js","./scanner20.js","./pdf20.js","./jszip.min.js","./vital29.js","./vital-rescue291.js","./vital29.css","./epef21.js","./lufu23.js","./medplan24.js","./gdb24.js","./au25.js","./stats25.js","./medpref25.js","./hilfsmittel251.js","./version.json","./manifest.webmanifest","./icon.svg","./design26.css","./design26.js","./logo-192.png","./logo-512.png","./logo-home-v270.png","./professional27.js","./professional27.css","./quality28.js","./quality28.css","./branding281.css","./logo-192-v281.png","./logo-512-v281.png","./logo-home-v281.png","./brand-wordmark-v281.png","./rechtsmonitor.js","./rechtsmonitor.css"];
+const ASSETS=["./","./index.html","./styles.css","./content.js","./app.js","./antraege-data.js","./antraege.js","./meine-daten.js","./lungenprofil.js","./befundscan-parser.js","./befund18-parser.js","./befundscan.js","./foto19.js","./viewport192.js","./suite15.js","./region16.js","./secure17.js","./calendar17.js","./nucala282.js","./assessment29.js","./assessment29.css","./versorgung30.js","./versorgung30.css","./labor18.js","./hub20.js","./scanner20.js","./pdf20.js","./jszip.min.js","./vital29.js","./vital-rescue291.js","./vital29.css","./epef21.js","./lufu23.js","./medplan24.js","./gdb24.js","./au25.js","./stats25.js","./statsplus292.js","./statsplus292.css","./weight292.js","./medpref25.js","./hilfsmittel251.js","./version.json","./manifest.webmanifest","./icon.svg","./design26.css","./design26.js","./logo-192.png","./logo-512.png","./logo-home-v270.png","./professional27.js","./professional27.css","./quality28.js","./quality28.css","./branding281.css","./logo-192-v281.png","./logo-512-v281.png","./logo-home-v281.png","./brand-wordmark-v281.png","./rechtsmonitor.js","./rechtsmonitor.css"];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('asthma-static-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
 self.addEventListener('fetch',event=>{
@@ -11,7 +11,7 @@ self.addEventListener('fetch',event=>{
   // Official change feed must always use the network; no stale service-worker cache.
   if(path.endsWith('/rechtsmonitor-feed.json')){event.respondWith(fetch(event.request,{cache:'no-store'}));return;}
   // Keep core unlock and vital forms coherent with the just-deployed HTML.
-  // With no network, use the locally precached version (also for ?v=2.9.1 URLs).
+  // With no network, use the locally precached version (also for ?v=2.9.2 URLs).
   if(['/secure17.js','/vital29.js','/vital-rescue291.js','/app.js'].some(suffix=>path.endsWith(suffix))){
     event.respondWith(fetch(event.request,{cache:'no-store'}).then(r=>{
       if(r.ok){const copy=r.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy)).catch(()=>{});}
