@@ -1,5 +1,5 @@
 {
-  "version": "2.9.6",
+  "version": "2.9.7",
   "released": "2026-10-22",
-  "notes": "Druck- und PDF-Funktion: eigenstaendige iPhone-Druckansicht nur mit ausgewaehlten Statistikbereichen. Vorhandener Bericht, Gesundheitsdaten, Verschluesselung und Messwertberechnungen bleiben unveraendert."
+  "notes": "Lokaler PDF-Export ohne iPhone-Druckdialog und deutlich genauer beschriftete Statistik-Diagramme: Achsen, Messpunktzahlen, Minimum/Maximum, Durchschnitt, letzter Wert mit Datum und Veraenderung; bisherige Statistik und AES-GCM-Tresor unveraendert."
 }

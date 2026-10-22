@@ -48,9 +48,21 @@
  function chart(parent,rows,series,refs={},unit=''){
    const values=rows.filter(x=>series.some(([key])=>num(x[key])!==null)).sort((a,b)=>makeDate(a).localeCompare(makeDate(b)));
    if(!values.length){parent.append(node('p','s292-empty','Keine Messwerte für ein Diagramm vorhanden.'));return;}
-   const c=node('div','s292-chart-box'),W=690,H=235,L=58,R=20,T=23,B=39;
+   const c=node('div','s292-chart-box'),W=690,H=295,L=73,R=35,T=45,B=65;
    const svg=document.createElementNS(svgNS,'svg');svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('role','img');svg.setAttribute('aria-label','Messdiagramm '+series.map(s=>s[1]).join(', '));
    const chartRows=values.length>450?values.filter((x,i)=>i===0||i===values.length-1||i%Math.ceil(values.length/450)===0):values;
+   const digits=unit==='l'?2:unit==='kg'?1:unit==='%'?1:0;
+   const selectLabels=(pts,maxLabels)=>{
+     if(pts.length<=maxLabels)return pts;
+     const selected=new Set([0,pts.length-1]);
+     for(const index of [1,2,3])selected.add(Math.round(index*(pts.length-1)/4));
+     const range=pts.map(item=>num(item[1]));
+     selected.add(range.indexOf(Math.min(...range)));
+     selected.add(range.indexOf(Math.max(...range)));
+     const ordered=[...selected].filter(i=>i>=0&&i<pts.length);
+     if(ordered.length>maxLabels){const priority=[pts.length-1,range.indexOf(Math.min(...range)),range.indexOf(Math.max(...range)),0,Math.round((pts.length-1)/2)];return [...new Set(priority)].slice(0,maxLabels).sort((a,b)=>a-b).map(i=>pts[i]);}
+     return ordered.sort((a,b)=>a-b).map(i=>pts[i]);
+   };
    const nums=values.flatMap(x=>series.map(([k])=>num(x[k])).filter(x=>x!==null));
    const refVals=series.map(([k])=>num(refs[k])).filter(v=>v!==null);
    let min=Math.min(...nums,...refVals),max=Math.max(...nums,...refVals),pad=max===min?Math.max(1,max*.06):(max-min)*.13;
@@ -60,15 +72,45 @@
    const finish=Date.parse(values.at(-1).date+'T'+(values.at(-1).time||'12:00'))||start;
    const x=val=>{const ts=Date.parse(val.date+'T'+(val.time||'12:00'))||start;return L+(W-L-R)*(finish===start?0.5:(ts-start)/(finish-start));};
    function shape(kind,attrs,content){const el=document.createElementNS(svgNS,kind);for(const [key,v] of Object.entries(attrs||{}))el.setAttribute(key,String(v));if(content!==undefined)el.textContent=String(content);svg.append(el);return el;}
-   for(let i=0;i<5;i++){const value=min+(max-min)*(4-i)/4,yy=T+(H-T-B)*i;shape('line',{x1:L,x2:W-R,y1:yy,y2:yy,stroke:'#d5e1e8','stroke-width':1});shape('text',{x:L-6,y:yy+4,'text-anchor':'end','font-size':11,fill:'#526779'},format(value,1));}
-   series.forEach(([key,label,color])=>{
-     const r=num(refs[key]);if(r!==null){shape('line',{x1:L,x2:W-R,y1:y(r),y2:y(r),stroke:color,'stroke-width':1.7,'stroke-dasharray':'7 5'});}
+   // Show explicit units, numeric scales and (bounded) real measurement labels.
+   shape('text',{x:L,y:20,'font-size':14,'font-weight':'700',fill:'#244d61'},'Messwert ('+(unit||'Einheit')+')');
+   for(let i=0;i<6;i++){const value=min+(max-min)*(5-i)/5,yy=T+(H-T-B)*i/5;shape('line',{x1:L,x2:W-R,y1:yy,y2:yy,stroke:'#d5e1e8','stroke-width':1});shape('text',{x:L-9,y:yy+4,'text-anchor':'end','font-size':12,fill:'#405967'},format(value,digits));}
+   series.forEach(([key,label,color],seriesIndex)=>{
+     const refValue=num(refs[key]);if(refValue!==null){shape('line',{x1:L,x2:W-R,y1:y(refValue),y2:y(refValue),stroke:color,'stroke-width':1.7,'stroke-dasharray':'7 5'});}
      const pts=chartRows.filter(item=>num(item[key])!==null);
      if(pts.length>1)shape('polyline',{points:pts.map(item=>x(item)+','+y(num(item[key]))).join(' '),fill:'none',stroke:color,'stroke-width':2.6,'stroke-linejoin':'round','stroke-linecap':'round'});
-     for(const p of pts){const el=shape('circle',{cx:x(p),cy:y(num(p[key])),r:pts.length>160?1.6:3.3,fill:color});const tip=document.createElementNS(svgNS,'title');tip.textContent=fmt(p.date)+' '+(p.time||'')+' · '+label+': '+format(num(p[key]),2)+' '+unit;el.append(tip);}
+     for(const p of pts){const el=shape('circle',{cx:x(p),cy:y(num(p[key])),r:pts.length>160?1.6:3.3,fill:color});const tip=document.createElementNS(svgNS,'title');tip.textContent=fmt(p.date)+' '+(p.time||'')+' · '+label+': '+format(num(p[key]),digits)+' '+unit;el.append(tip);}
+     const chosen=selectLabels(pts.map(p=>[p,num(p[key])]),series.length>1?4:7);
+     for(const [p,val] of chosen){
+       let yy=y(val)+(seriesIndex%2?21:-12);
+       if(yy<T+13)yy=y(val)+21;
+       if(yy>T+(H-T-B)-5)yy=y(val)-13;
+       const xx=Math.max(L+26,Math.min(W-R-26,x(p)));
+       shape('text',{x:xx,y:yy,'text-anchor':'middle','font-size':12,'font-weight':'700',fill:color},format(val,digits));
+     }
    });
-   shape('text',{x:L,y:H-10,'font-size':11,fill:'#526779'},fmt(values[0].date));shape('text',{x:W-R,y:H-10,'font-size':11,fill:'#526779','text-anchor':'end'},fmt(values.at(-1).date));
+   // Date ticks from actual measurements, never invented intermediate readings.
+   const dateIndices=[0,Math.round((values.length-1)/4),Math.round((values.length-1)/2),Math.round(3*(values.length-1)/4),values.length-1];
+   let previousX=-100,seenDates=new Set();
+   for(const index of [...new Set(dateIndices)]){
+     const row=values[index],xx=x(row),day=fmt(row.date);
+     if(seenDates.has(day)||xx-previousX<83)continue;
+     seenDates.add(day);previousX=xx;
+     shape('line',{x1:xx,x2:xx,y1:H-B,y2:H-B+5,stroke:'#93a9b4','stroke-width':1});
+     shape('text',{x:Math.max(L+32,Math.min(W-R-32,xx)),y:H-B+22,'font-size':11,'text-anchor':'middle',fill:'#496270'},day);
+   }
+   shape('text',{x:(L+W-R)/2,y:H-8,'font-size':12,'text-anchor':'middle',fill:'#244d61'},'Datum der Messung');
    c.append(svg);
+   const chartSummary=node('div','s292-summary');chartSummary.setAttribute('aria-label','Zahlen zum Diagramm');
+   for(const [key,label] of series){
+     const measurements=values.map(item=>({value:num(item[key]),date:item.date})).filter(item=>item.value!==null);
+     if(!measurements.length)continue;
+     const nn=measurements.map(item=>item.value),last=measurements.at(-1),first=measurements[0],difference=last.value-first.value;
+     const change=measurements.length>1?' · Änderung erster/letzter Wert '+(difference>0?'+':'')+format(difference,digits)+' '+unit:'';
+     chartSummary.append(node('span','',label+': '+measurements.length+' Messungen · Minimum '+format(Math.min(...nn),digits)+' '+unit+' · Maximum '+format(Math.max(...nn),digits)+' '+unit+' · Durchschnitt '+format(nsum(nn),digits)+' '+unit+' · Letzter Wert '+format(last.value,digits)+' '+unit+' am '+fmt(last.date)+change));
+   }
+   c.append(chartSummary);
+   c.append(node('p','s292-note','Zahlen an der senkrechten Achse: '+(unit||'Messwert')+'. Beschriftete Messpunkte: konkrete Einzelwerte; aus Platzgründen sind nicht alle Punkte direkt beschriftet. Die waagerechte Achse zeigt echte Messdaten. Durchgezogen: dokumentierte Messwerte. Gestrichelt: nur manuell hinterlegte persönliche Vergleichswerte; keine automatisch festgelegten medizinischen Grenzen. Alle Einzelwerte stehen in der Tabelle.'));
    const legend=node('div','s292-legend');for(const [key,label,color] of series){const cell=node('span');cell.append(node('i','s292-dot'));cell.querySelector('i').style.backgroundColor=color;cell.append(node('span','',label+(num(refs[key])!==null?' (gestrichelt: persönlicher Vergleich)':'')));legend.append(cell);}c.append(legend);
    if(chartRows.length!==values.length)c.append(node('p','s292-note','Die Grafik zeigt eine reduzierte Auswahl von '+chartRows.length+' Punkten; die Messwerttabelle enthält alle '+values.length+' Einträge.'));
    parent.append(c);

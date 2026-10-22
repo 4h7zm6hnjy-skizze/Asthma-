@@ -1,0 +1,27 @@
+ASTHMA 2.9.7 – LOKALER PDF-EXPORT MIT AUSFÜHRLICH BESCHRIFTETEN DIAGRAMMEN
+
+NEU:
+- PDF wird direkt auf dem iPhone erzeugt, auch wenn der Druckdialog der installierten WebApp nicht funktioniert.
+- Diagramme mit 6 Skalenwerten und realen Messdaten auf der Datum-Achse.
+- Wichtige Messpunkte werden direkt mit ihren Werten beschriftet (bei vielen Messungen begrenzt gegen Überlappung).
+- Zu jedem Diagramm stehen Anzahl, Minimum, Maximum, Durchschnitt, letzter Wert mit Datum und die Veränderung vom ersten bis zum letzten Messwert.
+- Systolischer und diastolischer Blutdruck bleiben getrennt dargestellt.
+- Alle Einzelwerte bleiben darunter als Tabelle vollständig sichtbar.
+- Gestrichelte Vergleichslinien nur für manuell gespeicherte persönliche Referenzen.
+- Die bisherige Statistik und alle privaten Daten bleiben unverändert.
+
+INSTALLATION AUSSCHLIESSLICH IPHONE:
+1. In der bisherigen Asthma-App ein vollständiges, verschlüsseltes Backup (.asthma17) erstellen.
+2. Diese ZIP-Datei mit der iPhone-App Dateien entpacken.
+3. In Safari https://github.com/4h7zm6hnjy-skizze/Asthma- öffnen.
+4. Add file > Upload files: ALLE SIEBEN Projektdateien auswählen und ins GitHub-HAUPTVERZEICHNIS laden. ZIP und diese Anleitung NICHT als Datei hochladen.
+5. Commit changes bestätigen.
+6. Die bestehende App öffnen (NICHT löschen) und unter Mehr > Einstellungen > Nach Updates suchen gegebenenfalls die neue Version laden.
+7. Statistik & PDF > Zeitraum festlegen > Statistik berechnen.
+8. Häkchen bei gewünschten Bereichen setzen und Als PDF speichern oder Statistik drucken antippen.
+9. Nach der PDF-Erstellung PDF teilen / In Dateien sichern wählen; alternativ PDF herunterladen.
+10. Zum Drucken das gespeicherte PDF in der iPhone-App Dateien öffnen und dort Teilen > Drucken wählen.
+
+DATENSCHUTZ: PDF-Dateien sind UNVERSCHLÜSSELT. Ggf. Häkchen für Adresse und Gewicht im Bericht vorher deaktivieren. Dateien nur auf einem vertrauenswürdigen Gerät speichern.
+Kein Löschen der WebApp, keine Löschung von Safari-Websitedaten, kein neuer Tresor.
+Getestet mit synthetischen Daten in Chromium (320, 390, 430 px) und PDF-Dokumenten. Der Test im echten iPhone-Teilen-Menü ist noch offen.
