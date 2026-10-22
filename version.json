@@ -1,5 +1,5 @@
 {
-  "version": "2.9.5",
+  "version": "2.9.6",
   "released": "2026-10-22",
-  "notes": "Bedarfsanwendungen und Nächte mit Beschwerden auf der Startseite direkt antippbar; öffnet das vorhandene verschlüsselte Tagesformular. Altes Tagebuch, Statistik und Gesundheitsdaten unverändert."
+  "notes": "Druck- und PDF-Funktion: eigenstaendige iPhone-Druckansicht nur mit ausgewaehlten Statistikbereichen. Vorhandener Bericht, Gesundheitsdaten, Verschluesselung und Messwertberechnungen bleiben unveraendert."
 }

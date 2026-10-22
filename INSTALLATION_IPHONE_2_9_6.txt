@@ -1,0 +1,39 @@
+ASTHMA 2.9.6 – DRUCK UND PDF AUF DEM IPHONE
+==========================================
+Dieses Update ändert ausschließlich die Ausgabe zum Drucken/PDF.
+Die alten Statistik-Berechnungen, verschlüsselten Werte und Tabellen bleiben unverändert.
+
+Vor Installation:
+1. In der bisherigen Asthma-App ein vollständiges verschlüsseltes .asthma17-Backup anlegen.
+2. Die bestehende Home-Bildschirm-App nicht löschen. Keine Safari-Website-Daten löschen.
+
+Installation (nur iPhone):
+1. Die ZIP in der iPhone-App „Dateien“ antippen und entpacken.
+2. GitHub-Repository 4h7zm6hnjy-skizze/Asthma- in Safari öffnen.
+3. Add file > Upload files wählen.
+4. DIESE SECHS DATEIEN aus dem ZIP-Hauptverzeichnis hochladen:
+   index.html
+   secure17.js
+   sw.js
+   version.json
+   app.js
+   statsprint296.js
+   Die TXT-Anleitung nicht hochladen. Nicht die ZIP als eine Datei hochladen.
+5. Commit changes bestätigen.
+6. Deine vorhandene Asthma-WebApp schließen und öffnen; ggf. „Nach Updates suchen“.
+
+So funktioniert die neue Druckansicht:
+1. In Statistik & PDF die gewünschte Periode auswählen und Statistik berechnen.
+2. Unter „Zusätzliche Druckbereiche wählen“ die gewünschten Häkchen setzen/entfernen.
+3. „Statistik drucken“ ODER „Als PDF speichern“ antippen.
+4. Sicherheitsabfrage bestätigen. Eine separate Druckansicht zeigt nur die gewählten Bereiche.
+5. Dort „Drucken / PDF“ antippen. Im iPhone-Druckdialog über die Druckvorschau
+   und Teilen das PDF in „Dateien“ sichern oder den AirPrint-Drucker wählen.
+   Falls nötig die Vorschau mit zwei Fingern vergrößern, um die PDF-Teilen-Funktion zu öffnen.
+
+Sicherheit und Grenzen:
+- Die neue Druckansicht öffnet ein Fenster auf demselben iPhone.
+- Keine Gesundheitsdaten werden von der App zu einem externen PDF-Dienst hochgeladen.
+- Ausdruck/PDF sind UNVERSCHLÜSSELT, also nur auf eigenen, sicheren Geräten speichern.
+- Falls das iPhone Pop-ups blockiert, zeigt die App eine Fehlermeldung.
+- Chromium-Funktions- und PDF-A4-Tests bestanden; echtes iOS Safari/PWA nicht testbar.
