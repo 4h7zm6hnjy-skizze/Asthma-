@@ -1,34 +1,25 @@
-ASTHMA-WEBAPP 3.0.2 – LUNGENFUNKTION
-===================================
+ASTHMA 3.0.3 – Updatepaket für deinen Mac
 
-Bitte vor dem Update in der App unter EINSTELLUNGEN eine verschlüsselte Sicherung erzeugen.
+SO EINFACH WIE MÖGLICH:
+1. ZIP-Datei auf dem Mac öffnen / entpacken.
+2. ASTHMA_UPDATE_STARTEN.command doppelt anklicken.
+3. Wenn macOS die Datei blockiert: Rechtsklick → Öffnen.
+4. GitHub-Anmeldung kann erforderlich sein. Ohne GitHub-Schreibrecht ist kein automatischer Upload möglich.
+5. Danach am iPhone die Asthma-Webapp öffnen und „Update suchen“ benutzen.
 
-1. Entpacke dieses ZIP auf deinem iPhone in der Dateien-App.
-2. Öffne dein GitHub-Projekt 4h7zm6hnjy-skizze/Asthma-.
-3. Ersetze im Hauptverzeichnis die folgenden DREI Dateien mit den gleichnamigen Dateien aus dem Ordner:
-      befundscan.js
-      sw.js
-      version.json
-   Die Dateien müssen im Stammverzeichnis stehen, nicht in einem neuen Unterordner.
-4. Änderungen in GitHub speichern (Commit changes).
-5. Webapp nach dem Veröffentlichen neu laden, bei Bedarf einmal schließen und erneut öffnen.
+WICHTIG VOR DEM UPDATE:
+- In der App unter Einstellungen eine vollständige, passwortverschlüsselte Sicherung erstellen.
+- Keine Safari-Websitedaten löschen und das alte Home-Bildschirm-Symbol nicht entfernen.
+- Die private Laborwert-JSON-Datei nie ins öffentliche GitHub-Repository hochladen.
 
-DANACH:
-- Asthma-App öffnen, mit dem bisherigen Passwort entsperren.
-- "Befunde" öffnen.
-- Neuer Knopf: "Lungenfunktion (.json) direkt importieren".
-- Vorbereitete Datei "Lungenfunktion_2025_09_17_Import.json" aus Downloads auswählen.
-- Kontrollansicht prüfen und auf "Geprüfte Werte übernehmen" tippen.
-- Die Speicherung wird ausdrücklich bestätigt. Die fertigen Werte erscheinen unter "Lungenfunktion".
+INHALT:
+- Laborvergleich: letzter Wert, Vorwert, Trend, Referenzstatus, Filter.
+- Differenzzahlen in Lungenfunktions- und Statistik-Diagrammen; verwertbare Messwerte bleiben durchgezogen.
+- Umfangreicher Offline-Cache für lokale Eingaben, Verlaufsdaten und PDF-Erstellung.
+- Button für den Offline-Bereitschaftstest unter Einstellungen.
+- Alte Werte und bisherige Statistik bleiben im lokalen Tresor erhalten.
 
-Wenn du den Lungenfunktionstest schon als Live-Text in der App siehst:
-- "Text auswerten" antippen.
-- Die App springt zur Kontrollansicht.
-- Prüfen, dann "Geprüfte Werte übernehmen".
-
-WICHTIG:
-- Kein automatisches Speichern ohne Bestätigung.
-- Keine vorhandenen Messungen löschen; doppelte Untersuchungen werden erkannt.
-- JSON-Dateien mit Labor-/Blutwerten gehören nur in die Laborakte, nicht in den Lungenfunktionsscanner.
-- Die mitgelieferte 2026-Datei wurde aus den sichtbaren Zahlen deines Screenshots erstellt; Messphase und Zahlen vor Speicherung mit Original vergleichen.
-- Weder die Befunddatei noch andere Gesundheitsdaten dürfen in das öffentliche GitHub-Projekt hochgeladen werden.
+GRENZEN:
+- Grüne/rote Labortrends bedeuten nur eine Veränderung innerhalb/außerhalb eines IDENTISCHEN Laborreferenzbereichs; keine automatische Diagnose.
+- Offline-Anzeige gilt nach vollständigem Download, soweit iOS den Speicher erhält. Online-Karten, amtliche Links, Aktualisierungen und Echtzeitdienste benötigen Internet.
+- Wenn GitHub das Schreiben verweigert, wird nichts in GitHub aktualisiert. Der Installer zeigt dann den genauen Fehler.
