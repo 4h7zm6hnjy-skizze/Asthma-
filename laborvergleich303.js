@@ -84,7 +84,7 @@
    if(f==='flags'&&!['high','low'].includes(x.assessment.kind))return false;
    if(f==='asthma'&&!/Asthma|Allergie/i.test(category)&&!['eosAbs','eosPct','ecp','igeTotal','igeSpecific'].includes(r.marker))return false;
    if(f==='gas'&&!/Blutgas|Säure-Basen/i.test(category)&&!['po2','pco2','ph','hco3','lactate'].includes(r.marker))return false;
-   if(f==='changed'&&(!x.previous||num(r.value)===null||num(x.previous.value)===null||String(r.unit||'')!==String(x.previous.unit||'')||num(r.value)===num(x.previous.value)))return false;
+   if(f==='changed'&&(!x.previous||num(r.value)===num(x.previous.value)))return false;
    return !s||[r.label,r.marker,r.allergen,r.category].some(v=>String(v||'').toLocaleLowerCase('de').includes(s));
   }).sort((x,y)=>{
    if(f==='all'){
@@ -117,4 +117,143 @@
  window.addEventListener('asthma:secure-change',e=>{if(e.detail?.group!=='labs'||refreshRequest)return;refreshRequest=true;queueMicrotask(()=>{refreshRequest=false;refresh()})});
  refresh();
  window.ASTHMA_LAB303={status,change};
+})();
+
+/* Langzeit-Bluttestvergleich 2026 – additive Offline-Erweiterung. Keine Patientendaten im Quellcode. */
+(()=>{
+ 'use strict';
+ const S=window.ASTHMA_SECURITY,oldPanel=document.getElementById('laborvergleich303'),$=id=>document.getElementById(id);
+ if(!S||!oldPanel||$('lab-compare-years'))return;
+ const h=document.createElement('section');h.id='lab-compare-years';h.className='suite-subpanel';
+ h.innerHTML=`<h3>Bluttests über alle Jahre vergleichen</h3>
+ <p>Wähle zwei Untersuchungstage. Neue Bluttests erscheinen hier automatisch, alle älteren Untersuchungen bleiben erhalten.</p>
+ <div class="lcy-dates"><label>Früherer Bluttest<select id="lcy-before"></select></label><label>Späterer Bluttest<select id="lcy-after"></select></label></div>
+ <div class="lcy-actions"><button type="button" class="btn btn-outline" id="lcy-last">Die letzten zwei Bluttests</button><button type="button" class="btn btn-outline" id="lcy-all">Ersten und letzten vergleichen</button><button type="button" class="btn btn-outline" id="lcy-swap">Tage tauschen</button></div>
+ <p id="lcy-info" role="status"></p>
+ <div class="lcy-filters"><label>Laborwert suchen<input id="lcy-search" type="search" placeholder="z. B. CRP, Eosinophile, pCO₂" autocomplete="off"></label>
+ <label>Anzeige<select id="lcy-filter"><option value="all">Alle Werte aus beiden Bluttests</option><option value="both">An beiden Tagen gemessen</option><option value="changed">Nur veränderte Zahlenwerte</option><option value="missing">Nur an einem Tag gemessen</option></select></label></div>
+ <p id="lcy-count"></p><div class="lcy-results" id="lcy-results"></div>
+ <button type="button" class="btn btn-outline" id="lcy-more" hidden>Weitere Blutwerte anzeigen</button>
+ <p class="input-note">Veränderungen sind rein rechnerisch: Steigende oder sinkende Werte bedeuten nicht automatisch Besserung oder Verschlechterung. Verschiedene Messmethoden und Referenzbereiche müssen ärztlich eingeordnet werden. Fehlende Tests werden nicht als 0 gewertet.</p>`;
+ oldPanel.insertAdjacentElement('beforebegin',h);
+ const legacy=document.createElement('details');legacy.id='lcy-old-comparison';
+ const lsum=document.createElement('summary');lsum.textContent='Bisherige Ansicht: Letzter Wert und Vorwert';
+ legacy.append(lsum);oldPanel.insertAdjacentElement('beforebegin',legacy);legacy.append(oldPanel);
+ const css=document.createElement('style');css.textContent=`
+ #lab-compare-years{padding:15px;background:#f6fbff;border:1px solid #b8d8e7;border-radius:15px;margin:14px 0}
+ #lab-compare-years h3{color:#183e54;margin:0 0 8px}
+ .lcy-dates,.lcy-filters{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:13px 0}
+ #lab-compare-years label{display:block;font-weight:600;font-size:.91rem}
+ #lab-compare-years input,#lab-compare-years select{width:100%;font-size:16px;min-width:0;padding:11px 9px;border:1px solid #abc8d6;border-radius:8px;margin-top:6px;background:white}
+ .lcy-actions{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}.lcy-actions button{white-space:normal}
+ #lcy-info,#lcy-count{color:#526f7d;font-size:.9rem}
+ .lcy-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+ .lcy-card{background:white;border:1px solid #d1e0e9;border-radius:12px;padding:12px;overflow-wrap:anywhere}
+ .lcy-card h4{font-size:1rem;margin:0 0 10px;color:#1a4156}
+ .lcy-cells{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+ .lcy-cell{background:#f0f6fa;border-radius:9px;padding:9px;min-width:0}
+ .lcy-cell .caption{display:block;font-size:.8rem;color:#5b707b}
+ .lcy-cell strong{display:block;font-size:1.05rem;margin:5px 0;color:#1b465c;overflow-wrap:anywhere}
+ .lcy-delta{font-weight:700;margin:11px 0 4px;color:#23546e;font-size:.94rem}
+ .lcy-explain{color:#526d7a;font-size:.82rem;margin:6px 0}
+ .lcy-card details summary{cursor:pointer;font-size:.86rem;font-weight:650;margin-top:10px}
+ #lcy-old-comparison{padding:10px 0}#lcy-old-comparison>summary{cursor:pointer;font-weight:650}
+ @media(max-width:620px){.lcy-dates,.lcy-filters{grid-template-columns:1fr}.lcy-results{grid-template-columns:1fr}#lab-compare-years{padding:11px}}
+ `;document.head.append(css);
+ const mk=(tag,text,cls)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(text!==undefined)x.textContent=String(text);return x};
+ const format=n=>Number(n).toLocaleString('de-DE',{maximumFractionDigits:4});
+ const dateText=x=>/^\d{4}-\d\d-\d\d$/.test(x||'')?x.slice(8)+'.'+x.slice(5,7)+'.'+x.slice(0,4):String(x||'');
+ const number=x=>{const t=String(x??'').trim().replace(',','.');return /^[-+]?\d+(?:\.\d+)?$/.test(t)&&Number.isFinite(Number(t))?Number(t):null};
+ const key=r=>[r.marker||'',String(r.allergen||'').trim().toLowerCase(),r.marker==='customTest'?String(r.label||'').trim().toLowerCase():''].join('|');
+ const label=r=>String(r.label||r.marker||'Untersuchung')+(r.allergen?' · '+r.allergen:'');
+ const unit=u=>String(u||'').trim().replace(/\s+/g,'').toLowerCase().replaceAll('μ','µ');
+ function diff(a,b){
+   if(!a||!b)return {valid:false,message:'Nur an einem der beiden Tage untersucht'};
+   let va=number(a.value),vb=number(b.value);if(va===null||vb===null)return {valid:false,message:'Ein Messwert ist kein vergleichbarer Zahlenwert'};
+   const ua=unit(a.unit),ub=unit(b.unit);let factor=null;
+   if(ua===ub)factor=1;
+   else if(a.marker==='crp'){
+     const m={'mg/l':1,'mg/dl':10};if(m[ua]&&m[ub])factor=m[ua]/m[ub];
+   }else if(['eosAbs','neutAbs','lymphAbs','monoAbs','basoAbs','immatureAbs','wbc','platelets'].includes(a.marker)){
+     const m={'/µl':1,'zellen/µl':1,'g/l':1000,'10³/µl':1000};if(m[ua]&&m[ub])factor=m[ua]/m[ub];
+   }
+   if(factor===null)return {valid:false,message:'Unterschiedliche Einheiten – keine sichere Umrechnung'};
+   const old=va*factor,change=vb-old;
+   return {valid:true,change,percent:old?100*change/Math.abs(old):null,converted:factor!==1,unit:b.unit||''};
+ }
+ let rows=[],dates=[],limit=30,previousLatest='';
+ const from=$('lcy-before'),to=$('lcy-after');
+ function addOptions(target,wanted,fallback){
+   const n=new Map();rows.forEach(r=>n.set(r.date,(n.get(r.date)||0)+1));
+   target.replaceChildren();let group=null,year=null;
+   for(const d of dates){if(year!==d.slice(0,4)){year=d.slice(0,4);group=mk('optgroup');group.label=year;target.append(group)}
+     const option=mk('option',dateText(d)+' · '+n.get(d)+' Messwerte');option.value=d;group.append(option)}
+   target.value=dates.includes(wanted)?wanted:fallback;
+ }
+ function buildPair(e,A,B){
+   const r=e.b||e.a,card=mk('article',undefined,'lcy-card');card.append(mk('h4',label(r)));
+   const grid=mk('div',undefined,'lcy-cells');
+   for(const [record,date] of [[e.a,A],[e.b,B]]){
+     const cell=mk('div',undefined,'lcy-cell');cell.append(mk('span',dateText(date),'caption'));
+     cell.append(mk('strong',record?String(record.value).replace('.',',')+' '+String(record.unit||''):'Nicht untersucht'));
+     if(record?.reference)cell.append(mk('span','Referenz: '+record.reference,'caption'));
+     grid.append(cell);
+   }
+   card.append(grid);
+   const d=diff(e.a,e.b);
+   if(d.valid){
+     const sign=d.change>0?'↑ +':d.change<0?'↓ ':'= ';
+     const pct=d.percent===null?'':' · '+(d.percent>0?'+':'')+format(d.percent)+' %';
+     card.append(mk('p','Differenz: '+sign+format(d.change)+' '+d.unit+pct,'lcy-delta'));
+     if(d.converted)card.append(mk('p','Vorwert wurde für die Differenz in die Einheit des neuen Befunds umgerechnet.','lcy-explain'));
+   }else card.append(mk('p',d.message,'lcy-explain'));
+   const detail=mk('details');detail.append(mk('summary','Beurteilungen und Notizen'));
+   for(const [rec,day] of [[e.a,'Früher'],[e.b,'Später']]){
+     if(!rec)continue;
+     detail.append(mk('p',day+': '+(rec.evaluation?.label||'Keine zusätzliche Bewertung'),'lcy-explain'));
+     if(rec.evaluation?.detail)detail.append(mk('p',rec.evaluation.detail,'lcy-explain'));
+     if(rec.notes)detail.append(mk('p','Notiz: '+rec.notes,'lcy-explain'));
+   }
+   card.append(detail);return card;
+ }
+ function render(){
+   const A=from.value,B=to.value,out=$('lcy-results');out.replaceChildren();
+   if(dates.length<2){$('lcy-info').textContent='Für den Vergleich werden Untersuchungen an zwei verschiedenen Tagen benötigt.';$('lcy-count').textContent='';$('lcy-more').hidden=true;return}
+   if(A===B){$('lcy-info').textContent='Bitte zwei unterschiedliche Tage auswählen.';$('lcy-count').textContent='';$('lcy-more').hidden=true;return}
+   const map=new Map();for(const rec of rows){if(rec.date!==A&&rec.date!==B)continue;
+     const k=key(rec);if(!map.has(k))map.set(k,{a:null,b:null});
+     const r=map.get(k),slot=rec.date===A?'a':'b';
+     if(!r[slot]||String(rec.updatedAt||rec.createdAt||'')>String(r[slot].updatedAt||r[slot].createdAt||''))r[slot]=rec;
+   }
+   const total=map.size,search=$('lcy-search').value.trim().toLowerCase(),filter=$('lcy-filter').value;
+   const displayed=[...map.values()].filter(e=>{
+     if(filter==='both'&&(!e.a||!e.b))return false;
+     if(filter==='missing'&&e.a&&e.b)return false;
+     if(filter==='changed'&&(!diff(e.a,e.b).valid||Math.abs(diff(e.a,e.b).change)<1e-12))return false;
+     if(!search)return true;
+     return [e.a,e.b].filter(Boolean).some(r=>[r.label,r.marker,r.allergen,r.category].some(v=>String(v||'').toLowerCase().includes(search)));
+   }).sort((x,y)=>label(x.b||x.a).localeCompare(label(y.b||y.a),'de'));
+   $('lcy-info').textContent='Vergleich '+dateText(A)+' und '+dateText(B)+' · '+dates.length+' Untersuchungstage insgesamt ('+dateText(dates[0])+' bis '+dateText(dates[dates.length-1])+')';
+   $('lcy-count').textContent=displayed.length+' von '+total+' unterschiedlichen Untersuchungen';
+   displayed.slice(0,limit).forEach(e=>out.append(buildPair(e,A,B)));
+   if(!displayed.length)out.append(mk('p','Keine passenden Werte gefunden.'));
+   $('lcy-more').hidden=limit>=displayed.length;
+ }
+ async function reload(){try{
+   const a=from.value,b=to.value;
+   rows=(await S.list('labs')).filter(r=>/^\d{4}-\d\d-\d\d$/.test(r.date||''));
+   dates=[...new Set(rows.map(r=>r.date))].sort();
+   const newest=dates.at(-1)||'',auto=previousLatest&&b===previousLatest&&newest!==previousLatest&&dates.length>1;
+   addOptions(from,a,dates.at(-2)||newest);addOptions(to,b,newest);
+   if(auto){from.value=previousLatest;to.value=newest}
+   if(dates.length>1&&from.value===to.value)from.value=dates.at(-2);
+   previousLatest=newest;render();
+ }catch(err){$('lcy-info').textContent='Laborwerte konnten nicht geladen werden: '+err.message}}
+ $('lcy-last').addEventListener('click',()=>{if(dates.length>1){from.value=dates.at(-2);to.value=dates.at(-1);render()}});
+ $('lcy-all').addEventListener('click',()=>{if(dates.length>1){from.value=dates[0];to.value=dates.at(-1);render()}});
+ $('lcy-swap').addEventListener('click',()=>{const a=from.value;from.value=to.value;to.value=a;render()});
+ ['lcy-before','lcy-after','lcy-filter','lcy-search'].forEach(id=>$(id).addEventListener(id==='lcy-search'?'input':'change',()=>{limit=30;render()}));
+ $('lcy-more').addEventListener('click',()=>{limit+=30;render()});
+ let updating=false;window.addEventListener('asthma:secure-change',e=>{if(e.detail?.group!=='labs'||updating)return;updating=true;setTimeout(()=>{updating=false;reload()},120)});
+ window.ASTHMA_LAB_LONGTERM={diff};reload();
 })();
