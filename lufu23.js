@@ -68,14 +68,29 @@
     for(const index of indices){const x=xy(0,index)[0];const tick=svgEl('text',{x,y:H-11,'text-anchor':'middle',fill:'#516c76','font-size':16},svg);tick.textContent=rows[index].date.slice(8)+'.'+rows[index].date.slice(5,7)+'.'+rows[index].date.slice(2,4)}
     const fmtUnit=available.length===1?units[available[0]]:units[available[0]];
     svgEl('text',{x:left,y:14,fill:'#4d6671','font-size':14},svg).textContent=fmtUnit;
+    const changes=[];
     for(const field of available){
       // Do not join before/after bronchodilatation into a false longitudinal trend.
       let last=null;
       rows.forEach((r,i)=>{
         const v=r[field];if(v===null){last=null;return}
         const [x,y]=xy(v,i);
-        if(last && last.phase===r.phase){svgEl('line',{x1:last.x,y1:last.y,x2:x,y2:y,stroke:colors[field],'stroke-width':3.5,'stroke-linecap':'round'},svg)}
-        last={x,y,phase:r.phase};
+        if(last && last.phase===r.phase){
+          svgEl('line',{x1:last.x,y1:last.y,x2:x,y2:y,stroke:colors[field],'stroke-width':3.5,'stroke-linecap':'round'},svg);
+          const diff=v-last.value,relative=last.value===0?null:diff/Math.abs(last.value)*100;
+          const decimal=field.includes('Liters')?2:1;
+          const display=(diff>0?'+':'')+nr(diff,decimal)+(field.includes('Liters')?' l':' Prozentpunkte');
+          const detail=relative===null?'':', '+(relative>0?'+':'')+nr(relative,1)+' % relativ';
+          changes.push(names[field]+': '+display+detail+' ('+niceDate(last.date)+' → '+niceDate(r.date)+')');
+          if(rows.length<=5&&available.length<=2&&Math.abs(x-last.x)>60){
+            const yy=Math.max(top+13,Math.min(H-bottom-5,(y+last.y)/2+(field===available[0]?-14:20)));
+            const label=svgEl('text',{x:(last.x+x)/2,y:yy,'text-anchor':'middle','font-size':mobile?11:12,'font-weight':700,
+              fill:diff>0?'#178052':diff<0?'#b44336':'#526776'},svg);
+            label.textContent=(diff>0?'+':'')+nr(diff,decimal)+(field.includes('Liters')?' l':' pp');
+            svgEl('title',{},label).textContent=names[field]+': '+display+detail+' · '+niceDate(last.date)+' → '+niceDate(r.date);
+          }
+        }
+        last={x,y,phase:r.phase,value:v,date:r.date};
         const dot=svgEl('circle',{cx:x,cy:y,r:6.5,fill:colors[field],stroke:'#fff','stroke-width':2},svg);
         const hit=svgEl('circle',{cx:x,cy:y,r:15,fill:'transparent',tabindex:0,role:'button','aria-label':niceDate(r.date)+': '+names[field]+' '+nr(v,field.includes('Liters')?2:1)+' '+units[field]},svg);
         svgEl('title',{},hit).textContent=niceDate(r.date)+' – '+names[field]+' '+nr(v,field.includes('Liters')?2:1)+' '+units[field];
@@ -84,6 +99,7 @@
         hit.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose()}});
       });
     }
+    if(changes.length)host.append(el('p','lufu23-muted','Differenzen zwischen Messpunkten derselben Messphase: '+changes.slice(-6).join(' · ')));
     const note=el('p','lufu23-muted',rows.length===1?'Ein Messpunkt vorhanden. Für einen zeitlichen Trend werden mindestens zwei vergleichbare Untersuchungen benötigt.':'Linien verbinden nur benachbarte Werte derselben Messphase. Messpunkte antippen, um die Werte zu prüfen.');host.append(note);
   }
   let data=[],counter=0;

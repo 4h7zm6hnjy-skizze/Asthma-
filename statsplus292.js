@@ -79,6 +79,22 @@
      const refValue=num(refs[key]);if(refValue!==null){shape('line',{x1:L,x2:W-R,y1:y(refValue),y2:y(refValue),stroke:color,'stroke-width':1.7,'stroke-dasharray':'7 5'});}
      const pts=chartRows.filter(item=>num(item[key])!==null);
      if(pts.length>1)shape('polyline',{points:pts.map(item=>x(item)+','+y(num(item[key]))).join(' '),fill:'none',stroke:color,'stroke-width':2.6,'stroke-linejoin':'round','stroke-linecap':'round'});
+     if(pts.length>=2&&pts.length<=7){
+       for(let i=1;i<pts.length;i++){
+         const a=pts[i-1],b=pts[i],old=num(a[key]),now=num(b[key]);
+         if(old===null||now===null||x(b)-x(a)<58)continue;
+         const diff=now-old,unitLabel=unit==='%'?' pp':unit?' '+unit:'';
+         const rel=old===0?'':' ('+(diff>0?'+':'')+format(diff/Math.abs(old)*100,1)+' % relativ)';
+         const text=(diff>0?'+':'')+format(diff,digits)+unitLabel;
+         const clinical=['fev1','fvc','fev1Liters','fvcLiters'].includes(key);
+         const fill=clinical?(diff>0?'#167d50':diff<0?'#b13b35':'#4a5d69'):'#4a5d69';
+         const label=shape('text',{x:(x(a)+x(b))/2,y:Math.max(T+12,Math.min(H-B-5,(y(old)+y(now))/2+(seriesIndex%2===0?-13:19))),
+           fill,'font-size':11,'font-weight':700,'text-anchor':'middle',stroke:'#fff','stroke-width':3,'paint-order':'stroke'},text);
+         const tooltip=document.createElementNS(svgNS,'title');tooltip.textContent=fmt(a.date)+' → '+fmt(b.date)+': '+text+rel;
+         label.append(tooltip);
+       }
+     }
+
      for(const p of pts){const el=shape('circle',{cx:x(p),cy:y(num(p[key])),r:pts.length>160?1.6:3.3,fill:color});const tip=document.createElementNS(svgNS,'title');tip.textContent=fmt(p.date)+' '+(p.time||'')+' · '+label+': '+format(num(p[key]),digits)+' '+unit;el.append(tip);}
      const chosen=selectLabels(pts.map(p=>[p,num(p[key])]),series.length>1?4:7);
      for(const [p,val] of chosen){
@@ -110,6 +126,7 @@
      chartSummary.append(node('span','',label+': '+measurements.length+' Messungen · Minimum '+format(Math.min(...nn),digits)+' '+unit+' · Maximum '+format(Math.max(...nn),digits)+' '+unit+' · Durchschnitt '+format(nsum(nn),digits)+' '+unit+' · Letzter Wert '+format(last.value,digits)+' '+unit+' am '+fmt(last.date)+change));
    }
    c.append(chartSummary);
+   c.append(node('p','s292-note','Zahlen zwischen Punkten zeigen absolute Messwertänderungen; bei Prozentwerten sind dies Prozentpunkte (pp). Das Vorzeichen bedeutet nicht automatisch eine klinische Verbesserung oder Verschlechterung. Bei vielen Messpunkten werden die Änderungszahlen aus Platzgründen nicht eingeblendet.'));
    c.append(node('p','s292-note','Zahlen an der senkrechten Achse: '+(unit||'Messwert')+'. Beschriftete Messpunkte: konkrete Einzelwerte; aus Platzgründen sind nicht alle Punkte direkt beschriftet. Die waagerechte Achse zeigt echte Messdaten. Durchgezogen: dokumentierte Messwerte. Gestrichelt: nur manuell hinterlegte persönliche Vergleichswerte; keine automatisch festgelegten medizinischen Grenzen. Alle Einzelwerte stehen in der Tabelle.'));
    const legend=node('div','s292-legend');for(const [key,label,color] of series){const cell=node('span');cell.append(node('i','s292-dot'));cell.querySelector('i').style.backgroundColor=color;cell.append(node('span','',label+(num(refs[key])!==null?' (gestrichelt: persönlicher Vergleich)':'')));legend.append(cell);}c.append(legend);
    if(chartRows.length!==values.length)c.append(node('p','s292-note','Die Grafik zeigt eine reduzierte Auswahl von '+chartRows.length+' Punkten; die Messwerttabelle enthält alle '+values.length+' Einträge.'));

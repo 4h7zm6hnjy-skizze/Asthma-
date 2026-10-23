@@ -122,6 +122,23 @@
   for(let i=0;i<=4;i++){const v=hi-i*(hi-lo)/4,Y=y(v);s.append(svg('line',{x1:L,x2:W-R,y1:Y,y2:Y,stroke:'#e4edf2'}));const label=svg('text',{x:L-5,y:Y+4,'font-size':10,'text-anchor':'end',fill:'#577180'});label.textContent=nice(v);s.append(label)}
   if(t.same)t.same.forEach(v=>s.append(svg('line',{x1:L,x2:W-R,y1:y(v),y2:y(v),stroke:'#af7951','stroke-dasharray':'5 4','stroke-width':1.5})));
   s.append(svg('polyline',{points:values.map((v,i)=>`${x(i)},${y(v)}`).join(' '),fill:'none',stroke:'#247c9b','stroke-width':3,'stroke-linecap':'round','stroke-linejoin':'round'}));
+  if(values.length<=7)for(let i=1;i<values.length;i++){
+   const a=t.points[i-1],b=t.points[i],diff=values[i]-values[i-1];
+   if(String(a.unit||'')!==String(b.unit||'')||x(i)-x(i-1)<52)continue;
+   const change=(diff>0?'+':'')+nice(diff);
+   const pct=values[i-1]===0?'':' ('+(diff>0?'+':'')+nice(diff/Math.abs(values[i-1])*100)+' %)';
+   const p=ref(a),q=ref(b);let fill='#425e70';
+   if(p&&q&&p[0]===q[0]&&p[1]===q[1]){
+    const oldOutside=values[i-1]<p[0]||values[i-1]>p[1];
+    const newOutside=values[i]<q[0]||values[i]>q[1];
+    if(oldOutside&&!newOutside)fill='#157b4a';else if(!oldOutside&&newOutside)fill='#b43b32';
+   }
+   const txt=svg('text',{x:(x(i-1)+x(i))/2,y:Math.max(T+12,Math.min(H-B-6,(y(values[i-1])+y(values[i]))/2+(i%2?14:-14))),
+    'text-anchor':'middle','font-size':10,'font-weight':700,fill});
+   txt.textContent=change+pct;
+   txt.append(svg('title',{})).textContent=dstr(a.date)+' → '+dstr(b.date)+': '+change+' '+(b.unit||'')+pct;
+   s.append(txt);
+  }
   t.points.forEach((r,i)=>{const dot=svg('circle',{cx:x(i),cy:y(values[i]),r:5,fill:'#247c9b',stroke:'white','stroke-width':1.5});dot.addEventListener('click',()=>{$('labp-touched').textContent=dstr(r.date)+' · '+(typeof r.value==='number'?nice(r.value):r.value)+' '+(r.unit||'')+(r.reference?' · Referenz: '+r.reference:'')});s.append(dot)});
   const left=svg('text',{x:L,y:H-23,'font-size':11,fill:'#536e7c'});left.textContent=dstr(t.a.date);const right=svg('text',{x:W-R,y:H-23,'font-size':11,fill:'#536e7c','text-anchor':'end'});right.textContent=dstr(t.b.date);s.append(left,right);
   const leg=svg('text',{x:L,y:H-5,'font-size':10,fill:'#667c87'});leg.textContent=t.same?'Messwert durchgezogen · Referenz gestrichelt':'Messwert durchgezogen';s.append(leg);container.append(s);

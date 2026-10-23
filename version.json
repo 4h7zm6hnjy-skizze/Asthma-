@@ -1,5 +1,5 @@
 {
-  "version": "3.0.2",
+  "version": "3.0.3",
   "released": "2026-10-23",
-  "notes": "Lungenfunktion: korrigierte Scanner-Übernahme, direkte Importmöglichkeit für vorbereitete Lungenfunktions-JSON-Dateien, klare Prüfung und Speicherung. Keine Änderungen an bestehenden verschlüsselten Werten, Laborakte oder Statistik."
+  "notes": "Laborvergleich mit Vorwerten, Delta-Anzeigen in Lungenfunktion und Statistik, vollständig lokaler Import und Offline-Cache. Vorhandene AES-GCM-Gesundheitsdaten bleiben unverändert."
 }
