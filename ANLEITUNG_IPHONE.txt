@@ -1,0 +1,25 @@
+ASTHMA UPDATE 3.0.3 – NUR IPHONE
+================================
+
+Dies ist ein Updatepaket, KEINE direkt installierbare iOS-App. Eine ZIP-Datei in GitHub hochzuladen allein aktiviert das Update nicht.
+
+1. Erst in der bestehenden Asthma-Webapp eine verschluesselte Datensicherung anlegen.
+2. ZIP auf dem iPhone in der Dateien-App speichern.
+3. In Safari das GitHub-Repository oeffnen: https://github.com/4h7zm6hnjy-skizze/Asthma-
+4. Dort ueber den grünen Button „Code“ einen Codespace auf Branch main starten (sofern dein GitHub-Konto Codespaces nutzen darf).
+5. Im Codespace die heruntergeladene ZIP-Datei in den Projektordner hochladen.
+6. Terminal im Projektordner oeffnen, folgende Zeile reinkopieren und Enter druecken:
+
+unzip -o Asthma_Update_3.0.3_iPhone.zip -d /tmp/asthma-303 && python3 /tmp/asthma-303/Asthma_Update_3.0.3/INSTALLIEREN_IM_CODESPACE.py
+
+7. Wenn im Terminal „FERTIG“ angezeigt wird, die Asthma-Webapp online neu oeffnen und „Update suchen“ benutzen.
+
+ALTERNATIVE:
+Wenn dir Codespaces zu kompliziert ist, gib die ZIP-Datei einer Person, die GitHub kennt. Die ZIP enthaelt alle Dateien und ein automatisches Skript fuer GitHub Codespaces.
+
+WICHTIG:
+- Keine privaten Laborwerte in GitHub hochladen! Diese ZIP enthaelt KEINE persoenlichen Gesundheitsdaten.
+- Der medizinische Bereich, bestehende Berichte und gespeicherte Werte werden nicht geloescht.
+- Offline funktioniert nach erfolgreichem Caching, solange iOS die Websitedaten aufbewahrt. Online-Links und Updates brauchen Internet.
+- Die beiden neuen Module sind moeglicherweise schon im Repo. Das Installationsskript aktualisiert auch die Einbindung und Offline-Cache-Regeln.
+- Eine ZIP-Datei allein kann GitHub Pages NICHT installieren oder entpacken.
