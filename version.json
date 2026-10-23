@@ -1,5 +1,5 @@
 {
-  "version": "3.0.3",
+  "version": "3.0.4",
   "released": "2026-10-23",
-  "notes": "Laborvergleich mit Vorwerten, Delta-Anzeigen in Lungenfunktion und Statistik, vollständig lokaler Import und Offline-Cache. Vorhandene AES-GCM-Gesundheitsdaten bleiben unverändert."
+  "notes": "Intensivprüfung: HTML-Kopf, Skriptaktualisierung, PDF-Diagrammbeschriftung, Laborfilter, Referenzformate, vollständiger Offline-Cache-Test und statische Codeprüfung. Bestehende verschlüsselte Daten bleiben unverändert."
 }

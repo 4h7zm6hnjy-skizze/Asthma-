@@ -15,7 +15,7 @@
  const uid=()=>crypto.randomUUID?.()||Array.from(crypto.getRandomValues(new Uint8Array(16)),v=>v.toString(16).padStart(2,'0')).join('');
  const key=r=>[r.date,r.marker,str(r.allergen).toLowerCase(),str(r.unit).toLowerCase().replace(/\s/g,''),String(r.value).replace(',','.')].join('|');
  const lineKey=r=>[r.marker,str(r.allergen).toLowerCase(),str(r.unit).toLowerCase().replace(/\s/g,''),r.marker==='customTest'?str(r.label).toLowerCase():''].join('|');
- const ref=r=>{const m=str(r.reference,100).replace(/\s/g,'').replace(/,/g,'.').match(/^(-?\d+(?:\.\d+)?)[–-](-?\d+(?:\.\d+)?)$/);return m&&Number(m[1])<=Number(m[2])?[Number(m[1]),Number(m[2])]:null};
+ const ref=r=>{const s=str(r.reference,100).replace(/\s/g,'').replace(/,/g,'.');const m=s.match(/^(-?\d+(?:\.\d+)?)[–-](-?\d+(?:\.\d+)?)(?:\/[a-zA-Zµ%][a-zA-Zµ%0-9/^.-]*)?$/);return m&&Number(m[1])<=Number(m[2])?[Number(m[1]),Number(m[2])]:null};
  function normalize(r){if(!r||typeof r!=='object'||!validDate(r.date))throw Error('Messdatum ungültig');
   const marker=str(r.marker,80);if(!/^[a-zA-Z][\w-]+$/.test(marker))throw Error('Ungültiger Testschlüssel');
   if(typeof r.value!=='number'&&typeof r.value!=='string')throw Error('Ungültiger Messwert');

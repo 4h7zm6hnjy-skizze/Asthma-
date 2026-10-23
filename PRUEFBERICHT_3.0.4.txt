@@ -1,0 +1,30 @@
+ASTHMA 3.0.4 – PRÜFBERICHT
+2026-10-23
+
+BEHOBENE CODEPROBLEME
+• Fehlerhafter HTML-Kopf und doppelte PhysioSport-Einbindung
+• Veraltete Versions-URLs beim Laden der Programmmodule
+• Tooltip-Text wurde im PDF-Diagramm versehentlich mit ausgegeben
+• PDF blieb nach erneuter Statistikberechnung eventuell veraltet
+• Laborvergleiche ohne identische Einheit wurden als Veränderung gefiltert
+• Laborreferenz mit optionalem Einheitenzusatz wurde nicht erkannt
+• Offline-Prüfung untersuchte nur einen Bruchteil und konnte alte Caches akzeptieren
+
+BESTANDENE PRÜFUNGEN
+OK – Versionsdatei: 3.0.4
+OK – HTML: Dokumentkopf gültig angeordnet, PhysioSport nur einmal
+OK – Startskripte: einheitliche Version, keine alten Abfragen
+OK – PDF: unsichtbarer SVG-Tooltip wird nicht als Beschriftung gedruckt
+OK – Labor: numerisch vergleichbarer Vorwert erforderlich
+OK – Offline: alle Dateien im aktuellen Versionscache prüfen
+OK – Offline: 68 Dateien vorhanden und vorgemerkt
+OK – Alle 37 dynamischen Module offline vorgemerkt
+OK – 7 geänderte JavaScript-Dateien bestehen die Node-Syntaxprüfung
+OK – PDF-Tooltip-Regressionsfall besteht
+OK – Labor-Referenzformate: Zahlenbereich, Dezimalpunkt, Einheiten
+
+NICHT ABGEDECKT
+Echter Test auf dem iPhone inklusive verschlüsselter Datensätze, Druckdialog und Flugmodus. Diesen bitte nach Installation durchführen.
+
+DATENSCHUTZ
+Nur öffentliche Programmdateien; keine Laborwerte, Passwörter oder persönlichen Befunde übertragen.

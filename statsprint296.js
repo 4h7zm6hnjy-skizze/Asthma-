@@ -42,7 +42,7 @@
      if(tag==='line'){ctx.beginPath();ctx.moveTo(get('x1'),get('y1'));ctx.lineTo(get('x2'),get('y2'));ctx.strokeStyle=paint;ctx.lineWidth=get('stroke-width',1);ctx.setLineDash((el.getAttribute('stroke-dasharray')||'').split(/[ ,]+/).filter(Boolean).map(Number));ctx.stroke();ctx.setLineDash([]);}
      else if(tag==='polyline'){const points=(el.getAttribute('points')||'').trim().split(/\s+/).map(p=>p.split(',').map(Number)).filter(a=>a.length===2&&a.every(Number.isFinite));if(points.length){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.strokeStyle=paint;ctx.lineWidth=get('stroke-width',2);ctx.stroke();}}
      else if(tag==='circle'){ctx.beginPath();ctx.arc(get('cx'),get('cy'),get('r',2),0,Math.PI*2);ctx.fillStyle=el.getAttribute('fill')||'#247e76';ctx.fill();}
-     else if(tag==='text'){ctx.fillStyle=el.getAttribute('fill')||'#526779';ctx.font=`${get('font-size',11)}px Arial`;ctx.textAlign=({end:'right',middle:'center'}[el.getAttribute('text-anchor')]||'left');ctx.fillText(el.textContent||'',get('x'),get('y'));}
+     else if(tag==='text'){ctx.fillStyle=el.getAttribute('fill')||'#526779';ctx.font=`${get('font-size',11)}px Arial`;ctx.textAlign=({end:'right',middle:'center'}[el.getAttribute('text-anchor')]||'left');ctx.fillText(Array.from(el.childNodes).filter(n=>n.nodeType===3).map(n=>n.nodeValue).join(''),get('x'),get('y'));}
    }
    const data=canvas.toDataURL('image/jpeg',0.89).split(',')[1];const raw=atob(data),buf=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)buf[i]=raw.charCodeAt(i);return {data:buf,width:canvas.width,height:canvas.height};
  }
@@ -113,6 +113,7 @@
  }
  share.addEventListener('click',sharePDF);
  const changed=$('statsplus292-options');changed?.addEventListener('change',()=>{if(output){reset();status('Druckauswahl geändert. Bitte PDF erneut erstellen.');}});
+ $('stats25-build')?.addEventListener('click',()=>{if(output){reset();status('Neue Auswertung angefordert. Bitte anschließend das PDF neu erstellen.');}});
  document.addEventListener('click',e=>{const b=e.target.closest?.('#stats25-print,#stats25-pdf');if(!b)return;e.preventDefault();e.stopImmediatePropagation();make();},true);
  window.addEventListener('pagehide',()=>{if(objectUrl)URL.revokeObjectURL(objectUrl);});
  window.ASTHMA_PRINT297_TEST=Object.freeze({makePDF:make,getStatus:()=>info.textContent,hasPDF:()=>Boolean(output),getPDF:()=>output,selected:picks});

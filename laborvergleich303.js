@@ -84,7 +84,7 @@
    if(f==='flags'&&!['high','low'].includes(x.assessment.kind))return false;
    if(f==='asthma'&&!/Asthma|Allergie/i.test(category)&&!['eosAbs','eosPct','ecp','igeTotal','igeSpecific'].includes(r.marker))return false;
    if(f==='gas'&&!/Blutgas|Säure-Basen/i.test(category)&&!['po2','pco2','ph','hco3','lactate'].includes(r.marker))return false;
-   if(f==='changed'&&(!x.previous||num(r.value)===num(x.previous.value)))return false;
+   if(f==='changed'&&(!x.previous||num(r.value)===null||num(x.previous.value)===null||String(r.unit||'')!==String(x.previous.unit||'')||num(r.value)===num(x.previous.value)))return false;
    return !s||[r.label,r.marker,r.allergen,r.category].some(v=>String(v||'').toLocaleLowerCase('de').includes(s));
   }).sort((x,y)=>{
    if(f==='all'){

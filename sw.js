@@ -1,5 +1,5 @@
-/* Asthma 3.0.2: neue Lungenfunktionsdatei und Parser bevorzugt vom Server laden. */
-const VERSION='3.0.3-offline-laborvergleich';
+/* Asthma 3.0.4: vorgeprüfter Cache mit Offline-Fallback. */
+const VERSION='3.0.4-audit-offline';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
  './','./index.html','./styles.css','./content.js','./app.js','./antraege-data.js','./antraege.js',
