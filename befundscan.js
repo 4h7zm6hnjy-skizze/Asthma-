@@ -1,64 +1,139 @@
 'use strict';
-/* Scanner 1.8: keine Netzwerkanfragen und keine automatische Übernahme ohne Prüfung. */
+/* Asthma 3.0.2: iPhone Lungenfunktionsscanner mit dateibasiertem Offline-Import.
+   Keine Cloud, keine eingebetteten Patientendaten. Schreibt nur in entsperrten Tresor. */
 (()=>{
- const $=id=>document.getElementById(id),SEC=window.ASTHMA_SECURITY,bridge=window.ASTHMA_PROFILE_BRIDGE,parser=window.ASTHMA_REPORT18;
+ const $=id=>document.getElementById(id), SEC=window.ASTHMA_SECURITY,
+  bridge=window.ASTHMA_PROFILE_BRIDGE, parser=window.ASTHMA_REPORT18;
  if(!$('scan-panel')||!SEC||!bridge||!parser)return;
- const ids={fev1:'scan-fev1-percent',fvc:'scan-fvc-percent',fev1Liters:'scan-fev1-liters',fvcLiters:'scan-fvc-liters',ratio:'scan-ratio'};
- let file=null,objectURL=null,parsed=null,busy=false;
- const format=n=>n===null||n===undefined?'':String(n).replace('.',',');
- const note=(text,err=false)=>{const el=$('scan-progress');el.textContent=text;el.classList.toggle('scan-error',err)};
- const el=(name,cl,text)=>{const n=document.createElement(name);if(cl)n.className=cl;if(text!==undefined)n.textContent=text;return n};
- const num=(s,max)=>{s=String(s??'').trim().replace(',','.');if(!s)return null;if(!/^\d+(?:\.\d+)?$/.test(s))throw Error('Bitte nur Zahlen mit Komma oder Punkt eintragen.');const n=Number(s);if(n<0||n>max||!Number.isFinite(n))throw Error('Zahl außerhalb des zulässigen Bereichs 0–'+max);return n};
- function reset(){parsed=null;$('scan-review').hidden=true;$('scan-raw').value='';$('scan-date').value='';$('scan-review-warnings').textContent='';for(const id of Object.values(ids))$(id).value='';$('scan-extended-rows')?.replaceChildren()}
- function clearFile(){if(objectURL)URL.revokeObjectURL(objectURL);objectURL=null;file=null;$('scan-preview').removeAttribute('src');$('scan-picked').hidden=true;$('scan-gallery').value='';$('scan-camera').value=''}
- function pick(f){if(busy||!f)return;if(!f.type.startsWith('image/')&& !/\.(jpg|jpeg|png|webp|heic|heif)$/i.test(f.name)){note('Bitte ein Bild wählen.',true);return}if(f.size>18*1024*1024){note('Bild zu groß (max. 18 MB).',true);return}reset();clearFile();file=f;objectURL=URL.createObjectURL(f);$('scan-preview').src=objectURL;$('scan-filename').textContent=f.name+' · '+(f.size/1024/1024).toFixed(1)+' MB';$('scan-picked').hidden=false;note('Foto ausgewählt. Lokale Texterkennung versuchen oder iPhone-Live-Text kopieren und unten einfügen.');}
- function table(parsed){const host=$('scan-extended-rows');host.replaceChildren();
-  for(const item of parsed.rows){const row=el('article','scan-metric-row'),title=el('strong','',item.label),flag=el('span','scan-confidence '+(item.confidence==='hoch'?'scan-high':'scan-uncertain'),item.confidence==='hoch'?'Spalte plausibel':'Bitte besonders prüfen');
-   const check=el('input');check.type='checkbox';check.className='scan-row-enabled';check.dataset.metric=item.key;check.checked=item.confidence==='hoch'||item.key==='ratio';check.setAttribute('aria-label',item.label+' übernehmen');
-   const makeField=(label,val,field)=>{const lab=el('label','',label),inp=el('input');inp.type='text';inp.inputMode='decimal';inp.className='scan-table-input';inp.dataset.part=field;inp.value=format(val);inp.placeholder='–';lab.append(inp);return lab};
-   const head=el('div','scan-metric-head');const left=el('label','scan-checkline');left.append(check,title);head.append(left,flag);row.append(head);
-   const grid=el('div','scan-metric-grid');grid.append(makeField('Soll',item.predicted,'predicted'),makeField('Ist ('+item.unit+')',item.measured,'measured'),makeField('% vom Soll',item.pct,'pct'));row.append(grid,el('small','scan-original-line','Befundzeile: '+item.line));row.dataset.metric=item.key;row.dataset.phase=item.phase;host.append(row);
+ const IDS={fev1:'scan-fev1-percent',fvc:'scan-fvc-percent',fev1Liters:'scan-fev1-liters',fvcLiters:'scan-fvc-liters',ratio:'scan-ratio'};
+ let parsed=null,file=null,objectURL=null,busy=false,sourceType='scanner';
+ const e=(tag,cls,text)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(text!==undefined)x.textContent=text;return x};
+ const fmt=x=>x===null||x===undefined?'':String(x).replace('.',',');
+ const status=(text,bad=false)=>{const el=$('scan-progress');el.textContent=text;el.classList.toggle('scan-error',bad)};
+ const num=(value,max=400)=>{const v=String(value??'').trim().replace(',','.');if(v==='')return null;if(!/^\d+(?:\.\d+)?$/.test(v))throw Error('Bitte nur Zahlen eintragen.');const n=Number(v);if(!Number.isFinite(n)||n>max)throw Error('Wert über zulässigem Bereich: '+v);return n;};
+ const validDate=x=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(x||''))return false;const d=new Date(x+'T12:00:00Z');return !Number.isNaN(d.getTime())&&d.toISOString().slice(0,10)===x};
+ const uuid=()=>crypto.randomUUID?.()||Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join('');
+ function clearFile(){if(objectURL)URL.revokeObjectURL(objectURL);objectURL=null;file=null;const p=$('scan-preview');if(p)p.removeAttribute('src');$('scan-picked').hidden=true;$('scan-gallery').value='';$('scan-camera').value='';}
+ function reset(){parsed=null;sourceType='scanner';$('scan-review').hidden=true;$('scan-raw').value='';$('scan-date').value='';$('scan-review-warnings').textContent='';$('scan-extended-rows').replaceChildren();for(const id of Object.values(IDS))$(id).value='';}
+ function pick(f){if(!f||busy)return;
+  if(!f.type.startsWith('image/')&&!/\.(jpg|jpeg|png|webp|heic|heif)$/i.test(f.name)){status('Bitte ein Foto auswählen.',true);return}
+  if(f.size>18*1024*1024){status('Bild über 18 MB.',true);return}
+  reset();clearFile();file=f;objectURL=URL.createObjectURL(f);$('scan-preview').src=objectURL;
+  $('scan-filename').textContent=f.name+' · '+(f.size/1048576).toFixed(1)+' MB';$('scan-picked').hidden=false;
+  status('Bild ausgewählt. Bitte iPhone-Texterkennung verwenden oder den kopierten Befundtext auswerten.');
+ }
+ function drawTable(data){const out=$('scan-extended-rows');out.replaceChildren();
+  for(const r of data.rows){
+   const card=e('article','scan-metric-row');card.dataset.metric=r.key;card.dataset.phase=r.phase||'unbekannt';
+   const head=e('div','scan-metric-head'), lab=e('label','scan-checkline');const check=e('input');
+   check.type='checkbox';check.className='scan-row-enabled';check.checked=r.confidence==='hoch'||r.key==='ratio';check.setAttribute('aria-label',r.label+' übernehmen');
+   lab.append(check,e('strong','',r.label));head.append(lab,e('span','scan-confidence '+(r.confidence==='hoch'?'scan-high':'scan-uncertain'),r.confidence==='hoch'?'Werte plausibel':'Bitte Original kontrollieren'));
+   card.append(head);const grid=e('div','scan-metric-grid');
+   for(const [part,title,value] of [['predicted','Soll',r.predicted],['measured','Ist ('+r.unit+')',r.measured],['pct','% vom Soll',r.pct]]){
+    const label=e('label','',title),input=e('input');input.type='text';input.inputMode='decimal';input.className='scan-table-input';input.dataset.part=part;input.value=fmt(value);input.placeholder='–';label.append(input);grid.append(label);
+   }
+   card.append(grid,e('small','scan-original-line','Original: '+String(r.line||'').slice(0,160)));out.append(card);
   }
  }
- function show(text){parsed=parser.parse(text);$('scan-review').hidden=false;const phases=[...new Set(parsed.rows.map(r=>r.phase))];if(phases.length===1&&['vor','nach'].includes(phases[0]))$('scan-phase').value=phases[0];table(parsed);const val=parser.profileValues(parsed,$('scan-phase').value);for(const [key,id] of Object.entries(ids))$(id).value=format(val[key]);$('scan-date').value=val.date||'';let warns=parsed.warnings.join(' ');if(parsed.rows.length)warns+=' Markierte Tabellenwerte werden nur nach deiner Bestätigung übernommen.';$('scan-review-warnings').textContent=warns||'Bitte Befund sorgfältig vergleichen.';note(parsed.rows.length?parsed.rows.length+' Messwertzeilen gefunden. Kontrolliere jede Zahl und die Messphase.':'Keine sichere automatische Zuordnung. Werte anhand des Fotos manuell erfassen.',!parsed.rows.length)}
- async function textFromImage(){if(!file)throw Error('Bitte zuerst ein Foto auswählen.');if(!('TextDetector' in window))throw Error('Dieser Browser bietet keine lokale Foto-Texterkennung. Auf dem iPhone: Foto in „Fotos“ öffnen → Text markieren/kopieren (Live Text) → hier in „Befundtext“ einfügen. Deine Daten werden dabei nicht an einen App-Server geschickt.');const image=await createImageBitmap(file);try{const c=document.createElement('canvas');const scale=Math.min(2,3000/Math.max(image.width,image.height));c.width=Math.round(image.width*scale);c.height=Math.round(image.height*scale);c.getContext('2d').drawImage(image,0,0,c.width,c.height);const results=await new TextDetector().detect(c);return results.sort((a,b)=>(a.boundingBox?.y||0)-(b.boundingBox?.y||0)).map(x=>x.rawValue).join('\n')}finally{image.close()}}
- async function scan(){if(busy)return;busy=true;$('scan-start').disabled=true;try{note('Prüfe, ob eine lokale Texterkennung verfügbar ist …');const raw=await textFromImage();$('scan-raw').value=raw;show(raw)}catch(e){$('scan-review').hidden=false;note(e.message,true)}finally{busy=false;$('scan-start').disabled=false}}
- async function pasteClipboard(){try{const text=await navigator.clipboard.readText();if(!text.trim())throw Error('Zwischenablage enthält keinen Text');$('scan-raw').value=text;show(text)}catch(e){note('Kopierten Text im Textfeld über „Einfügen“ einsetzen und „Text auswerten“ antippen. '+e.message,true);$('scan-review').hidden=false;$('scan-raw').focus()}}
- function extended(){const list=[];for(const row of document.querySelectorAll('#scan-extended-rows .scan-metric-row')){
-   if(!row.querySelector('.scan-row-enabled').checked)continue;
-   const get=f=>num(row.querySelector('[data-part="'+f+'"]').value,f==='pct'?400:(row.dataset.metric.startsWith('ratio')?120:30));
-   const o={key:row.dataset.metric,phase:row.dataset.phase,predicted:get('predicted'),measured:get('measured'),pct:get('pct')};
-   if(o.measured===null)throw Error('Bei '+o.key+' fehlt der geprüfte Istwert.');
-   if(o.predicted>0&&o.pct!==null&&Math.abs(100*o.measured/o.predicted-o.pct)>5)throw Error('Bei '+o.key+' widersprechen sich Soll, Ist und Prozentwerte. Bitte Zeile erneut prüfen.');
-   list.push(o);
-  }return list;
+ function showResult(data,type='scanner'){
+  parsed=data;sourceType=type;
+  $('scan-review').hidden=false;
+  const phases=[...new Set(data.rows.map(x=>x.phase))];if(phases.length===1&&['vor','nach'].includes(phases[0]))$('scan-phase').value=phases[0];else $('scan-phase').value='unbekannt';
+  drawTable(data);const values=parser.profileValues(data,$('scan-phase').value);
+  for(const [field,id] of Object.entries(IDS))$(id).value=fmt(values[field]);
+  $('scan-date').value=validDate(values.date)?values.date:'';
+  $('scan-review-warnings').textContent=(data.warnings||[]).join(' ')||'Werte mit dem Original vergleichen.';
+  status(data.rows.length+' Tabellenwerte erkannt. Jetzt unten die Kontrollfelder prüfen und „Geprüfte Werte übernehmen“ drücken.',!data.rows.length);
+  if(data.rows.length)$('scan-review').scrollIntoView({block:'start',behavior:'smooth'});
  }
- async function apply(){if(busy)return;busy=true;$('scan-apply').disabled=true;try{
-  const vals={};for(const [k,id] of Object.entries(ids))vals[k]=num($(id).value,['fev1','fvc','ratio'].includes(k)?100:12);
-  const d=$('scan-date').value;if(d&& !/^\d{4}-\d\d-\d\d$/.test(d))throw Error('Untersuchungsdatum fehlt oder ist ungültig.');
-  let metrics=extended();if(parsed){for(const r of parsed.rows){if(!metrics.some(m=>m.key===r.key&&m.phase===r.phase)){if(r.key==='fev1'){vals.fev1=null;vals.fev1Liters=null}if(r.key==='fvcEx'){vals.fvc=null;vals.fvcLiters=null}if(r.key==='ratio')vals.ratio=null}}}for(const metric of metrics){if(metric.key==='fev1'){vals.fev1=metric.pct;vals.fev1Liters=metric.measured;}if(metric.key==='fvcEx'){vals.fvc=metric.pct;vals.fvcLiters=metric.measured;}if(metric.key==='ratio')vals.ratio=metric.measured;}
-  if([vals.fev1,vals.fvc,vals.fev1Liters,vals.fvcLiters].every(x=>x===null))throw Error('Bitte mindestens FEV₁ oder FVC kontrolliert eingeben.');
-  if(vals.fev1Liters!==null&&vals.fvcLiters!==null&&vals.fev1Liters>vals.fvcLiters)throw Error('FEV₁-Literwert darf nicht größer als FVC exspiratorisch sein.');
-  if(vals.ratio!==null&&vals.fev1Liters!==null&&vals.fvcLiters>0&&Math.abs(100*vals.fev1Liters/vals.fvcLiters-vals.ratio)>5)throw Error('FEV₁/FVC weicht von den exspiratorischen Literwerten ab. Bitte Originalbefund prüfen.');
-  if(!d){if(!confirm('Kein Testdatum eingetragen. Messung trotzdem mit heutigem Datum archivieren?'))return;}
-  if(!confirm('Hast du die Messwerte, Messphase und Qualitätshinweise anhand des Originalbildes überprüft? Nur mit „OK“ werden sie verschlüsselt gespeichert.'))return;
-  const date=d||new Date().toISOString().slice(0,10),phase=$('scan-phase').value;
-  const old=bridge.get(), next={...old};if(vals.fev1!==null)next.fev1=vals.fev1;if(vals.fvc!==null)next.fvc=vals.fvc;
-  if(vals.fev1Liters!==null)next.fev1Liters=vals.fev1Liters;if(vals.fvcLiters!==null)next.fvcLiters=vals.fvcLiters;next.lungDate=date;
-  const prev=(await SEC.list('suite')).filter(x=>x.type==='measurements').map(x=>x.value);
-  if(prev.some(x=>x.date===date&&x.phase===phase&&x.fev1===vals.fev1&&x.fvc===vals.fvc&&x.fev1Liters===vals.fev1Liters&&x.fvcLiters===vals.fvcLiters))throw Error('Diese Messung ist im Verlauf bereits vorhanden.');
-  const measurement={id:(crypto.randomUUID?.()||Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x.toString(16).padStart(2,'0')).join('')),date,phase,source:'scanner',fev1:vals.fev1,fvc:vals.fvc,fev1Liters:vals.fev1Liters,fvcLiters:vals.fvcLiters,ratio:vals.ratio,metrics,qualityWarnings:parsed?.warnings||[],reviewed:true,createdAt:new Date().toISOString()};
-  await SEC.put('suite',{key:'measurements/'+measurement.id,type:'measurements',value:measurement},'measurements/'+measurement.id);
-  bridge.setLung(next);window.dispatchEvent(new CustomEvent('asthma:lung-imported',{detail:{saved:true}}));
-  note('Befunddatum, geprüfte Werte und gesamte Messwerttabelle verschlüsselt gespeichert. Der Befund erscheint im Verlauf und Kalender.');reset();clearFile();
- }catch(e){$('scan-review-warnings').textContent=e.message;note('Speicherung abgebrochen: '+e.message,true)}finally{busy=false;$('scan-apply').disabled=false}}
- $('scan-gallery').addEventListener('change',e=>pick(e.target.files?.[0]));$('scan-camera').addEventListener('change',e=>pick(e.target.files?.[0]));
+ const showText=text=>showResult(parser.parse(text),'scanner');
+ async function paste(){try{const s=await navigator.clipboard.readText();if(!s.trim())throw Error('Zwischenablage leer');$('scan-raw').value=s;showText(s)}
+ catch(err){status('Text bitte direkt ins Feld einsetzen und „Text auswerten“ drücken. '+err.message,true);$('scan-raw').focus();}}
+ async function pictureText(){if(!file)throw Error('Bitte erst Foto auswählen.');
+  if(!('TextDetector' in window))throw Error('iPhone-Safari bietet hier keine direkte Foto-Texterkennung: Foto öffnen, Live Text kopieren, im Feld einfügen und auswerten.');
+  const bmp=await createImageBitmap(file);try{const canvas=document.createElement('canvas');const scale=Math.min(2,3000/Math.max(bmp.width,bmp.height));canvas.width=Math.round(bmp.width*scale);canvas.height=Math.round(bmp.height*scale);canvas.getContext('2d').drawImage(bmp,0,0,canvas.width,canvas.height);
+   return (await new TextDetector().detect(canvas)).sort((a,b)=>(a.boundingBox?.y||0)-(b.boundingBox?.y||0)).map(x=>x.rawValue).join('\n')}
+  finally{bmp.close()}
+ }
+ async function scan(){if(busy)return;busy=true;$('scan-start').disabled=true;try{status('Lokale Texterkennung wird geprüft ...');const text=await pictureText();$('scan-raw').value=text;showText(text)}catch(err){$('scan-review').hidden=false;status(err.message,true)}finally{busy=false;$('scan-start').disabled=false}}
+ function extended(){const out=[];
+  for(const row of document.querySelectorAll('#scan-extended-rows .scan-metric-row')){
+   if(!row.querySelector('.scan-row-enabled').checked)continue;
+   const key=row.dataset.metric;
+   const get=part=>num(row.querySelector('[data-part="'+part+'"]').value,part==='pct'?400:key.startsWith('ratio')?120:30);
+   const r={key,phase:row.dataset.phase,predicted:get('predicted'),measured:get('measured'),pct:get('pct')};
+   if(r.measured===null)throw Error('Fehlender Istwert: '+key);
+   if(r.predicted>0&&r.pct!==null&&Math.abs(100*r.measured/r.predicted-r.pct)>5)throw Error('Soll/Ist/% bei '+key+' stimmen nicht überein. Bitte Original kontrollieren.');
+   out.push(r);
+  }return out;
+ }
+ async function apply(){if(busy)return;busy=true;$('scan-apply').disabled=true;
+  try{
+   const values={};for(const [k,id] of Object.entries(IDS))values[k]=num($(id).value,['fev1','fvc','ratio'].includes(k)?100:12);
+   const date=$('scan-date').value;if(!validDate(date))throw Error('Bitte ein gültiges Untersuchungsdatum eintragen.');
+   const metrics=extended();if(parsed){for(const r of parsed.rows){if(!metrics.some(m=>m.key===r.key&&m.phase===r.phase)){
+    if(r.key==='fev1'){values.fev1=null;values.fev1Liters=null}if(r.key==='fvcEx'){values.fvc=null;values.fvcLiters=null}if(r.key==='ratio')values.ratio=null;
+   }}}
+   for(const m of metrics){if(m.key==='fev1'){values.fev1=m.pct;values.fev1Liters=m.measured}
+    if(m.key==='fvcEx'){values.fvc=m.pct;values.fvcLiters=m.measured}if(m.key==='ratio')values.ratio=m.measured;
+   }
+   if([values.fev1,values.fvc,values.fev1Liters,values.fvcLiters].every(v=>v===null))throw Error('FEV₁ oder FVCex fehlt. Bitte Tabellenzeilen aktivieren und überprüfen.');
+   if(values.fev1Liters!==null&&values.fvcLiters!==null&&values.fev1Liters>values.fvcLiters)throw Error('FEV₁ darf nicht größer als FVCex in Liter sein.');
+   if(values.ratio!==null&&values.fev1Liters!==null&&values.fvcLiters>0&&Math.abs(100*values.fev1Liters/values.fvcLiters-values.ratio)>5)throw Error('FEV₁/FVC ist mit den Literwerten nicht konsistent. Messphase beachten.');
+   if(!confirm('Hast du Datum, Messphase und Zahlen mit dem Originalbefund verglichen und möchtest sie verschlüsselt speichern?'))return;
+   const phase=$('scan-phase').value;
+   const previous=(await SEC.list('suite')).filter(x=>x.type==='measurements').map(x=>x.value).filter(Boolean);
+   if(previous.some(x=>x.date===date&&x.phase===phase&&x.fev1===values.fev1&&x.fvc===values.fvc&&x.fev1Liters===values.fev1Liters&&x.fvcLiters===values.fvcLiters)){
+    status('Diese Lungenfunktion ist bereits gespeichert. Es wurde keine doppelte Messung angelegt.');return;
+   }
+   const item={id:uuid(),date,phase,source:sourceType,fev1:values.fev1,fvc:values.fvc,fev1Liters:values.fev1Liters,fvcLiters:values.fvcLiters,ratio:values.ratio,
+    metrics,qualityWarnings:parsed?.warnings||[],reviewed:true,createdAt:new Date().toISOString()};
+   await SEC.put('suite',{key:'measurements/'+item.id,type:'measurements',value:item},'measurements/'+item.id);
+   let warning='';try{const p=bridge.get();bridge.setLung({...p,
+    fev1:values.fev1??p.fev1,fvc:values.fvc??p.fvc,fev1Liters:values.fev1Liters??p.fev1Liters,
+    fvcLiters:values.fvcLiters??p.fvcLiters,lungDate:date});}
+   catch(err){warning=' Profilanzeige konnte nicht aktualisiert werden: '+err.message}
+   window.dispatchEvent(new CustomEvent('asthma:lung-imported',{detail:{saved:true}}));
+   reset();clearFile();status('Erfolgreich: Lungenfunktionswerte vom '+date.slice(8)+'.'+date.slice(5,7)+'.'+date.slice(0,4)+' verschlüsselt gespeichert. Öffne „Lungenfunktion“ für den Verlauf.'+warning);
+  }catch(err){$('scan-review-warnings').textContent=err.message;status('Speichern nicht möglich: '+err.message,true);$('scan-review').hidden=false;}
+  finally{busy=false;$('scan-apply').disabled=false}
+ }
+ function jsonResult(o){
+  if(!o||typeof o!=='object'||!validDate(o.date)||!Array.isArray(o.measurements)||o.measurements.length<1||o.measurements.length>100)throw Error('Datei enthält keinen gültigen Lungenfunktionstest.');
+  const map={FEV1:'fev1','FEV₁':'fev1',FVCex:'fvcEx',FVCin:'fvcIn',VC:'vc',PEF:'pef',TLC:'tLC',RV:'rV',TGV:'tgv',MEF25:'mef25',MEF50:'mef50',MEF75:'mef75',Rawtot:'raw',sRawtot:'sRaw',FEV1_FVCex:'ratio',FEV1_FVCin:'ratioFVCin',FEV1_VC:'ratioVC',RV_TLC:'ratioRV',Rawin:'rawIn',Rawex:'rawEx'};
+  const rows=[],warnings=[],known=new Set();
+  for(const m of o.measurements){const marker=String(m.marker||'');const key=map[marker];if(!key){warnings.push('Nicht zugeordnet: '+marker.slice(0,40));continue}
+   if(known.has(key)){warnings.push('Doppelt im Dokument: '+marker);continue}
+   const measured=num(m.value,key.startsWith('ratio')?120:30),predicted=num(m.predicted,150),pct=num(m.percentPredicted,400);
+   if(measured===null)continue;known.add(key);
+   const defs=parser.defs[key],confidence=predicted>0&&pct!==null&&Math.abs(100*measured/predicted-pct)<=5?'hoch':'mittel';
+   rows.push({key,label:defs?.label||marker,unit:defs?.unit||String(m.unit||'').slice(0,30),phase:['vor','nach'].includes(o.phase)?o.phase:'unbekannt',measured,predicted,pct,confidence,line:marker+' Soll '+(predicted??'–')+' Ist '+measured+' Prozent '+(pct??'–')});
+  }
+  if(!rows.some(x=>x.key==='fev1'||x.key==='fvcEx'))throw Error('Die Datei enthält keinen eindeutig zugeordneten FEV₁- oder FVCex-Wert.');
+  if(!['vor','nach'].includes(o.phase))warnings.push('Messphase vor/nach Bronchodilatator nicht angegeben: Bitte Original kontrollieren.');
+  return {date:o.date,rows,warnings};
+ }
+ function installJSON(){const actions=$('scan-panel').querySelector('.scan-actions');if(!actions)return;
+  const block=e('div','scan-actions');const lab=e('label','btn btn-outline','Lungenfunktion (.json) direkt importieren');lab.classList.add('scan-file-button');
+  const input=e('input');input.type='file';input.accept='.json,application/json';input.hidden=true;lab.append(input);block.append(lab);
+  const guide=e('p','input-note','Für die vorbereitete Lungenfunktionsdatei. Nicht für Blutwerte-JSON. Die Werte werden erst nach Bestätigung gespeichert.');
+  actions.insertAdjacentElement('afterend',block);block.insertAdjacentElement('afterend',guide);
+  input.addEventListener('change',async()=>{try{const f=input.files?.[0];if(!f)return;if(f.size>1024*1024)throw Error('Datei größer als 1 MB.');const o=JSON.parse(await f.text()),result=jsonResult(o);
+    reset();clearFile();showResult(result,'scanner-json');status(result.rows.length+' Lungenfunktionswerte aus der Datei erkannt. Bitte unten prüfen und speichern.');
+   }catch(err){status('Lungenfunktion-Datei konnte nicht gelesen werden: '+err.message,true)}finally{input.value=''}});
+ }
+ $('scan-gallery').addEventListener('change',ev=>pick(ev.target.files?.[0]));$('scan-camera').addEventListener('change',ev=>pick(ev.target.files?.[0]));
  $('scan-start').textContent='Lokale Fotoerkennung versuchen';$('scan-start').addEventListener('click',scan);
- $('scan-paste')?.addEventListener('click',pasteClipboard);
- $('scan-reparse').addEventListener('click',()=>show($('scan-raw').value));
- $('scan-clear').addEventListener('click',()=>{reset();clearFile();note('Foto verworfen.')});$('scan-discard').addEventListener('click',()=>{reset();clearFile();note('Scan verworfen.')});
- $('scan-phase').addEventListener('change',()=>{if(parsed)show($('scan-raw').value)});
+ $('scan-paste')?.addEventListener('click',paste);$('scan-reparse').addEventListener('click',()=>showText($('scan-raw').value));
+ $('scan-clear').addEventListener('click',()=>{reset();clearFile();status('Foto verworfen.')});
+ $('scan-discard').addEventListener('click',()=>{reset();clearFile();status('Befund verworfen.')});
+ $('scan-phase').addEventListener('change',()=>{if(!parsed)return;const v=parser.profileValues(parsed,$('scan-phase').value);for(const [field,id] of Object.entries(IDS))$(id).value=fmt(v[field]);status('Messphase gewählt – Werte anhand des Originalbefunds prüfen.');});
  $('scan-apply').addEventListener('click',apply);
- window.addEventListener('pagehide',()=>clearFile());
- window.__asthmaScanner18Test=Object.freeze({parse:parser.parse});
+ window.addEventListener('pagehide',clearFile);
+ window.__asthmaScanner18Test=Object.freeze({parse:parser.parse,jsonResult});
+ window.ASTHMA_APP_VERSION='3.0.2';
+ if($('version-chip'))$('version-chip').textContent='v3.0.2';
+ if($('footer-version'))$('footer-version').textContent='3.0.2';
+ if($('update-status'))$('update-status').textContent='Lungenfunktions-Scanner aktualisiert: 3.0.2';
+ installJSON();
 })();

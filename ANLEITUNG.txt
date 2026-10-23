@@ -1,54 +1,34 @@
-PhysioSport + Lungenfunktion (Erweiterung fuer bestehende Asthma-Webapp 2.9.7)
-23. Oktober 2026
+ASTHMA-WEBAPP 3.0.2 – LUNGENFUNKTION
+===================================
 
-WICHTIG: NICHT DIE PRIVATE JSON-DATEI AUF GITHUB HOCHLADEN!
-Das Repository 4h7zm6hnjy-skizze/Asthma- ist oeffentlich.
+Bitte vor dem Update in der App unter EINSTELLUNGEN eine verschlüsselte Sicherung erzeugen.
 
-A) WEBAPP ERWEITERN (iPhone, GitHub)
+1. Entpacke dieses ZIP auf deinem iPhone in der Dateien-App.
+2. Öffne dein GitHub-Projekt 4h7zm6hnjy-skizze/Asthma-.
+3. Ersetze im Hauptverzeichnis die folgenden DREI Dateien mit den gleichnamigen Dateien aus dem Ordner:
+      befundscan.js
+      sw.js
+      version.json
+   Die Dateien müssen im Stammverzeichnis stehen, nicht in einem neuen Unterordner.
+4. Änderungen in GitHub speichern (Commit changes).
+5. Webapp nach dem Veröffentlichen neu laden, bei Bedarf einmal schließen und erneut öffnen.
 
-1. GitHub-Repository oeffnen:
-   https://github.com/4h7zm6hnjy-skizze/Asthma-
-2. Auf dem Branch main die Datei physiosport298.js aus diesem ZIP als
-   neue Datei hochladen und Aenderung committen.
-3. Im selben Repository die vorhandene index.html bearbeiten.
-   DIREKT VOR </head> diese eine Zeile einfuegen:
+DANACH:
+- Asthma-App öffnen, mit dem bisherigen Passwort entsperren.
+- "Befunde" öffnen.
+- Neuer Knopf: "Lungenfunktion (.json) direkt importieren".
+- Vorbereitete Datei "Lungenfunktion_2025_09_17_Import.json" aus Downloads auswählen.
+- Kontrollansicht prüfen und auf "Geprüfte Werte übernehmen" tippen.
+- Die Speicherung wird ausdrücklich bestätigt. Die fertigen Werte erscheinen unter "Lungenfunktion".
 
-   <script defer src="./physiosport298.js?v=2.9.8"></script>
+Wenn du den Lungenfunktionstest schon als Live-Text in der App siehst:
+- "Text auswerten" antippen.
+- Die App springt zur Kontrollansicht.
+- Prüfen, dann "Geprüfte Werte übernehmen".
 
-   Die bestehende index.html sonst NICHT ersetzen oder loeschen.
-   Die Aenderung committen.
-4. Die vorhandene Webapp neu oeffnen/neu laden und mit dem bisherigen
-   Passwort entsperren. Der Bereich "PhysioSport – Krankengymnastik"
-   erscheint im Kalender; zusaetzliche Werte erscheinen unter Lungenfunktion.
-
-B) EIGENE TERMINE UND BEFUND IMPORTIEREN
-
-5. Die Datei PhysioSport_und_Lungenfunktion_23-10-2026.json
-   NUR auf dem eigenen Geraet in Dateien speichern.
-6. In der entsperrten App: Kalender > "Private Termine und Befund importieren"
-   und die JSON-Datei aus der Dateien-App waehlen.
-7. Die angezeigten Daten pruefen und den Import bestaetigen.
-   Die App verwendet den bestehenden lokal verschluesselten Tresor.
-8. Status (Offen/Erledigt/Abgesagt/Verschoben), Haken, Notizen sowie
-   Datum und Uhrzeit lassen sich danach im Bereich PhysioSport aendern.
-   Abgesagt markiert lediglich den Termin in der App und sagt NICHT
-   automatisch bei der Praxis ab.
-
-DATENSICHERUNG
-Vorher: In den Einstellungen ein vollstaendiges verschluesseltes Backup
-mit eigenem Passwort erstellen. Bestehende Browser-Daten nicht loeschen.
-
-FEHLER / EINSCHRAENKUNGEN
-- GitHub-Schreibzugriff war fuer die angeschlossene Integration nicht
-  verfuegbar (HTTP 403). Diese ZIP-Datei ist deswegen ein manuell
-  hochzuladendes Update, KEIN auf GitHub eingespieltes Update.
-- Das Erweiterungsmodul wurde syntaktisch geprueft; ein kompletter
-  Browser-Funktionstest auf deinem iPhone ist nicht erfolgt.
-- Die eigentliche Webapp meldet weiterhin 2.9.7, solange keine offizielle
-  Versionserhoehung in allen Projektdateien vorgenommen wurde.
-- Bei bereits anders bearbeiteten/verschobenen Terminen wird ein erneuter
-  Import vorhandene Eintraege nicht ueberschreiben.
-- PhysioSport-Eintraege bitte im PhysioSport-Bereich bearbeiten (nicht
-  mit dem generischen Kalenderformular), damit Spezialfelder erhalten bleiben.
-- Der Klinik-Ausdruck enthaelt ATS-Qualitaetswarnhinweise. Die medizinische
-  Interpretation sollte aerztlich geklaert werden.
+WICHTIG:
+- Kein automatisches Speichern ohne Bestätigung.
+- Keine vorhandenen Messungen löschen; doppelte Untersuchungen werden erkannt.
+- JSON-Dateien mit Labor-/Blutwerten gehören nur in die Laborakte, nicht in den Lungenfunktionsscanner.
+- Die mitgelieferte 2026-Datei wurde aus den sichtbaren Zahlen deines Screenshots erstellt; Messphase und Zahlen vor Speicherung mit Original vergleichen.
+- Weder die Befunddatei noch andere Gesundheitsdaten dürfen in das öffentliche GitHub-Projekt hochgeladen werden.

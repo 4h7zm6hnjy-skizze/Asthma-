@@ -1,5 +1,5 @@
 {
-  "version": "3.0.1",
+  "version": "3.0.2",
   "released": "2026-10-23",
-  "notes": "Laborakte Plus mit 147 voreingetragenen Untersuchungen, JSON-Import, gesonderter Laborstatistik mit durchgezogenen Messwertlinien und Referenzen, Änderungsübersicht, geschützter Speicherung, CSV-Export sowie unverändertem Datenbestand."
+  "notes": "Lungenfunktion: korrigierte Scanner-Übernahme, direkte Importmöglichkeit für vorbereitete Lungenfunktions-JSON-Dateien, klare Prüfung und Speicherung. Keine Änderungen an bestehenden verschlüsselten Werten, Laborakte oder Statistik."
 }
