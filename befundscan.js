@@ -131,9 +131,6 @@
  $('scan-apply').addEventListener('click',apply);
  window.addEventListener('pagehide',clearFile);
  window.__asthmaScanner18Test=Object.freeze({parse:parser.parse,jsonResult});
- window.ASTHMA_APP_VERSION='3.0.2';
- if($('version-chip'))$('version-chip').textContent='v3.0.2';
- if($('footer-version'))$('footer-version').textContent='3.0.2';
- if($('update-status'))$('update-status').textContent='Lungenfunktions-Scanner aktualisiert: 3.0.2';
+ // Der Scanner darf die globale App-Version nicht verändern.
  installJSON();
 })();

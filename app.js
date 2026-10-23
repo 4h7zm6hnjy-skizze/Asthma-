@@ -1,6 +1,6 @@
 'use strict';
 (() => {
-  const VERSION = '3.0.4';
+  const VERSION = '3.0.5';
   window.ASTHMA_APP_VERSION = VERSION;
   const STORAGE = 'asthma-v1-preferences';
   const sources = window.ASTHMA_SOURCES || {};
@@ -94,25 +94,69 @@
     if(!/^v?\d+\.\d+\.\d+$/.test(a)||!/^v?\d+\.\d+\.\d+$/.test(b))return null;
     const x=parse(a),y=parse(b);for(let i=0;i<3;i++){if(x[i]>y[i])return 1;if(x[i]<y[i])return -1;}return 0;
   }
+  // Ermittelt ausschließlich die veröffentlichte Programmversion; keine Nutzerdaten gehen ins Netz.
+  async function serverRelease(){
+    if(location.protocol==='file:')throw Error('Die App muss als Webseite geöffnet sein.');
+    const response=await fetch('./version.json?check='+Date.now(),{cache:'no-store'});
+    if(!response.ok)throw Error('Versionsdatei konnte nicht geladen werden (HTTP '+response.status+').');
+    const data=await response.json();
+    if(compareVersions(data.version,VERSION)===null)throw Error('Die Versionsnummer des Servers ist ungültig.');
+    return data;
+  }
   async function checkUpdate(){
-    const button=$('check-update');button.disabled=true;button.textContent='Prüfe…';
-    $('update-status').textContent='Versionsdatei auf deinem Hosting-Server wird geprüft…';
+    const button=$('check-update'),install=$('reload-app'),out=$('update-status');
+    if(button.disabled)return;
+    button.disabled=true;button.textContent='Prüfe…';
+    install.hidden=false;install.textContent='Update installieren';
+    out.textContent='Prüfe die aktuelle Version auf dem Server …';
     try{
-      if(location.protocol==='file:')throw new Error('file');
-      const response=await fetch('./version.json?check='+Date.now(),{cache:'no-store'});
-      if(!response.ok)throw new Error('http');
-      const data=await response.json();
-      const comparison=compareVersions(data.version,VERSION);
-      if(comparison===null)throw new Error('version');
-      if(comparison>0){
-        $('update-status').textContent=`Neue Version ${data.version} verfügbar (installiert: ${VERSION}). ${data.notes||''}`;
-        $('reload-app').hidden=false;
-        if('serviceWorker' in navigator)navigator.serviceWorker.getRegistration().then(reg=>reg?.update()).catch(()=>{});
-      }else if(comparison===0){$('update-status').textContent=`Du verwendest die aktuell auf diesem Server veröffentlichte Version ${VERSION}. Das ist keine automatische Prüfung von Gesetzesänderungen.`;$('reload-app').hidden=true;}
-      else{$('update-status').textContent=`Dieser Server meldet Version ${data.version}; geöffnet ist Version ${VERSION}. Bitte Hosting und Browser-Cache prüfen.`;$('reload-app').hidden=false;}
-    }catch(error){
-      $('update-status').textContent=location.protocol==='file:'?'Updateprüfung nur nach Veröffentlichung auf einem Webserver (z. B. GitHub Pages) möglich. Die heruntergeladene HTML-Datei funktioniert als Lesefassung auch ohne Server.':'Updateprüfung aktuell nicht möglich (offline oder Versionsdatei nicht erreichbar). Versuche es später bei bestehender Internetverbindung.';
-    }finally{button.disabled=false;button.textContent='Nach Updates suchen';}
+      const data=await serverRelease(),cmp=compareVersions(data.version,VERSION);
+      if(cmp>0)out.textContent='Version '+data.version+' ist verfügbar. Tippe auf „Update installieren“. '+(data.notes||'');
+      else if(cmp===0)out.textContent='Version '+VERSION+' ist aktuell. Mit „Update installieren“ kannst du die App-Dateien bei Anzeigeproblemen erneut laden.';
+      else out.textContent='Serverversion '+data.version+', geöffnete Version '+VERSION+'. Bitte die veröffentlichte App prüfen.';
+    }catch(e){out.textContent='Updateprüfung nicht möglich: '+e.message+' Prüfe deine Internetverbindung.';}
+    finally{button.disabled=false;button.textContent='Nach Updates suchen';}
+  }
+  let installingUpdate=false;
+  async function installUpdate(){
+    if(installingUpdate)return;
+    const button=$('reload-app'),out=$('update-status');
+    installingUpdate=true;button.disabled=true;button.textContent='Installiere …';
+    try{
+      const release=await serverRelease();
+      out.textContent='Lade App-Dateien für Version '+release.version+' …';
+      if('serviceWorker' in navigator){
+        const reg=await navigator.serviceWorker.getRegistration();
+        if(reg){
+          await reg.update();
+          const worker=reg.installing||reg.waiting;
+          if(worker){
+            if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});
+            if(worker.state!=='activated'&&worker.state!=='redundant'){
+              await Promise.race([
+                new Promise(resolve=>{
+                  const handler=()=>{if(worker.state==='installed'){
+                    worker.postMessage({type:'SKIP_WAITING'});
+                  }else if(worker.state==='activated'||worker.state==='redundant'){
+                    worker.removeEventListener('statechange',handler);resolve();}};
+                  worker.addEventListener('statechange',handler);handler();
+                }),
+                new Promise(resolve=>setTimeout(resolve,20000))
+              ]);
+            }
+          }
+        }
+      }
+      // A new URL forces a navigation. No IndexedDB/localStorage/health-record deletion.
+      const target=new URL(location.href);
+      target.searchParams.set('app_update',release.version);
+      target.searchParams.set('app_refresh',String(Date.now()));
+      out.textContent='Update geladen. Die App wird neu geöffnet …';
+      location.replace(target.href);
+    }catch(e){
+      out.textContent='Update konnte nicht installiert werden: '+e.message+'. Deine Daten bleiben erhalten.';
+      button.disabled=false;button.textContent='Update installieren';installingUpdate=false;
+    }
   }
   function updateConnection(){const el=$('connection');el.textContent=navigator.onLine?'Online · Offline-Inhalte vorhanden':'Offline · Inhalte verfügbar';}
   function bindEvents(){
@@ -125,7 +169,7 @@
     $('reset-filters').addEventListener('click',()=>{state.all=true;state.section='all';state.query='';$('search').value='';render()});
     $('check-update').addEventListener('click',checkUpdate);
     $('update-top').addEventListener('click',()=>{window.ASTHMA_NAV?.go('einstellungen');checkUpdate()});
-    $('reload-app').addEventListener('click',async()=>{ $('update-status').textContent='Aktualisiere die App-Dateien…';if('serviceWorker' in navigator){try{const reg=await navigator.serviceWorker.getRegistration();if(reg){await reg.update();if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});}}catch{}}location.reload()});
+    $('reload-app').addEventListener('click',installUpdate);
     $('forget').addEventListener('click',async()=>{if(!confirm('Achtung: Gesamtes gespeichertes Profil einschließlich persönlicher Angaben (Name, Adresse, Geburtsdatum, Gewicht) sowie GdB und Merkliste löschen? Vorher vollständiges Backup erstellen.'))return;try{await window.ASTHMA_SECURITY.profileClear()}catch(e){$('update-status').textContent='Löschen fehlgeschlagen: '+e.message;return;}state.gdb=30;state.equal=false;state.fev1=null;state.fvc=null;state.fev1Liters=null;state.fvcLiters=null;state.lungDate='';state.lungSymptoms=[];state.saved=[];state.section='all';state.query='';state.all=false;$('search').value='';render();window.dispatchEvent(new Event('asthma:profile-reset'));$('update-status').textContent='Lokale Profildaten wurden gelöscht.'});
     window.addEventListener('online',updateConnection);window.addEventListener('offline',updateConnection);
   }

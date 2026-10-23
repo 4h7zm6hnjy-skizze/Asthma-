@@ -1,5 +1,5 @@
-/* Asthma 3.0.4: vorgeprüfter Cache mit Offline-Fallback. */
-const VERSION='3.0.4-audit-offline';
+/* Asthma 3.0.5: neuer Cache bei Updates, vorhandene medizinische Daten unangetastet. */
+const VERSION='3.0.5-update-installieren';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
  './','./index.html','./styles.css','./content.js','./app.js','./antraege-data.js','./antraege.js',
