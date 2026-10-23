@@ -1,0 +1,28 @@
+ASTHMA 3.0.5 – UPDATE INSTALLIEREN (NUR IPHONE)
+
+Was behoben wird:
+* Die Laborakte überschreibt nicht mehr die aktuelle Versionsanzeige mit v3.0.1.
+* Der Lungenfunktionsscanner überschreibt nicht mehr die aktuelle Version mit 3.0.2.
+* Unter Einstellungen gibt es einen sichtbaren Button „Update installieren“.
+* Der Button prüft die Serverversion, aktualisiert die Offline-Dateien und öffnet die Webapp neu.
+* Der vorhandene verschlüsselte Gesundheitsdatenspeicher wird weder gelöscht noch verändert.
+
+INSTALLATION
+1. Zuerst in der Asthma-App eine vollständige verschlüsselte Sicherung erstellen.
+2. Im iPhone Codespace „glorious journey“ öffnen.
+3. Datei G.py aus dem ZIP in den Projektordner hochladen (Explorer > Drei Punkte > Upload).
+4. Im bestehenden Terminal GENAU eingeben:
+
+python3 G.py
+
+5. Enter drücken. Bei Erfolg steht „FERTIG: ASTHMA 3.0.5 AUF GITHUB“.
+6. Die Asthma-App ONLINE öffnen, Einstellungen > Nach Updates suchen > Neue Version laden.
+7. Unter Einstellungen sollte v3.0.5 stehen und der neue Button „Update installieren“ sichtbar sein.
+
+WICHTIG
+- Eine ZIP-Datei direkt in GitHub hochzuladen installiert KEIN Update.
+- Die Datei G.py muss im Hauptordner des Codespaces liegen, neben app.js und index.html.
+- Keine persönlichen Blutwerte oder Arztbriefe in das öffentliche GitHub-Repository laden.
+- App-Symbol NICHT löschen, Safari-Website-Daten NICHT löschen.
+- Der Button ändert nur Programmdateien, nicht die lokalen Gesundheitsdaten.
+- Wird ein Fehler angezeigt, Screenshot schicken und NICHT wiederholt andere Befehle probieren.
