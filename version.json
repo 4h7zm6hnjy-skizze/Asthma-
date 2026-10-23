@@ -1,5 +1,5 @@
 {
-  "version": "2.9.7",
-  "released": "2026-10-22",
-  "notes": "Lokaler PDF-Export ohne iPhone-Druckdialog und deutlich genauer beschriftete Statistik-Diagramme: Achsen, Messpunktzahlen, Minimum/Maximum, Durchschnitt, letzter Wert mit Datum und Veraenderung; bisherige Statistik und AES-GCM-Tresor unveraendert."
+  "version": "3.0.1",
+  "released": "2026-10-23",
+  "notes": "Laborakte Plus mit 147 voreingetragenen Untersuchungen, JSON-Import, gesonderter Laborstatistik mit durchgezogenen Messwertlinien und Referenzen, Änderungsübersicht, geschützter Speicherung, CSV-Export sowie unverändertem Datenbestand."
 }
