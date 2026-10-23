@@ -1,25 +1,47 @@
-ASTHMA UPDATE 3.0.3 – NUR IPHONE
-================================
+ASTHMA-WEBAPP – VERSION 3.0.4 – NUR IPHONE
+==========================================
 
-Dies ist ein Updatepaket, KEINE direkt installierbare iOS-App. Eine ZIP-Datei in GitHub hochzuladen allein aktiviert das Update nicht.
+Das ZIP ist ein geprüftes Updatepaket, aber KEINE iPhone-App zum direkten Öffnen.
+Die Installation erfolgt einmalig in deinem GitHub-Codespace.
 
-1. Erst in der bestehenden Asthma-Webapp eine verschluesselte Datensicherung anlegen.
-2. ZIP auf dem iPhone in der Dateien-App speichern.
-3. In Safari das GitHub-Repository oeffnen: https://github.com/4h7zm6hnjy-skizze/Asthma-
-4. Dort ueber den grünen Button „Code“ einen Codespace auf Branch main starten (sofern dein GitHub-Konto Codespaces nutzen darf).
-5. Im Codespace die heruntergeladene ZIP-Datei in den Projektordner hochladen.
-6. Terminal im Projektordner oeffnen, folgende Zeile reinkopieren und Enter druecken:
+BITTE ZUERST: In deiner Asthma-App unter Einstellungen eine vollständige
+verschlüsselte Datensicherung erstellen. Nie deine medizinischen Befunddateien
+öffentlich nach GitHub hochladen.
 
-unzip -o Asthma_Update_3.0.3_iPhone.zip -d /tmp/asthma-303 && python3 /tmp/asthma-303/Asthma_Update_3.0.3/INSTALLIEREN_IM_CODESPACE.py
+1. Dieses ZIP in der iPhone-App „Dateien“ öffnen und einmal antippen (entpacken).
+2. Die darin enthaltene Datei „F.py“ verwenden.
+3. Deinen vorhandenen GitHub-Codespace „glorious journey“ in Safari öffnen.
+   (Keinen weiteren Codespace erstellen.)
+4. Im Codespace links „Explorer“ öffnen, oben auf „…“ tippen und
+   „Upload...“/„Datei hochladen“ wählen. F.py aus der Dateien-App auswählen.
+   Sie muss im gleichen Asthma-Projektordner wie index.html liegen.
+5. Im bereits offenen Terminal nur diesen kurzen Befehl ausführen:
 
-7. Wenn im Terminal „FERTIG“ angezeigt wird, die Asthma-Webapp online neu oeffnen und „Update suchen“ benutzen.
+   python3 F.py
 
-ALTERNATIVE:
-Wenn dir Codespaces zu kompliziert ist, gib die ZIP-Datei einer Person, die GitHub kennt. Die ZIP enthaelt alle Dateien und ein automatisches Skript fuer GitHub Codespaces.
+6. Erst bei der Meldung „FERTIG: ASTHMA 3.0.4 AUF GITHUB“ ist das Update
+   veröffentlicht. Auf dem iPhone die Asthma-App online öffnen, „Update suchen“
+   und neu laden.
+7. Unter „Einstellungen → Offline-Nutzung prüfen“ die neuen Dateien kontrollieren,
+   danach kurz im Flugmodus testen. Wieder online gehen und eine neue Sicherung
+   prüfen.
 
-WICHTIG:
-- Keine privaten Laborwerte in GitHub hochladen! Diese ZIP enthaelt KEINE persoenlichen Gesundheitsdaten.
-- Der medizinische Bereich, bestehende Berichte und gespeicherte Werte werden nicht geloescht.
-- Offline funktioniert nach erfolgreichem Caching, solange iOS die Websitedaten aufbewahrt. Online-Links und Updates brauchen Internet.
-- Die beiden neuen Module sind moeglicherweise schon im Repo. Das Installationsskript aktualisiert auch die Einbindung und Offline-Cache-Regeln.
-- Eine ZIP-Datei allein kann GitHub Pages NICHT installieren oder entpacken.
+Wenn ein Fehler statt „FERTIG“ erscheint: NICHT erneut die App installieren,
+NICHT die Safari-Websitedaten löschen. Screenshot des Terminals an ChatGPT senden.
+
+Was repariert wird:
+- Fehlerhaftes HTML-Dokument und doppelter PhysioSport-Start
+- Veraltete Versionen alter Programmdateien beim Laden
+- PDF-Diagrammtexte, die unbemerkt Tooltip-Text mit enthielten
+- Veraltetes PDF nach erneuter Berechnung
+- Laborvergleich und Labor-Referenzangaben mit Einheiten
+- Vollständige Offline-Dateiprüfung gegen den richtigen Cache
+- Statische Syntaxprüfung aller vorhandenen .js-Dateien im Codespace
+
+Sicherheit:
+Die Reparatur ändert nur Programmdateien und Versionsnummern. Die verschlüsselten
+Gesundheitsdaten auf dem iPhone werden nicht geändert. Keine personenbezogenen
+Daten oder Laborbefunde gehören in diesen ZIP-Upload.
+
+Wichtig: Die statische Prüfung ersetzt keinen Test sämtlicher realer Funktionen
+und iPhone-Druckdialoge. Das muss nach Installation auf dem Gerät geprüft werden.

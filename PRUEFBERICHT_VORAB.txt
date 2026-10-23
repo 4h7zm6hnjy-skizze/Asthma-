@@ -1,0 +1,38 @@
+ASTHMA 3.0.4 – CODEPRÜFUNG UND REGRESSIONSTEST
+================================================
+Verifizierter Quellstand: GitHub Asthma- main, Version 3.0.3, 23.10.2026.
+
+NACHGEWIESENE MÄNGEL IM BESTEHENDEN CODE
+1. index.html enthielt ein <script> vor <head> und einen ungültigen </head ...>-Tag.
+   Das gleiche PhysioSport-Skript war zweimal im HTML referenziert.
+2. secure17.js startete Kernmodule mit fest kodierten, teils überholten
+   Query-Versionsangaben 2.9.1 bis 2.9.7 trotz App-Version 3.0.3.
+3. statsprint296.js druckte bei SVG-Texten via textContent auch die als <title>
+   eingebetteten Tooltips. Dies konnte überlange Diagrammtexte im PDF verursachen.
+4. Nach Neu-Berechnen der Statistik blieb die schon erzeugte PDF-Datei
+   möglicherweise weiter als Download verfügbar.
+5. Beim Laborvergleich wurde der Filter "verändert" auch auf nicht wirklich
+   vergleichbare Werteeinheiten oder nicht numerische Werte angewandt.
+6. Referenzbereiche in der Form 0–400 /µl waren im Labor teilweise nicht parsebar.
+7. Die Offline-Prüfung kontrollierte nur zwölf Dateien und konnte Caches alter
+   App-Versionen als Bereitschaft akzeptieren.
+
+AUFGENOMMENE REPARATUREN
+Diese sieben Mängel werden in Version 3.0.4 gezielt korrigiert. Zusätzlich
+werden im Codespace alle dort vorhandenen JavaScript-Dateien mit Node.js auf
+Syntaxfehler geprüft, Offline-Assets und dynamisch geladene Module abgeglichen
+und PDF-/Referenz-Regressionsfälle ausgeführt.
+
+LOKALER PROBELAUF
+Der Installer wurde in einem nachgebildeten Repository durchgetestet: Änderung,
+Syntaxprüfung und Commit erfolgreich; ein Push wurde in dieser Testumgebung
+absichtlich nicht durchgeführt (kein konfiguriertes GitHub-Remote).
+
+NOCH NICHT NACHGEWIESEN
+Eine vollständige Ende-zu-Ende-Prüfung auf dem echten iPhone, mit verschlüsselten
+Daten, Druck- und Dateien-Menü, Hintergrundverhalten und Flugmodus konnte hier
+nicht erfolgen. Das ist kein Versprechen, dass die gesamte App fehlerfrei ist.
+
+DATENSCHUTZ
+Keine Patientendaten im öffentlichen Repository; keine Änderung an Tresor,
+Verschlüsselung, vorhandenen statistischen Daten oder Lungenfunktionswerten.
