@@ -1,0 +1,46 @@
+{
+  "format": "Asthma-PhysioSport-Import",
+  "schema": 1,
+  "createdFor": "Private lokale Einmalübernahme aus vorgelegten Fotos",
+  "physio": [
+    {"id":"ps-2027-01-05-0720","date":"2027-01-05","time":"07:20","durationMinutes":20,"therapist":"Torsten Fischer","status":"offen","notes":"Krankengymnastik (KG) · Praxis Kison & Büthe"},
+    {"id":"ps-2027-01-07-0840","date":"2027-01-07","time":"08:40","durationMinutes":20,"therapist":"Arne Kison","status":"offen","notes":"Krankengymnastik (KG) · Praxis Kison & Büthe"},
+    {"id":"ps-2027-01-12-1530","date":"2027-01-12","time":"15:30","durationMinutes":20,"therapist":"Arne Kison","status":"offen","notes":"Krankengymnastik (KG) · Praxis Kison & Büthe"},
+    {"id":"ps-2027-01-14-1300","date":"2027-01-14","time":"13:00","durationMinutes":20,"therapist":"Arne Kison","status":"offen","notes":"Krankengymnastik (KG) · Praxis Kison & Büthe"},
+    {"id":"ps-2027-01-18-1700","date":"2027-01-18","time":"17:00","durationMinutes":20,"therapist":"Arne Kison","status":"offen","notes":"Krankengymnastik (KG) · Praxis Kison & Büthe"},
+    {"id":"ps-2027-01-20-1840","date":"2027-01-20","time":"18:40","durationMinutes":20,"therapist":"Arne Kison","status":"offen","notes":"Krankengymnastik (KG) · Praxis Kison & Büthe"}
+  ],
+  "lungenfunktion": {
+    "date": "2026-10-23",
+    "phase": "vor",
+    "doctor": "MRV, Abteilung Lungenheilkunde, Lüdenscheid",
+    "fev1": 55,
+    "fvc": 50,
+    "fev1Liters": 2.55,
+    "fvcLiters": 2.88,
+    "ratio": 89,
+    "extra": {
+      "vcLiters": 3.16,
+      "vcPercent": 53,
+      "fvcInLiters": 3.16,
+      "fvcInPercent": 55,
+      "tlcLiters": 5.03,
+      "tlcPercent": 61,
+      "rvLiters": 1.86,
+      "rvPercent": 88,
+      "rvTlcPercent": 37,
+      "rvTlcSoll": 130,
+      "tgvLiters": 2.64,
+      "tgvPercent": 70,
+      "pefLps": 6.88,
+      "pefPercent": 67,
+      "mef25Lps": 1.47,
+      "mef25Percent": 55,
+      "mef50Lps": 2.97,
+      "mef50Percent": 52,
+      "mef75Lps": 4.77,
+      "mef75Percent": 54
+    },
+    "note": "Pre-Messung laut Ausdruck. FEV1 2,55 l (55 % Soll), FVC exspiratorisch 2,88 l (50 % Soll), FEV1/FVC 89 %. VC 3,16 l (53 % Soll), TLC 5,03 l (61 % Soll). (A)-Markierung im Ausdruck: Einzelne Werte nicht gemäß ATS-Empfehlungen ermittelt; ärztliche Beurteilung erforderlich."
+  }
+}
