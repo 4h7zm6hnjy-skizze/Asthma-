@@ -1838,5 +1838,63 @@
     for(const [name,links] of sections){const section=el('section',undefined,'m306-group');section.append(el('h3',name));const grid=el('div',undefined,'m306-grid');for(const [label,route] of links){const b=el('button');b.type='button';b.dataset.goto=route;b.append(el('strong',label),el('small','Bereich öffnen'));grid.append(b)}section.append(grid);grouped.append(section)}
     more.querySelector('.hub20-grid')?.insertAdjacentElement('beforebegin',grouped);
   }
-  const v=document.createElement('small');v.className='cockpit306-version';v.textContent='Oberfläche & Laborwissen – Erweiterung 3.1.3';cockpit.append(v);
+  const v=document.createElement('small');v.className='cockpit306-version';v.textContent='Oberfläche & Laborwissen – Erweiterung 3.1.4';cockpit.append(v);
+})();
+
+
+/* Asthma 3.1.4: repariert alte Labor-Tabellen in der Statistik auch dann,
+   wenn noch eine enge Legacy-Tabelle erzeugt wird oder ein Bericht bereits offen ist. */
+(()=>{
+ 'use strict';
+ const report=document.getElementById('stats25-report');
+ if(!report||window.ASTHMA_STATS314)return;
+ window.ASTHMA_STATS314=true;
+ const make=(tag,cls,content)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(content!==undefined)x.textContent=String(content);return x;};
+ const clean=x=>String(x??'').replace(/\s+/g,' ').trim();
+ if(!document.getElementById('stats314-fix-css')){
+  const css=document.createElement('style');css.id='stats314-fix-css';css.textContent=`
+  #stats25-report table{max-width:100%}
+  #stats25-report th,#stats25-report td{word-break:normal;overflow-wrap:anywhere;white-space:normal}
+  .stats314-labcards{display:grid;gap:12px;margin:10px 0 18px}
+  .stats314-labcard{border:1px solid #d7e5eb;border-radius:14px;background:#fff;padding:12px;box-shadow:0 1px 0 rgba(18,59,82,.03);break-inside:avoid-page;page-break-inside:avoid}
+  .stats314-labhead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #e4edf1}
+  .stats314-labhead strong{display:block;color:#123b52;font-size:.98rem;line-height:1.35}
+  .stats314-labdate{color:#5f7581;font-size:.83rem;white-space:nowrap}
+  .stats314-labgrid{display:grid;grid-template-columns:120px minmax(0,1fr);gap:7px 10px;align-items:start}
+  .stats314-lablabel{font-weight:700;color:#1f4658}
+  .stats314-labvalue{min-width:0;color:#243943;overflow-wrap:anywhere}
+  @media(max-width:560px){.stats314-labhead{flex-direction:column}.stats314-labdate{white-space:normal}.stats314-labgrid{grid-template-columns:1fr}.stats314-lablabel{margin-top:4px}}
+  @media print{.stats314-labcard{padding:10px;border-color:#cadbe3}}
+  `;document.head.append(css)
+ }
+ function isLegacyLabTable(table){
+  const header=[...table.querySelectorAll('tr:first-child th, tr:first-child td')].map(x=>clean(x.textContent).toLowerCase());
+  const joined=header.join('|');
+  return header.length>=5&&joined.includes('datum')&&joined.includes('laborwert')&&joined.includes('ergebnis')&&joined.includes('referenz')&&joined.includes('beurteilung');
+ }
+ function convert(table){
+  if(table.dataset.stats314done==='1')return;
+  const rows=[...table.querySelectorAll('tr')].slice(1).filter(tr=>tr.children.length>=5);
+  if(!rows.length)return;
+  const list=make('div','stats314-labcards');
+  rows.forEach(tr=>{
+   const cells=[...tr.children].map(td=>clean(td.textContent));
+   const card=make('article','stats314-labcard');
+   const head=make('div','stats314-labhead');
+   head.append(make('strong',null,cells[1]||'Laborwert'),make('span','stats314-labdate',cells[0]||'–'));card.append(head);
+   const grid=make('div','stats314-labgrid');
+   const row=(label,value)=>{grid.append(make('div','stats314-lablabel',label),make('div','stats314-labvalue',value||'–'))};
+   row('Ergebnis',cells[2]||'–');
+   row('Referenz',cells[3]||'–');
+   row('Beurteilung / Notiz',cells.slice(4).filter(Boolean).join(' ')||'–');
+   card.append(grid);list.append(card);
+  });
+  table.dataset.stats314done='1';
+  table.style.display='none';
+  table.insertAdjacentElement('afterend',list);
+ }
+ function upgrade(){report.querySelectorAll('table').forEach(table=>{if(isLegacyLabTable(table))convert(table);});}
+ let timer=0;const queue=()=>{clearTimeout(timer);timer=setTimeout(upgrade,60)};
+ new MutationObserver(queue).observe(report,{childList:true,subtree:true});
+ queue();setTimeout(queue,300);setTimeout(queue,1200);
 })();

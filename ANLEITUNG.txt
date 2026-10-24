@@ -1,23 +1,22 @@
-ASTHMA – DRUCKSTATISTIK LAYOUTFIX 3.1.3
+ASTHMA – DRUCKSTATISTIK LAYOUTFIX 3.1.4
 
 Problem:
-In der Statistik wurden die Blutwerte in der Druck-/PDF-Ansicht auf dem iPhone extrem schmal dargestellt. Wörter wurden Zeichen für Zeichen umgebrochen und die Übersicht war kaum lesbar.
+Die Laborwerte wurden trotz Update auf dem iPhone weiterhin nach unten auseinandergezogen. Datum, Testname und Werte wurden in einer zu engen Tabelle fast Zeichen für Zeichen umbrochen.
 
-Lösung in 3.1.3:
-- Die Laborwerte in der Monats- und Jahresstatistik werden nicht mehr als zu enge 5-Spalten-Tabelle dargestellt.
-- Jeder Laborwert erscheint jetzt als eigene, sauber lesbare Karte.
-- Allgemeine Tabellen erhalten zusätzlich eine bessere Breite, Scrollbarkeit und weniger aggressiven Zeilenumbruch.
-- Die iPhone-Layoutkorrektur 3.1.2 bleibt erhalten.
-- Vorhandene Daten, Laborwerte, Treppenwerte und Diagramme bleiben unverändert.
+Zusätzliche Lösung in 3.1.4:
+- Alte oder bereits geöffnete Labor-Tabellen in der Statistik werden jetzt nachträglich erkannt.
+- Diese Tabellen werden automatisch in gut lesbare Karten umgewandelt.
+- Die enge Tabelle wird ausgeblendet.
+- Damit greift die Korrektur auch dann, wenn noch eine Legacy-Darstellung erzeugt oder ein Bericht bereits offen war.
+- Die bisherige Verbesserung 3.1.3 bleibt enthalten.
 
 Installation:
 1. ZIP laden und entpacken.
 2. Im GitHub-Projekt Asthma- die Datei laborvergleich303.js vollständig ersetzen.
-3. Änderung speichern.
-4. In der Webapp „Update installieren“ ausführen oder die Seite neu laden.
-5. Unter Statistik erneut einen Bericht erzeugen und die Labordarstellung prüfen.
+3. Änderungen speichern.
+4. In der Webapp „Update installieren“ antippen.
+5. Statistik schließen und einen neuen Bericht erzeugen.
 
 Wichtig:
-- Vorher verschlüsselte Datensicherung anlegen.
-- Die Hauptversion der App kann weiterhin 3.0.5 anzeigen. Die Erweiterung meldet 3.1.3.
-- Diese Korrektur ändert die Darstellung, nicht die medizinischen Inhalte.
+- Vorher eine verschlüsselte Datensicherung anlegen.
+- Diese Korrektur verändert nur die Darstellung, nicht die Gesundheitsdaten.
