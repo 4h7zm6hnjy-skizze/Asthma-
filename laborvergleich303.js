@@ -492,7 +492,63 @@
   item.append(input,make('span',null,label));ctrl.append(item);
  }
  ctrl.append(make('p','input-note','Vor dem Erstellen auswählen. Die bisherigen Statistikseiten und Diagramme bleiben unverändert. PDF/Druck sind unverschlüsselt.'));
- const buildBtn=$('stats25-build');buildBtn.parentNode.insertBefore(ctrl,buildBtn);
+ // 3.1.2: Fieldset darf kein Flex-Element der Monatsauswahl sein.
+ // Sonst erzwingt .stats25-controls input {width:100%;min-height:44px}
+ // auf iPhone übergroße Checkboxen und seitlich überlaufende Texte.
+ const buildBtn=$('stats25-build');
+ const statsToolbar=buildBtn?.closest('.stats25-controls');
+ if(statsToolbar?.parentElement)statsToolbar.insertAdjacentElement('afterend',ctrl);
+ else if(buildBtn?.parentElement)buildBtn.parentElement.insertAdjacentElement('afterend',ctrl);
+ const responsive=document.createElement('style');
+ responsive.id='stats306-iphone-fix-312';
+ responsive.textContent=`
+ #stats306-settings {
+   display:block; width:100%; min-width:0; max-width:100%;
+   box-sizing:border-box; margin:12px 0; padding:12px;
+   border:1px solid #c7dbe4; border-radius:14px;
+   background:#f6fbfd; overflow-wrap:anywhere;
+ }
+ #stats306-settings legend {
+   max-width:100%; padding:0 5px;
+   color:#17455a; font-weight:700; font-size:.95rem;
+   white-space:normal; overflow-wrap:anywhere;
+ }
+ #stats306-settings > label {
+   display:grid !important;
+   grid-template-columns:22px minmax(0,1fr);
+   align-items:start !important; column-gap:11px !important;
+   min-width:0 !important; max-width:100%; width:100%;
+   box-sizing:border-box; margin:8px 0 !important;
+   padding:11px 12px; border:1px solid #d9e6eb; border-radius:10px;
+   background:#fff; font-size:.92rem; font-weight:500;
+   line-height:1.4; cursor:pointer; overflow-wrap:anywhere;
+ }
+ #stats306-settings > label input[type="checkbox"] {
+   display:block; appearance:auto; -webkit-appearance:checkbox;
+   width:20px !important; min-width:20px !important;
+   max-width:20px !important; height:20px !important;
+   min-height:20px !important; max-height:20px !important;
+   margin:0 !important; padding:0 !important;
+   flex:0 0 20px !important; accent-color:#187c97;
+   box-sizing:border-box; align-self:start;
+ }
+ #stats306-settings > label span {
+   min-width:0; max-width:100%; display:block;
+   white-space:normal; overflow-wrap:anywhere;
+ }
+ #stats306-settings > p {
+   max-width:100%; font-size:.83rem; line-height:1.5;
+   overflow-wrap:anywhere;
+ }
+ @media(max-width:460px) {
+   #stats306-settings {padding:10px;margin:10px 0}
+   #stats306-settings > label {padding:10px; font-size:.89rem}
+ }
+ @media print {
+   #stats306-settings {display:none !important}
+ }
+ `;
+ document.head.append(responsive);
  function section(report,title){const x=make('section','stats25-section');x.dataset.stats306='true';x.append(make('h3',null,title));report.append(x);return x;}
  function metric(parent,label,value){const p=make('div','stats25-line');p.append(make('span',null,label),make('strong',null,value));parent.append(p)}
  function table(parent,columns,rows){const t=make('table');t.style.cssText='width:100%;border-collapse:collapse;font-size:.83rem;table-layout:auto';
@@ -1745,5 +1801,5 @@
     for(const [name,links] of sections){const section=el('section',undefined,'m306-group');section.append(el('h3',name));const grid=el('div',undefined,'m306-grid');for(const [label,route] of links){const b=el('button');b.type='button';b.dataset.goto=route;b.append(el('strong',label),el('small','Bereich öffnen'));grid.append(b)}section.append(grid);grouped.append(section)}
     more.querySelector('.hub20-grid')?.insertAdjacentElement('beforebegin',grouped);
   }
-  const v=document.createElement('small');v.className='cockpit306-version';v.textContent='Oberfläche & Laborwissen – Erweiterung 3.1.1';cockpit.append(v);
+  const v=document.createElement('small');v.className='cockpit306-version';v.textContent='Oberfläche & Laborwissen – Erweiterung 3.1.2';cockpit.append(v);
 })();

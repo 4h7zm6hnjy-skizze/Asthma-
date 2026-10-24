@@ -1,25 +1,31 @@
-ASTHMA 3.0.3 – Updatepaket für deinen Mac
+ASTHMA – STATISTIK-LAYOUTFIX 3.1.2 (iPhone)
 
-SO EINFACH WIE MÖGLICH:
-1. ZIP-Datei auf dem Mac öffnen / entpacken.
-2. ASTHMA_UPDATE_STARTEN.command doppelt anklicken.
-3. Wenn macOS die Datei blockiert: Rechtsklick → Öffnen.
-4. GitHub-Anmeldung kann erforderlich sein. Ohne GitHub-Schreibrecht ist kein automatischer Upload möglich.
-5. Danach am iPhone die Asthma-Webapp öffnen und „Update suchen“ benutzen.
+Inhalt:
+- Behebt übergroße blaue Häkchen und rechts abgeschnittene Beschreibungen
+  unter „Neue Berichtsteile – Monats- und Jahresstatistik“.
+- Platziert diesen Block außerhalb der flexiblen Zeile für Zeitraum und
+  „Statistik berechnen“.
+- Drei Auswahlfelder erscheinen untereinander, mit 20px-Häkchen und
+  korrekt umbrechendem Text.
+- Druck-/PDF-Ausgabe blendet die Einstellungen weiter aus.
+- Bestehende Blutwerte, Treppeneinträge, Reha-Hilfen, Statistikberechnungen,
+  ausgewählte Berichtsteile und die AES-GCM-Datenbank werden nicht geändert.
 
-WICHTIG VOR DEM UPDATE:
-- In der App unter Einstellungen eine vollständige, passwortverschlüsselte Sicherung erstellen.
-- Keine Safari-Websitedaten löschen und das alte Home-Bildschirm-Symbol nicht entfernen.
-- Die private Laborwert-JSON-Datei nie ins öffentliche GitHub-Repository hochladen.
+iPhone / GitHub:
+1. Vor der Änderung in der bestehenden App eine vollständige, verschlüsselte
+   .asthma17-Datensicherung erstellen und gesondert aufbewahren.
+2. ZIP in der iPhone-Dateien-App entpacken.
+3. GitHub-Repository 4h7zm6hnjy-skizze/Asthma- öffnen.
+4. Im Hauptverzeichnis die bestehende Datei laborvergleich303.js vollständig
+   durch die beigelegte Datei gleichen Namens ersetzen.
+5. GitHub-Änderung bestätigen; anschließend dieselbe installierte Webapp mit
+   Internetzugang öffnen und „Update installieren“ verwenden bzw. neu laden.
+6. Unter Statistik die drei Auswahlen und den Monatsbericht prüfen.
 
-INHALT:
-- Laborvergleich: letzter Wert, Vorwert, Trend, Referenzstatus, Filter.
-- Differenzzahlen in Lungenfunktions- und Statistik-Diagrammen; verwertbare Messwerte bleiben durchgezogen.
-- Umfangreicher Offline-Cache für lokale Eingaben, Verlaufsdaten und PDF-Erstellung.
-- Button für den Offline-Bereitschaftstest unter Einstellungen.
-- Alte Werte und bisherige Statistik bleiben im lokalen Tresor erhalten.
-
-GRENZEN:
-- Grüne/rote Labortrends bedeuten nur eine Veränderung innerhalb/außerhalb eines IDENTISCHEN Laborreferenzbereichs; keine automatische Diagnose.
-- Offline-Anzeige gilt nach vollständigem Download, soweit iOS den Speicher erhält. Online-Karten, amtliche Links, Aktualisierungen und Echtzeitdienste benötigen Internet.
-- Wenn GitHub das Schreiben verweigert, wird nichts in GitHub aktualisiert. Der Installer zeigt dann den genauen Fehler.
+WICHTIG:
+- Nicht die Webapp vom Home-Bildschirm entfernen oder Website-Daten löschen.
+- Die Kernversionsanzeige kann weiterhin 3.0.5 zeigen. Das Layoutmodul
+  meldet 3.1.2.
+- Auf einem echten iPhone/Safari wurde diese Änderung nicht getestet.
+- Das ZIP ist ein Ersatz für die bestehende laborvergleich303.js und
+  darf nicht zusätzlich unter einem anderen Namen hochgeladen werden.
