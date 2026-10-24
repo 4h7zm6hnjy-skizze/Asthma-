@@ -1,5 +1,5 @@
-/* Asthma 3.0.5: neuer Cache bei Updates, vorhandene medizinische Daten unangetastet. */
-const VERSION='3.0.5-update-installieren';
+/* Asthma 3.1.6: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
+const VERSION='3.1.6-navigation-early';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
  './','./index.html','./styles.css','./content.js','./app.js','./antraege-data.js','./antraege.js',

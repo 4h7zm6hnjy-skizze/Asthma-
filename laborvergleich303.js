@@ -1,4 +1,91 @@
 'use strict';
+
+/* Asthma Navigation 3.1.6: Reparatur VOR allen Statistik-Erweiterungen.
+   Dadurch funktioniert die Navigation auch bei Fehlern in spaeteren Zusatzmodulen.
+   Keine Aenderungen an Messwerten, IndexedDB, Verschluesselung oder Datenformat. */
+(()=>{
+ 'use strict';
+ try {
+   const $=id=>document.getElementById(id),hero=$('start'),home=$('uebersicht'),more=$('mehr');
+   const dock=document.querySelector('.bottom-dock');
+   if(!hero||!home||!dock)return;
+   // Earlier successful patch or reinitialization: avoid duplicate controls.
+   if($('nav316-active'))return;
+   // If 3.1.5 worked, it already removed Mehr and has the six tabs.
+   if(!more){window.ASTHMA_NAV316={ready:true,alreadyUpdated:true};return;}
+   const search=more.querySelector('.hub20-search'),tiles=more.querySelector('.hub20-grid');
+   if(!search||!tiles)return;
+   const css=document.createElement('style');css.id='nav316-active';
+   css.textContent=`
+    .nav316-search{width:min(1140px,100%);margin-inline:auto;box-sizing:border-box;padding:12px 16px 0;position:relative;z-index:2}
+    .nav316-search-head{display:flex;align-items:center;gap:9px;color:#fff;font-size:1rem;font-weight:750;padding:2px 2px 7px}
+    .nav316-search-head svg{width:21px;height:21px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;flex:none}
+    .nav316-search .hub20-search{margin:0 0 13px;padding:13px 15px;border-radius:15px;background:#f3fafc;border:1px solid #b9dce6;color:#193f52}
+    .nav316-search .hub20-search label{font-size:.9rem;color:#254c5d}
+    .nav316-search .hub20-search input{font-size:16px;min-height:47px;max-width:100%;box-sizing:border-box}
+    .nav316-search .hub20-search .input-note{font-size:.8rem;line-height:1.45;margin:7px 0 3px}
+    .nav316-search .hub20-results:not(:empty){margin-top:10px}
+    .nav316-expand{background:#f4fafc;border:1px solid #cce1e9;border-radius:15px;padding:12px 14px;margin:15px 0 23px}
+    .nav316-expand>summary{font-size:1rem;font-weight:740;color:#163f52;cursor:pointer;line-height:1.4}
+    .nav316-expand>.hub20-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 2px;visibility:visible;opacity:1}
+    .nav316-expand .hub20-grid button{min-width:0;white-space:normal}
+    .nav316-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 17px}
+    .nav316-tabs button{min-width:0;border:1px solid #b8d7e1;background:#f4fafc;color:#15465b;font-weight:700;padding:12px 10px;border-radius:12px;cursor:pointer;white-space:normal;line-height:1.35}
+    body[data-page="antraege"] #nav316-antraege [data-goto="antraege"],
+    body[data-page="akte"] #nav316-akte [data-goto="akte"]{background:#d8eef5;border-color:#3297b1}
+    body[data-page="akte"] #nav316-combined{background:#e3f4f4;color:#146074}
+    .bottom-dock button{min-height:53px;white-space:normal;line-height:1.1}
+    .bottom-dock button span{white-space:normal;text-align:center}
+    @media(max-width:390px){.bottom-dock{gap:0;padding-left:2px;padding-right:2px}.bottom-dock button{font-size:.6rem;padding-inline:1px}.bottom-dock button svg{width:20px;height:20px}.nav316-search{padding-inline:10px}.nav316-search .hub20-search{padding:10px}}
+   `;
+   document.head.append(css);
+   const wrap=document.createElement('div');wrap.id='nav316-search';wrap.className='nav316-search';
+   wrap.innerHTML='<div class="nav316-search-head"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></svg><span>Suche</span></div>';
+   wrap.append(search);
+   hero.insertBefore(wrap,hero.firstChild);
+   const label=search.querySelector('label');if(label)label.textContent='In deiner verschlüsselten Akte suchen';
+   const searchInput=$('private-search20');if(searchInput)searchInput.placeholder='FEV1, Labor, Blutdruck, Medikamente …';
+   const group=document.createElement('details');group.id='nav316-functions';group.className='nav316-expand';
+   const summary=document.createElement('summary');summary.textContent='Weitere Funktionen und Einstellungen';
+   const note=document.createElement('p');note.className='input-note';note.textContent='Profil, Hilfsmittel, Therapie, Arbeit, Berichte und Einstellungen.';
+   group.append(summary,note,tiles);
+   const quick=home.querySelector('.home20-quick');if(quick)quick.insertAdjacentElement('afterend',group);else home.prepend(group);
+   const oldNote=home.querySelector('.home20-heading p:last-child');
+   if(oldNote && oldNote.textContent.includes('Mehr'))oldNote.textContent='Deine häufigsten Funktionen direkt öffnen. Weitere Werkzeuge findest du hier auf der Startseite.';
+   const grouped=group.querySelector('[data-goto="antraege"] strong');if(grouped)grouped.textContent='Anträge & Akte';
+   const launcher=home.querySelector('.suite-launcher');
+   if(launcher){const a=launcher.querySelector('[data-goto="antraege"]');const b=launcher.querySelector('[data-goto="akte"]');
+     if(a){const h=a.querySelector('strong');if(h)h.textContent='Anträge & Akte';const desc=a.querySelector('small');if(desc)desc.textContent='Unterlagen und Formulare';}
+     if(b)b.remove();}
+   const tabbar=(page,id)=>{const el=$(id);if(!el||$('nav316-'+page))return;
+     const nav=document.createElement('nav');nav.id='nav316-'+page;nav.className='nav316-tabs';nav.setAttribute('aria-label','Anträge und persönliche Akte');
+     nav.innerHTML='<button data-goto="antraege" type="button">Anträge und Reha</button><button data-goto="akte" type="button">Akte und Dokumente</button>';
+     el.prepend(nav);};
+   tabbar('antraege','antraege');tabbar('akte','mein-bereich');
+   document.querySelectorAll('.app-nav [data-goto="mehr"],.app-nav [data-goto="akte"]').forEach(el=>el.remove());
+   const a=document.querySelector('.app-nav [data-goto="antraege"]');if(a)a.textContent='Anträge & Akte';
+   // All nodes needed for search and additional functions were moved first.
+   more.remove();
+   dock.innerHTML=`
+    <button data-goto="start" aria-label="Start" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-8 9 8v9H3z M9 20v-6h6v6"/></svg><span>Start</span></button>
+    <button data-goto="lungenwerte" aria-label="Lunge" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h4l3-7 4 12 3-6h4"/></svg><span>Lunge</span></button>
+    <button data-goto="kalender" aria-label="Kalender" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/></svg><span>Kalender</span></button>
+    <button id="nav316-combined" data-goto="antraege" aria-label="Anträge und Akte" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h10l4 4v14H5z M14 3v5h5 M8 12h8 M8 16h8"/></svg><span>Anträge<br>Akte</span></button>
+    <button data-goto="labor" aria-label="Labor und Blutwerte" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6m-5 0v6l-5 8a3 3 0 0 0 2.5 4h9a3 3 0 0 0 2.5-4l-5-8V3M8 16h8"/></svg><span>Labor</span></button>
+    <button id="nav316-bp" data-goto="vitalwerte" aria-label="Blutdruck" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8c0 5-8.8 11-8.8 11S3.2 13 3.2 8a4.7 4.7 0 0 1 8.8-2.2A4.7 4.7 0 0 1 20.8 8Z"/><path d="M6 11h3l1.5-3 2 6 1.5-3H18"/></svg><span>Blutdruck</span></button>`;
+   const bp=dock.querySelector('#nav316-bp');
+   bp.addEventListener('click',()=>{
+     const select=()=>document.querySelector('#v29-tabs button[data-kind="bp"]')?.click();
+     setTimeout(select,50);setTimeout(select,350);
+   });
+   // `Mehr` remains recognized by the original router. Direct links to it go to Start.
+   const redirect=()=>{if(location.hash!=='#mehr')return;
+      if(window.ASTHMA_NAV?.go)window.ASTHMA_NAV.go('start');
+      else history.replaceState(null,'','#start');};
+   redirect();window.addEventListener('hashchange',redirect);
+   window.ASTHMA_NAV316={ready:true,version:'3.1.6',searchOnStart:!!$('private-search20'),combined:!!$('nav316-combined')};
+ }catch(error){console.error('Asthma-Navigation 3.1.6 konnte nicht vollständig geladen werden:',error);}
+})();
 /* Asthma 3.0.3 – additive, offline-only lab comparison panel. No personal data in source. */
 (()=>{
  const SEC=window.ASTHMA_SECURITY;

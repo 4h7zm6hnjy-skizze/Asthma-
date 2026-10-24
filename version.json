@@ -1,5 +1,5 @@
 {
-  "version": "3.0.5",
+  "version": "3.1.6",
   "released": "2026-10-24",
-  "notes": "Fehlerbehebung Versionsanzeige in Labor und Befundscanner; permanenter Button „Update installieren“ mit iPhone-kompatibler Service-Worker-Aktualisierung. Keine Änderungen an verschlüsselten Gesundheitsdaten."
+  "notes": "Korrigierte Navigationsausführung vor Statistikmodulen, geänderter Offline-Cache, Startseiten-Suche und kombinierte Anträge/Akte. Keine Änderung an Gesundheitsdaten."
 }

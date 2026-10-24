@@ -1,22 +1,28 @@
-ASTHMA – DRUCKSTATISTIK LAYOUTFIX 3.1.4
+Asthma – Navigation & Cache Fix 3.1.6
 
-Problem:
-Die Laborwerte wurden trotz Update auf dem iPhone weiterhin nach unten auseinandergezogen. Datum, Testname und Werte wurden in einer zu engen Tabelle fast Zeichen für Zeichen umbrochen.
+WARUM EIN NEUES UPDATE?
+Bei 3.1.5 lag die Navigationsfunktion am Ende einer sehr großen JavaScript-Datei.
+Ein Fehler in einem früheren Modul kann die Ausführung verhindern. Diese Reparatur
+setzt die Navigation VOR alle Statistik-Module und erneuert den Offline-Cache.
 
-Zusätzliche Lösung in 3.1.4:
-- Alte oder bereits geöffnete Labor-Tabellen in der Statistik werden jetzt nachträglich erkannt.
-- Diese Tabellen werden automatisch in gut lesbare Karten umgewandelt.
-- Die enge Tabelle wird ausgeblendet.
-- Damit greift die Korrektur auch dann, wenn noch eine Legacy-Darstellung erzeugt oder ein Bericht bereits offen war.
-- Die bisherige Verbesserung 3.1.3 bleibt enthalten.
+INSTALLATION
+1. Zuerst in der bisherigen iPhone-Webapp unter Einstellungen eine vollständige
+   verschlüsselte .asthma17-Datensicherung erstellen und an einem sicheren Ort ablegen.
+2. Das ZIP entpacken.
+3. Die drei Dateien laborvergleich303.js, sw.js und version.json IN EINEM SCHRITT
+   in das Stammverzeichnis des GitHub-Projekts Asthma- hochladen und bestehende Dateien ersetzen.
+4. Commit changes bestätigen und die Veröffentlichung abwarten.
+5. In der bisherigen Webapp zu Einstellungen > Update installieren wechseln.
+6. App schließen und über dasselbe Home-Bildschirm-Symbol wieder öffnen.
+7. Prüfen: Suche ganz oben, untere Leiste Start/Lunge/Kalender/Anträge-Akte/Labor/Blutdruck.
 
-Installation:
-1. ZIP laden und entpacken.
-2. Im GitHub-Projekt Asthma- die Datei laborvergleich303.js vollständig ersetzen.
-3. Änderungen speichern.
-4. In der Webapp „Update installieren“ antippen.
-5. Statistik schließen und einen neuen Bericht erzeugen.
+NICHT tun: Alte Home-Bildschirm-App löschen, Safari-Website-Daten löschen oder
+einen neuen leeren Tresor einrichten.
 
-Wichtig:
-- Vorher eine verschlüsselte Datensicherung anlegen.
-- Diese Korrektur verändert nur die Darstellung, nicht die Gesundheitsdaten.
+TECHNISCH
+Das Update ändert keine verschlüsselten Daten, Datenbankstruktur oder Messwerte.
+Die Hauptdatei app.js meldet intern noch 3.0.5; version.json kennzeichnet den
+aktualisierten Veröffentlichungsstand 3.1.6. Ein vollständiger Versionsabgleich
+der Anwendung ist damit noch nicht hergestellt.
+Die JavaScript-Syntax und das neue Navigationsverhalten wurden lokal geprüft;
+die Installation auf einem echten iPhone kann hier nicht simuliert werden.
