@@ -1,49 +1,44 @@
-ASTHMA-WEBAPP – STARTSEITE SCHNELLERFASSUNG (Erweiterung 3.0.8)
-============================================================
+ASTHMA-WEBAPP – ANTRAGS-AUSFÜLLHILFE 3.1.0
+========================================
 
-Diese ZIP enthält eine vollständige Ersatzdatei:
-  laborvergleich303.js
+INSTALLATION (iPhone / GitHub)
+1. Die ZIP-Datei in iPhone »Dateien« speichern und entpacken.
+2. In deinem GitHub-Projekt 4h7zm6hnjy-skizze/Asthma- die
+   vorhandene Datei »laborvergleich303.js« durch die neue Datei
+   gleichen Namens ersetzen (nicht zusätzlich hochladen!).
+3. Änderung bei GitHub bestätigen/committen.
+4. Asthma-Webapp mit Internetverbindung öffnen und bei Bedarf
+   »Update installieren« antippen. App schließen und neu starten.
+5. Unter »Anträge« die neue Kachel
+   »Schritt für Schritt zum Antrag« öffnen.
 
-SO INSTALLIEREN (iPhone):
-1. ZIP herunterladen und in der iPhone-App „Dateien“ entpacken.
-2. GitHub im Browser öffnen: https://github.com/4h7zm6hnjy-skizze/Asthma-
-3. Die vorhandene Datei laborvergleich303.js durch die GLEICHNAMIGE Datei
-   aus diesem ZIP ersetzen. Eine alte und eine zweite Kopie nicht gleichzeitig
-   im Repository belassen. Änderungen in GitHub bestätigen/committen.
-4. Asthma-Webapp bei vorhandener Internetverbindung öffnen, entsperren,
-   ggf. „Update installieren“ benutzen und anschließend neu laden.
-5. Auf der Startseite erscheint „Neuen Wert eintragen oder Befund auswählen“
-   mit einem hervorgehobenen Knopf für den Treppenzähler.
+NEU: AUSFÜLLHILFE FÜR WEITERE ANTRÄGE
+- Auswahl der 29 vorhandenen Leistungsthemen und vier zusätzlichen Reha-Wege:
+  medizinisch/pneumologisch, psychosomatisch, berufliche Reha, Anschlussreha.
+- Auf jeder Leistungskarte »Ausfüllhilfe starten« antippen.
+- Vier Schritte: Thema wählen, persönliche Situation, Ziel und Nachweise,
+  Entwurf und offizielle Antragswege.
+- G0100/G0110/G0130: zusätzliche Erklärungen, welche Arten von
+  Angaben in den jeweiligen offiziellen Formularen verlangt werden.
+- Persönliche Daten (Name/Anschrift) kommen nur vom bereits entsperrten,
+  auf deinem Gerät gespeicherten verschlüsselten Profil.
+- GdB/Gleichstellung nur mit eigener ausdrücklicher Auswahl im Entwurf.
+- »Entwurf sicher speichern« legt Texte lokal im bestehenden
+  verschlüsselten Profil ab. Es wird nichts nach GitHub übertragen.
+- Kopieren oder eine Textdatei des Entwurfs erstellen.
+- Offizielle Quellen/Antragswege verlinkt. Die App stellt keinen
+  Antrag automatisch und befüllt amtliche PDF-Formulare nicht direkt.
+- Optional: »Datensparsame Frage kopieren«, um sie nach eigener
+  Entscheidung bei chatgpt.com einzufügen. Kein ChatGPT-API-Schlüssel,
+  keine automatische Übertragung von persönlichen Gesundheitsdaten.
 
-DIE SCHNELLAUSWAHL ENTHÄLT:
-- Lungenfunktion: Foto wählen (öffnet vorhandenen Scanner)
-- Lungenfunktion: PDF auswählen (öffnet bestehenden PDF-Assistenten)
-- Bluttest: Foto auswählen (öffnet vorhandene lokale Laborvorschau)
-- Blutdruck: Messwerte manuell eingeben
-- Puls: Messwert manuell eingeben
-- Treppenzähler: Stufen mit +30 / +24 und Grund erfassen
-- Sauerstoffsättigung SpO2: Wert manuell eingeben
-- Weitere Funktionen: Lungenfunktion manuell, Blutwert manuell,
-  Peak-Flow manuell, CSV/Excel-Import für ePEF, Gewicht,
-  Asthma-Tagebuch, Medikamente, Asthma-AU, Arbeitsbelastung,
-  Kalender, Monats-/Jahresstatistik.
-
-WICHTIG:
-- Die Knöpfe verweisen auf die BESTEHENDEN Erfassungs- und
-  Importfunktionen; es entstehen keine parallelen Datenspeicher.
-- Fotos/PDFs werden zunächst lokal im entsprechenden Assistenten geöffnet;
-  automatisch erkannt oder gespeichert wird nichts ohne Prüfung/Bestätigung.
-- PDF-Berichte von Lungenfunktion werden über den vorhandenen PDF-Assistenten
-  geöffnet. Bei gescannten PDFs kann die Texterkennung eingeschränkt sein.
-- Blutdruck und Puls haben derzeit keine automatische Foto-/Datei-Importfunktion;
-  die Schnellwahl öffnet die manuelle Eingabe.
-- Alle bisherigen Funktionen (Blutwertevergleich, Treppenzähler,
-  WorksManager-Import, Tagesampel und Statistik) bleiben erhalten.
-- Keine privaten Gesundheitsdaten sind in der Programmdatei hinterlegt.
-  Eine bereits vorhandene verschlüsselte Datensicherung ist dennoch ratsam.
-- Die allgemeine Versionsanzeige bleibt zunächst bei 3.0.5, weil nur
-  laborvergleich303.js ausgetauscht wird.
-- Diese Änderung wurde mit JavaScript-Syntaxprüfung und Browser-Test
-  geprüft. Der konkrete iPhone-Safari-Test steht noch aus.
-
-Bei Problemen Screenshot der Startseite nach App-Neustart schicken.
+WICHTIG
+- Die App-Version im Hauptmenü bleibt ggf. »3.0.5« – nur die
+  Erweiterungsdatei wird ausgetauscht.
+- Der Entwurf ersetzt kein amtliches Formular, keine ärztliche
+  Stellungnahme und keine rechtsverbindliche Fachberatung.
+- Versicherungsnummern nur in amtliche Antragsformulare eintragen.
+- Vor dem Einreichen: Angaben, Zuständigkeit und Fristen prüfen.
+- Aktualisierte persönliche Daten werden beim nächsten Entwurf aus
+  »Persönliche Daten« eingelesen, nicht in JavaScript festgeschrieben.
+- Das ZIP enthält keinerlei persönlichen Daten.

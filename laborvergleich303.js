@@ -1239,3 +1239,157 @@
  render();
  window.ASTHMA_REHA309={determine,localHint,recheck:render,getProfileLocation:()=>{const p=getPersonal();return {postalCode:p.postalCode||'',city:p.city||''}}};
 })();
+
+
+
+/* Asthma 3.1.0 – private, locally guided help for applications.
+ * No patient or user data embedded; no API keys, network transfers or automatic submission.
+ * An assisted text is NOT a completed official application form or medical certificate. */
+(()=>{
+ 'use strict';
+ const SEC=window.ASTHMA_SECURITY, $=id=>document.getElementById(id), root=$('antraege');
+ if(!root||!SEC?.state?.().unlocked||$('a310-guide'))return;
+ const catalog=(Array.isArray(window.ASTHMA_APPLICATIONS)?window.ASTHMA_APPLICATIONS:[]).filter(x=>x?.id&&x?.title);
+ const extra=[
+  {id:'reha-med',title:'Medizinische Reha (Lunge / Asthma)',cat:'Reha',who:'DRV oder Krankenkasse – individuell klären',kind:'portal',need:'Ärztliche Befunde; bei DRV in der Regel G0100, G0110 und ggf. weitere Anlagen',url:'https://www.deutsche-rentenversicherung.de/SharedDocs/Formulare/DE/Formularpakete/01_versicherte/reha/_DRV_Paket_Rehabilitation_Med_Rehabilitation.html',context:'Der Versicherungsträger ist nicht automatisch anhand der Postleitzahl bestimmbar.'},
+  {id:'reha-psy',title:'Psychosomatische Reha',cat:'Reha',who:'DRV oder Krankenkasse – individuell klären',kind:'portal',need:'Ärztliche/psychotherapeutische Befunde; bei DRV in der Regel G0100 und G0110',url:'https://www.deutsche-rentenversicherung.de/SharedDocs/Formulare/DE/Formularpakete/01_versicherte/reha/_DRV_Paket_Rehabilitation_Med_Rehabilitation.html'},
+  {id:'reha-work',title:'Berufliche Rehabilitation / Teilhabe am Arbeitsleben',cat:'Reha',who:'DRV, Agentur für Arbeit oder anderer Träger',kind:'portal',need:'Berufliche Belastungen, ärztliche Befunde; bei DRV in der Regel G0100 und G0130',url:'https://www.deutsche-rentenversicherung.de/SharedDocs/Formulare/DE/Formularpakete/01_versicherte/reha/_DRV_Paket_Rehabilitation_Leistungen_zur_Teilhabe.html'},
+  {id:'reha-after',title:'Anschlussrehabilitation nach Krankenhaus',cat:'Reha',who:'Kliniksozialdienst und zuständiger Kostenträger',kind:'portal',need:'Krankenhausbefunde und Empfehlung des Kliniksozialdienstes',url:'https://www.deutsche-rentenversicherung.de/DRV/DE/Reha/Medizinische-Reha/Allgemeine-med-Reha/allgemeine-med-reha.html'}
+ ];
+ const all=[...extra,...catalog],map=new Map(all.map(x=>[x.id,x]));
+ const node=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=String(txt);return e};
+ const url=u=>{try{const z=new URL(u);return z.protocol==='https:'?z.href:null}catch{return null}};
+ const today=()=>new Date().toLocaleDateString('de-DE');
+ const defaultDraft=()=>({topic:'reha-med',status:'',issue:'',limitations:'',goal:'',clinic:'',doctor:'',notes:'',hasDocs:false,includeGdb:false,includeAddress:true});
+ const clean=x=>String(x??'').trim();
+ const readProfile=()=>SEC.profileGet?.()||{};
+ const stored=readProfile().appGuide310;
+ const initial=(stored&&stored.version===1&&stored.current&&map.has(stored.current.topic))?{...defaultDraft(),...stored.current}:defaultDraft();
+ // Never use a stored profile address in bundled static code or in prompts for external services.
+ let answers=initial,step=0;
+ const panel=node('section','suite-subpanel');panel.id='a310-guide';
+ panel.innerHTML=`<div class="a310-heading"><div><p class="section-kicker">AUSFÜLLHILFE · AUF DEINEM GERÄT</p><h3>Schritt für Schritt zum Antrag</h3><p>Persönliche Erklärungen, hilfreiche Fragen und vorbereitete Begleitschreiben für Reha und weitere Leistungen.</p></div><span class="a310-private">Lokal &amp; verschlüsselt</span></div>
+ <div class="a310-toolbar"><button class="btn btn-outline" type="button" id="a310-reset">Neuen Entwurf beginnen</button><button class="btn btn-outline" type="button" id="a310-save">Entwurf sicher speichern</button></div>
+ <p class="a310-status" id="a310-status" role="status" aria-live="polite"></p>
+ <p class="a310-progress" id="a310-progress"></p><div id="a310-questions" class="a310-questions"></div>
+ <div class="a310-navigation"><button class="btn btn-outline" type="button" id="a310-back">Zurück</button><button class="btn btn-primary" type="button" id="a310-next">Weiter</button></div>
+ <details class="a310-ai"><summary>Persönliche Rückfragen mit ChatGPT besprechen (optional)</summary>
+ <p>Der Assistent oben funktioniert ohne KI-Anbindung. Für eine echte Unterhaltung öffnest du ChatGPT separat. <strong>Nichts wird aus dieser App automatisch an ChatGPT gesendet.</strong> Der Vorschlag enthält standardmäßig keine Namen, Anschriften, Gesundheitswerte oder Versicherungsnummern.</p>
+ <div class="a310-toolbar"><button type="button" class="btn btn-outline" id="a310-copy-ai">Datensparsame Frage kopieren</button><a class="btn btn-outline" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">ChatGPT öffnen ↗</a></div>
+ <p id="a310-ai-status" class="input-note" role="status"></p></details>
+ <p class="a310-note">Die Ausfüllhilfe ersetzt keine verbindliche Beratung, keine ärztliche Stellungnahme und keine amtlichen DRV-/Krankenkassenformulare. Anträge werden nicht automatisch verschickt. Vor dem Versenden Angaben und Fristen prüfen.</p>`;
+ const anchor=$('reha309')||root.querySelector('.application-tools');
+ if(anchor)anchor.insertAdjacentElement('afterend',panel);else root.prepend(panel);
+ const style=node('style');style.id='a310-style';style.textContent=`
+ #a310-guide{margin:17px 0;padding:16px;border:1px solid #b6d6e3;background:#f6fbfd;color:#163f53;border-radius:15px}
+ #a310-guide *{box-sizing:border-box}#a310-guide .a310-heading{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
+ #a310-guide h3{font-size:1.24rem;margin:5px 0 7px;color:#103f55}#a310-guide h4{font-size:1rem;margin:4px 0 12px}
+ #a310-guide p,#a310-guide label{font-size:.9rem;line-height:1.5}#a310-guide .a310-heading p{max-width:590px}
+ #a310-guide .a310-private{font-size:.78rem;border-radius:20px;padding:6px 11px;border:1px solid #b5d5cc;color:#165a49;background:#e5f5ef;align-self:flex-start}
+ #a310-guide .a310-toolbar,#a310-guide .a310-navigation{display:flex;flex-wrap:wrap;gap:9px;margin:13px 0;align-items:center}
+ #a310-guide .a310-status{min-height:1em;color:#225875;font-weight:650}
+ #a310-guide .a310-progress{font-size:.83rem;color:#4d7587;font-weight:700;margin:8px 0}
+ #a310-guide .a310-questions{background:white;padding:13px;border:1px solid #cfdee5;border-radius:12px}
+ #a310-guide .a310-field{display:block;font-weight:650;color:#35566a;margin:10px 0}
+ #a310-guide textarea,#a310-guide input[type=text],#a310-guide select{display:block;width:100%;min-width:0;font-size:16px;padding:10px;border-radius:9px;border:1px solid #bfd3df;background:white;color:#193d51;margin:6px 0 2px}
+ #a310-guide textarea{resize:vertical;min-height:76px}
+ #a310-guide .a310-hint{font-size:.84rem;color:#536e7d;margin:5px 0 12px}
+ #a310-guide .a310-check{display:flex;gap:9px;align-items:flex-start;margin:11px 0;color:#2b5266}
+ #a310-guide .a310-check input{margin-top:5px;flex-shrink:0}
+ #a310-guide .a310-preview{white-space:pre-wrap;overflow-wrap:anywhere;max-height:450px;overflow:auto;border:1px solid #ccdce5;border-radius:10px;padding:12px;background:#fafdff;font:normal .86rem/1.54 system-ui}
+ #a310-guide .a310-links{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0}#a310-guide .a310-links a{overflow-wrap:anywhere;white-space:normal;font-size:.81rem}
+ #a310-guide .a310-note{font-size:.78rem;color:#5b7481;margin:13px 0 0}
+ #a310-guide .a310-ai{border-top:1px solid #c8dde7;margin:17px 0 0;padding:12px 0 0}#a310-guide summary{font-weight:750;color:#17566f;cursor:pointer}
+ #a310-guide .a310-footnote{font-size:.82rem;color:#5a7280}
+ @media(max-width:420px){#a310-guide{padding:11px}#a310-guide .a310-toolbar button,#a310-guide .a310-navigation button{font-size:.87rem}}
+ `;document.head.append(style);
+ const body=$('a310-questions'),progress=$('a310-progress'),next=$('a310-next'),back=$('a310-back'),msg=$('a310-status');
+ function line(txt){body.append(node('p','a310-hint',txt))}
+ function h(txt){body.append(node('h4',null,txt))}
+ function field(label,key,placeholder,rows=3){const l=node('label','a310-field',label),t=node('textarea');t.rows=rows;t.maxLength=rows===2?320:1300;t.placeholder=placeholder||'';t.value=answers[key]||'';t.dataset.answer=key;l.append(t);body.append(l);return t}
+ function choose(label,key,options){const l=node('label','a310-field',label),t=node('select');t.dataset.answer=key;for(const [v,txt] of options)t.add(new Option(txt,v));t.value=answers[key]||'';l.append(t);body.append(l);return t}
+ function checkbox(label,key){const l=node('label','a310-check'),t=node('input');t.type='checkbox';t.dataset.answer=key;t.checked=!!answers[key];l.append(t,node('span',null,label));body.append(l);return t}
+ function addLink(box,name,link){const u=url(link);if(!u)return;const a=node('a','btn btn-outline',name+' ↗');a.href=u;a.target='_blank';a.rel='noopener noreferrer';box.append(a)}
+ function topic(){return map.get(answers.topic)||extra[0]}
+ function isReha(){return topic().cat==='Reha'}
+ function address(){const d=readProfile().personal||{};return [clean(d.street),[clean(d.postalCode),clean(d.city)].filter(Boolean).join(' ')].filter(Boolean).join('\n')}
+ function formStatus(){const s=answers.status||readProfile().rehaNavigator309?.status||'';return ({employed:'Arbeitnehmer/in',seeking:'Arbeitsuchend',oldage:'Altersrente',partialpension:'Erwerbsminderungsrente',partialoldage:'Teil-Altersrente',other:'Sonstige / unklar'})[s]||'Nicht angegeben'}
+ function officialLinks(){const t=topic();const links=[];if(isReha()){
+  if(t.id==='reha-work')links.push(['DRV – Berufliche Rehabilitation (G0100/G0130)',extra[2].url]);
+  else links.push(['DRV – Medizinische Rehabilitation (G0100/G0110)',extra[0].url]);
+  links.push(['Krankenkasse / Muster 61 – ärztlicher Antragsweg','https://www.kbv.de/praxis/verordnungen/rehabilitation']);
+  if(readProfile().rehaNavigator309?.carrier==='westfalen')links.push(['DRV Westfalen – Anlagen im Formularpaket',extra[0].url]);
+ }else links.push(['Offizieller Leistungsweg',t.url]);return links}
+ function draft(){const p=readProfile(),d=p.personal||{},t=topic(),is=isReha(),where=answers.includeAddress?address():'';
+  const name=answers.includeAddress?(clean(d.fullName)||'[Vor- und Nachname]'):'[Name selbst ergänzen]';
+  const rec=is?'[zuständigen Reha-Träger anhand des aktuellen Versicherungsverhältnisses eintragen]':clean(t.who)||'[zuständige Stelle prüfen]';
+  const parts=[name,where,'',rec,'','Datum: '+today(),'','Betreff: '+(is?'Begleitschreiben – Prüfung und Antragstellung: ':'Anfrage / Antrag: ')+t.title,'','Sehr geehrte Damen und Herren,',''];
+  if(is){parts.push('Ich möchte eine '+t.title+' beantragen und bitte um Prüfung der Zuständigkeit und der Anspruchsvoraussetzungen. Mir ist bekannt, dass hierfür je nach Kostenträger amtliche Formulare und ärztliche Unterlagen notwendig sein können.');parts.push('Aktuelle Situation: '+formStatus()+'.');}
+  else if(t.id==='widerspruch'){parts.push('Ich möchte gegen einen ablehnenden Bescheid vorgehen. Bitte berücksichtigen Sie die Frist und Rechtsbehelfsbelehrung des konkreten Bescheids. Ein fristwahrender Widerspruch sollte gesondert rechtzeitig eingereicht werden.');}
+  else parts.push('Hiermit bitte ich um Prüfung meines Bedarfs und der Möglichkeit einer Leistung: '+t.title+'.');
+  if(clean(answers.issue))parts.push('','Mein Anliegen / Anlass:',clean(answers.issue));
+  if(clean(answers.limitations))parts.push('','Tatsächliche Einschränkungen im Alltag oder Beruf:',clean(answers.limitations));
+  if(clean(answers.goal))parts.push('','Ziel / erbetene Unterstützung:',clean(answers.goal));
+  if(clean(answers.clinic)&&is)parts.push('','Wunschklinik bzw. Wunschort (Prüfung der Eignung und Verfügbarkeit vorbehalten):',clean(answers.clinic));
+  if(clean(answers.doctor))parts.push('','Behandelnde Stelle (freiwillige Angabe):',clean(answers.doctor));
+  if(answers.includeGdb){const n=Number(p.gdb),equal=p.equal===true||p.arbeitgeberCheck31?.answers?.eq==='yes';if(Number.isFinite(n)&&n>=20&&n<=100)parts.push('','Behinderungsstatus laut eigenem Profil: GdB '+n+(equal?'; Gleichstellung als bewilligt hinterlegt.':'.'));}
+  if(answers.hasDocs)parts.push('','Vorhandene ärztliche Unterlagen / Nachweise werde ich entsprechend den Vorgaben des Kostenträgers beifügen.');
+  if(clean(answers.notes))parts.push('','Zusätzliche Angaben:',clean(answers.notes));
+  parts.push('','Bitte teilen Sie mir den zuständigen Leistungsträger sowie die notwendigen amtlichen Formulare und Unterlagen mit. Ich bitte um eine schriftliche Bestätigung zum weiteren Verfahren.','','Mit freundlichen Grüßen',name,'','---','Entwurf aus meiner lokalen Ausfüllhilfe. Kein amtliches Antragsformular, keine ärztliche Bescheinigung, keine automatische Einreichung.');
+  return parts.filter((v,i,a)=>!(v===''&&i>0&&a[i-1]==='')).join('\n');
+ }
+ function aiPrompt(){const t=topic(),needs=t.need||'ggf. ärztliche Befunde';return 'Hilf mir bitte, einen Antrag zum Thema „'+t.title+'“ Schritt für Schritt vorzubereiten. Erkläre mir in einfacher Sprache jede Frage, frage nach fehlenden Angaben einzeln und gib die offiziellen, aktuellen Antragswege und notwendigen Unterlagen mit Quellen an. Ich will keine personenbezogenen Daten oder Versicherungsnummern ungefragt übermitteln. Bereits bekannt: Zuständige Stelle laut Leistungskatalog: '+(t.who||'noch zu prüfen')+'. Erforderliche Unterlagen laut Katalog: '+needs+'. Bitte erfinde keine Diagnosen oder Angaben und kennzeichne Musterschreiben klar als solche.';}
+ function rerender(){body.replaceChildren();progress.textContent='Schritt '+(step+1)+' von 4';back.disabled=step===0;next.textContent=step===3?'Zur Themenwahl':'Weiter';
+  if(step===0){h('1. Wobei brauchst du Hilfe?');const categories=[...new Set(all.map(x=>x.cat))];const select=choose('Antrag oder Leistung', 'topic',all.map(x=>[x.id,x.title+' ('+x.cat+')']));
+   line('Auswahl für alle '+catalog.length+' vorhandenen Leistungsthemen plus besondere Reha-Arten. Du kannst auch in der Leistungsliste „Ausfüllhilfe“ wählen.');
+   line('Offizieller Weg: '+(topic().way||topic().who||'individuell klären'));line('Benötigte Unterlagen: '+(topic().need||'beim Träger nachfragen'));
+   select.addEventListener('change',()=>{updateFields();rerender()});}
+  else if(step===1){h('2. Persönliche Situation und Bedarf');const p=readProfile().personal||{};
+   line('Name im verschlüsselten Profil: '+(clean(p.fullName)?'vorhanden':'noch nicht hinterlegt')+' · Anschrift: '+(address()?'vorhanden':'nicht gespeichert')+'. Daten werden erst in deinem lokal erzeugten Entwurf verwendet.');
+   if(isReha())choose('Aktuelle Lebenssituation','status',[['','Bitte auswählen'],['employed','Arbeitnehmer/in'],['seeking','Arbeitsuchend'],['oldage','Altersrentner/in'],['partialpension','Erwerbsminderungsrente'],['partialoldage','Teil-Altersrente'],['other','Sonstige / unklar']]);
+   field('Was möchtest du beantragen, und warum?','issue','Beschreibe in eigenen Worten den Anlass (nur bestätigte Angaben).');
+   field('Welche konkreten Einschränkungen gibt es?','limitations','z. B. bei der Arbeit oder im Alltag; nur selbst beobachtete Beschwerden');
+   checkbox('Vor- und Nachname sowie Anschrift aus „Persönliche Daten“ im Entwurf verwenden','includeAddress');
+   checkbox('Meinen bestätigten GdB und eine ggf. hinterlegte Gleichstellung im Entwurf erwähnen','includeGdb');}
+  else if(step===2){h('3. Ziele, Unterlagen und weitere Angaben');field('Was soll durch die beantragte Hilfe erreicht werden?','goal','z. B. Beschwerden reduzieren, Teilhabe erhalten, Arbeitsplatz anpassen');
+   if(isReha())field('Wunschklinik oder Wunschregion (optional)','clinic','Nur wenn du selbst eine passende Einrichtung vorschlagen möchtest',2);
+   field('Behandelnde Praxis / Arzt (optional)','doctor','Nur eintragen, wenn du das angeben möchtest',2);
+   field('Sonstige Hinweise (optional)','notes','Nur belegbare, relevante Informationen',2);
+   checkbox('Ich habe ärztliche Befunde oder andere Nachweise zur Einreichung','hasDocs');
+   line('Unterlagen laut Leistungskatalog: '+(topic().need||'Bei der zuständigen Stelle erfragen.')+' Die ärztliche Bewertung muss durch die Praxis erfolgen.');
+   if(isReha()){
+    const guide=node('details');guide.open=true;guide.append(node('summary',null,'Was gehört in die DRV-Unterlagen?'));
+    guide.append(node('p','a310-hint','G0100: Persönliche Angaben und Rentenversicherungsnummer aus deinem eigenen DRV-Schreiben, beantragte Leistung, Kontaktdaten, Versicherungs- und Beschäftigungsangaben entsprechend der aktuellen Formularfassung. Versicherungsnummer bitte nur im amtlichen Formular eintragen.'));
+    guide.append(node('p','a310-hint',topic().id==='reha-work'?'G0130: Berufliche Einschränkungen, Tätigkeit und gewünschte Unterstützung wahrheitsgemäß angeben.':'G0110: Gesundheitliche Einschränkungen, relevante Behandlungen, Arbeits-/Alltagsbelastung und frühere Rehabilitation nur nach tatsächlicher persönlicher Situation angeben.'));
+    guide.append(node('p','a310-hint','Ärztliche Angaben und Befundberichte stammen aus der Praxis. Ob besondere Anlagen erforderlich sind, hängt unter anderem von Reha-Art und zugeordnetem DRV-Träger ab. Die Formularpakete enthalten den aktuellen Stand.'));
+    body.append(guide);
+   }
+  }
+  else {h('4. Entwurf und nächste Schritte');line('Dieser Text ist ein Begleitschreiben. Offizielle Formulare (z. B. DRV G0100/G0110) musst du separat bei der zuständigen Stelle ausfüllen und einreichen.');
+   const pre=node('div','a310-preview',draft());pre.id='a310-preview';body.append(pre);
+   const tools=node('div','a310-toolbar');const copy=node('button','btn btn-primary','Entwurf kopieren');copy.type='button';copy.id='a310-copy-draft';const download=node('button','btn btn-outline','Als Textdatei sichern');download.type='button';download.id='a310-download';tools.append(copy,download);body.append(tools);
+   copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(draft());msg.textContent='Entwurf kopiert. Vor dem Einreichen bitte alle Angaben prüfen.';}catch(e){msg.textContent='Kopieren nicht möglich. Bitte Text oben markieren und manuell kopieren.'}});
+   download.addEventListener('click',()=>{const blob=new Blob([draft()],{type:'text/plain;charset=utf-8'}),ref=URL.createObjectURL(blob),a=node('a');a.href=ref;a.download='Asthma_Antragsentwurf_'+new Date().toISOString().slice(0,10)+'.txt';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(ref),30000);msg.textContent='Textdatei erstellt – bitte in Dateien sichern.';});
+   const links=node('div','a310-links');for(const [name,u] of officialLinks())addLink(links,name,u);body.append(links);
+   line('Hinweis: Bei DRV ist die auf deinem letzten Versicherungs-/Rentenbrief genannte Trägerstelle maßgeblich. Ein Wohnort allein beweist keine Zuständigkeit.');
+  }
+ }
+ function updateFields(){for(const e of body.querySelectorAll('[data-answer]')){const k=e.dataset.answer;answers[k]=e.type==='checkbox'?e.checked:e.value}}
+ body.addEventListener('input',updateFields);body.addEventListener('change',updateFields);
+ next.addEventListener('click',()=>{updateFields();if(step===3)step=0;else step++;msg.textContent='';rerender();});
+ back.addEventListener('click',()=>{updateFields();if(step>0)step--;rerender()});
+ $('a310-reset').addEventListener('click',()=>{answers=defaultDraft();step=0;msg.textContent='Neuer Entwurf begonnen. Dein zuvor gespeicherter Entwurf bleibt im verschlüsselten Profil, bis du erneut speicherst.';rerender()});
+ $('a310-save').addEventListener('click',async()=>{updateFields();const b=$('a310-save');b.disabled=true;try{await SEC.updateProfile({appGuide310:{version:1,current:{...answers},updatedAt:new Date().toISOString()}});msg.textContent='Entwurf im verschlüsselten persönlichen Profil gespeichert.';}catch(e){msg.textContent='Speichern fehlgeschlagen: '+e.message}finally{b.disabled=false}});
+ $('a310-copy-ai').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(aiPrompt());$('a310-ai-status').textContent='Neutrale Frage kopiert. ChatGPT öffnen und dort einfügen. Keine persönlichen Gesundheits- oder Adressdaten kopiert.'}catch{$('a310-ai-status').textContent='Bitte Frage selbst kopieren oder ChatGPT ohne Vorlage öffnen.'}});
+ // Each original existing benefit item gets a contextual entry point even when its list is re-rendered by filtering.
+ const list=$('apply-list');function hookCards(){if(!list)return;for(const card of list.querySelectorAll('.application-item[data-application]')){
+  const id=card.dataset.application;if(!map.has(id)||card.querySelector('.a310-card-open'))continue;
+  const toolbar=card.querySelector('.app-buttons');if(!toolbar)continue;
+  const b=node('button','btn btn-outline a310-card-open','Ausfüllhilfe starten');b.type='button';b.addEventListener('click',()=>{answers={...answers,topic:id};step=0;rerender();panel.scrollIntoView({block:'start',behavior:'smooth'});});toolbar.append(b);
+ }}
+ if(list){hookCards();const obs=new MutationObserver(hookCards);obs.observe(list,{childList:true,subtree:true})}
+ window.addEventListener('asthma:personal-profile-updated',()=>{if(step===1||step===3)rerender()});
+ window.addEventListener('asthma:secure-change',e=>{if(e.detail?.group==='profile'&&(step===1||step===3))rerender()});
+ window.ASTHMA_GUIDE310={count:all.length,open(id){if(map.has(id)){answers.topic=id;step=0;rerender();panel.scrollIntoView({block:'start'})}},getDraft:draft,chatPrompt:aiPrompt};
+ rerender();
+})();
