@@ -1,0 +1,28 @@
+ASTHMA TREPPENZÄHLER – SPANGEN + 13 ALTE EINTRÄGE
+
+INHALT
+- laborvergleich303.js  = Programm-Update (KEINE privaten Einträge im Code)
+- WorksManager_Treppen_13_Eintraege_PRIVAT.json = 13 private Einträge (378 Stufen)
+
+IPHONE-ANLEITUNG
+1. Diese ZIP-Datei in der Dateien-App antippen, damit sie entpackt wird.
+2. NUR laborvergleich303.js bei GitHub im bestehenden Asthma-Repository ersetzen.
+   Die Datei WorksManager_Treppen_13_Eintraege_PRIVAT.json NICHT bei GitHub hochladen.
+3. Asthma-Webapp mit Internetverbindung erneut öffnen und ggf. „Update installieren“ verwenden.
+4. Arbeitsplatz und Belastungen öffnen > Treppenzähler > „Alte WorksManager-Treppeneinträge übernehmen“.
+5. Dort die Datei WorksManager_Treppen_13_Eintraege_PRIVAT.json über „Private Importdatei wählen“ lokal auswählen.
+6. Die Vorschau „13 Einträge ...“ prüfen und „Erkannte Einträge verschlüsselt übernehmen“ antippen.
+7. Danach Monat/Jahr Oktober 2026 in der Statistik ansehen.
+
+WICHTIG
+- Die 13 sichtbaren Einträge umfassen den 13.–16.10.2026, insgesamt 378 Stufen.
+- Ein Bildausschnitt vom 14.10.2026 um 21:35 erscheint zweimal; er wird nur einmal gezählt.
+- Schicht und Beschwerden stehen auf den Screenshots nicht; sie werden NICHT ERFUNDEN und bleiben leer.
+- Gründe „Fertigteile runter“ und „Fertigteile runter gebracht“ wurden der Schnellauswahl
+  „Fertigteile runtergefahren“ zugeordnet; der Originaltext steht in der Notiz.
+- „Spangen holen 12,4 kg“ erhält Grund „Spangen“ und die Gewichtsangabe als Notiz.
+- Vorhandene Werte werden NICHT überschrieben. Das Importieren desselben Screenshots wird auf
+  Duplikate geprüft, anhand von Datum + Uhrzeit + Stufenzahl.
+- Die private JSON-Datei nach dem Import sicher aufbewahren oder bei Bedarf löschen; bei
+  einem unverschlüsselten Export darauf achten, dass niemand Zugriff darauf hat.
+- Das Paket ändert die allgemeine App-Versionsanzeige nicht (3.0.5).

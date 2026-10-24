@@ -1,0 +1,98 @@
+{
+  "kind": "Asthma-Stairs-Import-v1",
+  "source": "13 sichtbare WorksManager-Einträge aus 2 Screenshots, 13.–16.10.2026",
+  "notice": "Nur auf deinem iPhone in die entsperrte Asthma-App importieren. Diese Datei enthält private Tätigkeitsdaten. Nicht auf GitHub hochladen.",
+  "entries": [
+    {
+      "date": "2026-10-16",
+      "time": "03:21",
+      "steps": 30,
+      "reason": "Anguss runter",
+      "note": ""
+    },
+    {
+      "date": "2026-10-16",
+      "time": "03:14",
+      "steps": 30,
+      "reason": "Fertigteile runtergefahren",
+      "note": "Originalbezeichnung in WorksManager: Fertigteile runter"
+    },
+    {
+      "date": "2026-10-16",
+      "time": "02:31",
+      "steps": 24,
+      "reason": "Spangen",
+      "note": "Spangen holen, 12,4 kg"
+    },
+    {
+      "date": "2026-10-16",
+      "time": "01:36",
+      "steps": 30,
+      "reason": "Aufzug hochgeholt",
+      "note": ""
+    },
+    {
+      "date": "2026-10-15",
+      "time": "03:49",
+      "steps": 30,
+      "reason": "Fertigteile runtergefahren",
+      "note": "Originalbezeichnung in WorksManager: Fertigteile runter gebracht"
+    },
+    {
+      "date": "2026-10-14",
+      "time": "21:35",
+      "steps": 30,
+      "reason": "Farbe geholt",
+      "note": ""
+    },
+    {
+      "date": "2026-10-14",
+      "time": "03:21",
+      "steps": 30,
+      "reason": "Paletten runter gebracht",
+      "note": ""
+    },
+    {
+      "date": "2026-10-14",
+      "time": "00:44",
+      "steps": 30,
+      "reason": "WC",
+      "note": ""
+    },
+    {
+      "date": "2026-10-13",
+      "time": "23:18",
+      "steps": 30,
+      "reason": "Bindedraht geholt",
+      "note": ""
+    },
+    {
+      "date": "2026-10-13",
+      "time": "21:44",
+      "steps": 24,
+      "reason": "Spangen",
+      "note": ""
+    },
+    {
+      "date": "2026-10-13",
+      "time": "04:15",
+      "steps": 30,
+      "reason": "Kühlanlage",
+      "note": ""
+    },
+    {
+      "date": "2026-10-13",
+      "time": "03:43",
+      "steps": 30,
+      "reason": "Kühlanlage",
+      "note": ""
+    },
+    {
+      "date": "2026-10-13",
+      "time": "02:04",
+      "steps": 30,
+      "reason": "Kühlanlage",
+      "note": ""
+    }
+  ]
+}

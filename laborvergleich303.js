@@ -286,8 +286,8 @@
     <label>Datum<input id="sc-date" type="date" required></label>
     <label>Uhrzeit<input id="sc-time" type="time" required></label>
     <label>Anzahl Stufen<input id="sc-steps" type="number" min="1" max="20000" step="1" inputmode="numeric" placeholder="z. B. 60" required></label>
-    <label>Schicht<select id="sc-shift"><option>Frühschicht</option><option>Spätschicht</option><option>Nachtschicht</option><option>Andere / frei</option></select></label>
-    <label>Grund<select id="sc-reason"><option>Kühlanlage</option><option>Materialscheine</option><option>WC</option><option>Fertigteile runtergefahren</option><option>Verpackung geholt</option><option>Pappe geschnitten</option><option value="__custom__">Anderer Grund – selbst eintragen</option></select></label>
+    <label>Schicht<select id="sc-shift"><option value="">Nicht angegeben</option><option>Frühschicht</option><option>Spätschicht</option><option>Nachtschicht</option><option>Andere / frei</option></select></label>
+    <label>Grund<select id="sc-reason"><option>Kühlanlage</option><option>Materialscheine</option><option>WC</option><option>Fertigteile runtergefahren</option><option>Verpackung geholt</option><option>Pappe geschnitten</option><option>Spangen</option><option value="__custom__">Anderer Grund – selbst eintragen</option></select></label>
     <label id="sc-reason-custom-wrap" hidden>Anderer Grund (frei eingeben)<input id="sc-reason-custom" type="text" maxlength="120" placeholder="z. B. Maschinenkontrolle"></label>
     <label>Beschwerden danach<select id="sc-symptoms"><option value="">Nicht angegeben</option><option value="0">0 – keine</option><option value="1">1 – leicht</option><option value="2">2 – mittel</option><option value="3">3 – stark</option></select></label>
     <label class="sc-wide">Notiz (optional)<textarea id="sc-note" rows="2" maxlength="500" placeholder="z. B. drei Mal zum Materiallager, Atemnot"></textarea></label>
@@ -296,6 +296,12 @@
    <div class="sc-actions"><button id="sc-save" type="submit" class="btn btn-primary">Stufen speichern</button><button id="sc-cancel" type="button" class="btn btn-outline" hidden>Bearbeiten abbrechen</button></div>
   </form>
   <p id="sc-status" role="status" class="input-note"></p>
+  <details id="sc-import-panel"><summary>Alte WorksManager-Treppeneinträge übernehmen</summary>
+   <p>Die Daten aus deinem WorksManager-Screenshot liegen in einer separaten privaten JSON-Datei. Bitte diese Datei nur hier auf deinem iPhone auswählen, nicht bei GitHub hochladen.</p>
+   <label>Private Importdatei wählen<input id="sc-import-file" type="file" accept=".json,application/json"></label>
+   <div id="sc-import-preview" hidden><p id="sc-import-info" role="status"></p><button type="button" id="sc-import-confirm" class="btn btn-primary">Erkannte Einträge verschlüsselt übernehmen</button><button type="button" id="sc-import-cancel" class="btn btn-outline">Abbrechen</button></div>
+   <p id="sc-import-status" role="status" class="input-note">Doppelte Einträge werden erkannt und übersprungen. Bestehende Daten werden nicht überschrieben.</p>
+  </details>
   <div class="sc-lower"><h4>Einträge und Auswertung</h4><label>Ansicht<select id="sc-view"><option value="month">Aktueller Monat</option><option value="year">Ganzes Jahr</option><option value="all">Alle Jahre</option></select></label></div>
   <div class="sc-substats" id="sc-summary"></div><div id="sc-list" class="sc-list"></div><button id="sc-more" type="button" class="btn btn-outline" hidden>Weitere Einträge anzeigen</button>
   <details id="sc-annual"><summary>Jahresübersicht und Monatsstatistik</summary><div class="sc-annual-head"><label>Jahr auswählen<select id="sc-report-year"></select></label><button type="button" class="btn btn-outline" id="sc-print">Jahresbericht drucken / PDF</button></div><div id="sc-monthtable"></div></details>
@@ -324,6 +330,11 @@
  #sc-work-panel .sc-quick span{font-size:.84rem;color:#587383;margin-right:4px}
  #sc-work-panel .sc-quick button{border:1px solid #a5cbd9;border-radius:9px;background:#e9f7fb;color:#115a73;font-weight:750;min-width:51px;min-height:41px;padding:6px 10px;font-size:1rem}
  #sc-work-panel .sc-actions{display:flex;gap:8px;flex-wrap:wrap;margin:9px 0}
+ #sc-import-panel{margin:16px 0;padding:11px 13px;border:1px solid #bfdbe7;border-radius:11px;background:#fff}
+ #sc-import-panel>summary{cursor:pointer;color:#184e68;font-weight:750}
+ #sc-import-panel p{font-size:.89rem;color:#506f80;line-height:1.48}
+ #sc-import-panel .btn{margin:5px 6px 5px 0;white-space:normal}
+ #sc-import-panel #sc-import-file{font-size:16px}
  #sc-work-panel .sc-lower{display:flex;justify-content:space-between;align-items:end;flex-wrap:wrap;gap:10px;border-top:1px solid #d2e3eb;padding-top:15px;margin-top:16px}
  #sc-work-panel .sc-lower h4{margin:0;color:#234658}#sc-work-panel .sc-lower select{min-width:170px}
  #sc-work-panel .sc-substats{display:flex;flex-wrap:wrap;gap:8px;color:#506a78;font-size:.88rem;margin:14px 0}
@@ -608,4 +619,72 @@
  let wrapped=wrap(current);
  Object.defineProperty(window,'ASTHMA_STATSP292',{configurable:true,enumerable:true,get:()=>wrapped,set(value){current=value;wrapped=wrap(value)}});
  window.ASTHMA_STATS306={add,byReason,numeric,ready:()=>Boolean(wrapped?.append)};
+})();
+
+
+/* Asthma: privater WorksManager-Datenimport aus iPhone-Dateien.
+   Ausschließlich nach ausdrücklicher Auswahl und Bestätigung.
+   Kein eingebetteter Personen-/Arbeitsdatensatz und keine Netzwerkanfrage. */
+(()=>{
+ 'use strict';
+ const S=window.ASTHMA_SECURITY,$=id=>document.getElementById(id);
+ if(!S?.state?.().unlocked||!$('sc-import-file')||!$('sc-import-confirm'))return;
+ const file=$('sc-import-file'),panel=$('sc-import-panel'),preview=$('sc-import-preview'),message=$('sc-import-status'),info=$('sc-import-info');
+ const confirmBtn=$('sc-import-confirm');
+ let pending=[],busy=false;
+ const dOk=s=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(s||''))return false;const t=new Date(s+'T12:00:00');return !isNaN(+t)&&[t.getFullYear(),String(t.getMonth()+1).padStart(2,'0'),String(t.getDate()).padStart(2,'0')].join('-')===s};
+ const tOk=s=>/^([01]\d|2[0-3]):[0-5]\d$/.test(s||'');
+ const fp=r=>[r.date,r.time,Number(r.steps)].join('|');
+ const makeId=r=>'wm-'+r.date.replace(/-/g,'')+'-'+r.time.replace(':','')+'-'+r.steps;
+ const reset=()=>{pending=[];file.value='';preview.hidden=true;info.textContent=''};
+ const validate=data=>{
+  if(data?.kind!=='Asthma-Stairs-Import-v1'||!Array.isArray(data.entries)||data.entries.length<1||data.entries.length>5000)throw Error('Keine gültige Treppen-Importdatei.');
+  const unique=new Set(),out=[];
+  for(const x of data.entries){
+   if(!x||!dOk(x.date)||!tOk(x.time)||!Number.isInteger(Number(x.steps))||Number(x.steps)<1||Number(x.steps)>20000)throw Error('Fehlerhafter Eintrag: Datum, Uhrzeit oder Stufenanzahl.');
+   const reason=String(x.reason||'').trim().slice(0,120);
+   if(!reason)throw Error('Bei einem Eintrag fehlt der Grund.');
+   const item={date:x.date,time:x.time,steps:Number(x.steps),shift:'',reason,symptoms:'',note:String(x.note||'').slice(0,500),source:'WorksManager (Screenshot)',id:makeId(x)};
+   if(unique.has(fp(item)))continue;
+   unique.add(fp(item));out.push(item);
+  }
+  return out;
+ };
+ async function inspect(){
+  const f=file.files?.[0];reset();
+  // Keep selected File reference after clearing the input for safe file re-selection.
+  if(!f)return;
+  try{
+   if(f.size>1024*1024||f.size===0)throw Error('Bitte eine JSON-Datei bis 1 MB auswählen.');
+   pending=validate(JSON.parse(await f.text()));
+   const existing=(await S.list('suite')).filter(r=>r.type==='stairs').map(r=>r.value).filter(Boolean);
+   const known=new Set(existing.map(fp)),fresh=pending.filter(r=>!known.has(fp(r)));
+   const total=fresh.reduce((n,r)=>n+r.steps,0);
+   info.textContent=pending.length+' eindeutige Einträge erkannt: '+fresh.length+' neu ('+total.toLocaleString('de-DE')+' Stufen), '+(pending.length-fresh.length)+' bereits vorhanden.';
+   preview.hidden=false;confirmBtn.disabled=fresh.length===0;
+   message.textContent='Datei privat geprüft. Noch nichts importiert. „Verschlüsselt übernehmen“ bestätigen.';
+  }catch(e){reset();message.textContent='Datei konnte nicht geprüft werden: '+(e.message||e)}
+ }
+ // Do not keep file names or contents in a remote store.
+ file.addEventListener('change',inspect);
+ $('sc-import-cancel').addEventListener('click',()=>{reset();message.textContent='Import abgebrochen; keine Daten gespeichert.'});
+ confirmBtn.addEventListener('click',async()=>{
+  if(busy||!pending.length)return;
+  busy=true;confirmBtn.disabled=true;
+  try{
+   const known=new Set((await S.list('suite')).filter(r=>r.type==='stairs').map(r=>r.value).filter(Boolean).map(fp));
+   let saved=0,skipped=0;
+   for(const x of pending){
+    if(known.has(fp(x))){skipped++;continue}
+    const now=new Date().toISOString();
+    await S.put('suite',{key:'stairs/'+x.id,type:'stairs',value:{...x,createdAt:now,updatedAt:now}},'stairs/'+x.id);
+    known.add(fp(x));saved++;
+    message.textContent=saved+' von '+pending.length+' Einträgen verschlüsselt gespeichert …';
+   }
+   reset();message.textContent='Import abgeschlossen: '+saved+' Einträge übernommen, '+skipped+' doppelte übersprungen. Treppenstatistik wird aktualisiert.';
+   if(window.ASTHMA_STAIRS?.refresh)await window.ASTHMA_STAIRS.refresh();
+  }catch(e){message.textContent='Import teilweise fehlgeschlagen: '+(e.message||e)+'. Dieselbe Datei kann erneut gewählt werden, doppelte werden übersprungen.'}
+  finally{busy=false;confirmBtn.disabled=false}
+ });
+ window.ASTHMA_WM_IMPORT={validate,fp,makeId};
 })();
