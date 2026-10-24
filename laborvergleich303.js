@@ -86,6 +86,87 @@
    window.ASTHMA_NAV316={ready:true,version:'3.1.6',searchOnStart:!!$('private-search20'),combined:!!$('nav316-combined')};
  }catch(error){console.error('Asthma-Navigation 3.1.6 konnte nicht vollständig geladen werden:',error);}
 })();
+/* Asthma Header-Suche 3.1.7: vorhandene verschluesselte Akten-Suche oben in die Kopfzeile verschieben.
+   Ein einziges Suchfeld mit unveraenderter ID, keine neuen Datenablaegen/Netzwerkzugriffe. */
+(()=>{
+ 'use strict';
+ try {
+  const $=id=>document.getElementById(id);
+  if($('nav317-search-action'))return;
+  const header=document.querySelector('header.topbar .topbar-inner');
+  const brand=header?.querySelector('.brand');
+  const updateArea=header?.querySelector('.top-actions');
+  const existing=$('private-search20');
+  const search=existing?.closest('.hub20-search');
+  if(!header||!brand||!updateArea||!search)return;
+  const previousParent=search.parentElement;
+
+  const css=document.createElement('style');css.id='nav317-style';
+  css.textContent=`
+   header.topbar{position:relative;z-index:401;overflow:visible}
+   header.topbar .topbar-inner{position:relative;overflow:visible;gap:10px;min-width:0}
+   #nav317-search-action{display:flex;align-items:center;justify-content:center;gap:7px;min-width:90px;height:41px;border:1px solid #c5e1e7;border-radius:13px;background:#e9f6f8;color:#155469;font-size:.9rem;font-weight:750;padding:0 13px;white-space:nowrap;flex:none;cursor:pointer;box-shadow:none}
+   #nav317-search-action svg{width:19px;height:19px;stroke:currentColor;stroke-width:2;stroke-linecap:round;fill:none;flex:none}
+   #nav317-search-action[aria-expanded="true"]{background:#cceef2;border-color:#56a9bd}
+   #nav317-holder{display:flex;align-items:center;margin-left:auto;position:relative;min-width:0;flex:none}
+   #nav317-search-panel{position:absolute;right:-50px;top:calc(100% + 14px);width:min(420px,calc(100vw - 24px));max-height:min(65dvh,550px);overflow:auto;overscroll-behavior:contain;padding:14px;background:#fff;box-shadow:0 18px 46px rgba(14,52,69,.23);border:1px solid #b9dbe6;border-radius:16px;z-index:601;box-sizing:border-box;color:#163c4c}
+   #nav317-search-panel[hidden]{display:none!important}
+   #nav317-search-panel .nav317-panel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px}
+   #nav317-search-panel .nav317-panel-header strong{font-size:1rem;color:#164557}
+   #nav317-search-close{border:0;border-radius:9px;width:36px;height:36px;display:grid;place-items:center;background:#ebf5f8;color:#234d5d;font-size:1.35rem;line-height:1;cursor:pointer}
+   #nav317-search-panel .hub20-search{border:0!important;box-shadow:none!important;margin:0!important;padding:0!important;background:transparent!important;min-width:0;width:100%}
+   #nav317-search-panel .hub20-search label{color:#345b6b;font-size:.83rem;margin:0 0 6px}
+   #nav317-search-panel .hub20-search input{display:block;width:100%;max-width:100%;min-width:0;min-height:46px;font-size:16px;color:#143e51;background:#fff;border:1px solid #afcad6;border-radius:11px;padding:11px 12px}
+   #nav317-search-panel .hub20-search .input-note{font-size:.8rem;margin:8px 0;color:#566f7a;line-height:1.35}
+   #nav317-search-panel .hub20-results{max-height:38dvh;overflow:auto;display:grid;gap:7px;margin-top:8px}
+   #nav317-search-panel .hub20-result{width:100%;text-align:left;cursor:pointer}
+   @media(max-width:530px){
+    header.topbar .topbar-inner{gap:7px;padding-left:12px;padding-right:12px}
+    header.topbar .top-actions{flex:none;gap:4px}
+    #nav317-holder{margin-left:auto}
+    #nav317-search-action{height:39px;min-width:0;padding:0 10px;border-radius:11px;font-size:.8rem;gap:5px}
+    #nav317-search-action svg{width:18px;height:18px}
+    #nav317-search-panel{right:-53px;top:calc(100% + 13px)}
+   }
+   @media(max-width:360px){
+    #nav317-search-action{padding:0 8px;font-size:.75rem}
+    #nav317-search-panel{right:-47px}
+   }
+  `;
+  document.head.append(css);
+
+  const holder=document.createElement('div');holder.id='nav317-holder';
+  const toggle=document.createElement('button');toggle.id='nav317-search-action';toggle.type='button';
+  toggle.setAttribute('aria-controls','nav317-search-panel');toggle.setAttribute('aria-expanded','false');
+  toggle.setAttribute('aria-label','Akte durchsuchen');
+  toggle.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.7" cy="10.7" r="7"/><path d="m16 16 5 5"/></svg><span>Suchen</span>';
+  const panel=document.createElement('section');panel.id='nav317-search-panel';panel.hidden=true;
+  panel.setAttribute('aria-label','Suche in der verschluesselten Akte');
+  const top=document.createElement('div');top.className='nav317-panel-header';
+  const heading=document.createElement('strong');heading.textContent='Suche in deiner Akte';
+  const close=document.createElement('button');close.type='button';close.id='nav317-search-close';
+  close.setAttribute('aria-label','Suche schließen');close.textContent='×';
+  top.append(heading,close);panel.append(top,search);
+  holder.append(toggle,panel);updateArea.before(holder);
+
+  // The old start-page box is no longer needed; search stays in header on every screen.
+  if(previousParent?.id==='nav316-search'||previousParent?.id==='nav315-search')previousParent.remove();
+  const show=(open,focus=false)=>{
+   panel.hidden=!open;toggle.setAttribute('aria-expanded',String(open));
+   if(open&&focus)existing.focus({preventScroll:true});
+  };
+  toggle.addEventListener('click',()=>show(panel.hidden,true));
+  close.addEventListener('click',()=>{show(false);toggle.focus({preventScroll:true})});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden){show(false);toggle.focus({preventScroll:true})}});
+  document.addEventListener('pointerdown',e=>{if(!panel.hidden&&!holder.contains(e.target))show(false)});
+  // Clicking a result still follows the already installed local search navigation.
+  panel.querySelector('#private-search-results20')?.addEventListener('click',e=>{
+   if(e.target.closest('button'))show(false);
+  });
+  window.ASTHMA_HEADER_SEARCH317=Object.freeze({version:'3.1.7',ready:true,originalSearchReused:!!$('private-search20'),inHeader:header.contains($('private-search20'))});
+ }catch(error){console.error('Header-Suche 3.1.7 konnte nicht eingerichtet werden:',error)}
+})();
+
 /* Asthma 3.0.3 – additive, offline-only lab comparison panel. No personal data in source. */
 (()=>{
  const SEC=window.ASTHMA_SECURITY;

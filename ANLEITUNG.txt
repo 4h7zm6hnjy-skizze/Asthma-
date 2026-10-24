@@ -1,28 +1,15 @@
-Asthma – Navigation & Cache Fix 3.1.6
+Asthma 3.1.7 – SUCHE IM KOPFBEREICH
 
-WARUM EIN NEUES UPDATE?
-Bei 3.1.5 lag die Navigationsfunktion am Ende einer sehr großen JavaScript-Datei.
-Ein Fehler in einem früheren Modul kann die Ausführung verhindern. Diese Reparatur
-setzt die Navigation VOR alle Statistik-Module und erneuert den Offline-Cache.
+Die Suche befindet sich nach dem Update im oberen weißen Balken direkt zwischen Asthma-Logo und Update-Symbol. Auf „Suchen“ tippen, um die gewohnte verschlüsselte Akten-Suche auszuklappen. Beim Antippen eines Treffers wird der richtige Bereich geöffnet. Die bisherige Navigation bleibt erhalten.
 
-INSTALLATION
-1. Zuerst in der bisherigen iPhone-Webapp unter Einstellungen eine vollständige
-   verschlüsselte .asthma17-Datensicherung erstellen und an einem sicheren Ort ablegen.
-2. Das ZIP entpacken.
-3. Die drei Dateien laborvergleich303.js, sw.js und version.json IN EINEM SCHRITT
-   in das Stammverzeichnis des GitHub-Projekts Asthma- hochladen und bestehende Dateien ersetzen.
-4. Commit changes bestätigen und die Veröffentlichung abwarten.
-5. In der bisherigen Webapp zu Einstellungen > Update installieren wechseln.
-6. App schließen und über dasselbe Home-Bildschirm-Symbol wieder öffnen.
-7. Prüfen: Suche ganz oben, untere Leiste Start/Lunge/Kalender/Anträge-Akte/Labor/Blutdruck.
+INSTALLATION (bisherige App nicht löschen)
+1. In der App vor dem Update eine vollständige verschlüsselte .asthma17-Datensicherung anlegen.
+2. ZIP entpacken.
+3. Die Dateien laborvergleich303.js, sw.js und version.json im Hauptverzeichnis des GitHub-Projekts Asthma- ersetzen.
+4. GitHub-Commit bestätigen.
+5. In der bestehenden Asthma-Webapp „Update installieren“ ausführen, danach App schließen und erneut öffnen.
+6. Im weißen Kopfbereich „Suchen“ tippen und mit einem bekannten Suchbegriff testen.
 
-NICHT tun: Alte Home-Bildschirm-App löschen, Safari-Website-Daten löschen oder
-einen neuen leeren Tresor einrichten.
+WICHTIG: Nicht das iPhone-Home-Bildschirm-Symbol oder Safari-Websitedaten löschen! Keine Gesundheitsdaten oder Tresor-Strukturen wurden verändert.
 
-TECHNISCH
-Das Update ändert keine verschlüsselten Daten, Datenbankstruktur oder Messwerte.
-Die Hauptdatei app.js meldet intern noch 3.0.5; version.json kennzeichnet den
-aktualisierten Veröffentlichungsstand 3.1.6. Ein vollständiger Versionsabgleich
-der Anwendung ist damit noch nicht hergestellt.
-Die JavaScript-Syntax und das neue Navigationsverhalten wurden lokal geprüft;
-die Installation auf einem echten iPhone kann hier nicht simuliert werden.
+Hinweis zur Versionsanzeige: Der bestehende Kern app.js kann noch 3.0.5 melden. Der Veröffentlichungsstand version.json ist 3.1.7. Keine Aussage über Tests auf deinem konkreten iPhone.

@@ -1,5 +1,5 @@
 {
-  "version": "3.1.6",
+  "version": "3.1.7",
   "released": "2026-10-24",
-  "notes": "Korrigierte Navigationsausführung vor Statistikmodulen, geänderter Offline-Cache, Startseiten-Suche und kombinierte Anträge/Akte. Keine Änderung an Gesundheitsdaten."
+  "notes": "Lupe / Suchen im Kopfbereich rechts neben dem Logo. Die verschlüsselte Akten-Suche öffnet sich dort per Tipp. Navigation, Blutwerte und Gesundheitsdaten bleiben unverändert."
 }
