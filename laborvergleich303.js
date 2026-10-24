@@ -943,3 +943,142 @@
  Object.defineProperty(window,'ASTHMA_STATSP292',{configurable:true,enumerable:true,get:decorated,set});
  window.ASTHMA_DAILY307={evaluate,statusSnapshot,SOURCES,refresh:reload,summary:()=>cache.length};
 })();
+
+/* Asthma 3.0.8 – Schnellwahl auf der Startseite.
+   Keine neuen Datenspeicher und keine automatische Übertragung von Dateien.
+   Öffnet ausschließlich bestehende Aufnahme-, Import- und Eingabeformulare. */
+(()=>{
+ 'use strict';
+ const $=id=>document.getElementById(id);
+ const security=window.ASTHMA_SECURITY;
+ const home=$('uebersicht');
+ if(!home||!security?.state?.().unlocked||$('st308-quickstart'))return;
+ const actions=[
+  {id:'lung-photo',title:'Lungenfunktion',sub:'Befundfoto auswählen',icon:'lungs',target:'befunde',file:'scan-gallery',primary:true},
+  {id:'lung-pdf',title:'Lungenfunktion als PDF',sub:'PDF-Befund öffnen',icon:'file',target:'befunde',file:'pdf20-file',primary:true},
+  {id:'lab-photo',title:'Bluttest hochladen',sub:'Laborfoto auswählen',icon:'drop',target:'labor',file:'lab-file',primary:true},
+  {id:'bp',title:'Blutdruck',sub:'Oberen und unteren Wert erfassen',icon:'heart',target:'vitalwerte',form:'v29-form-bp',tab:'bp',primary:true},
+  {id:'pulse',title:'Puls',sub:'Puls und Uhrzeit erfassen',icon:'pulse',target:'vitalwerte',form:'v29-form-pulse',tab:'pulse',primary:true},
+  {id:'stairs',title:'Treppenzähler',sub:'+30 / +24 Stufen · Grund · Ampel',icon:'stairs',target:'arbeit',focus:'sc-steps',primary:true,featured:true},
+  {id:'oxygen',title:'Sauerstoffsättigung',sub:'SpO₂ eintragen',icon:'oxygen',target:'vitalwerte',form:'v29-form-spo2',tab:'spo2',primary:true},
+  {id:'lung-manual',title:'Lungenfunktion manuell',sub:'FEV₁ und FVC',icon:'lungs',target:'lungenwerte',focus:'lung-fev1-number'},
+  {id:'lab-manual',title:'Blutwerte manuell',sub:'Einzelwert und Referenz',icon:'drop',target:'labor',focus:'lab-value'},
+  {id:'pef',title:'Peak-Flow / ePEF',sub:'Einzelmessung eintragen',icon:'pulse',target:'peakflow',focus:'epef-manual-pef'},
+  {id:'pef-file',title:'PEF-Datei importieren',sub:'CSV / Excel einlesen',icon:'file',target:'peakflow',file:'epef-file'},
+  {id:'weight',title:'Gewicht',sub:'Neues Gewicht eintragen',icon:'scale',target:'vitalwerte',focus:'s292-weight-form'},
+  {id:'symptoms',title:'Asthma-Tagebuch',sub:'Beschwerden und Bedarfsmedikation',icon:'note',target:'start',focus:'a28-entry-details'},
+  {id:'medications',title:'Medikamente',sub:'Medikamentenplan ergänzen',icon:'med',target:'therapie',focus:'med-name'},
+  {id:'sick',title:'Asthma-Krankschreibung',sub:'AU mit Datum dokumentieren',icon:'file',target:'akte',focus:'au25-form'},
+  {id:'work',title:'Arbeitsbelastung',sub:'Hitze, Atemnot, Schicht',icon:'stairs',target:'arbeit',focus:'work-date'},
+  {id:'calendar',title:'Termin eintragen',sub:'Kalender öffnen',icon:'calendar',target:'kalender',focus:'cal-title'},
+  {id:'stats',title:'Monats- / Jahresstatistik',sub:'Werte und Diagramme auswerten',icon:'chart',target:'statistik',focus:'stats25-build'}
+ ];
+ const icons={
+  lungs:'<path d="M12 3v8m0-5 2-2m-2 2-2-2"/><path d="M10 10c-2-4-3-4-4-2L3 15c-1 5 2 6 5 5 3-1 3-3 3-6v-4M14 10c2-4 3-4 4-2l3 7c1 5-2 6-5 5-3-1-3-3-3-6v-4"/>',
+  file:'<path d="M6 3h8l5 5v13H6zM14 3v5h5M9 13h7M9 17h7"/>',
+  drop:'<path d="M12 2s-7 9-7 14a7 7 0 0 0 14 0c0-5-7-14-7-14z"/><path d="M8 17a4 4 0 0 0 4 4"/>',
+  heart:'<path d="M20.8 5.6a5.4 5.4 0 0 0-7.6 0L12 6.8l-1.2-1.2a5.4 5.4 0 0 0-7.6 7.6L12 22l8.8-8.8a5.4 5.4 0 0 0 0-7.6z"/><path d="M5 13h4l2-3 2 6 2-3h4"/>',
+  pulse:'<path d="M2 12h4l3-6 4 12 3-7 2 1h4"/>',
+  stairs:'<path d="M2 20h5v-5h5v-5h5V5h5"/><path d="M16 5h6v6"/>',
+  oxygen:'<circle cx="12" cy="12" r="9"/><path d="M5 13h3l2-4 3 7 2-4h4"/>',
+  scale:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9a4 4 0 0 1 6 0M12 10v4"/>',
+  note:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/>',
+  med:'<path d="m8 20 12-12a4 4 0 0 0-6-6L2 14a4 4 0 0 0 6 6zM7 9l8 8"/>',
+  calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6M17 2v6M3 11h18"/>',
+  chart:'<path d="M3 3v18h18M7 15l4-5 4 3 5-7"/>'
+ };
+ const escapeText=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+ const button=a=>'<button type="button" class="st308-action'+(a.featured?' st308-featured':'')+'" data-st308-action="'+a.id+'" aria-label="'+escapeText(a.title+': '+a.sub)+'"><span class="st308-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+(icons[a.icon]||icons.note)+'</svg></span><span class="st308-word"><strong>'+escapeText(a.title)+'</strong><small>'+escapeText(a.sub)+'</small></span><span class="st308-chevron" aria-hidden="true">›</span></button>';
+ let installed=false,watcher=null;
+ function setup(){
+  if(installed||$('st308-quickstart'))return Boolean(installed);
+  const dashboard=home.querySelector('.d26-dashboard');
+  if(!dashboard)return false;
+  const panel=document.createElement('section');panel.id='st308-quickstart';panel.className='st308-panel';
+  panel.setAttribute('aria-labelledby','st308-title');
+  panel.innerHTML='<div class="st308-heading"><div><p class="st308-kicker">SCHNELLERFASSUNG</p><h2 id="st308-title">Neuen Wert eintragen oder Befund auswählen</h2><p>Direkt zum passenden Formular – ohne Umwege durch die Menüs.</p></div><span class="st308-private">Lokal &amp; privat</span></div>'+
+   '<div class="st308-grid" aria-label="Wichtige Schnelleingaben">'+actions.filter(x=>x.primary).map(button).join('')+'</div>'+
+   '<details class="st308-extra"><summary>Weitere Werte, Dokumentation und Statistiken</summary><div class="st308-grid" aria-label="Weitere Schnelleingaben">'+actions.filter(x=>!x.primary).map(button).join('')+'</div></details>'+
+   '<p class="st308-hint">Befundfotos, PDFs und Excel-Dateien werden zunächst nur auf deinem Gerät ausgewählt. Medizinische Werte werden erst nach deiner Prüfung und ausdrücklichem Speichern in den bestehenden verschlüsselten Tresor übernommen. Bei Blutdruck und Puls erfolgt die Eingabe derzeit manuell.</p>'+
+   '<p class="st308-feedback" id="st308-feedback" role="status" aria-live="polite"></p>';
+  const greeting=dashboard.querySelector('.d26-greeting');
+  if(greeting)greeting.insertAdjacentElement('afterend',panel);else dashboard.prepend(panel);
+  const style=document.createElement('style');style.id='st308-styles';style.textContent=`
+   #st308-quickstart{margin:18px 0 22px;padding:18px;background:#eff7fb;border:1px solid #b7d5e4;border-radius:17px;color:#173d51;box-sizing:border-box}
+   #st308-quickstart *{box-sizing:border-box}
+   #st308-quickstart .st308-heading{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:14px}
+   #st308-quickstart .st308-kicker{font-size:.75rem;letter-spacing:.08em;font-weight:800;color:#267794;margin:0 0 5px}
+   #st308-quickstart h2{font-size:1.28rem;line-height:1.25;color:#163c51;margin:0 0 7px}
+   #st308-quickstart .st308-heading p:not(.st308-kicker){font-size:.88rem;color:#506d7e;margin:0}
+   #st308-quickstart .st308-private{font-size:.78rem;border:1px solid #a7cfc0;border-radius:20px;padding:5px 9px;color:#176b58;background:#f5fffa;font-weight:650}
+   #st308-quickstart .st308-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+   #st308-quickstart .st308-action{display:flex;align-items:center;text-align:left;gap:9px;min-height:76px;width:100%;padding:11px 10px;border:1px solid #bcd7e3;border-radius:12px;background:white;color:#1a455c;cursor:pointer;font-family:inherit;box-shadow:0 1px 2px #15384b13;touch-action:manipulation}
+   #st308-quickstart .st308-action:active{transform:scale(.99)}
+   #st308-quickstart .st308-action:focus-visible{outline:3px solid #377cc6;outline-offset:2px}
+   #st308-quickstart .st308-icon{display:flex;flex-shrink:0;align-items:center;justify-content:center;width:35px;height:35px;border-radius:10px;background:#eaf4f9;color:#206f93}
+   #st308-quickstart .st308-icon svg{height:23px;width:23px;display:block}
+   #st308-quickstart .st308-word{flex:1;min-width:0}
+   #st308-quickstart .st308-word strong{display:block;font-size:.9rem;line-height:1.25;overflow-wrap:anywhere;color:inherit}
+   #st308-quickstart .st308-word small{display:block;font-size:.74rem;line-height:1.3;color:#627c8d;margin-top:4px;overflow-wrap:anywhere}
+   #st308-quickstart .st308-chevron{font-size:1.3rem;color:#7b9dad;font-weight:700}
+   #st308-quickstart .st308-featured{grid-column:1/-1;min-height:82px;background:linear-gradient(120deg,#d9f2e9,#ebfbf6);border:2px solid #5cab91;color:#125a45}
+   #st308-quickstart .st308-featured .st308-icon{background:#147959;color:white}
+   #st308-quickstart .st308-featured .st308-word strong{font-size:1rem}
+   #st308-quickstart .st308-featured .st308-word small{color:#386e5a}
+   #st308-quickstart .st308-extra{margin-top:12px;background:#f9fcfe;border-radius:10px;border:1px solid #d2e4eb;padding:10px}
+   #st308-quickstart .st308-extra summary{font-size:.9rem;font-weight:700;color:#205472;cursor:pointer;padding:5px 0}
+   #st308-quickstart .st308-extra[open] .st308-grid{margin-top:10px}
+   #st308-quickstart .st308-hint{font-size:.78rem;line-height:1.45;color:#577181;margin:14px 1px 0}
+   #st308-quickstart .st308-feedback{font-size:.82rem;color:#246880;font-weight:650;margin:8px 0 0}
+   @media(max-width:380px){#st308-quickstart{padding:11px}#st308-quickstart .st308-action{padding:8px 6px;gap:6px}#st308-quickstart .st308-icon{width:30px;height:30px}#st308-quickstart .st308-word strong{font-size:.84rem}#st308-quickstart .st308-word small{font-size:.69rem}}
+   @media(min-width:770px){#st308-quickstart .st308-grid{grid-template-columns:repeat(3,minmax(0,1fr))}#st308-quickstart .st308-featured{grid-column:span 2}}
+  `;document.head.append(style);
+  const feedback=$('st308-feedback');
+  const nav=window.ASTHMA_NAV;
+  function reveal(element){if(!element)return;let n=element;while(n&&n!==document.body){if(n.tagName==='DETAILS')n.open=true;n=n.parentElement}}
+  function pointTo(element,focus=true){if(!element)return false;reveal(element);
+   requestAnimationFrame(()=>{
+    // Always scroll the *actual* edit field into view, after navigating.
+    const target=element.matches('form')?element.querySelector('input:not([type="hidden"]),select,textarea')||element:element;
+    try{target.scrollIntoView({block:'center',behavior:'smooth'})}catch{target.scrollIntoView()}
+    if(focus&&target.matches?.('input:not([type="file"]),textarea')){
+     try{target.focus({preventScroll:true})}catch{target.focus()}
+    }
+   });return true;
+  }
+  function perform(a){
+   if(!security.state().unlocked){feedback.textContent='Bitte zuerst den privaten Tresor entsperren.';return false}
+   if(!nav?.go){feedback.textContent='Navigation konnte nicht gestartet werden. App erneut öffnen.';return false}
+   // Important: Keep file input.click() *in the original user gesture* for iPhone Safari.
+   nav.go(a.target);
+   if(a.tab){const tab=$('v29-tabs')?.querySelector('[data-kind="'+a.tab+'"]');if(tab)tab.click();}
+   if(a.file){const f=$(a.file);if(!f){feedback.textContent='Dateiauswahl nicht verfügbar. Bitte die betreffende Seite öffnen.';return false}
+    reveal(f); // May be inside a closed <details>.
+    try{f.click()}catch(err){feedback.textContent='Bitte auf der geöffneten Seite die Dateiauswahl antippen.';pointTo(f,false);return false}
+    feedback.textContent='Datei auswählen und die erkannten Werte vor dem Speichern prüfen.';
+    return true;
+   }
+   if(a.id==='symptoms'){const d=$('a28-entry-details');if(d){d.open=true;feedback.textContent='Tagebuch-Schnelleingabe geöffnet.';return pointTo($('a28-form')||d,false)}}
+   if(a.id==='sick'){
+     // The AU form lives inside the medical record section. The existing tab may be collapsed.
+     const f=$('au25-form');if(f){reveal(f);feedback.textContent='Asthma-AU erfassen.';return pointTo(f,false)}
+   }
+   const form=a.form?$(a.form):null,element=form?.querySelector('input[name="value"]')||(a.focus?$(a.focus):null);
+   if(!element){feedback.textContent='Eingabefeld aktuell nicht verfügbar. Bitte die geöffnete Seite verwenden.';return false}
+   feedback.textContent=a.id==='stairs'?'Treppenzähler geöffnet – +30 oder +24 Stufen hinzufügen und Grund wählen.':'Eingabefeld geöffnet. Wert prüfen und anschließend speichern.';
+   return pointTo(element,!['stats25-build','au25-form'].includes(a.focus));
+  }
+  panel.addEventListener('click',event=>{
+   const b=event.target.closest('button[data-st308-action]');if(!b||!panel.contains(b))return;
+   const a=actions.find(x=>x.id===b.dataset.st308Action);if(!a)return;
+   event.preventDefault();perform(a);
+  });
+  window.ASTHMA_QUICKSTART308=Object.freeze({actions:actions.map(a=>({id:a.id,title:a.title,target:a.target})),open:id=>{
+   const a=actions.find(x=>x.id===id);return a?perform(a):false;
+  }});
+  installed=true;if(watcher)watcher.disconnect();return true;
+ }
+ if(setup())return;
+ watcher=new MutationObserver(()=>{setup()});watcher.observe(home,{childList:true,subtree:true});
+ // Wait for the existing modern dashboard; do not create a duplicate when loading is slow.
+})();
