@@ -1,0 +1,23 @@
+ASTHMA – NAVIGATION 3.1.5 (ergänzendes UI-Update)
+
+Enthält alle bisherigen Funktionen aus laborvergleich303.js einschließlich des zuletzt hochgeladenen Tabellen-Fix 3.1.4.
+
+Änderungen:
+- Bereich „Mehr“ aus der sichtbaren Navigation entfernt.
+- Bestehende lokale Suche mit Lupensymbol ganz oben auf die Startseite verschoben.
+- Die früher unter „Mehr“ stehenden Funktionen in „Weitere Funktionen und Einstellungen“ auf der Startseite zusammengeführt (aufklappbar).
+- „Anträge“ und „Akte“ zu einem Dock-Eintrag „Anträge/Akte“ zusammengeführt; zwischen beiden Seiten sind Reiter vorhanden.
+- Unten „Labor“ und „Blutdruck“ statt „Mehr“ und separatem „Akte“.
+- Blutdruck öffnet den bereits vorhandenen Blutdruck-Reiter. Keine zweite Datenablage.
+- Keine Änderungen an Datenbank, Verschlüsselung, Messwerten, Druckstatistiken oder Medikamenten.
+
+Installation auf GitHub:
+1. VORHER in der Webapp unter Einstellungen eine vollständige .asthma17-Sicherung erstellen und sicher aufbewahren.
+2. Die ZIP-Datei entpacken.
+3. NUR laborvergleich303.js in deinem GitHub-Repository Asthma- ersetzen und „Commit changes“ bestätigen.
+4. In der bisherigen Webapp „Update installieren“ antippen, neu anmelden.
+5. Prüfen: Suche oben auf Start, 6 Dock-Punkte, Labor-Liste, Blutdruckformular, Anträge und Akte.
+
+WICHTIG: Das Hauptprogramm wird weiterhin als 3.0.5 angezeigt, weil ausschließlich das Navigationsmodul ersetzt wird. Das Navigationsmodul selbst ist 3.1.5. Es ist kein vollständiges Versionsupgrade aller App-Dateien. Die Änderung ist erst nach manuellem GitHub-Upload und iPhone-Update aktiv.
+
+Praxisgrenze: JavaScript-Syntax geprüft und UI-Tests auf Basis der vorhandenen App-Struktur möglich; die finale iPhone-Darstellung kann erst nach Installation auf dem Gerät bestätigt werden.

@@ -1898,3 +1898,92 @@
  new MutationObserver(queue).observe(report,{childList:true,subtree:true});
  queue();setTimeout(queue,300);setTimeout(queue,1200);
 })();
+
+
+/* Asthma Navigation 3.1.5 – additive UI restructuring without vault/schema changes.
+   Operates after authentication, moves the existing private search without replacing its ID,
+   makes Antraege/Akte a single dock destination, and links blood pressure to existing vital29.
+   Leaves all measured records, documents, input fields, import tools and reports untouched. */
+(()=>{
+ 'use strict';
+ const $=id=>document.getElementById(id);
+ if($('nav315-styles')||!$('start')||!$('uebersicht')||!$('mehr'))return;
+ const hero=$('start'),home=$('uebersicht'),more=$('mehr');
+ const search=more.querySelector('.hub20-search');
+ const tiles=more.querySelector('.hub20-grid');
+ const dock=document.querySelector('.bottom-dock');
+ if(!search||!tiles||!dock)return;
+ const css=document.createElement('style');css.id='nav315-styles';
+ css.textContent=`
+ .nav315-search{width:min(1120px,100%);max-width:100%;box-sizing:border-box;margin:0 auto;padding:13px 16px 2px;position:relative;z-index:2}
+ .nav315-search-title{display:flex;align-items:center;gap:9px;color:#f7feff;font-weight:750;font-size:1.05rem;margin:0 0 7px;line-height:1.35}
+ .nav315-search-title svg{width:22px;height:22px;flex:0 0 22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+ .nav315-search .hub20-search{margin:0 0 13px;background:#f2fafd;border:1px solid #abd2df;border-radius:16px;padding:12px 14px;box-shadow:0 7px 22px #082d4426;color:#1d4559}
+ .nav315-search .hub20-search label{font-size:.84rem;color:#365969;margin:0 0 7px}
+ .nav315-search .hub20-search input{width:100%;box-sizing:border-box;font-size:16px;min-height:47px;background:white;color:#183c4d}
+ .nav315-search .hub20-search .input-note{font-size:.77rem;line-height:1.4;margin:8px 0 2px;color:#587585}
+ .nav315-search .hub20-results:not(:empty){margin-top:10px}
+ .nav315-expand{border:1px solid #cde3ec;background:#f2f9fc;border-radius:15px;padding:12px 14px;margin:14px 0 24px}
+ .nav315-expand>summary{color:#164459;font-weight:730;font-size:1rem;cursor:pointer;padding:4px;line-height:1.4}
+ .nav315-expand>p{margin:12px 4px 0;color:#5f7583;font-size:.85rem}
+ .nav315-expand .hub20-grid{margin:13px 0 0}
+ .nav315-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 17px}
+ .nav315-tabs>button{padding:12px 9px;border-radius:12px;border:1px solid #bad8e3;background:#f4fafc;color:#214f63;font-size:.87rem;line-height:1.35;font-weight:700;cursor:pointer;white-space:normal;min-width:0}
+ body[data-page="antraege"] #nav315-tabs-antraege button[data-goto="antraege"],
+ body[data-page="akte"] #nav315-tabs-akte button[data-goto="akte"]{border-color:#378ea5;background:#d8eff6;color:#10546a}
+ body[data-page="akte"] #nav315-dock-combined{background:#e3f4f4;color:#146074}
+ .bottom-dock button{min-height:54px;white-space:normal;line-height:1.1}
+ .bottom-dock button span{white-space:normal;text-align:center}
+ .bottom-dock button svg{flex:none}
+ @media(max-width:390px){.bottom-dock{gap:0;padding-left:2px;padding-right:2px}.bottom-dock button{font-size:.60rem;padding-left:1px;padding-right:1px}.bottom-dock button svg{width:20px;height:20px}.nav315-search{padding:10px 10px 2px}.nav315-search .hub20-search{padding:10px}}
+ @media(min-width:760px){.nav315-search{padding-top:20px}.nav315-expand .hub20-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+ `;
+ document.head.append(css);
+ // Move existing, password-protected search. hub20.js initializes after this file.
+ const searchHost=document.createElement('div');searchHost.className='nav315-search';searchHost.id='nav315-search';
+ searchHost.innerHTML='<div class="nav315-search-title"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="7"></circle><path d="m16 16 5 5"></path></svg><span>Suche</span></div>';
+ searchHost.append(search);
+ const label=search.querySelector('label');if(label)label.textContent='Deine verschlüsselte Akte durchsuchen';
+ const searchInput=$('private-search20');if(searchInput)searchInput.placeholder='FEV1, Blutdruck, Medikamente, Termine …';
+ hero.insertBefore(searchHost,hero.firstChild);
+ // All formerly hidden functions remain one tap away via a collapsed group at home.
+ const group=document.createElement('details');group.className='nav315-expand';group.id='nav315-functions';
+ const title=document.createElement('summary');title.textContent='Weitere Funktionen und Einstellungen';group.append(title);
+ const hint=document.createElement('p');hint.textContent='Profil, Hilfsmittel, Arbeit, Arztberichte und alle anderen bisherigen Bereiche.';group.append(hint,tiles);
+ const quick=home.querySelector('.home20-quick');if(quick)quick.insertAdjacentElement('afterend',group);else home.prepend(group);
+ const oldHelp=home.querySelector('.home20-heading p:last-child');
+ if(oldHelp&&oldHelp.textContent.includes('Mehr'))oldHelp.textContent='Schnellzugriffe für die täglichen Aufgaben. Weitere Funktionen findest du gesammelt darunter.';
+ // Simplify old launcher: grouped destination replaces adjacent overlapping tiles.
+ const homeLaunch=home.querySelector('.suite-launcher');
+ if(homeLaunch){const req=homeLaunch.querySelector('[data-goto="antraege"]'),files=homeLaunch.querySelector('[data-goto="akte"]');
+   if(req){const strong=req.querySelector('strong');if(strong)strong.textContent='Anträge & Akte';const small=req.querySelector('small');if(small)small.textContent='Anträge, Unterlagen, Dokumente';}
+   if(files)files.remove();}
+ // Retain the underlying antraege/akte pages, each with links to the other.
+ function tabs(page,id){const target=$(id);if(!target)return;
+  const section=document.createElement('nav');section.className='nav315-tabs';section.id='nav315-tabs-'+page;section.setAttribute('aria-label','Anträge und Akte');
+  section.innerHTML='<button data-goto="antraege" type="button">Anträge und Reha</button><button data-goto="akte" type="button">Meine Akte und Dokumente</button>';
+  target.prepend(section);
+ }
+ tabs('antraege','antraege');tabs('akte','mein-bereich');
+ document.querySelectorAll('.app-nav [data-goto="mehr"]').forEach(e=>e.remove());
+ document.querySelectorAll('.app-nav [data-goto="akte"]').forEach(e=>e.remove());
+ const reqNav=document.querySelector('.app-nav [data-goto="antraege"]');if(reqNav)reqNav.textContent='Anträge & Akte';
+ // Keep former destinations available, but remove the visible 'Mehr' page itself.
+ const grouped=tiles.querySelector('[data-goto="antraege"] strong');if(grouped)grouped.textContent='Anträge & Akte';
+ more.remove();
+ // Six fixed, predictable bottom destinations.
+ dock.innerHTML=`
+ <button data-goto="start" type="button" aria-label="Startseite öffnen"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8v9H3z M9 20v-6h6v6"/></svg><span>Start</span></button>
+ <button data-goto="lungenwerte" type="button" aria-label="Lungenfunktion öffnen"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 13h4l3-7 4 12 3-6h4"/></svg><span>Lunge</span></button>
+ <button data-goto="kalender" type="button" aria-label="Kalender öffnen"><svg aria-hidden="true" viewBox="0 0 24 24"><rect height="16" rx="2" width="18" x="3" y="5"/><path d="M7 3v4m10-4v4M3 10h18"/></svg><span>Kalender</span></button>
+ <button id="nav315-dock-combined" data-goto="antraege" type="button" aria-label="Anträge und Akte öffnen"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5z M14 3v5h5 M8 12h8 M8 16h8"/></svg><span>Anträge<br>Akte</span></button>
+ <button data-goto="labor" type="button" aria-label="Labor und Blutwerte öffnen"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 3h6 M10 3v6l-5 8a3 3 0 0 0 2.5 4h9a3 3 0 0 0 2.5-4l-5-8V3 M8 16h8"/></svg><span>Labor</span></button>
+ <button data-goto="vitalwerte" data-nav315-bp="1" type="button" aria-label="Blutdruckmessungen öffnen"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20.8 8c0 5-8.8 11-8.8 11S3.2 13 3.2 8a4.7 4.7 0 0 1 8.8-2.2A4.7 4.7 0 0 1 20.8 8Z"/><path d="M6 11h3l1.5-3 2 6 1.5-3H18"/></svg><span>Blutdruck</span></button>`;
+ // Reuse the EXISTING blood-pressure form; do not duplicate medical entries.
+ function selectBP(){const tab=document.querySelector('#v29-tabs button[data-kind="bp"]');if(tab)tab.click();}
+ dock.querySelector('[data-nav315-bp]').addEventListener('click',()=>{setTimeout(selectBP,55);setTimeout(selectBP,250);});
+ // Old links/bookmarks to 'Mehr' must not leave users on an empty page.
+ function redirectLegacy(){if(location.hash==='#mehr')window.ASTHMA_NAV?.go('start');}
+ redirectLegacy();window.addEventListener('hashchange',()=>setTimeout(redirectLegacy,0));
+ window.ASTHMA_NAV315=Object.freeze({version:'3.1.5',searchOnStart:!!$('private-search20'),combinedRecords:!!$('nav315-dock-combined'),bpTabAvailable:()=>!!document.querySelector('#v29-tabs button[data-kind="bp"]')});
+})();
