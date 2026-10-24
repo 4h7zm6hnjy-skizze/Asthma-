@@ -1,15 +1,17 @@
-Asthma 3.1.7 – SUCHE IM KOPFBEREICH
+ASTHMA – INTENSIVPRÜFUNG UND REPARATUR 3.1.8
 
-Die Suche befindet sich nach dem Update im oberen weißen Balken direkt zwischen Asthma-Logo und Update-Symbol. Auf „Suchen“ tippen, um die gewohnte verschlüsselte Akten-Suche auszuklappen. Beim Antippen eines Treffers wird der richtige Bereich geöffnet. Die bisherige Navigation bleibt erhalten.
+Belegte Fehler: Versionskonflikt 3.0.5 / 3.1.7, erneuter Neustart ohne neue Hauptversion, alte Cachekennung 3.0.4 in der Offline-Prüfung.
 
-INSTALLATION (bisherige App nicht löschen)
-1. In der App vor dem Update eine vollständige verschlüsselte .asthma17-Datensicherung anlegen.
-2. ZIP entpacken.
-3. Die Dateien laborvergleich303.js, sw.js und version.json im Hauptverzeichnis des GitHub-Projekts Asthma- ersetzen.
-4. GitHub-Commit bestätigen.
-5. In der bestehenden Asthma-Webapp „Update installieren“ ausführen, danach App schließen und erneut öffnen.
-6. Im weißen Kopfbereich „Suchen“ tippen und mit einem bekannten Suchbegriff testen.
+Installation in zwei Schritten:
+1. Vorher in der bestehenden iPhone-App eine vollständige, verschlüsselte .asthma17-Sicherung erstellen und außerhalb der App aufbewahren.
+2. Die Datei ASTHMA_PRUEFEN_UND_REPARIEREN.py aus diesem ZIP ins HAUPTVERZEICHNIS deines GitHub-Repositories Asthma- hochladen und speichern (Commit).
+3. GitHub -> Code -> Codespaces -> Codespace öffnen.
+4. Terminal: python3 ASTHMA_PRUEFEN_UND_REPARIEREN.py
+5. Auf die Meldung ERFOLG warten und in GitHub PRUEFBERICHT_3_1_8.md prüfen.
+6. In der bisherigen iPhone-Webapp Update installieren wählen. Danach muss Version 3.1.8 erscheinen.
 
-WICHTIG: Nicht das iPhone-Home-Bildschirm-Symbol oder Safari-Websitedaten löschen! Keine Gesundheitsdaten oder Tresor-Strukturen wurden verändert.
+WICHTIG: Das Skript arbeitet nur an den sechs App-Dateien app.js, index.html, secure17.js, sw.js, version.json, offline303.js und schreibt einen Prüfbericht. Es greift nicht auf den iPhone-Tresor und nicht auf hochgeladene JSON-Gesundheitsdaten zu.
 
-Hinweis zur Versionsanzeige: Der bestehende Kern app.js kann noch 3.0.5 melden. Der Veröffentlichungsstand version.json ist 3.1.7. Keine Aussage über Tests auf deinem konkreten iPhone.
+Keine App löschen, keine Browser-/Website-Daten entfernen. Das Repository ist öffentlich, darin befinden sich Gesundheits-Importdateien; das ist ein eigenständiges, kritisches Datenschutzrisiko. Repo separat privat stellen und alte Versionshistorie bereinigen.
+
+Das Script benötigt ein vollständiges GitHub Codespace, Git, Python 3 und Node.js. Nicht bloß hochladen: der Befehl muss einmal im Codespace ausgeführt werden. Ohne erfolgreichen Push ist die Version nicht installiert.
