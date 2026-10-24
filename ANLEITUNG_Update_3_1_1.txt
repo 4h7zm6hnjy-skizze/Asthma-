@@ -1,0 +1,49 @@
+ASTHMA-WEBAPP – ERWEITERUNG 3.1.1
+Laborerklärungen + Grenzwerte + aufgeräumte Startseite
+
+EINFACHE INSTALLATION AM IPHONE
+1. Dieses ZIP in der App „Dateien“ sichern und entpacken.
+2. Im bestehenden GitHub-Projekt 4h7zm6hnjy-skizze/Asthma- nur die
+   Datei „laborvergleich303.js“ durch die gleichnamige Datei aus dem
+   entpackten ZIP ersetzen. Nicht daneben als zweite Datei hochladen.
+3. Änderung bei GitHub bestätigen (Commit changes).
+4. Die bisherige Asthma-Webapp mit Internetverbindung erneut öffnen.
+   Bei Bedarf „Update installieren“ verwenden und erneut öffnen.
+   Auf der Startseite erscheint „Oberfläche & Laborwissen – Erweiterung 3.1.1“.
+
+NEU
+- Wichtigste Funktionen (Treppenzähler, Lungenfunktion, Blutwerte,
+  Vitalwerte, Befundscanner, Kalender) in einer Startseiten-Schnellwahl.
+- Behandlung, Arbeitsbelastung, Anträge und Statistik sinnvoll gruppiert.
+- Im Bereich „Mehr“ klare Kategorien statt einer langen Kachelliste.
+- Blutwerte: für alle 147 hinterlegten Untersuchungen eine Erklärung.
+- In jeder sichtbaren gespeicherten Laborwertkarte aufklappbar:
+  Was wird gemessen? Unter-/Obergrenze aus dem Original-Laborbefund,
+  rechnerische Einordnung in Bezug auf dessen Referenzbereich.
+- Für einseitige Angaben (z. B. <5) wird die vorhandene Grenze genutzt.
+- Extra Laborwert-Lexikon für Tests, auch wenn noch kein Wert vorliegt.
+- Laborübersicht zählt gespeicherte Werte mit und ohne prüfbaren Bereich.
+
+DATENSCHUTZ / VORHANDENE DATEN
+- Ersetzt ausschließlich die Programmdatei „laborvergleich303.js“.
+- Keine Änderung an Passwort, IndexedDB, Backups oder gespeicherten
+  Gesundheitsdaten. Die Erweiterung liest nur lokale Messwerte.
+- Reha-, Antragshilfe- und Treppenzähler-Funktionen der Version 3.1.0
+  bleiben in derselben Datei erhalten.
+- Vor Updates grundsätzlich vollständige .asthma17-Sicherung erstellen.
+- DIE ALTE IPHONE-WEBAPP NICHT LÖSCHEN und keine Safari-Website-Daten
+  entfernen. Sonst könnten lokal gespeicherte Daten unzugänglich werden.
+- Hauptversionsanzeige kann weiterhin 3.0.5 zeigen: dieses ZIP ist eine
+  EIN-DATEI-ERWEITERUNG, kein Update des gesamten App-Kerns.
+
+MEDIZINISCHE GRENZEN
+- Es werden keine pauschalen Norm- oder Gefahrenwerte erfunden. Der
+  individuelle Referenzbereich stammt aus dem gespeicherten Laborbefund.
+- Unklare, fehlende oder abweichende Einheiten werden nicht als sicher
+  bewertete Referenz ausgegeben. Blutgase nach Probenart beurteilen.
+- Die numerische Einordnung ersetzt keine ärztliche Diagnose.
+
+TESTSTATUS
+- JavaScript-Syntax, Beschreibungskatalog und Paketstruktur geprüft.
+- Ein echter Test im iPhone-Safari und mit deinem verschlüsselten
+  Datentresor ist hier nicht möglich; daher nicht als getestet behauptet.

@@ -1393,3 +1393,357 @@
  window.ASTHMA_GUIDE310={count:all.length,open(id){if(map.has(id)){answers.topic=id;step=0;rerender();panel.scrollIntoView({block:'start'})}},getDraft:draft,chatPrompt:aiPrompt};
  rerender();
 })();
+
+
+'use strict';
+/* Asthma 3.0.6: purely presentational patient-facing lab explanations.
+   Uses existing encrypted ASTHMA_SECURITY.list('labs'); never writes any medical record. */
+(()=>{
+  const S=window.ASTHMA_SECURITY;
+  const host=document.getElementById('labp-list');
+  if(!S||!host||window.ASTHMA_LAB_GUIDE_306)return;
+  window.ASTHMA_LAB_GUIDE_306=true;
+  const text=`
+ eosAbs|Eosinophile Granulozyten sind weiße Abwehrzellen. Bei Typ-2- und allergischer Entzündung können sie beteiligt sein. Kortison und Biologika können die Zahl verändern.
+ eosPct|Prozentualer Anteil der Eosinophilen unter den weißen Blutkörperchen. Er ersetzt nicht die absolute Zellzahl.
+ igeTotal|Gesamt-IgE ist eine Klasse von Abwehr-Antikörpern. Ein erhöhter Wert beweist für sich allein keine bestimmte Allergie.
+ igeSpecific|Antikörper gegen ein bestimmtes Allergen. Ein positiver Test zeigt eine Sensibilisierung, nicht zwangsläufig Beschwerden.
+ ecp|Eiweiß, das von aktivierten Eosinophilen freigesetzt werden kann. Die Messung ist stark methodenabhängig.
+ tryptase|Enzym aus Mastzellen. Wird unter anderem bei bestimmten schweren allergischen Reaktionen oder Mastzellerkrankungen untersucht.
+ a1at|Alpha-1-Antitrypsin schützt unter anderem die Lunge vor bestimmten Enzymen. Ein Mangel kann Lungengewebe schädigen.
+ a1atType|Genetisch beeinflusste Form von Alpha-1-Antitrypsin. Dies ist typischerweise ein Typbefund und kein reiner Zahlenwert.
+ aspergillusIgE|IgE-Antikörper gegen den Schimmelpilz Aspergillus. Werden bei passenden allergologischen Lungenfragen untersucht.
+ aspergillusIgG|IgG-Antikörper gegen Aspergillus. Nur zusammen mit Krankengeschichte und weiteren Untersuchungen einordnen.
+ il5|Entzündungsbotenstoff, der eosinophile Zellen beeinflusst. Kein Standardwert zur Kontrolle von Asthma.
+ il13|Botenstoff des Immunsystems, der an bestimmten Typ-2-Entzündungen beteiligt sein kann.
+ feno|Stickstoffmonoxid in der Ausatemluft. Kann Hinweise auf eine bestimmte Atemwegsentzündung liefern; kein Bluttest.
+ wbc|Gesamtzahl der weißen Blutkörperchen. Sie dienen der Infektabwehr und sind an Entzündungsreaktionen beteiligt.
+ rbc|Anzahl der roten Blutkörperchen, die mithilfe von Hämoglobin Sauerstoff transportieren.
+ hb|Hämoglobin ist der rote Blutfarbstoff. Er bindet und transportiert Sauerstoff.
+ hbCalc|Hämoglobinwert, der im Rahmen der Blutgasanalyse bestimmt oder berechnet wird. Gerätemethode beachten.
+ hct|Anteil der roten Blutkörperchen am gesamten Blutvolumen, meist in Prozent.
+ hctRatio|Hämatokrit als Anteil in L/L: 0,47 L/L entspricht 47 Prozent roten Blutkörperchen.
+ hctCalc|Aus der Blutgasanalyse abgeleiteter Hämatokritwert. Messmethode beachten.
+ mcv|Durchschnittliche Größe der roten Blutkörperchen. Hilft bei der Einordnung von Blutarmut.
+ mch|Durchschnittliche Hämoglobinmenge in einem roten Blutkörperchen.
+ mchc|Durchschnittliche Hämoglobinkonzentration in den roten Blutkörperchen.
+ rdwCV|Prozentuales Maß für Unterschiede in der Größe der roten Blutkörperchen.
+ rdwSD|Absolute Streuung der Größe der roten Blutkörperchen in Femtolitern.
+ platelets|Blutplättchen, die wichtig für Blutstillung und Blutgerinnung sind.
+ mpv|Durchschnittliche Größe der Blutplättchen. Zusammen mit der Plättchenzahl interpretieren.
+ retic|Junge rote Blutkörperchen; geben Hinweise auf die aktuelle Blutbildung.
+ esr|Blutsenkung: unspezifischer Test, der bei manchen Entzündungen verändert sein kann.
+ neutPct|Prozentanteil neutrophiler Granulozyten; sie dienen besonders der Abwehr von Bakterien.
+ neutAbs|Absolute Anzahl neutrophiler Granulozyten im Blut.
+ lymphPct|Prozentanteil der Lymphozyten unter den weißen Blutkörperchen.
+ lymphAbs|Absolute Anzahl der Lymphozyten, die zur gezielten Immunabwehr gehören.
+ monoPct|Prozentanteil der Monozyten; sie gehören zu den weißen Blutkörperchen.
+ monoAbs|Absolute Zahl der Monozyten, die unter anderem Erreger aufnehmen und Gewebe reinigen.
+ basoPct|Anteil basophiler Granulozyten, die an bestimmten Immunreaktionen beteiligt sind.
+ basoAbs|Absolute Anzahl basophiler Granulozyten im Blut.
+ immaturePct|Anteil noch unreifer Granulozyten; nur mit Blutbild und Situation bewerten.
+ immatureAbs|Absolute Anzahl noch unreifer Granulozyten im Blut.
+ ph|Maß dafür, wie sauer oder basisch die Blutprobe ist. Probenart beachten.
+ pco2|Kohlendioxidpartialdruck. Hilft, die Abatmung von Kohlendioxid einzuschätzen. Arterielle und venöse Werte unterscheiden sich.
+ po2|Sauerstoffpartialdruck. Die Beurteilung hängt von der arteriellen oder venösen Probenart und einer möglichen Sauerstoffgabe ab.
+ sao2|Berechnete Sauerstoffsättigung aus der Blutgasanalyse; nicht dasselbe wie Finger-SpO₂.
+ hco3|Bicarbonat ist ein Pufferstoff, der den Säure-Basen-Haushalt stabilisiert.
+ tco2|Gesamtkohlendioxid im Blut, insbesondere für die Säure-Basen-Beurteilung.
+ baseExcess|Basenüberschuss: berechneter Wert für den Stoffwechselanteil des Säure-Basen-Haushalts.
+ baseExcessEcf|Berechneter Basenüberschuss der Flüssigkeit außerhalb der Zellen.
+ anionGapK|Berechnete Differenz bestimmter geladener Blutbestandteile, mit Kalium.
+ anionGap|Berechnete Differenz bestimmter Elektrolyte, ohne Kalium. Albumin und Laborverfahren beeinflussen den Wert.
+ lactate|Laktat entsteht im Stoffwechsel und kann unter anderem bei starker Anstrengung zunehmen.
+ metHb|Verändertes Hämoglobin, das Sauerstoff nicht wie üblich transportieren kann.
+ coHb|An Kohlenmonoxid gebundener Anteil des Hämoglobins.
+ oxygenContent|Gesamter Sauerstoffgehalt im Blut, abhängig unter anderem von Hämoglobin und Sättigung.
+ crp|C-reaktives Protein ist ein unspezifischer Entzündungsmarker. mg/dl und mg/l haben einen Faktor zehn Unterschied.
+ hsCrp|Besonders empfindliche CRP-Messung für niedrige Konzentrationen.
+ pct|Procalcitonin kann bei bestimmten bakteriellen Infektionen ansteigen; allein keine gesicherte Infektionsdiagnose.
+ ferritin|Ferritin speichert Eisen. Es kann auch bei Entzündungen erhöht sein.
+ fibrinogen|Eiweiß, das bei der Blutgerinnung und bei Entzündungsreaktionen eine Rolle spielt.
+ ldh|Enzym, das in vielen Körperzellen vorkommt; Veränderungen sind nicht organspezifisch.
+ il6|Entzündungsbotenstoff des Immunsystems. Nur im Zusammenhang mit der klinischen Situation bewerten.
+ bloodCulture|Mikrobiologische Untersuchung auf Erreger im Blut; oft ein Text- oder Ja/Nein-Befund.
+ sputumCulture|Untersuchung von abgehustetem Schleim auf Krankheitserreger; kein Blutwert.
+ creatinine|Abbauprodukt des Muskelstoffwechsels; wird zur Einschätzung der Nierenfunktion verwendet.
+ egfr|Berechnete Schätzung der Filterleistung der Nieren, keine direkte Messung.
+ bun|Stickstoffanteil von Harnstoff; abhängig unter anderem von Nierenfunktion und Ernährung.
+ urea|Harnstoff aus dem Eiweißstoffwechsel, beeinflusst auch durch Flüssigkeitshaushalt.
+ uricAcid|Abbauprodukt des Purinstoffwechsels, zum Beispiel bei Gicht relevant.
+ cystatinC|Eiweiß, das ergänzend zur Einschätzung der Nierenfilterfunktion eingesetzt wird.
+ albuminUrine|Eiweiß Albumin im Urin. Kann bei Nierenerkrankungen verändert sein; kein Blutwert.
+ uACR|Albumin-Kreatinin-Verhältnis im Urin zur Beurteilung von Eiweißausscheidung; kein Blutwert.
+ sodium|Natrium ist ein Elektrolyt, wichtig für Flüssigkeitsverteilung, Nerven und Muskeln.
+ potassium|Kalium ist ein Elektrolyt, besonders wichtig für Muskel- und Herzfunktion.
+ chloride|Chlorid ist ein Elektrolyt für Flüssigkeits- und Säure-Basen-Haushalt.
+ calciumIon|Frei verfügbares Calcium, wichtig unter anderem für Nerven- und Muskelfunktion.
+ calcium|Gesamtcalcium, frei und an Eiweiß gebunden.
+ magnesium|Mineralstoff, wichtig für Muskeln, Nerven und zahlreiche Enzyme.
+ phosphate|Mineralstoff für Knochen und den Energiehaushalt.
+ zinc|Spurenelement, das viele Enzyme und Abwehrfunktionen unterstützt.
+ selenium|Spurenelement für bestimmte Enzyme, unter anderem zum Zellschutz.
+ alt|ALT oder GPT ist ein Leberenzym, das bei Schädigung von Leberzellen steigen kann.
+ ast|AST oder GOT ist ein Enzym aus Leber, Muskeln und anderen Geweben.
+ ggt|Gamma-GT ist ein Enzym, das unter anderem bei Leber- und Gallenwegsproblemen auffallen kann.
+ alp|Alkalische Phosphatase kommt unter anderem in Leber und Knochen vor.
+ bilirubin|Abbauprodukt des roten Blutfarbstoffs, wird durch Leber und Galle verarbeitet.
+ bilirubinDirect|In der Leber verarbeiteter Anteil des Bilirubins.
+ albumin|Wichtiges Bluteiweiß, das Stoffe transportiert und Wasser in den Gefäßen hält.
+ totalProtein|Gesamtkonzentration verschiedener Blutproteine.
+ cholinesterase|Enzym aus der Leber; wird bei speziellen Fragen zur Leberfunktion untersucht.
+ glucose|Glukose ist Traubenzucker und dient als Energiequelle. Die Einordnung hängt davon ab, ob die Messung nüchtern erfolgte.
+ glucoseRandom|Blutzucker aus einer nicht zwingend nüchternen Blutentnahme.
+ hba1c|Verzuckerter Anteil des Hämoglobins; spiegelt die Blutzuckerlage mehrerer Wochen wider.
+ hba1cMmol|Langzeitblutzucker HbA1c in der Einheit mmol/mol.
+ insulin|Hormon aus der Bauchspeicheldrüse, das die Aufnahme von Zucker in Zellen steuert.
+ cpeptide|Eiweiß, das bei der körpereigenen Insulinproduktion mit freigesetzt wird.
+ cholTotal|Gesamtkonzentration von Cholesterin im Blut.
+ hdl|HDL-Cholesterin ist Teil des Fetttransports; allein kein vollständiges Risikomaß.
+ ldl|LDL-Cholesterin transportiert Cholesterin; individuelle Zielwerte hängen vom Herz-Kreislauf-Risiko ab.
+ triglycerides|Blutfette für den Energiestoffwechsel, durch Mahlzeiten beeinflussbar.
+ lpa|Lipoprotein(a) ist ein überwiegend erblich bestimmter Faktor des Herz-Kreislauf-Risikos.
+ apoB|Eiweißbaustein bestimmter cholesterintransportierender Fettpartikel.
+ tsh|Steuerhormon der Hirnanhangsdrüse für die Schilddrüse.
+ ft4|Frei verfügbares Schilddrüsenhormon Thyroxin.
+ ft3|Frei verfügbares Schilddrüsenhormon Trijodthyronin.
+ tpoAb|Antikörper gegen ein Schilddrüsenenzym, bei bestimmten Autoimmunerkrankungen relevant.
+ trab|Antikörper gegen den TSH-Rezeptor, bei bestimmten Schilddrüsenerkrankungen relevant.
+ cortisol|Stress- und Stoffwechselhormon; Uhrzeit und Kortisonmedikamente sind wichtig.
+ acth|Hormon, das die Cortisolbildung in der Nebenniere anregt.
+ testosterone|Geschlechtshormon mit verschiedenen Funktionen; Messzeitpunkt ist wichtig.
+ shbg|Eiweiß, das bestimmte Geschlechtshormone im Blut bindet.
+ dheaS|Vorstufe bestimmter Geschlechtshormone aus der Nebenniere.
+ prolactin|Hormon der Hirnanhangsdrüse, unter anderem für die Milchbildung relevant.
+ vitd|25-OH-Vitamin D ist ein Marker für die Vitamin-D-Versorgung.
+ b12|Vitamin, das insbesondere für Blutbildung und Nervenfunktion benötigt wird.
+ holoTc|An Transportprotein gebundenes Vitamin B12, das für Zellen verfügbar sein kann.
+ folate|Vitamin B9; wichtig für Zellteilung und Blutbildung.
+ iron|Im Blut transportiertes Eisen, zusammen mit Ferritin und Transferrin zu beurteilen.
+ transferrin|Transporteiweiß, das Eisen im Blut bindet.
+ transferrinSat|Prozentanteil der mit Eisen belegten Bindungsstellen von Transferrin.
+ vitB1|Vitamin B1 ist am Energiestoffwechsel und an der Nervenfunktion beteiligt.
+ vitB6|Vitamin B6 unterstützt Eiweißstoffwechsel und Nervenfunktion.
+ ntprobnp|Marker der Herzbelastung, unter anderem bei Verdacht auf Herzschwäche verwendet.
+ troponin|Eiweiß aus Herzmuskelzellen; Messverfahren und Verlauf sind entscheidend.
+ ck|Enzym aus Muskeln, kann auch nach Anstrengung ansteigen.
+ inr|Standardisierter Messwert eines Teils der Blutgerinnung, insbesondere bei bestimmten Blutverdünnern.
+ ptt|Gerinnungszeit zur Prüfung bestimmter Gerinnungsfaktoren.
+ ddimer|Abbauprodukt von Blutgerinnseln; ein erhöhter Wert allein beweist keine Thrombose.
+ pt|Quick-Wert zur Beurteilung bestimmter Gerinnungsfaktoren.
+ igg|Antikörperklasse für die längerfristige Immunabwehr.
+ iga|Antikörperklasse, besonders zum Schutz von Schleimhäuten wichtig.
+ igm|Antikörperklasse, häufig früh bei Abwehrreaktionen beteiligt.
+ igg1|Untergruppe von Immunglobulin G.
+ igg2|Untergruppe von Immunglobulin G.
+ igg3|Untergruppe von Immunglobulin G.
+ igg4|Untergruppe von Immunglobulin G.
+ ana|Autoantikörper gegen Zellkernbestandteile; positive Ergebnisse allein sind keine Diagnose.
+ anca|Autoantikörper gegen Teile weißer Blutkörperchen, bei bestimmten Gefäßentzündungen relevant.
+ pr3|Autoantikörper gegen Proteinase 3, bei bestimmten Gefäßentzündungen untersucht.
+ mpo|Autoantikörper gegen Myeloperoxidase, bei bestimmten Gefäßentzündungen untersucht.
+ rf|Rheumafaktor, ein unspezifischer Antikörper, der bei einigen rheumatischen Erkrankungen auftreten kann.
+ antiCcp|Antikörper gegen citrullinierte Proteine, häufig bei Verdacht auf rheumatoide Arthritis relevant.
+ c3|Eiweiß des Komplementsystems als Teil der Immunabwehr.
+ c4|Eiweiß des Komplementsystems als Teil der Immunabwehr.
+ cd4|Bestimmte T-Helferzellen des Immunsystems.
+ spo2|Geschätzte Sauerstoffsättigung aus einem Pulsoxymeter, kein Labor-Blutwert.
+ spirometry|Lungenfunktionswert FEV1: Ausatmungsvolumen in der ersten Sekunde, kein Blutwert.
+ urinalysis|Urinuntersuchung auf Inhaltsstoffe und Auffälligkeiten, kein Blutwert.
+ other|Individueller Test. Eine gesicherte Beschreibung ist erst mit genauer Testbezeichnung möglich.`;
+  const catalog306=[{"id":"eosAbs","label":"Eosinophile absolut","category":"Asthma & Allergie","unit":"/µl"},{"id":"eosPct","label":"Eosinophile relativ","category":"Asthma & Allergie","unit":"%"},{"id":"igeTotal","label":"Gesamt-IgE","category":"Asthma & Allergie","unit":"IU/ml"},{"id":"igeSpecific","label":"Spezifisches IgE","category":"Asthma & Allergie","unit":"kU/l"},{"id":"ecp","label":"Eosinophiles kationisches Protein","category":"Asthma & Allergie","unit":"ng/ml"},{"id":"tryptase","label":"Tryptase","category":"Asthma & Allergie","unit":"µg/l"},{"id":"a1at","label":"Alpha-1-Antitrypsin","category":"Asthma & Allergie","unit":"mg/dl"},{"id":"a1atType","label":"Alpha-1-Antitrypsin-Phänotyp","category":"Asthma & Allergie","unit":""},{"id":"aspergillusIgE","label":"Aspergillus-spezifisches IgE","category":"Asthma & Allergie","unit":"kU/l"},{"id":"aspergillusIgG","label":"Aspergillus-spezifisches IgG","category":"Asthma & Allergie","unit":"mg/l"},{"id":"il5","label":"Interleukin-5","category":"Asthma & Allergie","unit":"pg/ml"},{"id":"il13","label":"Interleukin-13","category":"Asthma & Allergie","unit":"pg/ml"},{"id":"feno","label":"FeNO (Atemluft, kein Blutwert)","category":"Asthma & Allergie","unit":"ppb"},{"id":"wbc","label":"Leukozyten","category":"Großes Blutbild","unit":"10³/µl"},{"id":"rbc","label":"Erythrozyten","category":"Großes Blutbild","unit":"10⁶/µl"},{"id":"hb","label":"Hämoglobin","category":"Großes Blutbild","unit":"g/dl"},{"id":"hbCalc","label":"Hämoglobin (Blutgas, berechnet)","category":"Großes Blutbild","unit":"g/dl"},{"id":"hct","label":"Hämatokrit","category":"Großes Blutbild","unit":"%"},{"id":"hctRatio","label":"Hämatokrit L/L","category":"Großes Blutbild","unit":"L/L"},{"id":"hctCalc","label":"Hämatokrit (Blutgas, berechnet)","category":"Großes Blutbild","unit":"%"},{"id":"mcv","label":"MCV","category":"Großes Blutbild","unit":"fl"},{"id":"mch","label":"MCH","category":"Großes Blutbild","unit":"pg"},{"id":"mchc","label":"MCHC","category":"Großes Blutbild","unit":"g/dl"},{"id":"rdwCV","label":"RDW-CV","category":"Großes Blutbild","unit":"%"},{"id":"rdwSD","label":"RDW-SD","category":"Großes Blutbild","unit":"fl"},{"id":"platelets","label":"Thrombozyten","category":"Großes Blutbild","unit":"10³/µl"},{"id":"mpv","label":"MPV","category":"Großes Blutbild","unit":"fl"},{"id":"retic","label":"Retikulozyten","category":"Großes Blutbild","unit":"%"},{"id":"esr","label":"Blutsenkung","category":"Großes Blutbild","unit":"mm/h"},{"id":"neutPct","label":"Neutrophile relativ","category":"Differenzialblutbild","unit":"%"},{"id":"neutAbs","label":"Neutrophile absolut","category":"Differenzialblutbild","unit":"10³/µl"},{"id":"lymphPct","label":"Lymphozyten relativ","category":"Differenzialblutbild","unit":"%"},{"id":"lymphAbs","label":"Lymphozyten absolut","category":"Differenzialblutbild","unit":"10³/µl"},{"id":"monoPct","label":"Monozyten relativ","category":"Differenzialblutbild","unit":"%"},{"id":"monoAbs","label":"Monozyten absolut","category":"Differenzialblutbild","unit":"10³/µl"},{"id":"basoPct","label":"Basophile relativ","category":"Differenzialblutbild","unit":"%"},{"id":"basoAbs","label":"Basophile absolut","category":"Differenzialblutbild","unit":"10³/µl"},{"id":"immaturePct","label":"Unreife Granulozyten relativ","category":"Differenzialblutbild","unit":"%"},{"id":"immatureAbs","label":"Unreife Granulozyten absolut","category":"Differenzialblutbild","unit":"10³/µl"},{"id":"ph","label":"Blutgas: pH","category":"Blutgase & Säure-Basen","unit":""},{"id":"pco2","label":"Blutgas: pCO₂","category":"Blutgase & Säure-Basen","unit":"mmHg"},{"id":"po2","label":"Blutgas: pO₂","category":"Blutgase & Säure-Basen","unit":"mmHg"},{"id":"sao2","label":"Berechnete Sauerstoffsättigung","category":"Blutgase & Säure-Basen","unit":"%"},{"id":"hco3","label":"Bicarbonat","category":"Blutgase & Säure-Basen","unit":"mmol/l"},{"id":"tco2","label":"Gesamtkohlendioxid","category":"Blutgase & Säure-Basen","unit":"mmol/l"},{"id":"baseExcess","label":"Basenüberschuss Blut","category":"Blutgase & Säure-Basen","unit":"mmol/l"},{"id":"baseExcessEcf","label":"Basenüberschuss ECF","category":"Blutgase & Säure-Basen","unit":"mmol/l"},{"id":"anionGapK","label":"Anionenlücke mit Kalium","category":"Blutgase & Säure-Basen","unit":"mmol/l"},{"id":"anionGap","label":"Anionenlücke ohne Kalium","category":"Blutgase & Säure-Basen","unit":"mmol/l"},{"id":"lactate","label":"Laktat","category":"Blutgase & Säure-Basen","unit":"mmol/l"},{"id":"metHb","label":"Methämoglobin","category":"Blutgase & Säure-Basen","unit":"%"},{"id":"coHb","label":"Carboxyhämoglobin","category":"Blutgase & Säure-Basen","unit":"%"},{"id":"oxygenContent","label":"Sauerstoffgehalt","category":"Blutgase & Säure-Basen","unit":"ml/dl"},{"id":"crp","label":"CRP","category":"Entzündung & Infektionen","unit":"mg/dl"},{"id":"hsCrp","label":"hs-CRP","category":"Entzündung & Infektionen","unit":"mg/l"},{"id":"pct","label":"Procalcitonin","category":"Entzündung & Infektionen","unit":"ng/ml"},{"id":"ferritin","label":"Ferritin","category":"Entzündung & Infektionen","unit":"ng/ml"},{"id":"fibrinogen","label":"Fibrinogen","category":"Entzündung & Infektionen","unit":"g/l"},{"id":"ldh","label":"LDH","category":"Entzündung & Infektionen","unit":"U/l"},{"id":"il6","label":"Interleukin-6","category":"Entzündung & Infektionen","unit":"pg/ml"},{"id":"bloodCulture","label":"Blutkultur","category":"Entzündung & Infektionen","unit":""},{"id":"sputumCulture","label":"Sputumkultur (kein Blutwert)","category":"Entzündung & Infektionen","unit":""},{"id":"creatinine","label":"Kreatinin","category":"Niere & Stoffwechsel","unit":"mg/dl"},{"id":"egfr","label":"eGFR","category":"Niere & Stoffwechsel","unit":"ml/min/1,73 m²"},{"id":"bun","label":"Harnstoff-Stickstoff","category":"Niere & Stoffwechsel","unit":"mg/dl"},{"id":"urea","label":"Harnstoff","category":"Niere & Stoffwechsel","unit":"mg/dl"},{"id":"uricAcid","label":"Harnsäure","category":"Niere & Stoffwechsel","unit":"mg/dl"},{"id":"cystatinC","label":"Cystatin C","category":"Niere & Stoffwechsel","unit":"mg/l"},{"id":"albuminUrine","label":"Albumin im Urin","category":"Niere & Stoffwechsel","unit":"mg/l"},{"id":"uACR","label":"Albumin/Kreatinin im Urin","category":"Niere & Stoffwechsel","unit":"mg/g"},{"id":"sodium","label":"Natrium","category":"Elektrolyte & Mineralstoffe","unit":"mmol/l"},{"id":"potassium","label":"Kalium","category":"Elektrolyte & Mineralstoffe","unit":"mmol/l"},{"id":"chloride","label":"Chlorid","category":"Elektrolyte & Mineralstoffe","unit":"mmol/l"},{"id":"calciumIon","label":"Ionisiertes Calcium","category":"Elektrolyte & Mineralstoffe","unit":"mmol/l"},{"id":"calcium","label":"Calcium gesamt","category":"Elektrolyte & Mineralstoffe","unit":"mmol/l"},{"id":"magnesium","label":"Magnesium","category":"Elektrolyte & Mineralstoffe","unit":"mmol/l"},{"id":"phosphate","label":"Phosphat","category":"Elektrolyte & Mineralstoffe","unit":"mmol/l"},{"id":"zinc","label":"Zink","category":"Elektrolyte & Mineralstoffe","unit":"µg/dl"},{"id":"selenium","label":"Selen","category":"Elektrolyte & Mineralstoffe","unit":"µg/l"},{"id":"alt","label":"ALT/GPT","category":"Leber & Galle","unit":"U/l"},{"id":"ast","label":"AST/GOT","category":"Leber & Galle","unit":"U/l"},{"id":"ggt","label":"Gamma-GT","category":"Leber & Galle","unit":"U/l"},{"id":"alp","label":"Alkalische Phosphatase","category":"Leber & Galle","unit":"U/l"},{"id":"bilirubin","label":"Bilirubin gesamt","category":"Leber & Galle","unit":"mg/dl"},{"id":"bilirubinDirect","label":"Bilirubin direkt","category":"Leber & Galle","unit":"mg/dl"},{"id":"albumin","label":"Albumin","category":"Leber & Galle","unit":"g/dl"},{"id":"totalProtein","label":"Gesamteiweiß","category":"Leber & Galle","unit":"g/dl"},{"id":"cholinesterase","label":"Cholinesterase","category":"Leber & Galle","unit":"U/l"},{"id":"glucose","label":"Blutzucker","category":"Zucker & Blutfette","unit":"mg/dl"},{"id":"glucoseRandom","label":"Glukose spontan","category":"Zucker & Blutfette","unit":"mg/dl"},{"id":"hba1c","label":"HbA1c","category":"Zucker & Blutfette","unit":"%"},{"id":"hba1cMmol","label":"HbA1c IFCC","category":"Zucker & Blutfette","unit":"mmol/mol"},{"id":"insulin","label":"Insulin","category":"Zucker & Blutfette","unit":"µU/ml"},{"id":"cpeptide","label":"C-Peptid","category":"Zucker & Blutfette","unit":"ng/ml"},{"id":"cholTotal","label":"Gesamtcholesterin","category":"Zucker & Blutfette","unit":"mg/dl"},{"id":"hdl","label":"HDL-Cholesterin","category":"Zucker & Blutfette","unit":"mg/dl"},{"id":"ldl","label":"LDL-Cholesterin","category":"Zucker & Blutfette","unit":"mg/dl"},{"id":"triglycerides","label":"Triglyzeride","category":"Zucker & Blutfette","unit":"mg/dl"},{"id":"lpa","label":"Lipoprotein(a)","category":"Zucker & Blutfette","unit":"nmol/l"},{"id":"apoB","label":"Apolipoprotein B","category":"Zucker & Blutfette","unit":"mg/dl"},{"id":"tsh","label":"TSH","category":"Schilddrüse & Hormone","unit":"mIU/l"},{"id":"ft4","label":"Freies T4","category":"Schilddrüse & Hormone","unit":"ng/dl"},{"id":"ft3","label":"Freies T3","category":"Schilddrüse & Hormone","unit":"pg/ml"},{"id":"tpoAb","label":"TPO-Antikörper","category":"Schilddrüse & Hormone","unit":"IU/ml"},{"id":"trab","label":"TSH-Rezeptor-Antikörper","category":"Schilddrüse & Hormone","unit":"IU/l"},{"id":"cortisol","label":"Cortisol","category":"Schilddrüse & Hormone","unit":"µg/dl"},{"id":"acth","label":"ACTH","category":"Schilddrüse & Hormone","unit":"pg/ml"},{"id":"testosterone","label":"Testosteron","category":"Schilddrüse & Hormone","unit":"ng/ml"},{"id":"shbg","label":"SHBG","category":"Schilddrüse & Hormone","unit":"nmol/l"},{"id":"dheaS","label":"DHEA-S","category":"Schilddrüse & Hormone","unit":"µg/dl"},{"id":"prolactin","label":"Prolaktin","category":"Schilddrüse & Hormone","unit":"ng/ml"},{"id":"vitd","label":"Vitamin D (25-OH)","category":"Vitamine & Eisen","unit":"ng/ml"},{"id":"b12","label":"Vitamin B12","category":"Vitamine & Eisen","unit":"pg/ml"},{"id":"holoTc","label":"Holotranscobalamin","category":"Vitamine & Eisen","unit":"pmol/l"},{"id":"folate","label":"Folat","category":"Vitamine & Eisen","unit":"ng/ml"},{"id":"iron","label":"Eisen","category":"Vitamine & Eisen","unit":"µg/dl"},{"id":"transferrin","label":"Transferrin","category":"Vitamine & Eisen","unit":"g/l"},{"id":"transferrinSat","label":"Transferrinsättigung","category":"Vitamine & Eisen","unit":"%"},{"id":"vitB1","label":"Vitamin B1","category":"Vitamine & Eisen","unit":"µg/l"},{"id":"vitB6","label":"Vitamin B6","category":"Vitamine & Eisen","unit":"µg/l"},{"id":"ntprobnp","label":"NT-proBNP","category":"Herz & Gerinnung","unit":"pg/ml"},{"id":"troponin","label":"Troponin","category":"Herz & Gerinnung","unit":"ng/l"},{"id":"ck","label":"Kreatinkinase","category":"Herz & Gerinnung","unit":"U/l"},{"id":"inr","label":"INR","category":"Herz & Gerinnung","unit":""},{"id":"ptt","label":"aPTT","category":"Herz & Gerinnung","unit":"s"},{"id":"ddimer","label":"D-Dimere","category":"Herz & Gerinnung","unit":"mg/l"},{"id":"pt","label":"Quick","category":"Herz & Gerinnung","unit":"%"},{"id":"igg","label":"IgG","category":"Immunsystem & Autoimmunität","unit":"g/l"},{"id":"iga","label":"IgA","category":"Immunsystem & Autoimmunität","unit":"g/l"},{"id":"igm","label":"IgM","category":"Immunsystem & Autoimmunität","unit":"g/l"},{"id":"igg1","label":"IgG1","category":"Immunsystem & Autoimmunität","unit":"g/l"},{"id":"igg2","label":"IgG2","category":"Immunsystem & Autoimmunität","unit":"g/l"},{"id":"igg3","label":"IgG3","category":"Immunsystem & Autoimmunität","unit":"g/l"},{"id":"igg4","label":"IgG4","category":"Immunsystem & Autoimmunität","unit":"g/l"},{"id":"ana","label":"ANA","category":"Immunsystem & Autoimmunität","unit":""},{"id":"anca","label":"ANCA","category":"Immunsystem & Autoimmunität","unit":""},{"id":"pr3","label":"PR3-Antikörper","category":"Immunsystem & Autoimmunität","unit":"U/ml"},{"id":"mpo","label":"MPO-Antikörper","category":"Immunsystem & Autoimmunität","unit":"U/ml"},{"id":"rf","label":"Rheumafaktor","category":"Immunsystem & Autoimmunität","unit":"IU/ml"},{"id":"antiCcp","label":"Anti-CCP","category":"Immunsystem & Autoimmunität","unit":"U/ml"},{"id":"c3","label":"Komplement C3","category":"Immunsystem & Autoimmunität","unit":"g/l"},{"id":"c4","label":"Komplement C4","category":"Immunsystem & Autoimmunität","unit":"g/l"},{"id":"cd4","label":"CD4-Zellen","category":"Immunsystem & Autoimmunität","unit":"/µl"},{"id":"spo2","label":"SpO₂ (kein Blutwert)","category":"Sonstige Untersuchungen","unit":"%"},{"id":"spirometry","label":"FEV1 (kein Blutwert)","category":"Sonstige Untersuchungen","unit":"l"},{"id":"urinalysis","label":"Urinstatus (kein Blutwert)","category":"Sonstige Untersuchungen","unit":""},{"id":"other","label":"Eigener Test","category":"Sonstige Untersuchungen","unit":""}];
+  const descriptions=Object.fromEntries(text.trim().split('\n').map(x=>{const a=x.trim().split('|');return [a.shift(),a.join('|')]}));
+  window.ASTHMA_LAB_INFO_306={catalog:catalog306,descriptions};
+  const mk=(tag,txt,cls)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(txt!==undefined)el.textContent=String(txt);return el};
+  const norm=v=>String(v??'').trim();
+  const num=v=>{const s=norm(v).replace(',','.');return /^[-+]?\d+(?:\.\d+)?$/.test(s)?Number(s):null};
+  const fmt=n=>Number(n).toLocaleString('de-DE',{maximumFractionDigits:4});
+  // Strictly parse a two-sided laboratory reference range; do not fabricate missing bounds.
+  const range=v=>{const s=norm(v).replaceAll('−','-').replaceAll('–','-').replace(/\s/g,'').replace(/,/g,'.');const m=s.match(/^(-?\d+(?:\.\d+)?)-(-?\d+(?:\.\d+)?)(?:(?:\/?[a-zA-Zµμ%°0-9.²³^/-]+))?$/);return m&&Number(m[1])<=Number(m[2])?[Number(m[1]),Number(m[2])]:null};
+  const categoryById=Object.fromEntries(catalog306.map(t=>[t.id,t.category]));
+  const oneSided=ref=>{const s=norm(ref).replace(/,/g,'.').replace(/\s/g,'').replaceAll('≤','<=').replaceAll('≥','>=');const m=s.match(/^(<=|>=|<|>)(-?\d+(?:\.\d+)?)(?:[a-zA-Zµμ%°0-9.²³^/-]*)?$/);return m?{op:m[1],limit:Number(m[2])}:null};
+  const classification=r=>{const n=num(r.value);if(n===null)return null;const rr=range(r.reference);if(rr)return n<rr[0]||n>rr[1]?'out':'in';const side=oneSided(r.reference);if(!side)return null;const {op,limit}=side;const inside=op==='<'?n<limit:op==='<='?n<=limit:op==='>'?n>limit:n>=limit;return inside?'in':'out'};
+  let token=0,busy=false;
+  function guide(r){
+    const d=mk('details',undefined,'lab306-guide');d.append(mk('summary','Was bedeutet der Wert? Grenzwerte und Erklärung'));
+    const body=mk('div',undefined,'lab306-content');
+    body.append(mk('strong','Was wird gemessen?'));
+    body.append(mk('p',descriptions[r.marker]||'Für diese Untersuchung liegt keine verlässlich zugeordnete Standardbeschreibung vor. Bitte die konkrete Testbezeichnung auf dem Originalbefund beachten.'));
+    body.append(mk('strong','Referenz- und Grenzwerte'));
+    const arr=range(r.reference),unit=norm(r.unit),value=num(r.value);
+    if(arr){
+      const [lo,hi]=arr;body.append(mk('p','Untere Laborreferenz: '+fmt(lo)+' '+unit+' · obere Laborreferenz: '+fmt(hi)+' '+unit+'.'));
+      body.append(mk('p','Unter '+fmt(lo)+' '+unit+': unter der Referenz; von '+fmt(lo)+' bis '+fmt(hi)+' '+unit+': innerhalb; über '+fmt(hi)+' '+unit+': über der Referenz.'));
+      if(value!==null)body.append(mk('p',value<lo?'Dein Messwert liegt rechnerisch unter der Laborreferenz.':value>hi?'Dein Messwert liegt rechnerisch über der Laborreferenz.':'Dein Messwert liegt rechnerisch innerhalb der Laborreferenz.','lab306-context'));
+    }else if(oneSided(r.reference)){
+      const {op,limit}=oneSided(r.reference),operation=op.replace('<=','≤').replace('>=','≥');
+      body.append(mk('p','Laborseitig angegebener Grenzwert: '+operation+' '+fmt(limit)+' '+unit+'. Die zweite Grenze wurde vom Labor nicht angegeben.'));
+      if(value!==null)body.append(mk('p',classification(r)==='in'?'Dein Wert erfüllt die eingetragene Laborgrenze.':'Dein Wert überschreitet die eingetragene Laborgrenze bzw. unterschreitet die Untergrenze.','lab306-context'));
+    }else if(norm(r.reference))body.append(mk('p','Original-Laborangabe: '+norm(r.reference)+'. Daraus lässt sich hier keine verlässlich auswertbare Grenze ableiten.'));
+    else body.append(mk('p','Kein Referenzbereich eingetragen. Für diesen Test wird kein allgemeiner Grenzwert erfunden. Bitte die Angabe aus dem Originalbefund ergänzen.'));
+    if(['po2','pco2','ph','sao2'].includes(r.marker))body.append(mk('p','Bei Blutgaswerten ist wesentlich, ob die Probe arteriell, kapillär oder venös entnommen wurde.','lab306-context'));
+    if(['glucose','glucoseRandom'].includes(r.marker))body.append(mk('p','Den Nüchternstatus für die korrekte Beurteilung beachten.','lab306-context'));
+    if(['eosAbs','eosPct'].includes(r.marker))body.append(mk('p','Bei Asthmatherapie mit Kortison oder Anti-IL-5-Biologika können die Eosinophilen abfallen.','lab306-context'));
+    body.append(mk('small','Die Laborreferenz ist keine medizinische Gefahrenschwelle. Sie kann nach Labor, Methode, Alter oder Probenart unterschiedlich sein. Ein normaler Wert schließt eine Krankheit nicht aus.'));
+    d.append(body);return d;
+  }
+  async function refresh(){if(busy)return;busy=true;const id=++token;try{
+    const all=(await S.list('labs')).slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+    if(id!==token)return;
+    const sel=document.getElementById('labp-category'),query=document.getElementById('labp-search');
+    const category=sel?.value||'',search=(query?.value||'').toLocaleLowerCase('de');
+    const visible=all.filter(r=>(!category||(r.category||categoryById[r.marker]||'')===category)&&(!search||[r.label,r.marker,r.allergen,r.notes].some(v=>norm(v).toLocaleLowerCase('de').includes(search))));
+    const cards=[...host.querySelectorAll(':scope > .labp-record')];
+    cards.forEach((card,i)=>{
+      const r=visible[i];if(!r)return;
+      const shown=card.querySelector('h4')?.textContent?.trim();
+      const expected=(String(r.label||r.marker||'')+(r.allergen?' · '+r.allergen:'')).trim();
+      if(shown && shown!==expected)return; // never attach another test's explanation
+      const old=card.querySelector('.lab306-guide');if(old)return;
+      const g=guide(r),details=card.querySelector(':scope > details');
+      if(details)details.insertAdjacentElement('beforebegin',g);else card.append(g);
+    });
+    const target=document.getElementById('lab306-summary');if(target){
+      let within=0,outside=0,unrated=0;
+      all.forEach(r=>{const verdict=classification(r);if(verdict==='in')within++;else if(verdict==='out')outside++;else unrated++});
+      target.replaceChildren();const stats=[['Gespeicherte Werte',all.length],['Innerhalb der Laborreferenz',within],['Außerhalb der Laborreferenz',outside],['Ohne eindeutig prüfbaren Bereich',unrated]];
+      for(const [key,val] of stats){const box=mk('div',undefined,'lab306-stat'),n=mk('strong',val),label=mk('span',key);box.append(n,label);target.append(box)}
+    }
+  }catch(err){const p=document.getElementById('lab306-status');if(p)p.textContent='Laborübersicht derzeit nicht verfügbar: '+(err?.message||'unbekannter Fehler')}
+  finally{busy=false}}
+  let scheduled=false;const schedule=()=>{if(scheduled)return;scheduled=true;setTimeout(()=>{scheduled=false;refresh()},0)};
+  new MutationObserver(schedule).observe(host,{childList:true});
+  for(const id of ['labp-search','labp-category','labp-more','labp-confirm','labp-add'])document.getElementById(id)?.addEventListener('input',schedule);
+  for(const id of ['labp-category','labp-more','labp-confirm'])document.getElementById(id)?.addEventListener('click',()=>setTimeout(schedule,120));
+  window.addEventListener('asthma:secure-change',schedule);schedule();
+})();
+
+
+'use strict';
+/* Asthma 3.0.6: additive navigation and visual hierarchy; does not modify medical records. */
+(()=>{
+  if(document.getElementById('cockpit306'))return;
+  const $=id=>document.getElementById(id);
+  const page=$('uebersicht');if(!page)return;
+  const css=document.createElement('style');css.id='redesign306-css';css.textContent=`
+  :root{--n306:#16485d;--b306:#d0e4eb;--l306:#f3f9fb;--a306:#177d9e}
+  .cockpit306{margin:15px 0 19px;padding:16px;border-radius:18px;border:1px solid var(--b306);background:linear-gradient(160deg,#f4fbff 0%,#fff 90%);box-shadow:0 6px 22px #173e5610}
+  .cockpit306 h3{color:var(--n306);font-size:1.15rem;margin:0 0 5px}
+  .cockpit306>p{margin:0 0 14px;font-size:.9rem;color:#4c6774}
+  .cockpit306-group{margin:12px 0 17px}
+  .cockpit306-group h4{margin:0 0 10px;font-size:.88rem;letter-spacing:.015em;color:#385e6f}
+  .cockpit306-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .cockpit306-tile{display:flex;flex-direction:column;gap:5px;min-width:0;text-align:left;padding:13px;border:1px solid #cde2ea;border-radius:13px;background:white;box-shadow:0 2px 5px #173e5610;cursor:pointer;color:#163d4f;font:inherit;overflow-wrap:anywhere}
+  .cockpit306-tile strong{font-size:.95rem;line-height:1.3}
+  .cockpit306-tile small{color:#5a7180;line-height:1.35;font-size:.77rem}
+  .cockpit306-tile:focus-visible,.lab306-links button:focus-visible{outline:3px solid #1b829e;outline-offset:2px}
+  .cockpit306-tile.primary{background:#dbf1f6;border-color:#87c3d4}
+  .cockpit306-tile.primary strong{color:#0f536c}
+  .cockpit306-extra{border-top:1px solid #deedf2;margin-top:12px;padding-top:12px}
+  .cockpit306-extra summary{font-weight:700;color:#16495e;cursor:pointer;padding:5px 0}
+  #uebersicht .home20-quick,#uebersicht .suite-launcher,#uebersicht h3:has(+ .suite-launcher){display:none!important}
+  #uebersicht .suite-stats{margin-top:15px}
+  #labor .lab306-top{margin:14px 0;padding:15px;border:1px solid var(--b306);border-radius:16px;background:#eff7fb}
+  #labor .lab306-top h3{margin:0 0 6px;font-size:1.08rem;color:#15485c}
+  #labor .lab306-top p{font-size:.89rem;margin:4px 0 12px;color:#516b79}
+  #labor .lab306-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}
+  #labor .lab306-stat{padding:10px;background:#fff;border:1px solid #cfe0e9;border-radius:11px;min-width:0}
+  #labor .lab306-stat strong{font-size:1.22rem;color:#124c64;display:block}
+  #labor .lab306-stat span{font-size:.73rem;color:#526b78;line-height:1.25;display:block}
+  #labor .lab306-links{display:flex;gap:9px;flex-wrap:wrap;margin:10px 0 0}
+  #labor .lab306-links button{font:inherit;font-size:.86rem;font-weight:650;padding:9px 12px;border:1px solid #abcbd7;border-radius:9px;background:#fff;color:#1d536b;cursor:pointer}
+  #labor .lab306-guide{margin:12px 0;border:1px solid #c6dfe8;border-radius:11px;background:#f2f9fc;overflow:hidden}
+  #labor .lab306-guide summary{padding:11px;font-weight:700;cursor:pointer;color:#195068;font-size:.91rem}
+  #labor .lab306-content{padding:0 12px 13px;font-size:.9rem;line-height:1.52}
+  #labor .lab306-content strong{display:block;margin:9px 0 3px;color:#1a4557}
+  #labor .lab306-content p{margin:5px 0;color:#294859;overflow-wrap:anywhere}
+  #labor .lab306-content small{display:block;margin-top:10px;color:#597080;font-size:.81rem}
+  #labor .lab306-content .lab306-context{font-weight:600;color:#23536a}
+  #mehr .m306-group{border:1px solid #cfe2e9;border-radius:14px;background:#f5fafc;margin:12px 0;padding:13px}
+  #mehr .m306-group h3{margin:0 0 9px;color:#17495c;font-size:1.02rem}
+  #mehr .m306-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  #mehr .m306-grid button{min-width:0;border:1px solid #d0e0e8;background:white;border-radius:10px;text-align:left;padding:12px;font:inherit;color:#17475b;cursor:pointer}
+  #mehr .m306-grid button strong{display:block;font-size:.91rem}
+  #mehr .m306-grid button small{display:block;font-size:.76rem;color:#56707d;margin-top:4px}
+  #mehr>.hub20-grid{display:none!important}
+  @media(max-width:700px){.cockpit306-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#labor .lab306-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:430px){.cockpit306{padding:12px}.cockpit306-tile{padding:11px 10px}.cockpit306-tile strong{font-size:.86rem}}
+  @media(max-width:700px){#start .hero-illustration{display:none!important}#start .hero-content{padding-top:13px!important;padding-bottom:13px!important}#start h1{font-size:1.34rem!important}#start .hero-meta{display:none!important}}
+  #labor .lab306-lexicon{background:#fff;border:1px solid #ccdde4;border-radius:12px;padding:12px;margin-top:14px}
+  #labor .lab306-lexicon summary{cursor:pointer;font-weight:700;color:#174b60}
+  #labor .lab306-lexicon label{display:block;margin:10px 0;font-size:.88rem}
+  #labor .lab306-lexicon select{display:block;width:100%;max-width:100%;font-size:16px;margin:6px 0;padding:9px;border:1px solid #bed5de;border-radius:9px;background:#fff}
+  #labor .lab306-lexicon-detail{background:#f5fafe;border-radius:10px;padding:12px;margin-top:10px;color:#264b60;font-size:.9rem;line-height:1.55}
+  #labor .lab306-lexicon-detail h4{margin:0 0 6px;color:#18485f}
+  #labor .lab306-lexicon-detail p{margin:7px 0}
+  #labor .lab306-lexicon-detail small{color:#536b77}
+  .cockpit306-version{display:block;font-size:.75rem;color:#69818e;margin-top:8px}
+  @media print{.cockpit306,.lab306-links,.m306-group{display:none!important}}
+  `;document.head.append(css);
+  const el=(tag,txt,cls)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(txt!==undefined)x.textContent=txt;return x};
+  const groups=[
+    {title:'Schnell erfassen',items:[
+      ['Treppenzähler','Stufen & Belastung','arbeit',true],['Lungenfunktion','FEV₁ & Untersuchungen','lungenwerte'],
+      ['Blutwerte','Labor und Befunde','labor'],['Blutdruck & Puls','Vitalwerte eintragen','vitalwerte'],
+      ['Befund hochladen','Bild / PDF erfassen','befunde'],['Kalender','Termine & Erinnerungen','kalender']
+    ]},
+    {title:'Therapie & Alltag',items:[
+      ['Peak-Flow','Tagebuch und Verlauf','peakflow'],['Medikamente','Therapieplan','therapie'],
+      ['Krankheitstage','Asthma-AU und Tagebuch','akte']
+    ]},
+    {title:'Arbeit, Anträge & Auswertung',items:[
+      ['Arbeitsschutz','Belastungen & Rechte','arbeit'],['Reha und Anträge','Anträge verwalten','antraege'],
+      ['Statistik & PDF','Monats- / Jahresbericht','statistik']
+    ]}
+  ];
+  const cockpit=el('section',undefined,'cockpit306');cockpit.id='cockpit306';cockpit.setAttribute('aria-label','Schnellzugriff auf wichtige Funktionen');
+  cockpit.append(el('h3','Dein Gesundheits-Cockpit'),el('p','Die häufigsten Aufgaben direkt öffnen. Bestehende Aufzeichnungen und Diagramme bleiben darunter erhalten.'));
+  function buildTile(item){const [name,caption,route,featured]=item,b=el('button',undefined,'cockpit306-tile'+(featured?' primary':''));b.type='button';b.dataset.goto=route;
+    b.append(el('strong',name),el('small',caption));if(name==='Treppenzähler')b.addEventListener('click',()=>setTimeout(()=>document.getElementById('sc-steps')?.focus({preventScroll:false}),150));return b;}
+  groups.forEach((g,index)=>{const container=index===0?el('section',undefined,'cockpit306-group'):el('details',undefined,'cockpit306-extra');
+    if(index===0)container.append(el('h4',g.title));else container.append(el('summary',g.title));
+    const grid=el('div',undefined,'cockpit306-grid');g.items.forEach(item=>grid.append(buildTile(item)));container.append(grid);cockpit.append(container)});
+  (page.querySelector('.home20-heading')||page.firstElementChild)?.insertAdjacentElement('afterend',cockpit);
+  const lab=$('labor');if(lab&&!$('lab306-summary')){
+    const box=el('section',undefined,'lab306-top');box.append(el('h3','Deine Laborwerte übersichtlich erklärt'),el('p','Alle eingetragenen Werte mit den jeweiligen Referenzbereichen. Bei jedem Wert kannst du die Erklärung und Grenzwerte aufklappen.'));
+    box.append(el('div',undefined,'lab306-summary')).lastElementChild.id='lab306-summary';
+    const links=el('div',undefined,'lab306-links');
+    [['Gespeicherte Werte','labp-list'],['Verlauf','labp-graph'],['Zwei Bluttests vergleichen','lab-compare-years'],['Neuen Wert erfassen','labp-add']].forEach(([txt,id])=>{
+      const b=el('button',txt);b.type='button';b.addEventListener('click',()=>{if(id==='labp-add'){$('labp-add')?.click();return}const t=$(id);if(t){t.scrollIntoView({behavior:'smooth',block:'start'});if(t.closest('details'))t.closest('details').open=true}});links.append(b);
+    });box.append(links,el('p',undefined));box.lastElementChild.id='lab306-status';
+    lab.querySelector('.section-heading')?.insertAdjacentElement('afterend',box);
+  }
+  // All 147 descriptions are also available when no reading is saved yet.
+  const catalogue=window.ASTHMA_LAB_INFO_306;
+  const labTop=$('lab306-summary')?.parentElement;
+  if(labTop&&catalogue){
+    const fold=el('details',undefined,'lab306-lexicon');
+    fold.append(el('summary','Laborwert-Lexikon: alle 147 Untersuchungen erklären'));
+    const label=el('label','Untersuchung auswählen');
+    const select=el('select');select.id='lab306-lexicon-select';
+    let optgroup=null,previous='';
+    for(const t of catalogue.catalog){if(t.category!==previous){previous=t.category;optgroup=el('optgroup');optgroup.label=previous;select.append(optgroup)}const opt=el('option',t.label+' ('+t.unit+')');opt.value=t.id;optgroup.append(opt)}
+    label.append(select);fold.append(label);
+    const detail=el('section',undefined,'lab306-lexicon-detail');fold.append(detail);
+    const update=async()=>{const marker=select.value,def=catalogue.catalog.find(t=>t.id===marker);detail.replaceChildren();
+      if(!def)return;detail.append(el('h4',def.label),el('p',catalogue.descriptions[marker]||'Keine gesicherte Erklärung zugeordnet.'));
+      try{const S=window.ASTHMA_SECURITY;const rows=(await S.list('labs')).filter(r=>r.marker===marker).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+       const recent=rows.find(r=>String(r.reference||'').trim());if(recent)detail.append(el('p','Letzter dokumentierter Labor-Referenzwert: '+String(recent.reference)+' '+String(recent.unit||'')+' (Untersuchung vom '+String(recent.date||'')+').'));
+       else detail.append(el('p','In deinen bisherigen Einträgen ist kein Laborreferenzwert für diese Untersuchung vorhanden.'));
+      }catch{detail.append(el('p','Individuelle Laborreferenz derzeit nicht verfügbar.'))}
+      detail.append(el('small','Grenzwerte immer anhand des Originalbefunds und seiner Einheit prüfen. Kein allgemeiner medizinischer Grenzwert wird hinzugedichtet.'));
+    };
+    select.value='eosAbs';select.addEventListener('change',update);fold.addEventListener('toggle',()=>{if(fold.open)update()});
+    labTop.append(fold);
+  }
+  const more=$('mehr');if(more&&!$('m306-grouped')){
+    const grouped=el('div');grouped.id='m306-grouped';const sections=[
+      ['Gesundheit und Messwerte',[['Lungenfunktion','lungenwerte'],['Peak-Flow','peakflow'],['Blutwerte','labor'],['Vitalwerte','vitalwerte'],['Befundscanner','befunde'],['Therapie','therapie']]],
+      ['Planung, Alltag und Arbeit',[['Kalender','kalender'],['Meine Akte','akte'],['Arbeit und Treppenzähler','arbeit'],['Mein Profil','profil'],['Arztbericht','bericht'],['Statistik & PDF','statistik']]],
+      ['Anträge, Hilfe und Wissen',[['Anträge','antraege'],['Hilfsmittel','hilfen'],['Region und Suche','region'],['Wissen und Rechte','wissen'],['Einstellungen','einstellungen']]]
+    ];
+    for(const [name,links] of sections){const section=el('section',undefined,'m306-group');section.append(el('h3',name));const grid=el('div',undefined,'m306-grid');for(const [label,route] of links){const b=el('button');b.type='button';b.dataset.goto=route;b.append(el('strong',label),el('small','Bereich öffnen'));grid.append(b)}section.append(grid);grouped.append(section)}
+    more.querySelector('.hub20-grid')?.insertAdjacentElement('beforebegin',grouped);
+  }
+  const v=document.createElement('small');v.className='cockpit306-version';v.textContent='Oberfläche & Laborwissen – Erweiterung 3.1.1';cockpit.append(v);
+})();
