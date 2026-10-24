@@ -688,3 +688,258 @@
  });
  window.ASTHMA_WM_IMPORT={validate,fp,makeId};
 })();
+
+
+/* Asthma · Tagesampel für Treppen/Arbeitsbelastung (3.0.7).
+   Read-only for existing observations; optional daily context lives in the encrypted suite vault.
+   This tool is not a clinical fitness certificate or a legal finding, and has no step-count limit. */
+(()=>{
+ 'use strict';
+ const S=window.ASTHMA_SECURITY;
+ const $=id=>document.getElementById(id);
+ const main=$('sc-work-panel');
+ if(!S?.state?.().unlocked||!main||$('st307-panel'))return;
+ const SOURCES=Object.freeze([
+  {id:'arbschg3',title:'§ 3 ArbSchG – Arbeitgeberpflichten, Wirksamkeit',url:'https://www.gesetze-im-internet.de/arbschg/__3.html'},
+  {id:'arbschg4',title:'§ 4 ArbSchG – besonders schutzbedürftige Beschäftigte',url:'https://www.gesetze-im-internet.de/arbschg/__4.html'},
+  {id:'arbschg5',title:'§ 5 ArbSchG – Gefährdungsbeurteilung',url:'https://www.gesetze-im-internet.de/arbschg/__5.html'},
+  {id:'arbschg6',title:'§ 6 ArbSchG – Dokumentation',url:'https://www.gesetze-im-internet.de/arbschg/__6.html'},
+  {id:'sgb151',title:'§ 151 SGB IX – Rechte bei Gleichstellung',url:'https://www.gesetze-im-internet.de/sgb_9_2018/__151.html'},
+  {id:'sgb164',title:'§ 164 Abs. 4 SGB IX – behinderungsgerechte Arbeit',url:'https://www.gesetze-im-internet.de/sgb_9_2018/__164.html'},
+  {id:'sgb167',title:'§ 167 SGB IX – Prävention und BEM',url:'https://www.gesetze-im-internet.de/sgb_9_2018/__167.html'},
+  {id:'sgb178',title:'§ 178 SGB IX – Schwerbehindertenvertretung',url:'https://www.gesetze-im-internet.de/sgb_9_2018/__178.html'},
+  {id:'med11',title:'§ 11 ArbSchG – arbeitsmedizinische Vorsorge',url:'https://www.gesetze-im-internet.de/arbschg/__11.html'},
+  {id:'med5a',title:'§ 5a ArbMedVV – Wunschvorsorge',url:'https://www.gesetze-im-internet.de/arbmedvv/__5a.html'},
+  {id:'asr18',title:'BAuA · ASR A1.8 – Verkehrswege und Treppen',url:'https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-8'},
+  {id:'asra35',title:'BAuA · ASR A3.5 – Raumtemperatur',url:'https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A3-5'},
+  {id:'notice16',title:'§ 16 ArbSchG – erkannte Gefahren melden',url:'https://www.gesetze-im-internet.de/arbschg/__16.html'}
+ ]);
+ const node=(tag,cls,txt)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(txt!==undefined)x.textContent=String(txt);return x;};
+ const fmt=x=>Number(x).toLocaleString('de-DE',{maximumFractionDigits:1});
+ const day=s=>/^\d{4}-\d\d-\d\d$/.test(s||'')?s.slice(8)+'.'+s.slice(5,7)+'.'+s.slice(0,4):String(s||'');
+ const nval=x=>x===''||x==null||!Number.isFinite(Number(x))?null:Number(x);
+ const toAnswer=(answer)=>answer==='yes'?'yes':answer==='no'?'no':answer==='partial'?'partial':'unknown';
+ const validDate=d=>/^\d{4}-\d{2}-\d{2}$/.test(d||'');
+ const unique=xs=>[...new Set(xs)];
+ function statusSnapshot(profile){
+  const gdb=nval(profile?.gdb),answers=profile?.arbeitgeberCheck31?.answers||{};
+  const eqYes=profile?.equal===true||answers.eq==='yes';
+  const eqNo=profile?.equal===false||answers.eq==='no';
+  const equal=eqYes?'yes':eqNo?'no':'unknown';
+  const conflict=eqYes&&eqNo;
+  const covered=(gdb!==null&&gdb>=50)||((gdb===30||gdb===40)&&equal==='yes');
+  const equalText=(gdb!==null?'GdB '+gdb+' · ':'')+(gdb!==null&&gdb>=50?'Schwerbehinderung laut Profil':equal==='yes'?'Gleichstellung laut Angaben bewilligt':equal==='no'?'Gleichstellung laut Profil nicht hinterlegt':'Gleichstellung nicht bestätigt')+(conflict?' (widersprüchliche Angaben – Bescheid/Profil abgleichen)':'');
+  return {gdb,equal,covered,equalText,answers,conflict};
+ }
+ function evaluate(items,check={},work=[],profile={}){
+  const steps=items.reduce((acc,x)=>acc+(Number.isFinite(Number(x.steps))?Math.max(0,Number(x.steps)):0),0);
+  const symptoms=items.map(x=>nval(x.symptoms)).filter(v=>v!==null&&v>=0&&v<=3);
+  for(const x of work){const v=nval(x.symptoms);if(v!==null&&v>=0&&v<=3)symptoms.push(v)}
+  const extra=nval(check.symptoms);if(extra!==null&&extra>=0&&extra<=3)symptoms.push(extra);
+  const maxSym=symptoms.length?Math.max(...symptoms):null;
+  // Missing symptom details must not be treated as a negative symptom report.
+  // An explicit day-wide self assessment may close gaps in single stair entries.
+  const incomplete=check.symptoms==null||check.symptoms==='unknown'
+   ?items.some(x=>nval(x.symptoms)===null)||work.some(x=>nval(x.symptoms)===null)
+   :false;
+  const heat=work.map(x=>nval(x.temperature)).filter(v=>v!==null&&v>=-20&&v<=70);
+  const heatMax=heat.length?Math.max(...heat):null;
+  const load=check.load||'unknown',breaks=check.breaks||'unknown';
+  const context=statusSnapshot(profile),a=context.answers;
+  const medReasons=[],legalReasons=[],medSources=['med11','med5a'],legalSources=['arbschg3','arbschg5'];
+  const med={level:'yellow',label:'Nicht ausreichend beurteilbar',reasons:medReasons,refs:medSources};
+  const legal={level:'yellow',label:'Arbeitsschutz prüfen',reasons:legalReasons,refs:legalSources};
+  if(maxSym===3){med.level='red';med.label='Kritisch – medizinisch abklären';medReasons.push('Starke Beschwerden (Stufe 3) dokumentiert. Bei akuter schwerer Atemnot oder bedrohlichen Symptomen Notruf 112.');}
+  else if(maxSym===2){med.label='Bedenklich – zeitnah prüfen';medReasons.push('Mittlere Beschwerden während/nach der Arbeit dokumentiert.');}
+  else if(maxSym===1){med.label='Bedenklich – beobachten';medReasons.push('Leichte Beschwerden dokumentiert; Belastung und Erholung beobachten.');}
+  else if(maxSym===0&&!incomplete){med.label='Keine akuten Beschwerden gemeldet';med.level='green';medReasons.push('Die angegebenen Einträge enthalten keine Beschwerden; das ist kein medizinischer Unbedenklichkeitsnachweis.');}
+  else if(maxSym===0&&incomplete){med.label='Beschwerdeangaben unvollständig';medReasons.push('Mindestens ein Eintrag hat keine Beschwerdeangabe. Es ist keine gesicherte Beschwerdefreiheit für den ganzen Tag dokumentiert.');}
+  else medReasons.push('Bei den Treppeneinträgen fehlt eine verlässliche Beschwerdeangabe; eine grüne Bewertung wäre unbegründet.');
+  if(heatMax!==null&&heatMax>=30){medReasons.push('Zusätzlich '+fmt(heatMax)+' °C am Arbeitsplatz dokumentiert: Hitzebelastung gesondert prüfen.');medSources.push('asra35');if(med.level==='green'){med.level='yellow';med.label='Bedenklich – Hitze prüfen';}}
+  if(load==='yes'){medReasons.push('Das Tragen einer Last auf Treppen wurde angegeben: Gewicht, Häufigkeit und Atembelastung individuell bewerten.');if(med.level==='green'){med.level='yellow';med.label='Lastentragen – prüfen';}}
+  if(breaks==='no'){medReasons.push('Unzureichende Erholungsmöglichkeit laut eigener Angabe.');if(med.level==='green'){med.level='yellow';med.label='Entlastung prüfen';}}
+  if(context.covered){medReasons.push('Behinderungsbedingte Einschränkungen und ärztliche Empfehlungen gehören in die individuelle Arbeitsplatzbewertung.');medSources.push('sgb164');}
+  if(items.length>0&&maxSym!==3){medReasons.push('Für Treppenstufen pro Tag gibt es keinen allgemeinen gesetzlichen oder medizinischen Höchstwert. Die Stufenzahl ist allein kein Grenzwert für deine Belastbarkeit.');}
+  if(context.covered){legalReasons.push(context.equalText+': Ansprüche auf behinderungsgerechte Arbeitsbedingungen sind besonders zu prüfen (§§ 151, 164 SGB IX).');legalSources.push('sgb151','sgb164','sgb178');}
+  else legalReasons.push('Allgemeiner Arbeitsschutz gilt unabhängig vom GdB oder einer Gleichstellung.');
+  if(context.conflict)legalReasons.push('Gleichstellung ist widersprüchlich eingetragen; bitte Bescheid und Arbeitgeber-Check miteinander abgleichen.');
+  const knownRisk=toAnswer(a.risk),knownProtection=toAnswer(a.protect),knownAid=toAnswer(a.aid),knownEmployer=toAnswer(a.known);
+  const deficits=[];
+  if(knownRisk==='no')deficits.push('Nach dem Arbeitgeber-Check wurde die individuelle Gefährdungsbeurteilung nach deiner Kenntnis nicht durchgeführt.');
+  if(knownProtection==='no')deficits.push('Nach dem Arbeitgeber-Check wurden keine wirksamen Schutzmaßnahmen umgesetzt.');
+  if(knownAid==='no')deficits.push('Nach dem Arbeitgeber-Check wurden keine konkreten Entlastungen oder Hilfsmittel angeboten.');
+  if(deficits.length){legalReasons.push(...deficits);legalSources.push('arbschg4','arbschg6','sgb164');}
+  if(knownEmployer==='yes')legalReasons.push('Der Arbeitgeber kennt laut Arbeitgeber-Check deine arbeitsbezogenen Einschränkungen.');
+  if(breaks==='no'){legalReasons.push('Fehlende Erholungsmöglichkeiten wurden für diesen Tag angegeben; tatsächliche Schutzmaßnahmen prüfen.');legalSources.push('arbschg3','arbschg4');}
+  if(heatMax!==null&&heatMax>=30){legalReasons.push('Hohe gemessene Raumtemperatur: ASR A3.5 und die konkreten Maßnahmen prüfen.');legalSources.push('asra35');}
+  if(load==='yes'){legalReasons.push('Lastentragen auf der Treppe dokumentiert: Arbeitsorganisation und mögliche Transporthilfen prüfen.');legalSources.push('asr18','sgb164');}
+  const symptomatic=maxSym!==null&&maxSym>=2;
+  const corroborated=context.covered&&knownEmployer==='yes'&&knownRisk==='no'&&(knownProtection==='no'||knownAid==='no')&&symptomatic;
+  if(corroborated){legal.level='red';legal.label='Möglicher Pflichtverstoß – prüfen';legalReasons.push('Mehrere konkrete Anhaltspunkte kommen zusammen: dokumentierte Beschwerden, bekanntes Handicap und laut Selbstauskunft fehlende Risiko-/Schutzprüfung. Kein automatischer Beweis für einen Rechtsverstoß.');}
+  else if(deficits.length||breaks==='no'||symptomatic||heatMax!==null&&heatMax>=30){legal.level='yellow';legal.label='Bedenklich – Arbeitgeberpflichten prüfen';}
+  else if(knownRisk==='yes'&&knownProtection==='yes'&&maxSym===0&&!incomplete&&load!=='yes'&&breaks!=='no'){
+   legal.level='green';legal.label='Kein konkreter Verstoß erkennbar';legalReasons.push('Nach den vorhandenen Antworten sind Gefährdungsprüfung und Schutzmaßnahmen dokumentiert; das ersetzt keine rechtliche Einzelprüfung.');
+  }else{legalReasons.push('Für eine abschließende Prüfung fehlen individuelle Nachweise zur Gefährdungsbeurteilung und Wirksamkeit der Maßnahmen.');}
+  legalReasons.push('Die Stufenzahl allein beweist keinen Rechtsverstoß. Dokumentation und tatsächliche Arbeitsorganisation sind entscheidend.');
+  legalSources.push('arbschg5','sgb164');
+  if(context.covered){legalSources.push('sgb167');}
+  return {steps,maxSym,heatMax,context,med,legal,sourceIds:{medical:unique(medSources),legal:unique(legalSources)}};
+ }
+ const panel=node('section','suite-subpanel');panel.id='st307-panel';
+ panel.innerHTML=`<h3>Tägliche Treppenbewertung mit Ampel</h3>
+ <p>Die Tagesbewertung wird beim Erfassen, Ändern oder Importieren von Treppen automatisch aktualisiert. Getrennt nach <strong>Gesundheitsbelastung</strong> und <strong>Arbeitsschutz / Gleichstellung</strong>. Die Werte zählen dokumentierte Stufen, nicht automatisch nur Aufstiege.</p>
+ <p class="st307-identity" id="st307-status"></p><p class="st307-identity">Die rechtliche Bewertung verwendet den <strong>aktuell gespeicherten</strong> Arbeitgeber-Check auch für ältere Messtage. Frühere Verhältnisse lassen sich daraus nicht beweisen. Rechtsquellen: amtliche Links unten (Stand der Prüfung 24.10.2026).</p>
+ <div class="st307-tools"><label>Zeitraum<select id="st307-range"><option value="30">Letzte 30 Tage mit Einträgen</option><option value="year">Dieses Jahr</option><option value="all">Alle Jahre</option></select></label>
+ <button class="btn btn-outline" type="button" id="st307-refresh">Bewertungen aktualisieren</button></div>
+ <div class="st307-overall" id="st307-overall" aria-live="polite"></div>
+ <div id="st307-days" aria-live="polite"></div>
+ <button id="st307-more" type="button" class="btn btn-outline" hidden>Weitere Tage zeigen</button>
+ <details class="st307-legal"><summary>Rechtsgrundlagen und Erläuterungen</summary><p>Keine pauschale tägliche Stufenobergrenze im deutschen Arbeitsrecht. Die Ampeln sind dokumentationsbasierte Hinweise, keine Messung der individuellen Belastbarkeit, keine ärztliche Eignungsbescheinigung und keine verbindliche juristische Feststellung.</p><div id="st307-all-sources"></div></details>`;
+ const before=main.querySelector('.sc-lower');(before||main).insertAdjacentElement(before?'beforebegin':'afterend',panel);
+ const css=node('style');css.textContent=`
+ #st307-panel{border:1px solid #b9d9e7;border-radius:15px;background:#f7fbff;padding:14px;margin:15px 0}
+ #st307-panel h3{margin:0 0 7px;font-size:1.15rem;color:#154255}
+ #st307-panel>p{font-size:.89rem;line-height:1.5;color:#456474}
+ #st307-panel .st307-tools{display:flex;align-items:end;gap:10px;flex-wrap:wrap;margin:12px 0}
+ #st307-panel label{display:block;color:#33596b;font-size:.9rem;font-weight:650}
+ #st307-panel input,#st307-panel select,#st307-panel textarea{width:100%;background:white;color:#183f52;font-size:16px;border:1px solid #aecedb;border-radius:9px;padding:9px;box-sizing:border-box;margin-top:5px}
+ #st307-panel .st307-identity{background:#e9f4fa;padding:9px;border-radius:8px}
+ #st307-panel .st307-day{margin:11px 0;background:white;border:1px solid #d4e4ec;border-radius:13px;padding:12px}
+ #st307-panel .st307-day h4{margin:0 0 8px;font-size:1rem}
+ #st307-panel .st307-metrics{display:flex;gap:10px;flex-wrap:wrap;color:#567483;font-size:.83rem;margin:6px 0 11px}
+ #st307-panel .st307-lights{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+ #st307-panel .st307-light{border:1px solid #ddd;border-left-width:6px;border-radius:9px;padding:10px;min-width:0}
+ #st307-panel .st307-light strong{display:block;font-size:.89rem;color:#21394b;margin:3px 0 5px}
+ #st307-panel .st307-light span{display:block;font-size:.82rem;line-height:1.35}
+ #st307-panel .st307-light.green{background:#eaf7ee;border-color:#9dcfae;border-left-color:#28804a}
+ #st307-panel .st307-light.yellow{background:#fff6df;border-color:#edda9b;border-left-color:#b27b13}
+ #st307-panel .st307-light.red{background:#fcece9;border-color:#e7b8b0;border-left-color:#b63c33}
+ #st307-panel .st307-reason{font-size:.86rem;color:#435e6e;margin:7px 0}
+ #st307-panel .st307-day details{margin-top:9px}
+ #st307-panel summary{cursor:pointer;color:#244e64;font-size:.9rem;font-weight:700}
+ #st307-panel .st307-facts{font-size:.87rem;padding:0 0 0 20px;line-height:1.5}
+ #st307-panel .st307-refs{margin:8px 0;display:flex;flex-wrap:wrap;gap:6px}
+ #st307-panel .st307-refs a{font-size:.82rem;padding:6px;border:1px solid #bed4df;border-radius:8px;color:#0b5875;background:#fff;overflow-wrap:anywhere}
+ #st307-panel .st307-context{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+ #st307-panel .st307-context label:last-of-type{grid-column:1/-1}
+ #st307-panel .st307-context button{grid-column:1/-1}
+ #st307-panel .st307-overall{font-weight:600;color:#24475d;margin:8px 0}
+ #st307-panel .st307-alert{padding:10px;border-radius:9px;background:#fff4df;color:#755109;font-size:.85rem}
+ #st307-panel .st307-legal{margin-top:13px}
+ #st307-panel .st307-legal p{font-size:.86rem;color:#506877}
+ @media(max-width:640px){#st307-panel{padding:10px}#st307-panel .st307-lights,#st307-panel .st307-context{grid-template-columns:1fr}#st307-panel .st307-tools{display:block}#st307-panel .st307-tools button{margin-top:8px}}
+ `;document.head.append(css);
+ function refs(container,ids){const div=node('div','st307-refs');for(const id of unique(ids)){const r=SOURCES.find(x=>x.id===id);if(!r)continue;const a=node('a',null,r.title);a.href=r.url;a.target='_blank';a.rel='noopener noreferrer';div.append(a)}container.append(div);}
+ refs($('st307-all-sources'),SOURCES.map(x=>x.id));
+ const stepReport=[];
+ let cache=[],assessments=new Map(),workdays=new Map(),limit=14,busy=false,requested=false,lastRecords=[];
+ const status=$('st307-status');
+ function listFor(d){return cache.filter(r=>r.date===d)}
+ function workFor(d){return workdays.get(d)||[]}
+ function currentProfile(){return S.profileGet()||{}}
+ function fullEval(d){return evaluate(listFor(d),assessments.get(d)||{},workFor(d),currentProfile())}
+ function lastDayMetrics(days,d){const index=days.indexOf(d),prior=index+1<days.length?days[index+1]:null;
+  if(!prior)return 'Kein früherer dokumentierter Tag als Vergleich.';
+  const before=listFor(prior).reduce((n,r)=>n+Number(r.steps||0),0),after=listFor(d).reduce((n,r)=>n+Number(r.steps||0),0),difference=after-before;
+  return 'Voriger Eintragstag '+day(prior)+': '+fmt(before)+' Stufen · Differenz '+(difference>0?'+':'')+fmt(difference)+' Stufen'+(before?' ('+(difference>0?'+':'')+fmt(difference/Math.abs(before)*100)+' %)':'');
+ }
+ function choice(label,id,choices,value){const hold=node('label',null,label),select=node('select');select.id=id;for(const [v,t] of choices){const opt=node('option',null,t);opt.value=v;select.append(opt)}select.value=value||'unknown';hold.append(select);return hold}
+ const yn=[['unknown','Nicht angegeben'],['no','Nein'],['yes','Ja']];
+ const symptoms=[['unknown','Nicht angegeben'],['0','0 – keine'],['1','1 – leicht'],['2','2 – mittel'],['3','3 – stark']];
+ function card(d,days){
+  const rows=listFor(d),report=fullEval(d),card=node('article','st307-day'),stats=report.context;
+  const header=node('h4',null,day(d)+' · '+fmt(report.steps)+' Stufen');card.append(header);
+  const metrics=node('div','st307-metrics');metrics.append(node('span',null,rows.length+' Eintrag'+(rows.length===1?'':'e')));
+  metrics.append(node('span',null,lastDayMetrics(days,d)));
+  card.append(metrics);
+  const reasons=new Map();for(const item of rows){const k=String(item.reason||'Nicht zugeordnet').trim()||'Nicht zugeordnet';reasons.set(k,(reasons.get(k)||0)+Number(item.steps||0))}
+  if(reasons.size){const list=node('p','st307-reason');list.append(node('strong',null,'Tätigkeiten: '));list.append(document.createTextNode([...reasons].sort((a,b)=>b[1]-a[1]).map(([k,v])=>k+': '+fmt(v)+' Stufen').join(' · ')));card.append(list)}
+  const lights=node('div','st307-lights');
+  for(const [title,key] of [['Arbeitsmedizinisch','med'],['Arbeitsrecht / Gleichstellung','legal']]){
+   const info=report[key],block=node('div','st307-light '+info.level);
+   block.append(node('strong',null,title),node('span',null,(info.level==='green'?'GRÜN':info.level==='red'?'ROT':'GELB')+' · '+info.label));
+   lights.append(block);
+  }
+  card.append(lights);
+  const details=node('details');details.append(node('summary',null,'Begründung, Gesetze und Tagesangaben'));
+  for(const [key,title] of [['med','Arbeitsmedizinische Beurteilung'],['legal','Arbeitsrechtliche Orientierung']]){
+   details.append(node('h5',null,title));const ul=node('ul','st307-facts');for(const t of report[key].reasons)ul.append(node('li',null,t));details.append(ul);refs(details,report.sourceIds[key]);
+  }
+  details.append(node('p','st307-alert','Eine rote Rechtsampel bedeutet „möglichen Pflichtverstoß fachlich prüfen“, nicht „Gesetzesverstoß bewiesen“. Eine grüne Ampel bedeutet nicht, dass die Belastung medizinisch sicher ist.'));
+  const saved=assessments.get(d)||{};
+  const f=node('form','st307-context');f.id='st307-context-'+d;
+  f.append(choice('Zusätzliche Beschwerden an diesem Tag','st307-symptom-'+d,symptoms,saved.symptoms||'unknown'));
+  f.append(choice('Last auf der Treppe getragen?','st307-load-'+d,yn,saved.load||'unknown'));
+  f.append(choice('Ausreichende Erholung/Entlastung möglich?','st307-breaks-'+d,yn,saved.breaks||'unknown'));
+  const note=node('label',null,'Ergänzende sachliche Notiz (optional)'),input=node('textarea');input.rows=2;input.maxLength=500;input.value=saved.note||'';input.id='st307-note-'+d;note.append(input);f.append(note);
+  const b=node('button','btn btn-primary','Tagesangaben verschlüsselt speichern');b.type='submit';f.append(b);
+  const msg=node('p','st307-reason');msg.setAttribute('role','status');f.append(msg);
+  f.addEventListener('submit',async ev=>{
+   ev.preventDefault();if(b.disabled)return;b.disabled=true;
+   const context={id:'daily-'+d,date:d,kind:'stairsDailyContext',symptoms:$('st307-symptom-'+d).value,load:$('st307-load-'+d).value,breaks:$('st307-breaks-'+d).value,note:input.value.trim().slice(0,500),updatedAt:new Date().toISOString()};
+   try{await S.put('suite',{key:'stairsDailyContext/'+d,type:'stairsDailyContext',value:context},'stairsDailyContext/'+d);assessments.set(d,context);msg.textContent='Gespeichert, Ampel wird neu berechnet.';updateOne(d,days)}
+   catch(e){msg.textContent='Speichern fehlgeschlagen: '+e.message}
+   finally{b.disabled=false}
+  });
+  details.append(f);card.append(details);
+  return card;
+ }
+ function updateOne(d,days){const previous=document.getElementById('st307-day-'+d);if(!previous)return;const wasOpen=previous.querySelector('details')?.open;const newer=card(d,days);newer.id=previous.id;newer.querySelector('details').open=Boolean(wasOpen);previous.replaceWith(newer);}
+ function render(){
+  const allDays=[...new Set(cache.map(x=>x.date))].sort().reverse(),mode=$('st307-range').value,year=String(new Date().getFullYear());
+  const days=(mode==='year'?allDays.filter(x=>x.startsWith(year)):mode==='all'?allDays:allDays.slice(0,30));
+  const root=$('st307-days');root.replaceChildren();
+  const profile=statusSnapshot(currentProfile());
+  status.textContent=profile.equalText+' · Die Ampel berücksichtigt nur die vorhandenen Angaben.';
+  if(!days.length){root.append(node('p','st307-alert','Noch keine Treppen-Einträge im gewählten Zeitraum gespeichert. Sobald du Stufen einträgst oder importierst, entsteht hier eine tägliche Bewertung.'));$('st307-overall').textContent='';$('st307-more').hidden=true;return;}
+  let medRed=0,medYellow=0,legRed=0,legYellow=0;for(const d of days){const e=fullEval(d);if(e.med.level==='red')medRed++;if(e.med.level==='yellow')medYellow++;if(e.legal.level==='red')legRed++;if(e.legal.level==='yellow')legYellow++}
+  $('st307-overall').textContent=days.length+' erfasste Kalendertage · Gesundheit: '+medRed+' kritisch, '+medYellow+' prüfbedürftig · Arbeitsschutz: '+legRed+' mögliche Pflichtverstöße zu prüfen, '+legYellow+' prüfbedürftig.';
+  const frag=document.createDocumentFragment();for(const d of days.slice(0,limit)){const c=card(d,days);c.id='st307-day-'+d;frag.append(c)}root.append(frag);
+  $('st307-more').hidden=days.length<=limit;
+ }
+ async function reload(){if(busy){requested=true;return}busy=true;
+  try{const all=await S.list('suite');cache=all.filter(x=>x.type==='stairs').map(x=>x.value).filter(x=>x&&validDate(x.date)&&Number.isInteger(Number(x.steps))&&Number(x.steps)>0);
+   assessments=new Map(all.filter(x=>x.type==='stairsDailyContext'&&validDate(x.value?.date)).map(x=>[x.value.date,x.value]));
+   workdays=new Map();for(const record of all){if(record.type!=='work'||!validDate(record.value?.date))continue;const d=record.value.date;if(!workdays.has(d))workdays.set(d,[]);workdays.get(d).push(record.value)}
+   render();}
+  catch(err){status.textContent='Bewertung nicht möglich: '+err.message}
+  finally{busy=false;if(requested){requested=false;reload()}}
+ }
+ $('st307-range').addEventListener('change',()=>{limit=14;render()});$('st307-more').addEventListener('click',()=>{limit+=14;render()});$('st307-refresh').addEventListener('click',reload);
+ let debounce=false;window.addEventListener('asthma:secure-change',e=>{
+  if(e.detail?.group!=='suite'||debounce)return;
+  debounce=true;setTimeout(()=>{debounce=false;reload()},120)
+ });
+ window.addEventListener('asthma:profile-change',reload);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)reload()});
+ reload();
+ // Enrich existing month/year report without replacing its previous data or charts.
+ function appendDaily(report,range){
+  const r=range;report.querySelectorAll('[data-st307-report]').forEach(el=>el.remove());
+  const allDays=[...new Set(cache.map(x=>x.date).filter(x=>x>=r.from&&x<=r.to))].sort();
+  const area=node('section','stats25-section');area.dataset.st307Report='true';area.append(node('h3',null,'Tägliche Treppenampel – Arbeitsmedizin und Arbeitsschutz'));
+  area.append(node('p','stats25-muted','Datengestützte Orientierung mit Angaben zu Beschwerden, Gleichstellung und Gefährdungsbeurteilung. Die Ampel ist keine individuelle ärztliche Freigabe oder rechtsverbindliche Prüfung. Keine allgemeine gesetzliche Stufengrenze.'));
+  area.append(node('p','stats25-muted',statusSnapshot(currentProfile()).equalText));
+  if(!allDays.length)area.append(node('p','stats25-muted','Für den Zeitraum wurden keine Treppeneinträge gespeichert.'));
+  for(const d of allDays){const q=fullEval(d),e=node('div','stats25-line');
+   e.append(node('span',null,day(d)+' · '+fmt(q.steps)+' Stufen'));
+   const ms=q.med.level==='red'?'ROT':q.med.level==='green'?'GRÜN':'GELB',ls=q.legal.level==='red'?'ROT':q.legal.level==='green'?'GRÜN':'GELB';
+   e.append(node('strong',null,'Medizin '+ms+' – '+q.med.label+' | Recht '+ls+' – '+q.legal.label));
+   area.append(e);
+   const why=node('p','stats25-muted',q.med.reasons[0]+' '+q.legal.reasons.filter(x=>/Gefährdungsbeurteilung|Schutzmaßnahmen|Pflichtverstoß|Arbeitgeber-Check/.test(x)).join(' ').slice(0,550));area.append(why);
+  }
+  area.append(node('p','stats25-muted','Die Auswertung basiert auf dem aktuell gespeicherten Arbeitgeber-Check, auch bei älteren Tagen. Fehlende Angaben sind nicht als Unbedenklichkeit zu verstehen.'));
+  for(const id of ['arbschg5','arbschg4','sgb151','sgb164','med5a','asr18','asra35']){const source=SOURCES.find(x=>x.id===id);if(source)area.append(node('p','stats25-muted','Quelle: '+source.title+' · '+source.url));}
+  report.append(area);
+ }
+ const prior=Object.getOwnPropertyDescriptor(window,'ASTHMA_STATSP292');let original=prior?.get?prior.get():window.ASTHMA_STATSP292;
+ const raw=()=>prior?.get?prior.get():original;
+ const set=value=>{if(prior?.set)prior.set(value);else original=value;cachedIn=null};
+ let cachedIn=null,cachedOut=null;
+ function decorated(){const a=raw();if(a===cachedIn)return cachedOut;cachedIn=a;
+  cachedOut=a?.append?Object.freeze({...a,append:async(report,r)=>{await a.append(report,r);try{await reload();appendDaily(report,r)}catch(e){console.warn('Treppen-Tagesauswertung:',e);}}}):a;
+  return cachedOut;
+ }
+ Object.defineProperty(window,'ASTHMA_STATSP292',{configurable:true,enumerable:true,get:decorated,set});
+ window.ASTHMA_DAILY307={evaluate,statusSnapshot,SOURCES,refresh:reload,summary:()=>cache.length};
+})();

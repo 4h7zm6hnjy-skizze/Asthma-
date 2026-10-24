@@ -1,0 +1,60 @@
+ASTHMA – TÄGLICHE TREPPENAMPEL (Erweiterung 3.0.7)
+==================================================
+
+Dieses ZIP enthält eine vollständige Ersatzdatei: laborvergleich303.js.
+Sie ersetzt NUR die gleichnamige Datei im vorhandenen GitHub-Projekt
+4h7zm6hnjy-skizze/Asthma-. Alle bisherigen Funktionen bleiben enthalten.
+
+INSTALLATION AUF DEM IPHONE:
+1. ZIP-Datei in "Dateien" speichern und antippen zum Entpacken.
+2. Dein GitHub-Repository öffnen.
+3. Die bisherige laborvergleich303.js durch die Datei aus dem ZIP ersetzen.
+   WICHTIG: ZIP nicht als solche in das Repository legen.
+4. Die Änderung auf GitHub bestätigen.
+5. Asthma-Webapp bei Internetverbindung neu laden, ggf. über
+   "Update installieren"; bei älteren Offline-Caches ggf. erneut öffnen.
+6. Arbeitsplatz und Belastungen > Treppenzähler >
+   "Tägliche Treppenbewertung mit Ampel" öffnen.
+
+DIE NEUE FUNKTION:
+- Tagesstufen, Gründe und Veränderung zum vorherigen Eintragstag.
+- Zwei getrennte Ampeln: Arbeitsmedizin/Gesundheit und Arbeitsschutz/Gleichstellung.
+- Angaben zu Beschwerden, Last auf Treppen, Erholung und sachliche Notiz.
+- Wiederberechnung nach Änderungen, neuen Eingaben und Imports.
+- Berücksichtigung vorhandener Arbeitgeber-Check-Antworten und des GdB/
+  der Gleichstellung aus dem lokalen Profil.
+- Einzelbegründung pro Tag mit anklickbaren amtlichen Rechtsquellen.
+- Zusätzlicher Abschnitt im Monats- und Jahresbericht (mit Ausdruck/PDF).
+
+PRIVATSPHÄRE:
+Keine Gesundheitswerte oder persönlichen Daten in dieser öffentlichen
+Programmdatei. Tageszusatzangaben werden nur im vorhandenen AES-GCM-Tresor
+auf dem iPhone gespeichert. Es sind keine neuen Serveranfragen eingebaut.
+Die 13 früheren WorksManager-Einträge müssen, sofern noch nicht erfolgt,
+weiterhin mit der SEPARATEN privaten JSON-Datei in der App importiert werden.
+Diese private Datei gehört NICHT auf GitHub.
+
+WICHTIGE EINORDNUNG:
+Es gibt keine pauschale gesetzliche tägliche Stufenhöchstzahl.
+Rot im Bereich Arbeitsschutz bedeutet "möglichen Pflichtverstoß prüfen" –
+nicht "Rechtsverstoß festgestellt". Die Ampel ersetzt keine individuelle
+arbeitsmedizinische Untersuchung, Beratung oder rechtliche Einzelfallprüfung.
+Die rechtliche Orientierung verwendet den aktuell gespeicherten Arbeitgeber-
+Check auch für ältere Tage. Prüfe historische Angaben daher gesondert.
+
+AMTLICHE RECHTSQUELLEN (am 24.10.2026 geprüft):
+Arbeitsschutzgesetz: §§ 3, 4, 5, 6, 11, 16
+https://www.gesetze-im-internet.de/arbschg/
+SGB IX: §§ 151, 164, 167, 178
+https://www.gesetze-im-internet.de/sgb_9_2018/
+ArbMedVV: § 5a (Wunschvorsorge)
+https://www.gesetze-im-internet.de/arbmedvv/__5a.html
+BAuA: ASR A1.8 (Treppen/Verkehrswege) und ASR A3.5 (Raumtemperatur)
+https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-8
+https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A3-5
+
+TECHNISCHE PRÜFUNG:
+JavaScript-Syntax und Chromium-Browsertests, iPhone-Breite 390 px;
+13 importierte Einträge an vier Tagen (378 Stufen), Grün/Gelb/Rot-Regeln,
+Gleichstellung, geschützte Tagesangaben und Berichtsappendix erfolgreich.
+Original-App und Installation auf dem konkreten iPhone nicht live getestet.
