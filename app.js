@@ -1,6 +1,6 @@
 'use strict';
 (() => {
-  const VERSION = '3.0.5';
+  const VERSION = '3.1.8';
   window.ASTHMA_APP_VERSION = VERSION;
   const STORAGE = 'asthma-v1-preferences';
   const sources = window.ASTHMA_SOURCES || {};
@@ -124,6 +124,13 @@
     installingUpdate=true;button.disabled=true;button.textContent='Installiere …';
     try{
       const release=await serverRelease();
+      const comparison=compareVersions(release.version,VERSION);
+      if(comparison===null)throw Error('Die Serverversion ist ungültig.');
+      if(comparison<=0){
+        out.textContent='Version '+VERSION+' ist bereits installiert. Kein weiterer Neustart nötig.';
+        button.disabled=false;button.textContent='Update installieren';installingUpdate=false;
+        return;
+      }
       out.textContent='Lade App-Dateien für Version '+release.version+' …';
       if('serviceWorker' in navigator){
         const reg=await navigator.serviceWorker.getRegistration();
@@ -151,7 +158,7 @@
       const target=new URL(location.href);
       target.searchParams.set('app_update',release.version);
       target.searchParams.set('app_refresh',String(Date.now()));
-      out.textContent='Update geladen. Die App wird neu geöffnet …';
+      out.textContent='App wird aktualisiert. Bitte nach dem Neustart die Versionsanzeige prüfen.';
       location.replace(target.href);
     }catch(e){
       out.textContent='Update konnte nicht installiert werden: '+e.message+'. Deine Daten bleiben erhalten.';

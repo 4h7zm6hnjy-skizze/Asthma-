@@ -19,8 +19,12 @@
   try{
    if(!('caches' in window)||!('serviceWorker' in navigator)){p.textContent='Offline-Cache wird von diesem Browser nicht vollständig unterstützt.';return;}
    if(!navigator.serviceWorker.controller){p.textContent='Die App wird noch nicht vom Offline-Dienst gesteuert. Bitte einmal bei bestehender Internetverbindung neu öffnen und erneut prüfen.';return;}
-   const versions=await caches.keys();if(!versions.includes('asthma-static-3.0.4-audit-offline')){p.textContent='Der neue Offline-Cache ist noch nicht aktiv. App online neu öffnen und erneut prüfen.';return;}
-   const appCache=await caches.open('asthma-static-3.0.4-audit-offline');
+   // Den Cache der aktuell laufenden App suchen, nicht einen historischen Versionsnamen.
+   const versions=await caches.keys();
+   const current=String(window.ASTHMA_APP_VERSION||'').trim();
+   const active=versions.filter(v=>current&&v.startsWith('asthma-static-'+current+'-'));
+   if(!active.length){p.textContent='Für die laufende Version '+(current||'(unbekannt)')+' ist noch kein passender Offline-Cache aktiv. App online aktualisieren und erneut prüfen.';return;}
+   const appCache=await caches.open(active[active.length-1]);
    const base=new URL('./',location.href);
    const results=await Promise.all(assets.map(async a=>({name:a,present:!!(await appCache.match(new URL(a,base),{ignoreSearch:true}))})));
    const missing=results.filter(x=>!x.present).map(x=>x.name);

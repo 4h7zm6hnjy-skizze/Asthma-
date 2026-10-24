@@ -1,5 +1,5 @@
 {
-  "version": "3.1.7",
+  "version": "3.1.8",
   "released": "2026-10-24",
-  "notes": "Lupe / Suchen im Kopfbereich rechts neben dem Logo. Die verschlüsselte Akten-Suche öffnet sich dort per Tipp. Navigation, Blutwerte und Gesundheitsdaten bleiben unverändert."
+  "notes": "Intensivprüfung: Haupt-App, Startdateien, Tresor-Skriptlader und Offline-Cache synchronisiert. Wiederholtes Neustarten bei aktueller Version behoben; Offline-Prüfung verwendet aktive Version. Keine Gesundheitsdaten geändert."
 }

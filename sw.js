@@ -1,5 +1,5 @@
-/* Asthma 3.1.7: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
-const VERSION='3.1.7-header-search';
+/* Asthma 3.1.8: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
+const VERSION='3.1.8-consistent-cache';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
  './','./index.html','./styles.css','./content.js','./app.js','./antraege-data.js','./antraege.js',
