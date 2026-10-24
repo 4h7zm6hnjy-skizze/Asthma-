@@ -1,31 +1,23 @@
-ASTHMA – STATISTIK-LAYOUTFIX 3.1.2 (iPhone)
+ASTHMA – DRUCKSTATISTIK LAYOUTFIX 3.1.3
 
-Inhalt:
-- Behebt übergroße blaue Häkchen und rechts abgeschnittene Beschreibungen
-  unter „Neue Berichtsteile – Monats- und Jahresstatistik“.
-- Platziert diesen Block außerhalb der flexiblen Zeile für Zeitraum und
-  „Statistik berechnen“.
-- Drei Auswahlfelder erscheinen untereinander, mit 20px-Häkchen und
-  korrekt umbrechendem Text.
-- Druck-/PDF-Ausgabe blendet die Einstellungen weiter aus.
-- Bestehende Blutwerte, Treppeneinträge, Reha-Hilfen, Statistikberechnungen,
-  ausgewählte Berichtsteile und die AES-GCM-Datenbank werden nicht geändert.
+Problem:
+In der Statistik wurden die Blutwerte in der Druck-/PDF-Ansicht auf dem iPhone extrem schmal dargestellt. Wörter wurden Zeichen für Zeichen umgebrochen und die Übersicht war kaum lesbar.
 
-iPhone / GitHub:
-1. Vor der Änderung in der bestehenden App eine vollständige, verschlüsselte
-   .asthma17-Datensicherung erstellen und gesondert aufbewahren.
-2. ZIP in der iPhone-Dateien-App entpacken.
-3. GitHub-Repository 4h7zm6hnjy-skizze/Asthma- öffnen.
-4. Im Hauptverzeichnis die bestehende Datei laborvergleich303.js vollständig
-   durch die beigelegte Datei gleichen Namens ersetzen.
-5. GitHub-Änderung bestätigen; anschließend dieselbe installierte Webapp mit
-   Internetzugang öffnen und „Update installieren“ verwenden bzw. neu laden.
-6. Unter Statistik die drei Auswahlen und den Monatsbericht prüfen.
+Lösung in 3.1.3:
+- Die Laborwerte in der Monats- und Jahresstatistik werden nicht mehr als zu enge 5-Spalten-Tabelle dargestellt.
+- Jeder Laborwert erscheint jetzt als eigene, sauber lesbare Karte.
+- Allgemeine Tabellen erhalten zusätzlich eine bessere Breite, Scrollbarkeit und weniger aggressiven Zeilenumbruch.
+- Die iPhone-Layoutkorrektur 3.1.2 bleibt erhalten.
+- Vorhandene Daten, Laborwerte, Treppenwerte und Diagramme bleiben unverändert.
 
-WICHTIG:
-- Nicht die Webapp vom Home-Bildschirm entfernen oder Website-Daten löschen.
-- Die Kernversionsanzeige kann weiterhin 3.0.5 zeigen. Das Layoutmodul
-  meldet 3.1.2.
-- Auf einem echten iPhone/Safari wurde diese Änderung nicht getestet.
-- Das ZIP ist ein Ersatz für die bestehende laborvergleich303.js und
-  darf nicht zusätzlich unter einem anderen Namen hochgeladen werden.
+Installation:
+1. ZIP laden und entpacken.
+2. Im GitHub-Projekt Asthma- die Datei laborvergleich303.js vollständig ersetzen.
+3. Änderung speichern.
+4. In der Webapp „Update installieren“ ausführen oder die Seite neu laden.
+5. Unter Statistik erneut einen Bericht erzeugen und die Labordarstellung prüfen.
+
+Wichtig:
+- Vorher verschlüsselte Datensicherung anlegen.
+- Die Hauptversion der App kann weiterhin 3.0.5 anzeigen. Die Erweiterung meldet 3.1.3.
+- Diese Korrektur ändert die Darstellung, nicht die medizinischen Inhalte.

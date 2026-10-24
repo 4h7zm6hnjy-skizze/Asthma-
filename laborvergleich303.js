@@ -549,11 +549,49 @@
  }
  `;
  document.head.append(responsive);
+ if(!document.getElementById('stats306-print-fix-313')){const style313=document.createElement('style');style313.id='stats306-print-fix-313';style313.textContent=`
+ .stats306-tablewrap{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0 14px}
+ .stats306-table{width:max-content;min-width:100%;border-collapse:collapse;font-size:.86rem;table-layout:auto;background:#fff}
+ .stats306-table th,.stats306-table td{padding:7px 8px;border-bottom:1px solid #dde8ed;vertical-align:top;text-align:left;white-space:normal;word-break:normal;overflow-wrap:break-word}
+ .stats306-table th{border-bottom:2px solid #b9d8e3;background:#f5fafc;color:#123b52;font-weight:700}
+ .stats306-tablewrap[data-wide='true'] .stats306-table th:nth-child(1),
+ .stats306-tablewrap[data-wide='true'] .stats306-table td:nth-child(1){min-width:84px}
+ .stats306-tablewrap[data-wide='true'] .stats306-table th:nth-child(2),
+ .stats306-tablewrap[data-wide='true'] .stats306-table td:nth-child(2){min-width:165px}
+ .stats306-tablewrap[data-wide='true'] .stats306-table th:nth-child(3),
+ .stats306-tablewrap[data-wide='true'] .stats306-table td:nth-child(3){min-width:120px}
+ .stats306-tablewrap[data-wide='true'] .stats306-table th:nth-child(4),
+ .stats306-tablewrap[data-wide='true'] .stats306-table td:nth-child(4){min-width:110px}
+ .stats306-tablewrap[data-wide='true'] .stats306-table th:nth-child(5),
+ .stats306-tablewrap[data-wide='true'] .stats306-table td:nth-child(5){min-width:220px}
+ .stats306-labcards{display:grid;gap:12px;margin:10px 0 18px}
+ .stats306-labcard{border:1px solid #d7e5eb;border-radius:14px;background:#fff;padding:12px;box-shadow:0 1px 0 rgba(18,59,82,.03);break-inside:avoid-page;page-break-inside:avoid}
+ .stats306-labhead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #e4edf1}
+ .stats306-labhead strong{display:block;color:#123b52;font-size:.98rem;line-height:1.35}
+ .stats306-labdate{color:#5f7581;font-size:.83rem;white-space:nowrap}
+ .stats306-labgrid{display:grid;grid-template-columns:120px minmax(0,1fr);gap:7px 10px;align-items:start}
+ .stats306-lablabel{font-weight:700;color:#1f4658}
+ .stats306-labvalue{min-width:0;color:#243943;overflow-wrap:anywhere}
+ @media(max-width:560px){.stats306-labhead{flex-direction:column}.stats306-labdate{white-space:normal}.stats306-labgrid{grid-template-columns:1fr}.stats306-lablabel{margin-top:4px}}
+ @media print{.stats306-tablewrap{overflow:visible}.stats306-table{width:100%;font-size:10px}.stats306-table th,.stats306-table td{padding:5px 6px}.stats306-labcards{gap:10px}.stats306-labcard{padding:10px;border-color:#cadbe3}}
+ `;document.head.append(style313)}
  function section(report,title){const x=make('section','stats25-section');x.dataset.stats306='true';x.append(make('h3',null,title));report.append(x);return x;}
  function metric(parent,label,value){const p=make('div','stats25-line');p.append(make('span',null,label),make('strong',null,value));parent.append(p)}
- function table(parent,columns,rows){const t=make('table');t.style.cssText='width:100%;border-collapse:collapse;font-size:.83rem;table-layout:auto';
-  const head=make('tr');for(const label of columns){const th=make('th',null,label);th.style.cssText='text-align:left;border-bottom:2px solid #b9d8e3;padding:5px 4px;overflow-wrap:anywhere';head.append(th)}t.append(head);
-  for(const values of rows){const tr=make('tr');for(const cell of values){const td=make('td',null,cell);td.style.cssText='vertical-align:top;border-bottom:1px solid #e0ebef;padding:5px 4px;overflow-wrap:anywhere';tr.append(td)}t.append(tr)}parent.append(t);
+ function table(parent,columns,rows){const wrap=make('div','stats306-tablewrap');if(columns.length>=4)wrap.dataset.wide='true';const t=make('table','stats306-table');
+  const head=make('tr');for(const label of columns){head.append(make('th',null,label))}t.append(head);
+  for(const values of rows){const tr=make('tr');for(const cell of values){tr.append(make('td',null,cell))}t.append(tr)}wrap.append(t);parent.append(wrap);
+ }
+ function labCards(parent,records){const list=make('div','stats306-labcards');
+  for(const x of records){const card=make('article','stats306-labcard');const head=make('div','stats306-labhead');
+   head.append(make('strong',null,name(x)),make('span','stats306-labdate',dayText(x.date)));card.append(head);
+   const grid=make('div','stats306-labgrid');
+   const row=(label,value)=>{grid.append(make('div','stats306-lablabel',label),make('div','stats306-labvalue',value||'–'))};
+   row('Ergebnis',clean(x.value)+(clean(x.unit)?' '+clean(x.unit):''));
+   row('Referenz',clean(x.reference)||'–');
+   row('Beurteilung',clean(x.evaluation?.label||x.assessment||'Ohne gesonderte Bewertung'));
+   row('Hinweise',clean(x.evaluation?.detail||'')+(x.notes?(clean(x.evaluation?.detail||'')?' · ':'')+clean(x.notes):'')||'–');
+   card.append(grid);list.append(card)}
+  parent.append(list);
  }
  const byType=(suite,type,r)=>suite.filter(x=>x.type===type&&x.value&&allowedDay(x.value.date)&&x.value.date>=r.from&&x.value.date<=r.to).map(x=>x.value);
  const sum=arr=>arr.reduce((n,x)=>n+Number(x.steps||0),0);
@@ -614,10 +652,9 @@
   metric(box,'Verschiedene Labortests',String(new Set(records.map(sameGroup)).size));
   if(!records.length){box.append(make('p','stats25-muted','Für den ausgewählten Zeitraum sind keine Laborwerte gespeichert.'));return}
   // Every row is preserved without silent truncation; the user controls which period is printed.
-  box.append(make('h4',null,'Alle Einzelwerte – vollständig, mit Einheiten und ärztlicher Beurteilung'));
-  const rows=records.map(x=>[dayText(x.date),name(x),clean(x.value)+' '+clean(x.unit),clean(x.reference)||'–',
-   clean(x.evaluation?.label||x.assessment||'Ohne gesonderte Bewertung')+(x.evaluation?.detail?' · '+clean(x.evaluation.detail):'')+(x.notes?' · '+clean(x.notes):'')]);
-  table(box,['Datum','Laborwert','Ergebnis','Referenz','Beurteilung / Notiz'],rows);
+  box.append(make('h4',null,'Alle Einzelwerte – vollständig und mobil lesbar'));
+  box.append(make('p','stats25-muted','Jeder gespeicherte Laborwert wird als eigene Karte ausgegeben, damit PDF- und Handyansicht besser lesbar bleiben.'));
+  labCards(box,records);
   box.append(make('h4',null,'Verlaufsdiagramme zu mehrfach gemessenen Blutwerten'));
   const groups=new Map();for(const p of records){const k=sameGroup(p);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(p)}
   const plotted=[...groups.entries()].filter(([k,rs])=>rs.filter(p=>numeric(p.value)!==null).length>1&&new Set(rs.filter(p=>numeric(p.value)!==null).map(p=>p.date)).size>1);
@@ -1801,5 +1838,5 @@
     for(const [name,links] of sections){const section=el('section',undefined,'m306-group');section.append(el('h3',name));const grid=el('div',undefined,'m306-grid');for(const [label,route] of links){const b=el('button');b.type='button';b.dataset.goto=route;b.append(el('strong',label),el('small','Bereich öffnen'));grid.append(b)}section.append(grid);grouped.append(section)}
     more.querySelector('.hub20-grid')?.insertAdjacentElement('beforebegin',grouped);
   }
-  const v=document.createElement('small');v.className='cockpit306-version';v.textContent='Oberfläche & Laborwissen – Erweiterung 3.1.2';cockpit.append(v);
+  const v=document.createElement('small');v.className='cockpit306-version';v.textContent='Oberfläche & Laborwissen – Erweiterung 3.1.3';cockpit.append(v);
 })();
