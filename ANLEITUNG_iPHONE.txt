@@ -1,12 +1,34 @@
-ASTHMA – BLUTWERTEVERGLEICH LANGZEIT
+ASTHMA-WEBAPP – REHA-ANTRÄGE UND PERSÖNLICHE ZUSTÄNDIGKEIT
+Update-Code 3.0.9 (Basis-App zeigt weiterhin 3.0.5)
 
-In dieser ZIP-Datei ist die komplette Ersatzdatei laborvergleich303.js.
+INSTALLATION AM IPHONE
+1. Dieses ZIP in Dateien herunterladen und antippen, um es zu entpacken.
+2. In deinem GitHub-Projekt 4h7zm6hnjy-skizze/Asthma- die bestehende Datei laborvergleich303.js durch die gleichnamige Datei aus dem ZIP ersetzen (NICHT die ZIP-Datei in GitHub hochladen).
+3. GitHub-Änderung speichern/committen. Asthma-Webapp mit Internet neu öffnen und ggf. "Update installieren" wählen.
+4. Unter "Anträge" erscheint der neue Bereich "Reha-Antrag: Wer ist zuständig?".
 
-Auf dem iPhone:
-1. ZIP-Datei in „Dateien“ speichern und antippen (entpacken).
-2. In GitHub im Asthma--Repository die bisherige Datei laborvergleich303.js durch die neue gleichnamige Datei ersetzen und speichern/committen.
-3. Deine Asthma-Webapp online neu laden; ggf. die Update-Funktion nutzen.
+NUTZUNG
+- Unter Profil > Persönliche Daten die gespeicherte Anschrift und das Geburtsdatum prüfen.
+- Unter Anträge > Reha-Antrag die Lebenssituation, Reha-Art und Versicherung auswählen.
+- Deinen tatsächlich zuständigen DRV-Träger bitte nach dem Briefkopf des letzten DRV-Schreibens auswählen; aus PLZ/Wohnort allein ist dies nicht sicher ermittelbar.
+- "Auswahl verschlüsselt speichern" speichert nur deine Auswahlangaben im bereits vorhandenen privaten Tresor. Die Anschrift wird bei jeder Prüfung frisch aus dem Profil gelesen.
+- Die angezeigten offiziellen Formulare auf der Seite des jeweiligen Trägers herunterladen / online bearbeiten. Ein Antrag wird nicht automatisch versendet.
 
-WICHTIG: Eine ZIP-Datei allein in GitHub hochzuladen aktualisiert die Webapp NICHT automatisch! Zuerst entpacken und die .js-Datei ersetzen.
+WICHTIGE UNTERSCHEIDUNGEN
+- Erwerbsfähige Arbeitnehmer: in der Regel DRV, medizinisch G0100 + G0110; beruflich G0100 + G0130, sofern DRV zuständig.
+- Altersrentner mit gesetzlicher Krankenversicherung: meistens Krankenkasse über ärztliches Muster 61; Sonderregeln z.B. bei Teil-Altersrente und Krebsrehabilitation.
+- Erwerbsminderungsrentner: medizinische Reha durch DRV weiterhin möglich unter Voraussetzungen.
+- Westfalen (Regierungsbezirk Arnsberg) ist nur ein REGIONALER HINWEIS, keine sichere individuelle DRV-Zuweisung. DRV Westfalen verwendet bei allgemeiner medizinischer Reha grundsätzlich ein Gutachterverfahren (Ausnahmen möglich); eigenes Zusatzblatt 6-100 im DRV-Formularpaket.
+- GdB/Gleichstellung allein bestimmen nicht den Kostenträger.
 
-Diese ZIP-Datei enthält KEINE persönlichen Laborwerte. Vorhandene verschlüsselte Gesundheitsdaten bleiben durch das Ersetzen der Programmdatei erhalten.
+OFFIZIELLE QUELLEN (mit Links auch direkt in der App)
+https://www.deutsche-rentenversicherung.de/SharedDocs/Formulare/DE/Formularpakete/01_versicherte/reha/_DRV_Paket_Rehabilitation_Med_Rehabilitation.html
+https://www.deutsche-rentenversicherung.de/SharedDocs/Formulare/DE/Formularpakete/01_versicherte/reha/_DRV_Paket_Rehabilitation_Leistungen_zur_Teilhabe.html
+https://www.deutsche-rentenversicherung.de/DRV/DE/Ueber-uns-und-Presse/Struktur-und-Organisation/Traeger
+https://www.deutsche-rentenversicherung.de/Westfalen/DE/Ueber-uns/Unternehmensprofil/unternehmensprofil_neu.html
+https://www.deutsche-rentenversicherung.de/DRV/DE/Reha/Medizinische-Reha/Allgemeine-med-Reha/allgemeine-med-reha.html
+https://www.kbv.de/praxis/verordnungen/rehabilitation
+https://www.gesetze-im-internet.de/sgb_9_2018/__14.html
+
+DATENSCHUTZ
+Keine persönlichen Reha- oder Gesundheitsdaten in GitHub veröffentlichen. Die Programmdatei enthält keine personenbezogenen Einträge.

@@ -1082,3 +1082,160 @@
  watcher=new MutationObserver(()=>{setup()});watcher.observe(home,{childList:true,subtree:true});
  // Wait for the existing modern dashboard; do not create a duplicate when loading is slow.
 })();
+
+
+
+/* Asthma 3.0.9 – Reha-Zustaendigkeitslotse nach lokalem Profil.
+   Aktuelle Versicherungszuordnung ist nicht aus einer Wohnadresse ableitbar.
+   Keine Gesundheits-/Adressdaten in GitHub, keine Netzwerkanfragen. */
+(()=>{
+ 'use strict';
+ const SEC=window.ASTHMA_SECURITY, root=document.getElementById('antraege');
+ if(!SEC?.state?.().unlocked||!root||document.getElementById('reha309'))return;
+ const $=id=>document.getElementById(id), el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=String(text);return n};
+ const URLS=Object.freeze({
+  reha:'https://www.deutsche-rentenversicherung.de/DRV/DE/Reha/FAQ_Rehabilitation/Reha/00_faq_liste_reha',
+  eantrag:'https://www.deutsche-rentenversicherung.de/SharedDocs/Formulare/DE/_pdf/G0100.pdf',
+  med:'https://www.deutsche-rentenversicherung.de/SharedDocs/Formulare/DE/Formularpakete/01_versicherte/reha/_DRV_Paket_Rehabilitation_Med_Rehabilitation.html',
+  work:'https://www.deutsche-rentenversicherung.de/SharedDocs/Formulare/DE/Formularpakete/01_versicherte/reha/_DRV_Paket_Rehabilitation_Leistungen_zur_Teilhabe.html',
+  g0100:'https://www.deutsche-rentenversicherung.de/SharedDocs/Formulare/DE/_pdf/G0100.pdf',
+  g0110:'https://www.deutsche-rentenversicherung.de/SharedDocs/Formulare/DE/_pdf/G0110.html',
+  g0130:'https://www.deutsche-rentenversicherung.de/SharedDocs/Formulare/DE/_pdf/G0130?nn=6a097dd8ca84ce5471c19ad2',
+  westfalen:'https://www.deutsche-rentenversicherung.de/Westfalen/DE/Ueber-uns/Unternehmensprofil/unternehmensprofil_neu.html',
+  agents:'https://www.deutsche-rentenversicherung.de/DRV/DE/Ueber-uns-und-Presse/Struktur-und-Organisation/Traeger',
+  drvProcedure:'https://www.deutsche-rentenversicherung.de/DRV/DE/Reha/Medizinische-Reha/Allgemeine-med-Reha/allgemeine-med-reha.html',
+  kv:'https://www.kbv.de/praxis/verordnungen/rehabilitation',
+  gkv:'https://www.kbv.de/praxis/verordnungen/rehabilitation',
+  westfalen6:'https://www.deutsche-rentenversicherung.de/SharedDocs/Formulare/DE/Formularpakete/01_versicherte/reha/_DRV_Paket_Rehabilitation_Med_Rehabilitation.html',
+  sgbi9:'https://www.gesetze-im-internet.de/sgb_9_2018/__14.html'
+ });
+ const empty={status:'',type:'medical',carrier:'',insurer:'unknown',insurerName:''};
+ const allowed={status:['','employed','seeking','oldage','partialpension','partialoldage','other'],type:['medical','psychosomatic','work','aftercare','oncology'],carrier:['','westfalen','bund','rheinland','kbs','other'],insurer:['statutory','private','unknown']};
+ const getPersonal=()=>{const p=SEC.profileGet()?.personal;return p&&typeof p==='object'&&!Array.isArray(p)?p:{}};
+ const getPrefs=()=>{const p=SEC.profileGet()?.rehaNavigator309;if(!p||p.version!==1)return {...empty};return Object.fromEntries(Object.entries(empty).map(([k,defaultValue])=>[k,allowed[k]?allowed[k].includes(p[k])?p[k]:defaultValue:k==='insurerName'?String(p.insurerName||'').slice(0,100):defaultValue]));};
+ const norm=x=>String(x||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/ß/g,'ss').trim().toLowerCase();
+ const localHint=p=>{
+  const city=norm(p.city),plz=String(p.postalCode||'').replace(/\s/g,'');
+  // Only tightly scoped, vetted Westphalian localities. For all other addresses
+  // display a noncommittal notice rather than guessing an insurer from postal area.
+  const west=['meinerzhagen','kierspe','ludenscheid','iserlohn','hemer','menden','altena','balve','plettenberg','werdohl','neuenrade','halver','schalksmuhle','nachrodt-wiblingwerde','sundern','hagen','schwerte','dortmund','arnsberg','meschede','olpe','siegen','soest','unna','hamm','bochum'];
+  if(west.some(x=>city===x)||['58540','58566'].includes(plz))return {region:'Deutsche Rentenversicherung Westfalen',slug:'westfalen',proven:'Regionale Orientierung: DRV Westfalen (Regierungsbezirk Arnsberg), keine bestätigte Trägerzuordnung'};
+  return {region:'',slug:'',proven:plz||city?'Aus der vorhandenen Anschrift ist hier keine verlässliche regionale Zuordnung möglich.':'Wohnort fehlt im persönlichen Profil.'};
+ };
+ const panel=el('section','suite-subpanel');panel.id='reha309';panel.setAttribute('aria-labelledby','reha309-title');
+ panel.innerHTML=`<p class="section-kicker">REHA · PERSÖNLICHER ANTRAGSWEG</p><h3 id="reha309-title">Reha-Antrag: Wer ist zuständig?</h3>
+ <p>Der Assistent verwendet deinen <strong>lokal gespeicherten Wohnort</strong> aus „Persönliche Daten“ und deine hier gewählte Lebenssituation. Den endgültig zuständigen DRV-Träger kann nur der aktuelle Rentenversicherungsbescheid beziehungsweise die DRV bestätigen.</p>
+ <p class="r309-where" id="r309-address" role="status"></p>
+ <form id="r309-form" autocomplete="off"><div class="r309-grid">
+ <label>Meine Situation<select name="status" required><option value="">Bitte auswählen</option><option value="employed">Arbeitnehmer/in – erwerbstätig</option><option value="seeking">Arbeitsuchend / noch erwerbsfähig</option><option value="oldage">Altersrentner/in</option><option value="partialpension">Erwerbsminderungsrente</option><option value="partialoldage">Teil-Altersrente / Rentenantrag geplant</option><option value="other">Sonstige / unklar</option></select></label>
+ <label>Welche Reha?<select name="type"><option value="medical">Medizinische Reha (z. B. Lunge/Asthma)</option><option value="psychosomatic">Psychosomatische Reha</option><option value="work">Berufliche Reha / Teilhabe am Arbeitsleben</option><option value="aftercare">Anschlussrehabilitation nach Krankenhaus</option><option value="oncology">Onkologische Reha (Sonderfall)</option></select></label>
+ <label>Rentenversicherungsträger laut <strong>aktuellem DRV-Schreiben</strong><select name="carrier"><option value="">Noch nicht bekannt</option><option value="westfalen">DRV Westfalen</option><option value="bund">DRV Bund</option><option value="rheinland">DRV Rheinland</option><option value="kbs">DRV Knappschaft-Bahn-See</option><option value="other">Anderer DRV-Träger</option></select></label>
+ <label>Krankenversicherung<select name="insurer"><option value="unknown">Bitte auswählen / nicht sicher</option><option value="statutory">Gesetzlich versichert</option><option value="private">Privat versichert</option></select></label>
+ <label class="r309-span">Meine Krankenkasse (optional)<input type="text" name="insurerName" maxlength="100" placeholder="Nur eintragen, wenn bekannt"></label>
+ </div><div class="r309-actions"><button type="button" id="r309-save" class="btn btn-primary">Auswahl verschlüsselt speichern</button><button type="button" id="r309-profile" class="btn btn-outline">Anschrift im Profil prüfen</button><button type="button" id="r309-recheck" class="btn btn-outline">Zuständigkeit neu prüfen</button></div>
+ <p role="status" id="r309-status" class="input-note"></p></form>
+ <div id="r309-result" class="r309-result" aria-live="polite"></div>
+ <details class="r309-sources"><summary>Amtliche Quellen &amp; Sonderfälle</summary><div id="r309-links"></div><p>DRV und Krankenkassen prüfen die versicherungsrechtlichen und medizinischen Voraussetzungen. Bei einem Arbeitsunfall oder einer Berufskrankheit kann die Unfallversicherung zuständig sein. Bei einer Anschlussrehabilitation hilft der Sozialdienst des Krankenhauses. Rehabilitationssport (Muster 56) ist kein medizinischer Reha-Antrag.</p></details>`;
+ const anchor=root.querySelector('.application-note')||root.querySelector('.application-tools');if(anchor)anchor.insertAdjacentElement('afterend',panel);else root.prepend(panel);
+ const css=el('style');css.id='r309-styles';css.textContent=`
+ #reha309{padding:16px;border:1px solid #b6d6e4;border-radius:15px;background:#f7fbfe;margin:16px 0;color:#183e50}
+ #reha309 *{box-sizing:border-box}
+ #reha309 h3{font-size:1.25rem;color:#153f54;margin:5px 0 8px}
+ #reha309 p{line-height:1.5;font-size:.9rem}
+ #reha309 .r309-where{border:1px solid #cadee6;background:#eaf4f9;padding:10px 12px;border-radius:11px;font-size:.88rem}
+ #reha309 .r309-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}
+ #reha309 label{font-weight:650;display:block;font-size:.88rem;color:#33566b;line-height:1.4}
+ #reha309 select,#reha309 input{font-size:16px;display:block;width:100%;min-width:0;padding:12px 9px;border:1px solid #b5ccd8;border-radius:10px;margin-top:6px;color:#163d50;background:white}
+ #reha309 .r309-span{grid-column:1/-1}
+ #reha309 .r309-actions{display:flex;flex-wrap:wrap;gap:8px}
+ #reha309 .r309-actions button{font-size:.87rem;white-space:normal}
+ #reha309 .r309-result{padding:12px;border:1px solid #cbdfe8;border-radius:12px;background:#fff;margin:12px 0}
+ #reha309 .r309-result h4{margin:3px 0 8px;color:#174359}
+ #reha309 .r309-result ul{line-height:1.55;padding-left:21px;font-size:.87rem}
+ #reha309 .r309-alert{border-left:4px solid #be8430;background:#fff7e7;padding:10px;border-radius:8px;margin:10px 0;color:#765216}
+ #reha309 .r309-actions-links{display:flex;flex-wrap:wrap;gap:8px;margin:11px 0}
+ #reha309 .r309-actions-links a{padding:9px 11px;border:1px solid #a8cddc;background:#eef8fc;border-radius:9px;color:#0f5372;font-size:.86rem;text-decoration:none;font-weight:700}
+ #reha309 .r309-sources{margin-top:14px;padding:10px;border:1px solid #d3e4eb;border-radius:10px}
+ #reha309 .r309-sources summary{cursor:pointer;font-weight:700}
+ #reha309 .r309-sources a{color:#0b587a;display:block;padding:5px 0;font-size:.85rem;overflow-wrap:anywhere}
+ @media(max-width:680px){#reha309{padding:12px}#reha309 .r309-grid{grid-template-columns:1fr}#reha309 .r309-span{grid-column:auto}}
+ `;document.head.append(css);
+ const form=$('r309-form');for(const [key,val] of Object.entries(getPrefs())){const f=form.elements.namedItem(key);if(f)f.value=val;}
+ function link(container,name,href){const a=el('a',null,name+' ↗');a.href=href;a.target='_blank';a.rel='noopener noreferrer';container.append(a);return a}
+ for(const [name,u] of [['DRV: Reha-Antrag & Verfahren',URLS.reha],['DRV: G0100 – Online- oder PDF-Antrag',URLS.eantrag],['DRV: G0110 – medizinische Reha-Anlage',URLS.g0110],['DRV: G0130 – berufliche Reha-Anlage',URLS.g0130],['DRV: medizinische Reha (Westfalen-Besonderheit)',URLS.drvProcedure],['DRV Westfalen: Gebiet Arnsberg/Detmold/Münster',URLS.westfalen],['DRV Westfalen: Zusatzformular 6-100 im medizinischen Reha-Paket',URLS.westfalen6],['DRV: zuständigen Träger aus Schreiben bestimmen',URLS.agents],['KBV: ärztliches Muster 61',URLS.kv],['GKV: medizinische Reha',URLS.gkv],['§ 14 SGB IX: Klärung der Zuständigkeit',URLS.sgbi9]])link($('r309-links'),name,u);
+ const getChoice=()=>({status:form.elements.namedItem('status').value,type:form.elements.namedItem('type').value,carrier:form.elements.namedItem('carrier').value,insurer:form.elements.namedItem('insurer').value,insurerName:form.elements.namedItem('insurerName').value.trim().slice(0,100)});
+ const listNames={westfalen:'DRV Westfalen',bund:'DRV Bund',rheinland:'DRV Rheinland',kbs:'DRV Knappschaft-Bahn-See',other:'der im aktuellen Schreiben genannten DRV'};
+ function determine(p,choice){
+  const region=localHint(p),medical=choice.type!=='work',normal=choice.type==='medical'||choice.type==='psychosomatic';
+  const retirement=choice.status==='oldage',working=choice.status==='employed'||choice.status==='seeking';
+  const note=[],forms=[],main=[],references=[];
+  if(!choice.status){main.push('Bitte zuerst deine berufliche bzw. Rentensituation auswählen. Die Anschrift allein bestimmt den Kostenträger nicht.');}
+  else if(choice.type==='work'){
+   main.push('Berufliche Rehabilitation / Teilhabe am Arbeitsleben: Für versicherte Beschäftigte kann die DRV zuständig sein; die Agentur für Arbeit ist ebenfalls ein möglicher Träger. Zuständigkeit und Anspruch müssen individuell geprüft werden.');
+   forms.push(['DRV-Formular G0100 (Grund-Antrag)',URLS.g0100],['DRV-Formular G0130 (berufliche Anlage)',URLS.g0130],['Formularpaket berufliche Reha',URLS.work]);
+   if(retirement)note.push('Bei Altersrente ist berufliche Wiedereingliederung nicht der übliche Weg. Individuelle Beratung einholen.');
+  }else if(working){
+   main.push('Bei einer medizinischen oder psychosomatischen Reha zur Erhaltung/Wiederherstellung der Erwerbsfähigkeit kommt grundsätzlich die Deutsche Rentenversicherung als Kostenträger in Betracht. Versicherungszeiten und medizinische Voraussetzungen werden geprüft.');
+   forms.push(['G0100 online ausfüllen',URLS.eantrag],['G0100 – Grundantrag',URLS.g0100],['G0110 – medizinische Anlage',URLS.g0110],['Offizielles medizinisches Formularpaket',URLS.med]);
+  }else if(retirement){
+   if(choice.type==='oncology'){
+    main.push('Bei onkologischer Rehabilitation ist auch für Altersrentner eine Leistung der Rentenversicherung möglich. DRV und Krankenkasse können abhängig vom Einzelfall infrage kommen; Zuständigkeit zunächst klären.');
+    forms.push(['DRV G0100 – Antrag und Online-Einstieg',URLS.g0100],['DRV medizinisches Formularpaket mit trägerspezifischen Anlagen',URLS.med],['KBV: Muster 61 / Zuständigkeitsklärung',URLS.kv]);
+   }else if(choice.insurer==='statutory'){
+    main.push('Bei regulärer medizinischer Rehabilitation im Altersruhestand ist in der Regel die gesetzliche Krankenkasse zuständig. Die behandelnde Arztpraxis verordnet die Reha über Muster 61. Bei einer Altersrente unter zwei Dritteln der Vollrente können andere Regeln gelten.');
+    forms.push(['KBV: Muster 61 – über die Arztpraxis',URLS.kv]);
+   }else if(choice.insurer==='private'){
+    main.push('Bei privater Krankenversicherung ist die Krankenkasse kein gesetzlicher Reha-Träger. Ob und in welchem Umfang eine Rehabilitation bezahlt wird, richtet sich insbesondere nach den Vertragsbedingungen; bitte bei der privaten Krankenversicherung und gegebenenfalls Beihilfestelle erkundigen.');
+    forms.push(['DRV: mögliche Sonderfälle / allgemeine Reha-Beratung',URLS.reha]);
+   }else{
+    main.push('Bei Altersrente ist für eine nicht-onkologische medizinische Reha oft die gesetzliche Krankenkasse zuständig. Zuerst den Krankenversicherungsstatus klären; bei Privatversicherung unterscheiden sich die Ansprüche.');
+    forms.push(['KBV: Muster 61 bei GKV',URLS.kv],['DRV: Reha und Rentenstatus klären',URLS.reha]);
+   }
+  }else if(choice.status==='partialpension'){
+   main.push('Bei Bezug einer Erwerbsminderungsrente kann die DRV für medizinische Reha zuständig sein, wenn die Erwerbsfähigkeit durch die Reha verbessert oder erhalten werden kann. Die genaue individuelle Anspruchslage wird geprüft.');
+   forms.push(['G0100 – Rehabilitationsantrag',URLS.g0100],['G0110 – medizinische Anlage',URLS.g0110],['DRV: medizinisches Formularpaket',URLS.med]);
+  }else{
+   main.push('Bei Teil-Altersrente, geplanter Altersrente oder ungeklärtem Status lässt sich der Kostenträger nicht allein aus Rentenstatus und Wohnort festlegen. Krankenkasse und DRV beraten; die Praxis kann Muster 61 Teil A zur Zuständigkeitsprüfung nutzen.');
+   forms.push(['DRV: Reha-Antragstellung / Rentenstatus klären',URLS.reha],['KBV: Muster 61 Teil A zur Zuständigkeitsklärung',URLS.kv]);
+  }
+  if(choice.type==='aftercare')note.push('Anschlussrehabilitation nach einer Krankenhausbehandlung: bitte den Sozialdienst der Klinik einbeziehen; es gelten besondere Wege und Fristen.');
+  if(choice.type==='oncology')note.push('Onkologische Rehabilitation hat Sonderregelungen; vor der Wahl des Formularpakets bei der DRV beraten lassen.');
+  if(choice.type==='psychosomatic'&&(working||choice.status==='partialpension'))note.push('Auch psychosomatische Rehabilitation fällt regelmäßig unter den Antrag G0100 + G0110, wenn die DRV zuständig ist.');
+  if(choice.insurer==='private'&&working)note.push('Private Krankenversicherung ändert nicht automatisch die mögliche DRV-Zuständigkeit bei Beschäftigten.');
+  let carrierInfo='';
+  if(choice.carrier){carrierInfo='Du hast '+listNames[choice.carrier]+' als Träger laut aktuellem Schreiben ausgewählt. Das ist aussagekräftiger als die Wohnadresse.';
+   if(choice.carrier==='westfalen'&&medical){note.push('Bei DRV Westfalen wird bei einer allgemeinen medizinischen Reha grundsätzlich ein Gutachten veranlasst; es gibt Ausnahmen. Das trägerspezifische Blatt 6-100 im offiziellen medizinischen Formularpaket beachten.');forms.push(['DRV Westfalen – Zusatzblatt 6-100 (Formularpaket)',URLS.westfalen6]);}
+   if(choice.carrier==='bund'&&medical)note.push('Bei DRV Bund besteht bei einer allgemeinen medizinischen Reha grundsätzlich die Wahl zwischen ärztlichem Befundbericht und Gutachten.');
+   if(region.slug==='westfalen'&&choice.carrier!=='westfalen')note.push('Dein regionaler Wohnorthinweis lautet Westfalen. Der im aktuellen DRV-Schreiben genannte Träger hat jedoch Vorrang vor dieser regionalen Näherung.');
+  }else if(region.slug==='westfalen'){
+   carrierInfo='Anhand des Wohnorts kommt regional DRV Westfalen in Betracht (Regierungsbezirk Arnsberg). Das ist KEINE bestätigte persönliche DRV-Zuordnung. Prüfe den Briefkopf deiner neuesten Renteninformation.';
+   if(medical)note.push('Falls DRV Westfalen dein zuständiger Träger ist, wird bei allgemeiner medizinischer Reha grundsätzlich ein Gutachten erstellt (Ausnahmen möglich). Im DRV-Formularpaket Westfalen das Zusatzblatt 6-100 beachten.');
+  }else carrierInfo='Der zuständige DRV-Träger ist nicht bekannt. Er lässt sich nicht sicher aus der Anschrift allein bestimmen. Bitte die aktuelle Renteninformation / das letzte DRV-Schreiben prüfen.';
+  if(normal&&choice.status==='oldage'&&choice.insurerName)note.push('Als Krankenkasse hast du „'+choice.insurerName+'“ eingetragen. Die App versendet an diese Kasse keine Daten.');
+  references.push(['Aktuellen DRV-Träger herausfinden',URLS.agents]);
+  return {main,note,forms,carrierInfo,region,references};
+ }
+ function render(){const p=getPersonal(),pick=getChoice(),hint=localHint(p),r=determine(p,pick),where=$('r309-address'),dest=$('r309-result');
+  const postcode=String(p.postalCode||'').trim(),city=String(p.city||'').trim(),street=String(p.street||'').trim();
+  where.replaceChildren();where.append(el('strong',null,'Profil-Wohnort: '));
+  where.append(document.createTextNode([postcode,city].filter(Boolean).join(' ')||'Nicht gespeichert'));
+  const personalDOB=/^\d{4}-\d{2}-\d{2}$/.test(p.birthDate||'')?new Date(p.birthDate+'T12:00:00'):null;
+  const age=personalDOB&&!Number.isNaN(+personalDOB)?(()=>{const d=new Date();return d.getFullYear()-personalDOB.getFullYear()-(d.getMonth()<personalDOB.getMonth()||(d.getMonth()===personalDOB.getMonth()&&d.getDate()<personalDOB.getDate())?1:0)})():null;
+  const pr=SEC.profileGet(),gdb=Number(pr.gdb),equal=pr.equal===true||pr.arbeitgeberCheck31?.answers?.eq==='yes';
+  const small=el('span',null,' · '+(street?'Straße ist im Profil vorhanden.':'Straße nicht hinterlegt.')+' '+hint.proven+(age!==null?' · Alter laut Geburtsdatum: '+age+' Jahre (keine automatische Renteneinstufung)':'')+(Number.isFinite(gdb)&&gdb>=20&&gdb<=100?' · GdB '+gdb:'')+(equal?' · Gleichstellung im Profil angegeben':'')+'.');where.append(small);
+  dest.replaceChildren();dest.append(el('h4',null,pick.status?'Persönliche Reha-Orientierung':'Erst Situation auswählen'));
+  r.main.forEach(s=>dest.append(el('p',null,s)));
+  const carrier=el('p',null,r.carrierInfo);carrier.style.fontWeight='650';dest.append(carrier);
+  if(r.note.length){const alert=el('div','r309-alert');alert.append(el('strong',null,'Bitte beachten'));const ul=el('ul');r.note.forEach(s=>ul.append(el('li',null,s)));alert.append(ul);dest.append(alert)}
+  if(r.forms.length){dest.append(el('h4',null,'Passende offizielle Antragswege / Formulare'));const actions=el('div','r309-actions-links');r.forms.forEach(([s,u])=>link(actions,s,u));dest.append(actions)}
+  dest.append(el('p',null,'Diese Vorprüfung ist unverbindlich und verwendet keine Versicherungsnummer. Ein festgestellter GdB oder eine Gleichstellung allein entscheiden nicht über den Reha-Kostenträger. Bei einem unzuständigen angegangenen Reha-Träger erfolgt die Zuständigkeitsprüfung und gegebenenfalls Weiterleitung nach § 14 SGB IX.')); 
+ }
+ form.addEventListener('change',render);form.addEventListener('input',e=>{if(e.target.name==='insurerName')render()});
+ $('r309-save').addEventListener('click',async()=>{const v=getChoice(),msg=$('r309-status');msg.textContent='Auswahl wird im privaten Tresor gespeichert …';try{await SEC.updateProfile({rehaNavigator309:{version:1,...v,updatedAt:new Date().toISOString()}});msg.textContent='Auswahl lokal verschlüsselt gespeichert. Die Anschrift wird immer aus deinem aktuellen persönlichen Profil gelesen.';}catch(e){msg.textContent='Speichern fehlgeschlagen: '+(e.message||e)}});
+ $('r309-profile').addEventListener('click',()=>{window.ASTHMA_NAV?.go('profil');requestAnimationFrame(()=>document.getElementById('a27-profile')?.scrollIntoView({block:'start',behavior:'smooth'}))});
+ $('r309-recheck').addEventListener('click',()=>{render();$('r309-status').textContent='Neu anhand der aktuellen persönlichen Profiladresse bewertet.';});
+ window.addEventListener('asthma:personal-profile-updated',render);
+ window.addEventListener('asthma:secure-change',event=>{if(event.detail?.group==='profile')render()});
+ render();
+ window.ASTHMA_REHA309={determine,localHint,recheck:render,getProfileLocation:()=>{const p=getPersonal();return {postalCode:p.postalCode||'',city:p.city||''}}};
+})();
