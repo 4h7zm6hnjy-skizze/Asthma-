@@ -257,3 +257,355 @@
  let updating=false;window.addEventListener('asthma:secure-change',e=>{if(e.detail?.group!=='labs'||updating)return;updating=true;setTimeout(()=>{updating=false;reload()},120)});
  window.ASTHMA_LAB_LONGTERM={diff};reload();
 })();
+
+/* Asthma Webapp: Treppenzaehler fuer Arbeitsplatz und Belastungen.
+   Kompatible Ein-Datei-Erweiterung. Daten bleiben im AES-GCM-Tresor als suite/stairs/*.
+   Keine Netzwerkaufrufe. Bestehende Labor- und Arbeitsplatzdaten bleiben unveraendert. */
+(()=>{
+ 'use strict';
+ const S=window.ASTHMA_SECURITY;
+ const work=document.getElementById('arbeit');
+ const $=id=>document.getElementById(id);
+ if(!work||!S?.state?.().unlocked||$('sc-work-panel'))return;
+ const mk=(tag,cls,value)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(value!==undefined)n.textContent=String(value);return n;};
+ const today=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');};
+ const timeNow=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+ const printDate=d=>/^\d{4}-\d\d-\d\d$/.test(d||'')?d.slice(8)+'.'+d.slice(5,7)+'.'+d.slice(0,4):String(d||'');
+ const format=n=>Number(n||0).toLocaleString('de-DE',{maximumFractionDigits:1});
+ const validDay=d=>{if(!/^\d{4}-\d\d-\d\d$/.test(d||''))return false;const test=new Date(d+'T12:00:00');return !Number.isNaN(+test)&&todayFor(test)===d;};
+ const todayFor=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+ const uuid=()=>typeof crypto.randomUUID==='function'?crypto.randomUUID():Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x.toString(16).padStart(2,'0')).join('');
+ const escapeCsv=x=>'"'+String(x??'').replace(/"/g,'""')+'"';
+ const currentYear=()=>new Date().getFullYear();
+ const section=mk('section','suite-subpanel');section.id='sc-work-panel';
+ section.innerHTML=`
+  <div class="sc-head"><div><h3>Treppenzähler</h3><p>Treppensteigen bei der Arbeit dokumentieren – wie in WorksManager. Stufen werden manuell eingetragen, nicht automatisch vom iPhone gezählt.</p></div><span class="sc-chip">Privat &amp; verschlüsselt</span></div>
+  <div class="sc-stats" aria-live="polite"><div><strong id="sc-today">0</strong><small>Stufen heute</small></div><div><strong id="sc-month">0</strong><small>Stufen im Monat</small></div><div><strong id="sc-year">0</strong><small>Stufen im Jahr</small></div></div>
+  <form id="sc-form" autocomplete="off">
+   <div class="sc-form-grid">
+    <label>Datum<input id="sc-date" type="date" required></label>
+    <label>Uhrzeit<input id="sc-time" type="time" required></label>
+    <label>Anzahl Stufen<input id="sc-steps" type="number" min="1" max="20000" step="1" inputmode="numeric" placeholder="z. B. 60" required></label>
+    <label>Schicht<select id="sc-shift"><option>Frühschicht</option><option>Spätschicht</option><option>Nachtschicht</option><option>Andere / frei</option></select></label>
+    <label>Grund<select id="sc-reason"><option>Kühlanlage</option><option>Materialscheine</option><option>WC</option><option>Fertigteile runtergefahren</option><option>Verpackung geholt</option><option>Pappe geschnitten</option><option value="__custom__">Anderer Grund – selbst eintragen</option></select></label>
+    <label id="sc-reason-custom-wrap" hidden>Anderer Grund (frei eingeben)<input id="sc-reason-custom" type="text" maxlength="120" placeholder="z. B. Maschinenkontrolle"></label>
+    <label>Beschwerden danach<select id="sc-symptoms"><option value="">Nicht angegeben</option><option value="0">0 – keine</option><option value="1">1 – leicht</option><option value="2">2 – mittel</option><option value="3">3 – stark</option></select></label>
+    <label class="sc-wide">Notiz (optional)<textarea id="sc-note" rows="2" maxlength="500" placeholder="z. B. drei Mal zum Materiallager, Atemnot"></textarea></label>
+   </div>
+   <div class="sc-quick" role="group" aria-label="Stufenzahl rasch erhöhen"><span>Schnell hinzufügen:</span><button type="button" data-sc-add="30">+30</button><button type="button" data-sc-add="24">+24</button></div>
+   <div class="sc-actions"><button id="sc-save" type="submit" class="btn btn-primary">Stufen speichern</button><button id="sc-cancel" type="button" class="btn btn-outline" hidden>Bearbeiten abbrechen</button></div>
+  </form>
+  <p id="sc-status" role="status" class="input-note"></p>
+  <div class="sc-lower"><h4>Einträge und Auswertung</h4><label>Ansicht<select id="sc-view"><option value="month">Aktueller Monat</option><option value="year">Ganzes Jahr</option><option value="all">Alle Jahre</option></select></label></div>
+  <div class="sc-substats" id="sc-summary"></div><div id="sc-list" class="sc-list"></div><button id="sc-more" type="button" class="btn btn-outline" hidden>Weitere Einträge anzeigen</button>
+  <details id="sc-annual"><summary>Jahresübersicht und Monatsstatistik</summary><div class="sc-annual-head"><label>Jahr auswählen<select id="sc-report-year"></select></label><button type="button" class="btn btn-outline" id="sc-print">Jahresbericht drucken / PDF</button></div><div id="sc-monthtable"></div></details>
+  <button type="button" id="sc-export" class="btn btn-outline">Alle Treppeneinträge als CSV exportieren</button>
+  <p class="input-note">Die Zahlen beruhen auf deinen Eingaben und sind kein medizinischer Belastungstest. Bei akuter deutlicher Atemnot die Belastung unterbrechen und den ärztlichen Notfallplan befolgen.</p>`;
+ const form=$('work-form');
+ if(form?.parentElement)form.parentElement.insertAdjacentElement('beforebegin',section);
+ else work.append(section);
+ const css=mk('style');css.textContent=`
+ #sc-work-panel{border:1px solid #c8dde8;border-radius:18px;padding:18px;background:#f5fbff;margin:14px 0 24px}
+ #sc-work-panel .sc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+ #sc-work-panel .sc-head h3{margin:0 0 6px;font-size:1.2rem;color:#183e53}
+ #sc-work-panel .sc-head p{margin:0 0 12px;color:#557383;font-size:.91rem;line-height:1.5}
+ #sc-work-panel .sc-chip{font-size:.72rem;color:#17566a;background:#dff4f8;padding:6px 9px;border-radius:30px;white-space:nowrap}
+ #sc-work-panel .sc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:8px 0 19px}
+ #sc-work-panel .sc-stats>div{border-radius:12px;padding:13px 8px;text-align:center;background:#fff;border:1px solid #d9e8ef;min-width:0}
+ #sc-work-panel .sc-stats strong{display:block;color:#0e607b;font-size:1.5rem;line-height:1.15;overflow-wrap:anywhere}
+ #sc-work-panel .sc-stats small{display:block;font-size:.78rem;color:#506a79;margin-top:7px}
+ #sc-work-panel .sc-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ #sc-reason-custom-wrap[hidden]{display:none!important}
+ #sc-work-panel .sc-reasons-tip{font-size:.8rem;color:#507184}
+ #sc-work-panel label{display:block;font-size:.89rem;color:#375766;font-weight:700}
+ #sc-work-panel input,#sc-work-panel select,#sc-work-panel textarea{display:block;width:100%;min-width:0;box-sizing:border-box;font-size:16px;border:1px solid #bad0dc;border-radius:10px;padding:11px 10px;background:white;color:#183f52;margin-top:5px}
+ #sc-work-panel .sc-wide{grid-column:1/-1}
+ #sc-work-panel .sc-quick{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:14px 0}
+ #sc-work-panel .sc-quick span{font-size:.84rem;color:#587383;margin-right:4px}
+ #sc-work-panel .sc-quick button{border:1px solid #a5cbd9;border-radius:9px;background:#e9f7fb;color:#115a73;font-weight:750;min-width:51px;min-height:41px;padding:6px 10px;font-size:1rem}
+ #sc-work-panel .sc-actions{display:flex;gap:8px;flex-wrap:wrap;margin:9px 0}
+ #sc-work-panel .sc-lower{display:flex;justify-content:space-between;align-items:end;flex-wrap:wrap;gap:10px;border-top:1px solid #d2e3eb;padding-top:15px;margin-top:16px}
+ #sc-work-panel .sc-lower h4{margin:0;color:#234658}#sc-work-panel .sc-lower select{min-width:170px}
+ #sc-work-panel .sc-substats{display:flex;flex-wrap:wrap;gap:8px;color:#506a78;font-size:.88rem;margin:14px 0}
+ #sc-work-panel .sc-substats span{padding:8px 10px;border-radius:8px;background:#e8f3f8}
+ #sc-work-panel .sc-entry{border:1px solid #d2e4ec;background:#fff;border-radius:11px;padding:11px 12px;margin:8px 0}
+ #sc-work-panel .sc-entry-top{display:flex;justify-content:space-between;gap:7px;align-items:center}
+ #sc-work-panel .sc-entry strong{color:#184b62}#sc-work-panel .sc-entry small{display:block;color:#607885;margin:5px 0}
+ #sc-work-panel .sc-entry p{margin:5px 0;color:#435f6d;overflow-wrap:anywhere}
+ #sc-work-panel .sc-entry-actions{display:flex;gap:7px;flex-wrap:wrap}
+ #sc-work-panel .sc-entry-actions button{border:1px solid #d0e2eb;border-radius:8px;background:white;color:#245d75;padding:6px 10px;min-height:38px;font-size:.86rem}
+ #sc-work-panel #sc-annual{margin:17px 0;padding:12px;border:1px solid #d0e3ea;border-radius:11px;background:white}
+ #sc-work-panel #sc-annual>summary{font-weight:750;color:#284f64;cursor:pointer}
+ #sc-work-panel .sc-annual-head{display:flex;justify-content:space-between;align-items:end;gap:10px;flex-wrap:wrap;margin:13px 0}
+ #sc-work-panel .sc-table{width:100%;border-collapse:collapse;font-size:.87rem}
+ #sc-work-panel .sc-table td,#sc-work-panel .sc-table th{border-bottom:1px solid #e1ecf0;padding:8px 5px;text-align:left}
+ #sc-work-panel .sc-table th{color:#3d6375}
+ #sc-home-tile{margin:12px auto;padding:12px 16px;max-width:1040px;border-radius:13px;border:1px solid #b4d8e5;background:#f0faff;display:flex;justify-content:space-between;align-items:center;gap:12px}
+ #sc-home-tile strong{display:block;color:#155c76;font-size:1.3rem}#sc-home-tile span{display:block;color:#587080;font-size:.82rem}
+ #sc-home-tile button{min-height:43px;border-radius:8px;border:1px solid #a2cad8;background:white;padding:9px 14px;color:#18546a;font-weight:750}
+ #sc-report{display:none}
+ @media(max-width:580px){#sc-work-panel{padding:12px}#sc-work-panel .sc-chip{white-space:normal;text-align:center}#sc-work-panel .sc-stats strong{font-size:1.2rem}#sc-work-panel .sc-stats small{font-size:.7rem}#sc-work-panel .sc-form-grid{grid-template-columns:1fr}#sc-home-tile{margin:10px 8px}}
+ @media print{body.sc-print-active>*:not(#sc-report){display:none!important}body.sc-print-active #sc-report{display:block!important;background:white!important;color:black!important;padding:9mm;font-size:10pt}#sc-report table{border-collapse:collapse;width:100%;margin:10px 0}#sc-report td,#sc-report th{border:1px solid #aaa;padding:4px;text-align:left}#sc-report h1{font-size:18pt}#sc-report h2{font-size:13pt;margin:16px 0 7px}#sc-report tr{break-inside:avoid}}
+ `;
+ document.head.append(css);
+ const home=$('start');let tile=null;
+ if(home){tile=mk('div');tile.id='sc-home-tile';tile.innerHTML='<div><strong id="sc-home-total">0 Stufen heute</strong><span>Treppenzähler · Arbeitsplatz</span></div><button type="button" id="sc-home-open">Stufen erfassen</button>';
+  const slot=home.querySelector('.hero-content');if(slot)slot.insertAdjacentElement('afterend',tile);else home.append(tile);
+  $('sc-home-open').addEventListener('click',()=>{if(window.ASTHMA_NAV?.go)window.ASTHMA_NAV.go('arbeit');else document.querySelector('[data-goto="arbeit"]')?.click();setTimeout(()=>$('sc-steps')?.focus({preventScroll:false}),150);});
+ }
+ const ystats=(arr)=>{const unique=new Set(arr.map(r=>r.date));return {sum:arr.reduce((n,r)=>n+r.steps,0),count:arr.length,days:unique.size,average:unique.size?arr.reduce((n,r)=>n+r.steps,0)/unique.size:0};};
+ let rows=[],editingId=null,shown=30,loading=false;
+ const select=$('sc-view'),yearPicker=$('sc-report-year'),status=$('sc-status');
+ const setStatus=(message,error=false)=>{status.textContent=message;status.style.color=error?'#a53f35':'#23704c';};
+ const reasonPicker=$('sc-reason'),customReason=$('sc-reason-custom'),customReasonWrap=$('sc-reason-custom-wrap');
+ const reasonOptions=[...reasonPicker.options].map(o=>o.value);
+ function syncReason(){const custom=reasonPicker.value==='__custom__';customReasonWrap.hidden=!custom;customReason.required=custom;if(!custom)customReason.value='';}
+ reasonPicker.addEventListener('change',syncReason);
+ const clearForm=()=>{editingId=null;$('sc-form').reset();$('sc-date').value=today();$('sc-time').value=timeNow();syncReason();$('sc-save').textContent='Stufen speichern';$('sc-cancel').hidden=true;};
+ clearForm();
+ // Optional shift choice matches the existing workplace form by default.
+ const shift=$('work-shift');if(shift&&[...$('sc-shift').options].some(x=>x.value===shift.value))$('sc-shift').value=shift.value;
+ for(const b of section.querySelectorAll('[data-sc-add]'))b.addEventListener('click',()=>{const n=$('sc-steps'),add=Number(b.dataset.scAdd),v=Number(n.value)||0;n.value=String(Math.min(20000,Math.max(0,v)+add));n.focus();});
+ $('sc-cancel').addEventListener('click',()=>{clearForm();setStatus('Bearbeitung abgebrochen.')});
+ function validate(){const date=$('sc-date').value,time=$('sc-time').value,steps=Number($('sc-steps').value);
+  if(!validDay(date)||!/^([01]\d|2[0-3]):[0-5]\d$/.test(time)||!Number.isInteger(steps)||steps<1||steps>20000)throw Error('Datum, Uhrzeit oder Stufenanzahl ungültig. Bitte 1–20.000 Stufen eingeben.');
+  const reason=reasonPicker.value==='__custom__'?customReason.value.trim().slice(0,120):reasonPicker.value;
+  if(!reason)throw Error('Bitte einen Grund auswählen oder den anderen Grund eintragen.');
+  return {date,time,steps,shift:$('sc-shift').value,reason,symptoms:$('sc-symptoms').value,note:$('sc-note').value.trim().slice(0,500)};}
+ $('sc-form').addEventListener('submit',async e=>{e.preventDefault();const b=$('sc-save');if(b.disabled)return;
+  let data;try{data=validate()}catch(err){setStatus(err.message,true);return}
+  b.disabled=true;
+  try{const older=editingId?rows.find(x=>x.id===editingId):null;
+   const item={id:older?.id||uuid(),...data,createdAt:older?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
+   await S.put('suite',{key:'stairs/'+item.id,type:'stairs',value:item},'stairs/'+item.id);
+   clearForm();setStatus(older?'Treppeneintrag geändert und verschlüsselt gespeichert.':'Treppeneintrag verschlüsselt gespeichert.');await reload();
+  }catch(err){setStatus('Speichern fehlgeschlagen: '+err.message,true)}finally{b.disabled=false}
+ });
+ const del=async id=>{if(!confirm('Diesen Treppeneintrag dauerhaft löschen?'))return;
+  try{await S.del('suite','stairs/'+id);if(editingId===id)clearForm();setStatus('Treppeneintrag gelöscht.');await reload()}
+  catch(err){setStatus('Löschen fehlgeschlagen: '+err.message,true)};
+ };
+ const edit=item=>{$('sc-date').value=item.date;$('sc-time').value=item.time;$('sc-steps').value=item.steps;$('sc-shift').value=item.shift;
+  reasonPicker.value=reasonOptions.includes(item.reason)?item.reason:'__custom__';syncReason();
+  if(reasonPicker.value==='__custom__')customReason.value=item.reason||'';
+  $('sc-symptoms').value=item.symptoms??'';$('sc-note').value=item.note??'';
+  editingId=item.id;$('sc-save').textContent='Änderung speichern';$('sc-cancel').hidden=false;setStatus('Du bearbeitest den Eintrag vom '+printDate(item.date)+'.');section.scrollIntoView({behavior:'smooth',block:'start'});
+ };
+ function render(){
+  const now=today(),month=now.slice(0,7),year=now.slice(0,4);
+  const t=ystats(rows.filter(r=>r.date===now)).sum,m=ystats(rows.filter(r=>r.date.startsWith(month))).sum,y=ystats(rows.filter(r=>r.date.startsWith(year))).sum;
+  $('sc-today').textContent=format(t);$('sc-month').textContent=format(m);$('sc-year').textContent=format(y);
+  if(tile)$('sc-home-total').textContent=format(t)+' Stufen heute';
+  const period=select.value,subset=rows.filter(r=>period==='all'||(period==='month'?r.date.startsWith(month):r.date.startsWith(year)));
+  const stats=ystats(subset),sum=$('sc-summary');sum.replaceChildren();
+  for(const [a,v] of [['Stufen',stats.sum],['Einträge',stats.count],['Aktive Tage',stats.days],['Ø je aktivem Tag',stats.average]])sum.append(mk('span',null,a+': '+format(v)));
+  const list=$('sc-list');list.replaceChildren();
+  if(!subset.length)list.append(mk('p','input-note','Noch keine Treppeneinträge für diesen Zeitraum.'));
+  subset.slice(0,shown).forEach(r=>{const card=mk('article','sc-entry'),top=mk('div','sc-entry-top');
+   top.append(mk('strong',null,format(r.steps)+' Stufen'));top.append(mk('span',null,printDate(r.date)+' · '+r.time+' Uhr'));
+   card.append(top,mk('small',null,[r.shift,r.reason,r.symptoms===''?'':'Beschwerden '+r.symptoms+'/3'].filter(Boolean).join(' · ')));
+   if(r.note)card.append(mk('p',null,r.note));
+   const actions=mk('div','sc-entry-actions');const e=mk('button',null,'Bearbeiten'),d=mk('button',null,'Löschen');e.type='button';d.type='button';e.addEventListener('click',()=>edit(r));d.addEventListener('click',()=>del(r.id));actions.append(e,d);card.append(actions);list.append(card);
+  });
+  $('sc-more').hidden=subset.length<=shown;
+  const possible=[...new Set([currentYear(),...rows.map(r=>Number(r.date.slice(0,4))).filter(n=>Number.isInteger(n))])].sort((a,b)=>b-a);
+  const selected=Number(yearPicker.value)||currentYear();yearPicker.replaceChildren();possible.forEach(y=>{const opt=mk('option',null,String(y));opt.value=String(y);yearPicker.append(opt)});yearPicker.value=possible.includes(selected)?String(selected):String(currentYear());
+  renderYear();
+ }
+ function monthsOf(year){const months=[];for(let i=1;i<=12;i++){const mm=String(i).padStart(2,'0');const items=rows.filter(r=>r.date.startsWith(year+'-'+mm));months.push({month:i,items,...ystats(items)})}return months;}
+ function renderYear(){const year=yearPicker.value,months=monthsOf(year),target=$('sc-monthtable');target.replaceChildren();const table=mk('table','sc-table');
+  const header=mk('tr');for(const x of ['Monat','Stufen','Einträge','Aktive Tage'])header.append(mk('th',null,x));table.append(header);
+  months.forEach(m=>{const tr=mk('tr');tr.append(mk('td',null,new Date(Number(year),m.month-1,1).toLocaleString('de-DE',{month:'long'})),mk('td',null,format(m.sum)),mk('td',null,m.count),mk('td',null,m.days));table.append(tr)});
+  const all=months.flatMap(m=>m.items),st=ystats(all);const tr=mk('tr');for(const x of ['Gesamt',format(st.sum),String(st.count),String(st.days)])tr.append(mk('th',null,x));table.append(tr);target.append(table);
+  target.append(mk('p','input-note','Durchschnitt pro aktivem Tag: '+format(st.average)+' Stufen.'));
+ }
+ $('sc-view').addEventListener('change',()=>{shown=30;render()});$('sc-more').addEventListener('click',()=>{shown+=30;render()});yearPicker.addEventListener('change',renderYear);
+ $('sc-export').addEventListener('click',()=>{if(!rows.length){setStatus('Noch keine Treppeneinträge vorhanden.',true);return}
+  if(!confirm('CSV-Datei mit persönlichen Gesundheits- und Arbeitsplatzdaten unverschlüsselt exportieren?'))return;
+  const header=['Datum','Uhrzeit','Stufen','Schicht','Grund','Beschwerden 0-3','Notiz'];
+  const lines=[header,...rows.map(r=>[r.date,r.time,r.steps,r.shift,r.reason,r.symptoms,r.note])];
+  const csv='\ufeff'+lines.map(x=>x.map(escapeCsv).join(';')).join('\r\n');
+  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=mk('a');a.href=url;a.download='Asthma_Treppen_Alle_Jahre.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),20000);setStatus('CSV-Datei erstellt. Sie ist nicht verschlüsselt.');
+ });
+ $('sc-print').addEventListener('click',()=>{if(!confirm('Der Jahresbericht enthält möglicherweise persönliche Gesundheitsdaten. Als unverschlüsselten Ausdruck/PDF erstellen?'))return;
+  const year=yearPicker.value,mths=monthsOf(year),period=rows.filter(r=>r.date.startsWith(year)).slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  const report=$('sc-report')||mk('section');report.id='sc-report';report.replaceChildren();
+  report.append(mk('h1',null,'Asthma – Treppenzähler '+year),mk('p',null,'Erstellt am '+new Date().toLocaleString('de-DE')+' · Privat / Gesundheitsakte'));
+  const st=ystats(period);report.append(mk('p',null,'Gesamt: '+format(st.sum)+' Stufen · '+st.count+' Einträge · '+st.days+' aktive Tage · Ø '+format(st.average)+' Stufen je aktivem Tag'));
+  const table=(heads,lines)=>{const t=mk('table'),tr=mk('tr');heads.forEach(h=>tr.append(mk('th',null,h)));t.append(tr);lines.forEach(line=>{const row=mk('tr');line.forEach(x=>row.append(mk('td',null,String(x??''))));t.append(row)});return t;};
+  report.append(mk('h2',null,'Monatsübersicht'),table(['Monat','Stufen','Einträge','Aktive Tage'],mths.map(m=>[new Date(Number(year),m.month-1,1).toLocaleString('de-DE',{month:'long'}),format(m.sum),m.count,m.days])));
+  const byReason=new Map(),byShift=new Map();for(const row of period){const reason=row.reason||'Ohne Angabe',shift=row.shift||'Ohne Angabe';byReason.set(reason,(byReason.get(reason)||0)+row.steps);byShift.set(shift,(byShift.get(shift)||0)+row.steps);}
+  report.append(mk('h2',null,'Stufen nach Grund'),table(['Grund','Stufen'],[...byReason].sort((a,b)=>b[1]-a[1]).map(([name,total])=>[name,format(total)])));
+  report.append(mk('h2',null,'Stufen nach Schicht'),table(['Schicht','Stufen'],[...byShift].sort((a,b)=>b[1]-a[1]).map(([name,total])=>[name,format(total)])));
+  report.append(mk('h2',null,'Einzelne Einträge'),table(['Datum','Zeit','Stufen','Schicht','Grund','Beschwerden','Notiz'],period.map(r=>[printDate(r.date),r.time,r.steps,r.shift,r.reason,r.symptoms,r.note])));
+  document.body.append(report);document.body.classList.add('sc-print-active');
+  const clean=()=>{document.body.classList.remove('sc-print-active');report.remove()};window.addEventListener('afterprint',clean,{once:true});
+  try{window.print()}finally{setTimeout(clean,16000)};
+ });
+ let refreshing=false;
+ async function reload(){if(loading)return;loading=true;
+  try{const items=await S.list('suite');rows=items.filter(x=>x.type==='stairs'&&x.value&&/^\d{4}-\d\d-\d\d$/.test(x.value.date||'')&&Number.isInteger(Number(x.value.steps))&&Number(x.value.steps)>0).map(x=>({...x.value,steps:Number(x.value.steps)}))
+   .sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));render();}
+  catch(err){setStatus('Treppeneinträge konnten nicht geladen werden: '+err.message,true)}finally{loading=false}
+ }
+ window.addEventListener('asthma:secure-change',e=>{if(e.detail?.group!=='suite'||refreshing)return;refreshing=true;setTimeout(()=>{refreshing=false;reload()},130)});
+ // Update Tageswerte beim Wiederöffnen der App nach Datumswechsel.
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden){if(!editingId){$('sc-date').value=today();$('sc-time').value=timeNow()}reload()}});
+ reload();
+ window.ASTHMA_STAIRS={refresh:reload};
+})();
+
+
+/* Asthma 3.0.6: Erweiterte Monats-/Jahresstatistik. Ergänzung, kein Überschreiben.
+   Vollständig lokal: verschlüsselte Messwerte nur im Browser nach Tresor-Entsperrung.
+   Stufen, vollständige Laborwerte, Laborverläufe und Datenvollständigkeit. */
+(()=>{
+ 'use strict';
+ const S=window.ASTHMA_SECURITY,$=id=>document.getElementById(id);
+ if(!S?.state?.().unlocked||!$('stats25-report')||$('stats306-settings'))return;
+ const make=(tag,cls,content)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(content!==undefined)x.textContent=String(content);return x;};
+ const clean=x=>String(x??'').trim();
+ const format=n=>Number(n).toLocaleString('de-DE',{maximumFractionDigits:2});
+ const numeric=x=>{const v=clean(x).replace(',','.');return /^[-+]?\d+(?:\.\d+)?$/.test(v)&&Number.isFinite(Number(v))?Number(v):null;};
+ const dayText=d=>/^\d{4}-\d\d-\d\d$/.test(d||'')?d.slice(8)+'.'+d.slice(5,7)+'.'+d.slice(0,4):clean(d);
+ const allowedDay=d=>/^\d{4}-\d\d-\d\d$/.test(d||'');
+ const sameGroup=r=>[r.marker||r.label||'Ohne Name',clean(r.allergen).toLowerCase(),clean(r.unit).toLowerCase().replace(/\s+/g,'')].join('|');
+ const name=r=>clean(r.label||r.marker||'Unbekannter Laborwert')+(r.allergen?' · '+r.allergen:'');
+ const warn=msg=>{const p=make('p','stats25-muted',msg);p.style.color='#875b24';return p};
+ const ctrl=make('fieldset','suite-subpanel');ctrl.id='stats306-settings';
+ ctrl.style.cssText='margin-top:12px;padding:12px;border:1px solid #abcbd9;border-radius:12px';
+ ctrl.append(make('legend',null,'Neue Berichtsteile – Monats- und Jahresstatistik'));
+ const choices=[['stair','Treppen mit Gründen, Schichten, Tagen und Monatstabelle'],['lab','Alle Blutwerte mit Datum, Referenz, Beurteilung und Verlauf'],['coverage','Übersicht aller wichtigen gespeicherten Gesundheitsbereiche']];
+ const checks={};for(const [id,label] of choices){const item=make('label');item.style.cssText='display:flex;align-items:flex-start;gap:9px;margin:8px 0';
+  const input=make('input');input.type='checkbox';input.checked=true;input.id='stats306-check-'+id;input.style.flex='0 0 auto';checks[id]=input;
+  item.append(input,make('span',null,label));ctrl.append(item);
+ }
+ ctrl.append(make('p','input-note','Vor dem Erstellen auswählen. Die bisherigen Statistikseiten und Diagramme bleiben unverändert. PDF/Druck sind unverschlüsselt.'));
+ const buildBtn=$('stats25-build');buildBtn.parentNode.insertBefore(ctrl,buildBtn);
+ function section(report,title){const x=make('section','stats25-section');x.dataset.stats306='true';x.append(make('h3',null,title));report.append(x);return x;}
+ function metric(parent,label,value){const p=make('div','stats25-line');p.append(make('span',null,label),make('strong',null,value));parent.append(p)}
+ function table(parent,columns,rows){const t=make('table');t.style.cssText='width:100%;border-collapse:collapse;font-size:.83rem;table-layout:auto';
+  const head=make('tr');for(const label of columns){const th=make('th',null,label);th.style.cssText='text-align:left;border-bottom:2px solid #b9d8e3;padding:5px 4px;overflow-wrap:anywhere';head.append(th)}t.append(head);
+  for(const values of rows){const tr=make('tr');for(const cell of values){const td=make('td',null,cell);td.style.cssText='vertical-align:top;border-bottom:1px solid #e0ebef;padding:5px 4px;overflow-wrap:anywhere';tr.append(td)}t.append(tr)}parent.append(t);
+ }
+ const byType=(suite,type,r)=>suite.filter(x=>x.type===type&&x.value&&allowedDay(x.value.date)&&x.value.date>=r.from&&x.value.date<=r.to).map(x=>x.value);
+ const sum=arr=>arr.reduce((n,x)=>n+Number(x.steps||0),0);
+ const byReason=rows=>{const map=new Map();for(const r of rows){const k=clean(r.reason)||'Ohne Angabe';const v=map.get(k)||{reason:k,steps:0,records:0};v.steps+=Number(r.steps||0);v.records++;map.set(k,v)}return [...map.values()].sort((a,b)=>b.steps-a.steps||a.reason.localeCompare(b.reason,'de'))};
+ function stairs(report,records,r){const box=section(report,'Treppenzähler – Arbeitsbelastung');
+  const rows=records.filter(x=>allowedDay(x.date)&&x.date>=r.from&&x.date<=r.to&&Number.isInteger(Number(x.steps))&&Number(x.steps)>0);
+  const days=new Set(rows.map(x=>x.date)),count=sum(rows),d=days.size;
+  metric(box,'Stufen im Zeitraum',format(count));metric(box,'Einträge',String(rows.length));metric(box,'Tage mit erfassten Stufen',String(d));
+  metric(box,'Ø Stufen an Tagen mit Einträgen',d?format(count/d):'Keine Messung');
+  if(!rows.length){box.append(make('p','stats25-muted','Noch keine Treppen für diesen Zeitraum erfasst. Nicht erfasste Tage gelten nicht als 0-Stufen-Tage.'));return}
+  box.append(make('h4',null,'Stufen nach Grund'));
+  table(box,['Grund','Stufen','Einträge'],byReason(rows).map(a=>[a.reason,format(a.steps),String(a.records)]));
+  const shifts=new Map();for(const x of rows){const k=x.shift||'Ohne Schichtangabe';shifts.set(k,(shifts.get(k)||0)+Number(x.steps))}
+  box.append(make('h4',null,'Stufen nach Schicht'));
+  table(box,['Schicht','Stufen'],[...shifts].sort((a,b)=>b[1]-a[1]).map(([a,b])=>[a,format(b)]));
+  const symptomCounts=[0,0,0,0];let unknown=0;for(const x of rows){const n=Number(x.symptoms);if(x.symptoms===''||x.symptoms==null||!Number.isInteger(n)||n<0||n>3)unknown++;else symptomCounts[n]++}
+  metric(box,'Beschwerden 0/1/2/3 – Anzahl Einträge',symptomCounts.join(' / '));metric(box,'Beschwerden nicht angegeben',String(unknown));
+  if(r.mode==='year'){
+   box.append(make('h4',null,'Monatsvergleich der Stufen'));
+   const months=Array.from({length:12},(_,i)=>{const mm=String(i+1).padStart(2,'0'),arr=rows.filter(x=>x.date.slice(5,7)===mm),active=new Set(arr.map(x=>x.date)).size;
+    return [new Date(Number(r.key),i,1).toLocaleDateString('de-DE',{month:'long'}),format(sum(arr)),String(arr.length),String(active)]});
+   table(box,['Monat','Stufen','Einträge','Tage'],months);
+  }else{
+   box.append(make('h4',null,'Tagesübersicht'));
+   const daysList=[...new Set(rows.map(x=>x.date))].sort();
+   table(box,['Datum','Stufen','Einträge'],daysList.map(date=>[dayText(date),format(sum(rows.filter(x=>x.date===date))),String(rows.filter(x=>x.date===date).length)]));
+  }
+  box.append(make('p','stats25-muted','Manuelle Eintragungen. Aus den Stufen allein lässt sich keine Gehstrecke, Belastungsintensität oder medizinische Diagnose ableiten.'));
+ }
+ const markerName=x=>/^[A-Za-z0-9_-]{1,64}$/.test(x||'')?x:'Messwert';
+ function miniChart(parent,records,key,measureName){
+  const points=records.filter(x=>sameGroup(x)===key&&numeric(x.value)!==null).sort((a,b)=>a.date.localeCompare(b.date));
+  if(points.length<2||new Set(points.map(x=>x.date)).size<2)return;
+  const data=points.length>120?points.filter((r,i)=>i===0||i===points.length-1||i%Math.ceil(points.length/120)===0):points;
+  const vals=data.map(x=>numeric(x.value)),rawLo=Math.min(...vals),rawHi=Math.max(...vals),padding=Math.max((rawHi-rawLo)*.14,Math.abs(rawHi)*.025,0.01);
+  const lo=rawLo-padding,hi=rawHi+padding,W=660,H=202,L=67,R=20,T=32,B=40;
+  const d0=Date.parse(data[0].date+'T12:00:00'),d1=Date.parse(data[data.length-1].date+'T12:00:00'),width=W-L-R;
+  const x=r=>L+width*(d1===d0?0.5:(Date.parse(r.date+'T12:00:00')-d0)/(d1-d0));
+  const y=n=>T+(H-T-B)*(hi-n)/(hi-lo);
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  svg.setAttribute('role','img');svg.setAttribute('aria-label','Verlauf '+measureName);
+  const add=(type,props,txt)=>{const z=document.createElementNS('http://www.w3.org/2000/svg',type);for(const [k,v] of Object.entries(props))z.setAttribute(k,String(v));if(txt!==undefined)z.textContent=String(txt);svg.append(z);return z};
+  add('text',{x:L,y:18,'font-size':12,'font-weight':700,fill:'#255364'},measureName+' ('+(data[0].unit||'ohne Einheit')+')');
+  for(let i=0;i<4;i++){const v=lo+(hi-lo)*i/3,yy=y(v);
+   add('line',{x1:L,y1:yy,x2:W-R,y2:yy,stroke:'#dce8ee','stroke-width':1});add('text',{x:L-5,y:yy+3,'text-anchor':'end','font-size':10,fill:'#54707f'},format(v));}
+  add('polyline',{points:data.map(r=>x(r)+','+y(numeric(r.value))).join(' '),fill:'none',stroke:'#2782a0','stroke-width':2.4});
+  for(const rec of data){add('circle',{cx:x(rec),cy:y(numeric(rec.value)),r:3,fill:'#217c98'});}
+  add('text',{x:L,y:H-12,'font-size':10,fill:'#5c7481'},dayText(data[0].date));
+  add('text',{x:W-R,y:H-12,'text-anchor':'end','font-size':10,fill:'#5c7481'},dayText(data.at(-1).date));
+  parent.append(svg);
+  const a=points[0],b=points.at(-1),va=numeric(a.value),vb=numeric(b.value),difference=vb-va;
+  parent.append(make('p','stats25-muted','Erster Wert '+format(va)+' · Letzter Wert '+format(vb)+' · Veränderung '+(difference>0?'+':'')+format(difference)+' '+(b.unit||'')+(va?' ('+(difference>0?'+':'')+format(difference/Math.abs(va)*100)+' %)':'')));
+ }
+ function labs(report,labs,r){const box=section(report,'Labor – vollständige Werte und Befunde');
+  const records=labs.filter(x=>allowedDay(x.date)&&x.date>=r.from&&x.date<=r.to).slice().sort((a,b)=>a.date.localeCompare(b.date)||name(a).localeCompare(name(b),'de'));
+  metric(box,'Dokumentierte Laborwerte im Zeitraum',String(records.length));
+  metric(box,'Labor-Untersuchungstage',String(new Set(records.map(x=>x.date)).size));
+  metric(box,'Verschiedene Labortests',String(new Set(records.map(sameGroup)).size));
+  if(!records.length){box.append(make('p','stats25-muted','Für den ausgewählten Zeitraum sind keine Laborwerte gespeichert.'));return}
+  // Every row is preserved without silent truncation; the user controls which period is printed.
+  box.append(make('h4',null,'Alle Einzelwerte – vollständig, mit Einheiten und ärztlicher Beurteilung'));
+  const rows=records.map(x=>[dayText(x.date),name(x),clean(x.value)+' '+clean(x.unit),clean(x.reference)||'–',
+   clean(x.evaluation?.label||x.assessment||'Ohne gesonderte Bewertung')+(x.evaluation?.detail?' · '+clean(x.evaluation.detail):'')+(x.notes?' · '+clean(x.notes):'')]);
+  table(box,['Datum','Laborwert','Ergebnis','Referenz','Beurteilung / Notiz'],rows);
+  box.append(make('h4',null,'Verlaufsdiagramme zu mehrfach gemessenen Blutwerten'));
+  const groups=new Map();for(const p of records){const k=sameGroup(p);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(p)}
+  const plotted=[...groups.entries()].filter(([k,rs])=>rs.filter(p=>numeric(p.value)!==null).length>1&&new Set(rs.filter(p=>numeric(p.value)!==null).map(p=>p.date)).size>1);
+  plotted.sort((a,b)=>{const priority=['eosAbs','ecp','igeTotal','crp','ph','pco2','po2','hco3','hb','wbc','creatinine'];const ra=priority.indexOf(a[1][0].marker),rb=priority.indexOf(b[1][0].marker);return (ra<0?99:ra)-(rb<0?99:rb)||name(a[1][0]).localeCompare(name(b[1][0]),'de')});
+  for(const [key,items] of plotted)miniChart(box,records,key,name(items[0]));
+  if(!plotted.length)box.append(make('p','stats25-muted','Keine Laborwerte mit mindestens zwei Messdaten und gleichen Einheiten im gewählten Zeitraum.'));
+  box.append(make('p','stats25-muted','Laborreferenzen und Einordnung stammen aus den gespeicherten Befunden. Unterschiedliche Probenarten, Messmethoden, Medikamente und fehlende Messungen können die Vergleichbarkeit beeinflussen. Keine automatisierte Diagnose.'));
+ }
+ function coverage(report,all,r){const box=section(report,'Datenvollständigkeit – wichtige Gesundheitsbereiche');
+  const {suite,epef,labs,diary,calendar,au,documents,cases}=all;
+  const inside=d=>allowedDay(d)&&d>=r.from&&d<=r.to;
+  const kind=(t)=>suite.filter(x=>x.type===t&&inside(x.value?.date)).length;
+  const currentMeds=suite.filter(x=>x.type==='meds').length;
+  const aulist=au.filter(x=>(x.from||'')<=r.to&&(x.to||'')>=r.from);
+  const lines=[
+   ['Treppen / Arbeitswege',kind('stairs'),'Einzelne dokumentierte Treppenwege'],
+   ['Blutwerte',labs.filter(x=>inside(x.date)).length,'Alle bekannten einzelnen Laborwerte'],
+   ['Lungenfunktion (ärztlich)',kind('measurements'),'Spirometrie / gespeicherte Befunde'],
+   ['Peak-Flow / Hand-FEV₁',epef.filter(x=>x.kind==='measurement'&&inside(x.date)).length,'Messungen aus ePEF'],
+   ['SpO₂',suite.filter(x=>x.type==='vital29'&&x.value?.kind==='spo2'&&inside(x.value.date)).length,'Dokumentierte Sauerstoffsättigung'],
+   ['Blutdruck',suite.filter(x=>x.type==='vital29'&&x.value?.kind==='bp'&&inside(x.value.date)).length,'Dokumentierte Blutdruckmessungen'],
+   ['Puls',suite.filter(x=>x.type==='vital29'&&x.value?.kind==='pulse'&&inside(x.value.date)).length,'Dokumentierte Pulsmessungen'],
+   ['Gewicht',kind('weight292'),'Datierte Gewichtseinträge'],
+   ['Asthma-Tagebuch',diary.filter(x=>inside(x.date)).length,'Symptome und dokumentierte Bedarfsanwendungen'],
+   ['Arbeitsbelastungen',kind('work'),'Hitze / Staub / sonstige Arbeitsplatzbelastungen'],
+   ['Arbeitsunfähigkeit (Asthma)',aulist.length,'Bescheinigungen mit Zeitraumüberschneidung'],
+   ['Kalender / PhysioSport',calendar.filter(x=>inside(x.date)).length,'Alle gespeicherten Kalendertermine'],
+   ['Dokumente',documents.filter(x=>inside(clean(x.date||x.createdAt).slice(0,10))).length,'Im Berichtszeitraum datierte Dokumente'],
+   ['Anträge',cases.filter(x=>inside(x.submittedOn)).length,'Eingereichte Anträge'],
+   ['Medikamentenplan',currentMeds,'Aktueller Medikamentenbestand, kein Einnahmenachweis']
+  ];
+  table(box,['Bereich','Einträge','Hinweis'],lines.map(([a,b,c])=>[a,String(b),c]));
+  box.append(make('p','stats25-muted','0 bedeutet: Im ausgewählten Zeitraum ist in diesem Datenbereich kein entsprechender Eintrag gespeichert. Daraus folgt nicht, dass keine Beschwerden, Untersuchungen oder Behandlungen stattgefunden haben.'));}
+ async function add(report,r){
+  if(!report||!r||!S.state().unlocked)return;
+  report.querySelectorAll('[data-stats306]').forEach(x=>x.remove());
+  if(!Object.values(checks).some(x=>x.checked))return;
+  const names=['suite','labs','epef','diary','calendar','au','documents','cases'];
+  const values=await Promise.all(names.map(n=>S.list(n)));
+  const all=Object.fromEntries(names.map((n,i)=>[n,values[i]]));
+  if(checks.stair.checked)stairs(report,all.suite.filter(x=>x.type==='stairs').map(x=>x.value).filter(Boolean),r);
+  if(checks.lab.checked)labs(report,all.labs,r);
+  if(checks.coverage.checked)coverage(report,all,r);
+ }
+ // The existing histogram/statistics module loads later. Intercept its assignment
+ // so the existing report builder awaits the extra content before offering PDF.
+ let current=window.ASTHMA_STATSP292;
+ const wrap=api=>{
+  if(!api?.append||typeof api.append!=='function')return api;
+  return Object.freeze({...api,append:async(report,r)=>{
+   await api.append(report,r);
+   try{await add(report,r)}catch(err){console.error('Erweiterte Monats-/Jahresstatistik:',err);report.append(warn('Zusätzliche Labor-/Treppenstatistik konnte nicht erstellt werden: '+err.message));}
+  }});
+ };
+ let wrapped=wrap(current);
+ Object.defineProperty(window,'ASTHMA_STATSP292',{configurable:true,enumerable:true,get:()=>wrapped,set(value){current=value;wrapped=wrap(value)}});
+ window.ASTHMA_STATS306={add,byReason,numeric,ready:()=>Boolean(wrapped?.append)};
+})();

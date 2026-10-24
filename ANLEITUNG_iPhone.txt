@@ -1,0 +1,50 @@
+ASTHMA WEBAPP – TREPPENZÄHLER UND VOLLSTÄNDIGE STATISTIK
+Update für bestehende App 3.0.5 / Ein-Datei-Installation (24.10.2026)
+
+WICHTIG: Es wird KEINE neue leere Asthma-Webapp installiert.
+Stattdessen ersetzt diese Datei nur das bestehende JavaScript-Modul.
+Alle bestehenden lokalen Daten bleiben unverändert verschlüsselt.
+
+INSTALLATION AUF DEM IPHONE
+1. Diese ZIP-Datei in der iPhone-App „Dateien“ speichern.
+2. ZIP antippen – es entsteht ein entpackter Ordner.
+3. Darin liegt laborvergleich303.js.
+4. GitHub-Projekt öffnen: https://github.com/4h7zm6hnjy-skizze/Asthma-
+5. Im Hauptverzeichnis die alte laborvergleich303.js durch diese neue
+   Datei GLEICHEN NAMENS ersetzen und Änderung bei GitHub bestätigen.
+   Die ZIP nicht unbearbeitet als Webapp-Update hochladen.
+6. Asthma-Webapp auf dem iPhone bei bestehender Internetverbindung neu laden.
+   Falls die alte Ansicht erscheint, vorhandenen „Update installieren“-Button
+   nutzen und die App erneut öffnen.
+
+NEU BEI ARBEITSPLATZ UND BELASTUNGEN
+- Treppenzähler mit +30 und +24 Stufen
+- Schnellgründe: Kühlanlage, Materialscheine, WC,
+  Fertigteile runtergefahren, Verpackung geholt, Pappe geschnitten
+- „Anderer Grund – selbst eintragen“ für beliebige Tätigkeiten
+- Datum, Uhrzeit, Schicht, Symptome und Notiz
+- Verschlüsselte Historie, Bearbeiten/Löschen
+- Monats-/Jahresübersichten, Export, Jahresdruckbericht nach Grund/Schicht
+
+NEU IN STATISTIK > MONAT/JAHR
+- Neuer Auswahlblock „Neue Berichtsteile“
+- Gesamtstufen, Einträge, aktive Tage, Monats- bzw. Tagesübersicht,
+  Kategorien nach Grund, Schichten und Beschwerden
+- ALLE vorhandenen Labor-Einzelwerte im gewählten Zeitraum,
+  Datum, Einheit, Referenz, gespeicherte ärztliche Beurteilung/Notiz
+- Verlaufskurven bei mindestens zwei Messungen desselben Tests mit
+  vergleichbarer Einheit; Zahlenwerte werden nicht medizinisch bewertet
+- Vollständigkeitsliste zu Lungenfunktion, PEF, Blutdruck, Puls, SpO2,
+  Gewicht, Asthma-Tagebuch, AU, Medikamente, Dokumente und Terminen
+- Bestehender Monats-/Jahresbericht und die bisherigen Diagramme
+  (PEF, Gewicht, SpO2, Blutdruck, Puls und Lungenfunktion) bleiben erhalten
+
+TECHNISCHE HINWEISE
+- Kein Serverupload persönlicher Daten, keine zusätzlichen Dienste.
+- Die Daten liegen weiter im bestehenden passwortgeschützten Tresor.
+- Diese Änderung ersetzt NUR laborvergleich303.js; die interne allgemeine
+  App-Versionsnummer bleibt zunächst 3.0.5. Das ist kein Installationsfehler.
+- Bei Drucken/Teilen sind exportierte Dateien NICHT verschlüsselt.
+- KEINE Gesundheitsdaten in GitHub hochladen; nur die JavaScript-Datei.
+- ZIP und JavaScript haben eine lokale Syntax-/Browser-Funktionsprüfung
+  bestanden. Ein echter iPhone/Safari-End-to-End-Test ist nicht erfolgt.
