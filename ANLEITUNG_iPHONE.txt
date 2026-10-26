@@ -1,11 +1,15 @@
-Asthma-Ampel: Positionskorrektur fuer iPhone (Version bleibt 3.2.0)
+ASTHMA-AMPEL: PDF-REPARATUR FUER iPHONE
 
-KORREKTUR: Die Karten "Heute im Blick" und "Diagnosehinweise" werden nach dem Profil angelegt. Das hatte die Ampel nach unten verschoben. Jetzt bleibt die Ampel unmittelbar nach dem Patientenprofil.
+WICHTIG: Bestehende App NICHT loeschen. Vorher in Einstellungen eine verschluesselte Sicherung erstellen.
 
-1. Bitte vor Aenderungen eine verschluesselte Sicherung in der App erstellen.
-2. In Safari dieses Repo aufrufen: https://github.com/4h7zm6hnjy-skizze/Asthma-
-3. Die Datei ampel320.js ueber Add file > Upload files in das Hauptverzeichnis hochladen und Commit changes bestaetigen. Eine bestehende Datei gleichen Namens wird dadurch ueberschrieben.
-4. Bestehende Asthma-Webapp schliessen, neu starten und mit dem bisherigen Passwort anmelden.
-5. Auf der Startseite muss die Reihenfolge lauten: Patientenprofil, Asthma-Ampel, Heute im Blick, Diagnosehinweise.
+1. ZIP auf iPhone herunterladen und in der Dateien-App antippen (entpacken).
+2. Safari: https://github.com/4h7zm6hnjy-skizze/Asthma-
+3. Im Hauptverzeichnis: Add file > Upload files (ggf. ueber Safari Desktop-Website anfordern).
+4. NUR DIE DATEI ampel320.js aus diesem Ordner hochladen (keine ZIP). Bei vorhandener Datei Ueberschreiben bestaetigen, Commit changes.
+5. Die existierende Asthma-Webapp schliessen und bei Internetverbindung neu oeffnen. Version bleibt 3.2.0.
+6. Statistik > Ampel > Zeitraum waehlen > Ampel-PDF erstellen > PDF teilen / Drucken > In Dateien sichern oder Drucken.
+   Falls Teilen nicht funktioniert: PDF herunterladen oder PDF ansehen.
 
-Keine persoenlichen Gesundheitsdaten sind in diesem Paket enthalten. Die Version bleibt 3.2.0, weil sich nur die Anordnung aendert. Die App auf dem Home-Bildschirm bitte NICHT loeschen.
+DATENSCHUTZ: PDF liegt ausserhalb der App unverschluesselt vor. Keine persoenlichen Messwerte werden auf GitHub hochgeladen.
+
+Technik: Ersetzt window.print() durch einen lokalen PDF-Generator, der Messwerte und Notizen aus dem entsperrten Browser-Tresor in der Anzeige nutzt. Kein Server, kein externes PDF-Angebot.
