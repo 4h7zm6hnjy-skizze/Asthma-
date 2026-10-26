@@ -63,23 +63,25 @@
   ].join('');
   home.insertBefore(pane, home.querySelector('.home20-quick') || home.firstChild);
 
-  // Version 3.2.0: move the existing Ampel immediately below the patients'
-  // dashboard profile. That profile is created later by professional27.js.
-  // Moving the DOM node does not recreate data or its existing event listeners.
+  // Keep the Ampel directly below the profile, even when the later-loading
+  // daily overview and assessment cards insert themselves after that profile.
+  // Observe structural changes only; moving the same node preserves its state
+  // and listeners. The position check prevents a MutationObserver feedback loop.
   const placeBelowPatientProfile = () => {
     const patientProfile = document.getElementById('a27-personal-summary');
-    if (!patientProfile || !patientProfile.isConnected) return false;
+    if (!patientProfile || !patientProfile.isConnected || !home.contains(patientProfile)) return false;
     if (pane.parentNode !== patientProfile.parentNode || pane.previousElementSibling !== patientProfile) {
       patientProfile.insertAdjacentElement('afterend', pane);
     }
     return true;
   };
-  if (!placeBelowPatientProfile()) {
-    const profileObserver = new MutationObserver(() => {
-      if (placeBelowPatientProfile()) profileObserver.disconnect();
-    });
-    profileObserver.observe(home, {childList: true, subtree: true});
-  }
+  // A one-shot observer was insufficient: quality28.js loads AFTER this module
+  // and places "Heute im Blick" immediately after the same profile element.
+  // Keep watching until the page is unloaded so a later layout rebuild cannot
+  // displace the Ampel again.
+  const profileOrderObserver = new MutationObserver(() => { placeBelowPatientProfile(); });
+  profileOrderObserver.observe(home, {childList: true, subtree: true});
+  placeBelowPatientProfile();
 
   const st=elt('section','suite-subpanel as-stat');st.id='as-stat';
   st.innerHTML = [

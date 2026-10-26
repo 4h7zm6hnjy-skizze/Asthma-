@@ -1,53 +1,11 @@
-ASTHMA – ASTHMA-AMPEL 3.2.0 – NUR iPHONE
-===========================================
+Asthma-Ampel: Positionskorrektur fuer iPhone (Version bleibt 3.2.0)
 
-Dieses Paket enthält die aktualisierten Programmdateien für dein vorhandenes
-GitHub-Repository. Kein Mac und kein Terminal nötig.
+KORREKTUR: Die Karten "Heute im Blick" und "Diagnosehinweise" werden nach dem Profil angelegt. Das hatte die Ampel nach unten verschoben. Jetzt bleibt die Ampel unmittelbar nach dem Patientenprofil.
 
-VORHER: In deiner bisherigen Asthma-Webapp unter Einstellungen eine
-vollständige VERSCHLÜSSELTE .asthma17-Sicherung erstellen.
+1. Bitte vor Aenderungen eine verschluesselte Sicherung in der App erstellen.
+2. In Safari dieses Repo aufrufen: https://github.com/4h7zm6hnjy-skizze/Asthma-
+3. Die Datei ampel320.js ueber Add file > Upload files in das Hauptverzeichnis hochladen und Commit changes bestaetigen. Eine bestehende Datei gleichen Namens wird dadurch ueberschrieben.
+4. Bestehende Asthma-Webapp schliessen, neu starten und mit dem bisherigen Passwort anmelden.
+5. Auf der Startseite muss die Reihenfolge lauten: Patientenprofil, Asthma-Ampel, Heute im Blick, Diagnosehinweise.
 
-INSTALLATION AUF DEM iPHONE (Safari und GitHub):
-
-1. Die ZIP-Datei "Asthma_3.2.0_iPhone_Update.zip" im iPhone in "Dateien" speichern.
-2. In "Dateien" einmal auf die ZIP-Datei tippen: Der Ordner wird entpackt.
-3. Safari öffnen und anmelden:
-   https://github.com/4h7zm6hnjy-skizze/Asthma-
-4. Auf "Add file" > "Upload files" gehen. Falls die Schaltfläche nicht
-   angezeigt wird: in Safari über "aA" > "Desktop-Website anfordern".
-5. Aus dem entpackten Ordner "DATEIEN_FUER_GITHUB" alle sieben Dateien
-   auswählen und hochladen (nicht die ZIP selbst). Die vorhandenen Dateien
-   auf derselben Repository-Ebene ersetzen. Nicht in einen Unterordner legen!
-6. Unten auf "Commit changes" tippen und bestätigen.
-7. Deine bisherige Asthma-Webapp öffnen, ohne das Homescreen-Symbol zu löschen.
-   Unter "Einstellungen" > "Nach Updates suchen" > "Update installieren".
-8. Nach Anmeldung sollte die Version 3.2.0 erscheinen. Auf der Startseite
-   steht die neue "Asthma-Ampel heute" mit fünf bunten Lungen.
-
-HILFE:
-- Bei GitHub unbedingt sicherstellen, dass die sieben Dateien im
-  Repository-HAUPTORDNER liegen. Wenn sie in einem Unterordner landen,
-  erscheinen sie nicht in der Webapp.
-- Wenn GitHub die Dateiauswahl nur einzeln zulässt, lade die sieben Dateien
-  nacheinander hoch und tippe am Ende auf "Commit changes".
-- "Nach Updates suchen" kann erst die neue Version melden, wenn GitHub Pages
-  die neuen Dateien veröffentlicht hat. Nicht die Webapp deinstallieren oder
-  Safari-Website-Daten löschen. Ggf. die Seite in Safari neu öffnen.
-- Falls eine Meldung "Datei existiert bereits" erscheint, öffne den
-  Repository-Hauptordner, nicht den vorherigen Ordner und nutze erneut Upload.
-- Alles bleibt im bestehenden verschlüsselten Tresor auf demselben iPhone.
-  Die Update-Dateien enthalten keine persönlichen Messwerte.
-
-NEU:
-- Fünf Lungen: super / gut / geht so / nicht gut / schlecht bis kritisch.
-- 16 vorgegebene Antworten und "Eigene Notiz" zum Selberschreiben.
-- Weitere Angaben optional: Symptome und Häufigkeit des Bedarfssprays.
-- Ein Hauptstatus pro Tag, optional zusätzliche Einträge; bearbeiten/löschen.
-- Eigener Statistikbereich Tag, Woche, Monat, Jahr, 10 Jahre; Verlauf,
-  Verteilung, Monatskalender und PDF/Druck. Alte Statistiken unverändert.
-
-DATENSCHUTZ UND SICHERHEIT:
-- Dieses Update tauscht App-Programmdateien aus, keine persönlichen Daten.
-- Die Ampel-Einträge werden nach dem Entsperren lokal verschlüsselt gespeichert
-  und sind nun auch Teil vollständiger Backups und Wiederherstellungen.
-- Bei kritischer Atemnot nicht auf eine App-Bewertung warten, Notruf 112.
+Keine persoenlichen Gesundheitsdaten sind in diesem Paket enthalten. Die Version bleibt 3.2.0, weil sich nur die Anordnung aendert. Die App auf dem Home-Bildschirm bitte NICHT loeschen.
