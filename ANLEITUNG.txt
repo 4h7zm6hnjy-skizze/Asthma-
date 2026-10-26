@@ -1,17 +1,46 @@
-ASTHMA – INTENSIVPRÜFUNG UND REPARATUR 3.1.8
+ASTHMA – AMPEL 3.2.0
+====================
 
-Belegte Fehler: Versionskonflikt 3.0.5 / 3.1.7, erneuter Neustart ohne neue Hauptversion, alte Cachekennung 3.0.4 in der Offline-Prüfung.
+NEU
+- 5 farbige Lungen auf der Startseite: super / gut / geht so / nicht gut / kritisch
+- Mit einem Tipp wird dein Status verschlüsselt gespeichert.
+- 16 vorgegebene Notizen als Mehrfachauswahl.
+- Zusätzlich ein Häkchen „Eigene Notiz“ und ein Textfeld.
+- Optional: Beschwerden und Häufigkeit des Bedarfssprays.
+- Zweite/weitere Einträge pro Tag; bearbeiten und löschen.
+- Statistik: Tag, Woche, Monat, Jahr, 10 Jahre, Verlauf, Balkendiagramm, Monatskalender, Ausdruck/PDF.
+- Alte Statistik und alle bisherigen Daten bleiben unangetastet.
 
-Installation in zwei Schritten:
-1. Vorher in der bestehenden iPhone-App eine vollständige, verschlüsselte .asthma17-Sicherung erstellen und außerhalb der App aufbewahren.
-2. Die Datei ASTHMA_PRUEFEN_UND_REPARIEREN.py aus diesem ZIP ins HAUPTVERZEICHNIS deines GitHub-Repositories Asthma- hochladen und speichern (Commit).
-3. GitHub -> Code -> Codespaces -> Codespace öffnen.
-4. Terminal: python3 ASTHMA_PRUEFEN_UND_REPARIEREN.py
-5. Auf die Meldung ERFOLG warten und in GitHub PRUEFBERICHT_3_1_8.md prüfen.
-6. In der bisherigen iPhone-Webapp Update installieren wählen. Danach muss Version 3.1.8 erscheinen.
+SO GEHT ES AM EINFACHSTEN (Mac)
+1. ZIP-Datei entpacken.
+2. ASTHMA_UPDATE_3_2_0_MAC.command doppelt anklicken.
+3. Das Fenster erledigt Download, Prüfung und Vorbereitung automatisch. Wenn du am Mac bereits
+   für GitHub angemeldet bist, versucht das Programm auch den Upload.
+4. Bei Meldung „FERTIG“ am iPhone Asthma öffnen → Einstellungen → Nach Updates suchen.
 
-WICHTIG: Das Skript arbeitet nur an den sechs App-Dateien app.js, index.html, secure17.js, sw.js, version.json, offline303.js und schreibt einen Prüfbericht. Es greift nicht auf den iPhone-Tresor und nicht auf hochgeladene JSON-Gesundheitsdaten zu.
+Wenn macOS die .command-Datei blockiert: Im Finder Rechtsklick → Öffnen. Wenn für GitHub
+keine Schreibanmeldung besteht, erscheint der Ordner FERTIG_ZUM_HOCHLADEN.
 
-Keine App löschen, keine Browser-/Website-Daten entfernen. Das Repository ist öffentlich, darin befinden sich Gesundheits-Importdateien; das ist ein eigenständiges, kritisches Datenschutzrisiko. Repo separat privat stellen und alte Versionshistorie bereinigen.
+ALTERNATIVE: UPLOAD ÜBER GITHUB
+1. Den Mac-Befehl einmal ausführen (auch ein gescheiterter GitHub-Push erzeugt die fertigen
+   Dateien im Ordner FERTIG_ZUM_HOCHLADEN).
+2. In Safari (oder am Mac) https://github.com/4h7zm6hnjy-skizze/Asthma-/upload/main öffnen.
+3. Die sieben Dateien aus FERTIG_ZUM_HOCHLADEN im Hauptverzeichnis des Projekts hochladen,
+   bestehende gleichnamige Dateien ersetzen, Änderung „Commit“ bestätigen.
+4. Dann in der iPhone-Webapp unter Einstellungen „Nach Updates suchen“.
 
-Das Script benötigt ein vollständiges GitHub Codespace, Git, Python 3 und Node.js. Nicht bloß hochladen: der Befehl muss einmal im Codespace ausgeführt werden. Ohne erfolgreichen Push ist die Version nicht installiert.
+SEHR WICHTIG
+- NICHT die App vom Home-Bildschirm löschen, NICHT Safari-Website-Daten löschen,
+  NICHT einen neuen Tresor anlegen.
+- Vorher eine verschlüsselte Sicherung innerhalb der App erstellen: Einstellungen →
+  Vollständige verschlüsselte Sicherung.
+- Das Update fasst deine lokal verschlüsselten Werte nicht an.
+- Es wird KEIN persönlicher medizinischer Datensatz nach GitHub übertragen.
+- Die Ampelfarben sind SELBSTBEWERTUNG, kein Notfallindikator. Bei schwerer Atemnot 112.
+- Das Update ist auf den GitHub-Code mit Basisversion 3.1.8 zugeschnitten.
+  Bei einer abweichenden neuen Version bricht die Vorbereitung zur Sicherheit ab.
+
+GITHUB-SCHREIBRECHT
+Der ChatGPT-GitHub-Zugang konnte auf das Projekt nur lesend zugreifen (HTTP 403 bei Schreibversuchen).
+Daher konnte die Veröffentlichung nicht selbst durchgeführt werden. Das Paket macht sie
+am Mac weitgehend automatisch, wenn dein Mac die nötige GitHub-Anmeldung besitzt.
