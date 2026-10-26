@@ -63,6 +63,24 @@
   ].join('');
   home.insertBefore(pane, home.querySelector('.home20-quick') || home.firstChild);
 
+  // Version 3.2.0: move the existing Ampel immediately below the patients'
+  // dashboard profile. That profile is created later by professional27.js.
+  // Moving the DOM node does not recreate data or its existing event listeners.
+  const placeBelowPatientProfile = () => {
+    const patientProfile = document.getElementById('a27-personal-summary');
+    if (!patientProfile || !patientProfile.isConnected) return false;
+    if (pane.parentNode !== patientProfile.parentNode || pane.previousElementSibling !== patientProfile) {
+      patientProfile.insertAdjacentElement('afterend', pane);
+    }
+    return true;
+  };
+  if (!placeBelowPatientProfile()) {
+    const profileObserver = new MutationObserver(() => {
+      if (placeBelowPatientProfile()) profileObserver.disconnect();
+    });
+    profileObserver.observe(home, {childList: true, subtree: true});
+  }
+
   const st=elt('section','suite-subpanel as-stat');st.id='as-stat';
   st.innerHTML = [
     '<h3>Asthma-Ampel – dein Verlauf</h3><p>Bei mehreren Einträgen zählt für den Tagesdurchschnitt der letzte Status. Einzelne Messungen bleiben erhalten.</p>',

@@ -1,47 +1,19 @@
-ASTHMA-WEBAPP – VERSION 3.0.4 – NUR IPHONE
-==========================================
+ASTHMA-AMPEL DIREKT UNTER PATIENTENPROFIL – iPHONE
 
-Das ZIP ist ein geprüftes Updatepaket, aber KEINE iPhone-App zum direkten Öffnen.
-Die Installation erfolgt einmalig in deinem GitHub-Codespace.
+Nur eine Datei muss ersetzt werden: ampel320.js
 
-BITTE ZUERST: In deiner Asthma-App unter Einstellungen eine vollständige
-verschlüsselte Datensicherung erstellen. Nie deine medizinischen Befunddateien
-öffentlich nach GitHub hochladen.
+1. Öffne mit deinem iPhone Safari und https://github.com/4h7zm6hnjy-skizze/Asthma-
+2. Stelle sicher, dass du bei GitHub angemeldet bist.
+3. Tippe auf „Add file“ und dann „Upload files“.
+   Ggf. in Safari über das Menü aA / Website-Einstellungen die Desktop-Website anfordern.
+4. Wähle aus der Dateien-App nur die heruntergeladene Datei ampel320.js aus.
+5. Bestätige „Commit changes“ (Änderungen speichern). Falls GitHub das Ersetzen
+   einer bestehenden Datei auf diesem Weg nicht erlaubt: Datei auf GitHub öffnen,
+   Stift-Symbol / „Edit this file“ wählen und den Inhalt ersetzen.
+6. Beende die Asthma-App vollständig und öffne sie erneut bei bestehender
+   Internetverbindung. Du kannst alternativ im gleichen Safari-Profil neu laden.
 
-1. Dieses ZIP in der iPhone-App „Dateien“ öffnen und einmal antippen (entpacken).
-2. Die darin enthaltene Datei „F.py“ verwenden.
-3. Deinen vorhandenen GitHub-Codespace „glorious journey“ in Safari öffnen.
-   (Keinen weiteren Codespace erstellen.)
-4. Im Codespace links „Explorer“ öffnen, oben auf „…“ tippen und
-   „Upload...“/„Datei hochladen“ wählen. F.py aus der Dateien-App auswählen.
-   Sie muss im gleichen Asthma-Projektordner wie index.html liegen.
-5. Im bereits offenen Terminal nur diesen kurzen Befehl ausführen:
-
-   python3 F.py
-
-6. Erst bei der Meldung „FERTIG: ASTHMA 3.0.4 AUF GITHUB“ ist das Update
-   veröffentlicht. Auf dem iPhone die Asthma-App online öffnen, „Update suchen“
-   und neu laden.
-7. Unter „Einstellungen → Offline-Nutzung prüfen“ die neuen Dateien kontrollieren,
-   danach kurz im Flugmodus testen. Wieder online gehen und eine neue Sicherung
-   prüfen.
-
-Wenn ein Fehler statt „FERTIG“ erscheint: NICHT erneut die App installieren,
-NICHT die Safari-Websitedaten löschen. Screenshot des Terminals an ChatGPT senden.
-
-Was repariert wird:
-- Fehlerhaftes HTML-Dokument und doppelter PhysioSport-Start
-- Veraltete Versionen alter Programmdateien beim Laden
-- PDF-Diagrammtexte, die unbemerkt Tooltip-Text mit enthielten
-- Veraltetes PDF nach erneuter Berechnung
-- Laborvergleich und Labor-Referenzangaben mit Einheiten
-- Vollständige Offline-Dateiprüfung gegen den richtigen Cache
-- Statische Syntaxprüfung aller vorhandenen .js-Dateien im Codespace
-
-Sicherheit:
-Die Reparatur ändert nur Programmdateien und Versionsnummern. Die verschlüsselten
-Gesundheitsdaten auf dem iPhone werden nicht geändert. Keine personenbezogenen
-Daten oder Laborbefunde gehören in diesen ZIP-Upload.
-
-Wichtig: Die statische Prüfung ersetzt keinen Test sämtlicher realer Funktionen
-und iPhone-Druckdialoge. Das muss nach Installation auf dem Gerät geprüft werden.
+Das In-App-Update meldet weiterhin Version 3.2.0, weil ausschließlich
+ die Position geändert wird. Kein Löschen der App, keine Datenbereinigung!
+Die Änderung verschiebt nur das vorhandene Bedienelement unter „Patientenprofil“.
+Gespeicherte Einträge, Notizen, Auswertungen und die Datenbank bleiben unverändert.
