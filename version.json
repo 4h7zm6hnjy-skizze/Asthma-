@@ -1,5 +1,5 @@
 {
-  "version": "3.1.8",
-  "released": "2026-10-24",
-  "notes": "Intensivprüfung: Haupt-App, Startdateien, Tresor-Skriptlader und Offline-Cache synchronisiert. Wiederholtes Neustarten bei aktueller Version behoben; Offline-Prüfung verwendet aktive Version. Keine Gesundheitsdaten geändert."
+  "version": "3.2.0",
+  "released": "2026-10-26",
+  "notes": "Asthma-Tagesampel: fünf Lungenstufen; 16 vorgegebene Notizen plus eigene Notiz, freiwillige Symptome und Bedarfsmedikation, Mehrfacheintraege, Bearbeiten/Loeschen; Tages-, Wochen-, Monats-, Jahres- und 10-Jahres-Statistik mit Verlauf, Balken, Kalender, Druck und PDF. AES-GCM-Tresor und vollstaendige Sicherung erweitert. Bestehende Werte und Statistiken bleiben bestehen."
 }

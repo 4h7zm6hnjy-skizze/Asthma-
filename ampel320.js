@@ -113,7 +113,8 @@
     records=items.filter(r=>r&&r.type==='self-rating'&&validDate(r.date)&&Number.isInteger(r.level)&&r.level>=1&&r.level<=5);
     records.sort((a,b)=>(b.date+'T'+(b.time||'')).localeCompare(a.date+'T'+(a.time||'')));
     const main=current();
-    $('as-today').textContent=main?'Heute: '+BY_LEVEL[main.level].title+' · '+(main.time||'–')+' Uhr':'Heute noch kein Status gespeichert.';
+    const latest=records.filter(r=>r.date===iso()).sort((a,b)=>(String(b.time||'')+String(b.updatedAt||'')).localeCompare(String(a.time||'')+String(a.updatedAt||'')))[0];
+    $('as-today').textContent=latest?'Heute: '+BY_LEVEL[latest.level].title+' · '+(latest.time||'–')+' Uhr':'Heute noch kein Status gespeichert.';
     if(!editing&&!extra)fill(main||null);
     statsRefresh();
   }
