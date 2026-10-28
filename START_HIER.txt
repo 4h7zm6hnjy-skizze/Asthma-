@@ -1,0 +1,41 @@
+ASTHMA 3.2.1 – TREPPEN / KURZBEFEHLE
+
+1. Vorher eine verschlüsselte Sicherung in deiner bisherigen App erstellen.
+2. ZIP entpacken.
+3. NUR die neun Dateien aus GitHub_Update in denselben GitHub-Ordner
+   wie die vorhandene index.html hochladen und ersetzen.
+   Keine Dateien des bisherigen Repositorys löschen.
+   Die ZIP selbst nicht hochladen.
+
+Laut Anleitung in deinem Ausgangsarchiv ist das Repository:
+https://github.com/4h7zm6hnjy-skizze/Asthma-/upload/main
+Die aktuelle Erreichbarkeit dieses Repositorys wurde nicht geprüft.
+
+4. Nach Veröffentlichung durch GitHub Pages in der App unter Einstellungen
+   nach Updates suchen und installieren. Version 3.2.1 kontrollieren.
+5. Arbeit → Treppenzähler → Treppen-Schnellauswahl.
+   Dort stehen der fertige Link und die Kurzbefehl-Anleitung.
+
+NEU
+- 15 / 17 / 30 / 90 Stufen, danach Grund getrennt wählen.
+- Kühlanlage, Materialscheine, WC, Fertigteile runtergefahren,
+  Verpackung geholt, Pappe geschnitten, Spangen und eigener Grund.
+- Tagesgesamtzahl, keine Dauer/keine Zeitmessung.
+- Empfang aus Kurzbefehle mit Prüfung, Bestätigung und Duplikatschutz.
+- Einfügen des Übergabetextes in der bisherigen Home-Bildschirm-App,
+  falls Safari einen anderen lokalen Tresor verwendet.
+
+WICHTIG FÜR KURZBEFEHLE
+Auf dem iPhone ist einmalige Einrichtung nötig. Öffne
+KURZBEFEHLE_ANLEITUNG.html im Paket bzw. die Anleitung in der App.
+Zwei Varianten: einfacher Öffnen-Kurzbefehl (2 Aktionen) oder native
+Menüs mit Anzahl und Grund direkt in Kurzbefehle.
+Keine signierte .shortcut-Datei / kein iCloud-Installationslink enthalten.
+Speichern erfordert den vorhandenen entsperrten Tresor und Bestätigung.
+Kein dauerhaftes Sperrbildschirm-Widget und keine Hintergrundspeicherung.
+
+Falls Safari leer aussieht: NICHT neu einrichten. Die bisherige App öffnen.
+Keine Website-Daten löschen und die App nicht deinstallieren.
+
+Basis: dein Archiv Asthma--main 5.zip vom 26.10.2026.
+Das Update wurde nicht bei GitHub hochgeladen oder veröffentlicht.

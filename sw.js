@@ -1,12 +1,13 @@
-/* Asthma 3.1.8: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
-const VERSION='3.2.0-asthma-ampel';
+/* Asthma 3.2.1: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
+const VERSION='3.2.1-consistent-cache';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
+ './stairs-shortcuts.js','./stairs-shortcuts.css','./KURZBEFEHLE_ANLEITUNG.html',
  './','./index.html','./styles.css','./content.js','./app.js','./antraege-data.js','./antraege.js',
  './meine-daten.js','./lungenprofil.js','./befundscan-parser.js','./befund18-parser.js','./befundscan.js',
  './foto19.js','./viewport192.js','./suite15.js','./region16.js','./secure17.js','./calendar17.js',
  './nucala282.js','./assessment29.js','./assessment29.css','./versorgung30.js','./versorgung30.css',
- './labor18.js','./laborvergleich303.js','./offline303.js','./ampel320.js','./ampel320.css','./hub20.js','./scanner20.js','./pdf20.js','./jszip.min.js','./vital29.js',
+ './labor18.js','./laborvergleich303.js','./offline303.js','./hub20.js','./scanner20.js','./pdf20.js','./jszip.min.js','./vital29.js',
  './vital-rescue291.js','./vital29.css','./epef21.js','./lufu23.js','./medplan24.js','./gdb24.js',
  './au25.js','./stats25.js','./statsplus292.js','./statsprint296.js','./statsplus292.css',
  './weight292.js','./medpref25.js','./hilfsmittel251.js','./version.json','./manifest.webmanifest',
@@ -24,9 +25,9 @@ self.addEventListener('fetch',event=>{
  if(path.endsWith('/version.json')||path.endsWith('/rechtsmonitor-feed.json')){
   event.respondWith(fetch(event.request,{cache:'no-store'}).catch(()=>caches.match(event.request,{ignoreSearch:true})));return;
  }
- const important=['/secure17.js','/vital29.js','/vital-rescue291.js','/app.js','/design26.js',
+ const important=['/stairs-shortcuts.js','/stairs-shortcuts.css','/secure17.js','/vital29.js','/vital-rescue291.js','/app.js','/design26.js',
   '/quality28.js','/quality28.css','/suite15.js','/stats25.js','/statsprint296.js',
-  '/statsplus292.js','/labor18.js','/lufu23.js','/laborvergleich303.js','/offline303.js','/ampel320.js','/ampel320.css','/befundscan.js','/befund18-parser.js'];
+  '/statsplus292.js','/labor18.js','/lufu23.js','/laborvergleich303.js','/offline303.js','/befundscan.js','/befund18-parser.js'];
  if(important.some(s=>path.endsWith(s))){
   event.respondWith(fetch(event.request,{cache:'no-store'}).then(r=>{
    if(r.ok){const clone=r.clone();caches.open(CACHE).then(c=>c.put(event.request,clone)).catch(()=>{})}

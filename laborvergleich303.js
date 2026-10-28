@@ -460,7 +460,7 @@
     <label>Beschwerden danach<select id="sc-symptoms"><option value="">Nicht angegeben</option><option value="0">0 – keine</option><option value="1">1 – leicht</option><option value="2">2 – mittel</option><option value="3">3 – stark</option></select></label>
     <label class="sc-wide">Notiz (optional)<textarea id="sc-note" rows="2" maxlength="500" placeholder="z. B. drei Mal zum Materiallager, Atemnot"></textarea></label>
    </div>
-   <div class="sc-quick" role="group" aria-label="Stufenzahl rasch erhöhen"><span>Schnell hinzufügen:</span><button type="button" data-sc-add="30">+30</button><button type="button" data-sc-add="24">+24</button></div>
+   <div class="sc-quick" role="group" aria-label="Stufenzahl rasch erhöhen"><span>Schnell hinzufügen:</span><button type="button" data-sc-add="15">+15</button><button type="button" data-sc-add="17">+17</button><button type="button" data-sc-add="30">+30</button><button type="button" data-sc-add="90">+90</button></div>
    <div class="sc-actions"><button id="sc-save" type="submit" class="btn btn-primary">Stufen speichern</button><button id="sc-cancel" type="button" class="btn btn-outline" hidden>Bearbeiten abbrechen</button></div>
   </form>
   <p id="sc-status" role="status" class="input-note"></p>
@@ -1220,7 +1220,7 @@
   {id:'lab-photo',title:'Bluttest hochladen',sub:'Laborfoto auswählen',icon:'drop',target:'labor',file:'lab-file',primary:true},
   {id:'bp',title:'Blutdruck',sub:'Oberen und unteren Wert erfassen',icon:'heart',target:'vitalwerte',form:'v29-form-bp',tab:'bp',primary:true},
   {id:'pulse',title:'Puls',sub:'Puls und Uhrzeit erfassen',icon:'pulse',target:'vitalwerte',form:'v29-form-pulse',tab:'pulse',primary:true},
-  {id:'stairs',title:'Treppenzähler',sub:'+30 / +24 Stufen · Grund · Ampel',icon:'stairs',target:'arbeit',focus:'sc-steps',primary:true,featured:true},
+  {id:'stairs',title:'Treppenzähler',sub:'15 / 17 / 30 / 90 Stufen · Grund',icon:'stairs',target:'arbeit',focus:'sc-steps',primary:true,featured:true},
   {id:'oxygen',title:'Sauerstoffsättigung',sub:'SpO₂ eintragen',icon:'oxygen',target:'vitalwerte',form:'v29-form-spo2',tab:'spo2',primary:true},
   {id:'lung-manual',title:'Lungenfunktion manuell',sub:'FEV₁ und FVC',icon:'lungs',target:'lungenwerte',focus:'lung-fev1-number'},
   {id:'lab-manual',title:'Blutwerte manuell',sub:'Einzelwert und Referenz',icon:'drop',target:'labor',focus:'lab-value'},
@@ -1326,7 +1326,7 @@
    }
    const form=a.form?$(a.form):null,element=form?.querySelector('input[name="value"]')||(a.focus?$(a.focus):null);
    if(!element){feedback.textContent='Eingabefeld aktuell nicht verfügbar. Bitte die geöffnete Seite verwenden.';return false}
-   feedback.textContent=a.id==='stairs'?'Treppenzähler geöffnet – +30 oder +24 Stufen hinzufügen und Grund wählen.':'Eingabefeld geöffnet. Wert prüfen und anschließend speichern.';
+   feedback.textContent=a.id==='stairs'?'Treppenzähler geöffnet – 15, 17, 30 oder 90 Stufen hinzufügen und Grund wählen.':'Eingabefeld geöffnet. Wert prüfen und anschließend speichern.';
    return pointTo(element,!['stats25-build','au25-form'].includes(a.focus));
   }
   panel.addEventListener('click',event=>{

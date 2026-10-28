@@ -1,5 +1,5 @@
 {
-  "version": "3.2.0",
-  "released": "2026-10-26",
-  "notes": "Asthma-Tagesampel: fünf Lungenstufen; 16 vorgegebene Notizen plus eigene Notiz, freiwillige Symptome und Bedarfsmedikation, Mehrfacheintraege, Bearbeiten/Loeschen; Tages-, Wochen-, Monats-, Jahres- und 10-Jahres-Statistik mit Verlauf, Balken, Kalender, Druck und PDF. AES-GCM-Tresor und vollstaendige Sicherung erweitert. Bestehende Werte und Statistiken bleiben bestehen."
+  "version": "3.2.1",
+  "released": "2026-10-27",
+  "notes": "Treppen-Schnellauswahl: 15/17/30/90 Stufen, Grund getrennt wählen, Tagesgesamtzahl und lokale Kurzbefehl-Übergabe mit Duplikatschutz. Keine Zeitmessung."
 }
