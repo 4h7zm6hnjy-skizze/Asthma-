@@ -42,6 +42,30 @@
  allBtn.onclick=()=>setAll(true);noneBtn.onclick=()=>setAll(false);controls.append(selectionActions);
  const notice=node('p','s292-note');notice.id='s292-selection-status';controls.append(notice);
  const toolbar=$('stats25-build').closest('.stats25-controls');toolbar?.insertAdjacentElement('afterend',controls);
+ // Interactive Inhaltsverzeichnis, generated from the actual report cards and
+ // the same 19 selections used by the PDF/print renderer.
+ function updateContents(){
+   const report=$('stats25-report'),heading=report?.querySelector(':scope > .stats25-heading');
+   report?.querySelector(':scope > #s292-contents')?.remove();
+   if(!heading)return;
+   const nav=node('nav','s292-contents');nav.id='s292-contents';nav.setAttribute('aria-label','Inhaltsverzeichnis des Gesundheitsberichts');
+   const title=node('h3','','Inhaltsverzeichnis');nav.append(title);
+   const note=node('p','s292-contents-note','Die Einträge entsprechen deiner aktuellen Druck- und PDF-Auswahl. Tippe auf einen Abschnitt, um dorthin zu springen.');nav.append(note);
+   const ol=node('ol','s292-contents-list');
+   let count=0;
+   for(const [id,label] of allKinds){
+     if(!selected[id])continue;
+     const target=report.querySelector('[data-s292-base="'+id+'"]')||report.querySelector('[data-s292-kind="'+id+'"]');
+     if(!target)continue;
+     const anchorId='s292-report-section-'+id;target.id=anchorId;
+     const li=node('li',''),link=node('a','',label);link.href='#'+anchorId;
+     link.addEventListener('click',event=>{event.preventDefault();target.scrollIntoView({behavior:'smooth',block:'start'});});
+     li.append(link);ol.append(li);count++;
+   }
+   if(!count){nav.append(node('p','s292-contents-empty','Wähle mindestens einen Berichtsteil aus und berechne den Bericht.'));}
+   else nav.append(ol);
+   heading.insertAdjacentElement('afterend',nav);
+ }
  function applySelection(){
    const report=$('stats25-report'),addon=$('statsplus292-appendix');
    const activeBase=baseKinds.some(([id])=>selected[id]);
@@ -52,6 +76,7 @@
    if(addon){addon.dataset.printEnabled=kinds.some(([id])=>selected[id])?'true':'false';let first=true;for(const [id] of kinds){const card=addon.querySelector('[data-s292-kind="'+id+'"]');if(card){card.dataset.printFirst=selected[id]&&first?'true':'false';if(selected[id])first=false;}}}
    notice.textContent='Für Ausdruck/PDF ausgewählt: '+Object.values(selected).filter(Boolean).length+' von '+allKinds.length+' Bereichen.';
    report?.classList.toggle('s292-custom-print',!activeBase);
+   updateContents();
  }
  applySelection();
  for(const id of ['stats25-print','stats25-pdf'])$(id)?.addEventListener('click',event=>{

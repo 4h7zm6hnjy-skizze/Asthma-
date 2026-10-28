@@ -32,7 +32,7 @@
 .s292-weight th,.s292-weight td{text-align:left;padding:6px;border-bottom:1px solid #d9e7eb}
 @media print{
  .s292-controls,.s292-weight{display:none!important}
- body.stats25-print[data-s292-old="off"] #stats25-report>:not(#statsplus292-appendix){display:none!important}
+ body.stats25-print[data-s292-old="off"] #stats25-report>:not(#statsplus292-appendix):not(#s292-contents){display:none!important}
  body.stats25-print #statsplus292-appendix[data-print-enabled="false"]{display:none!important}
  body.stats25-print .s292-category[data-print-enabled="false"]{display:none!important}
  body.stats25-print .s292-category{break-before:page!important;page-break-before:always!important}
@@ -64,3 +64,16 @@
 body.stats25-print #stats25-report [data-print-enabled="false"]{display:none!important}
 body.stats25-print #stats25-report .s292-category[data-print-enabled="true"]{display:block!important}
 body.stats25-print .s292-category .s292-table-wrap{overflow:visible!important}
+
+/* 3.3.0: navigation in monthly and yearly statistics */
+.s292-contents{margin:18px 0 22px;padding:16px;border:1px solid #b7d3df;background:#f4f9fc;border-radius:14px;break-inside:avoid;page-break-inside:avoid}
+.s292-contents h3{font-size:19px;color:#174f67;margin:0 0 8px}
+.s292-contents-note{font-size:12px;line-height:1.5;color:#436478;margin:0 0 12px}
+.s292-contents-list{padding-left:27px;column-count:2;column-gap:24px;margin:0}
+.s292-contents-list li{font-size:13px;padding:5px 0;break-inside:avoid;color:#1b5169}
+.s292-contents-list a{color:#145e85;text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere}
+.s292-contents-list a:focus-visible{outline:3px solid #207eaa;outline-offset:3px;border-radius:3px}
+.s292-contents-empty{font-size:13px;color:#637483}
+.stats25-section[id^="s292-report-section-"],.s292-category[id^="s292-report-section-"]{scroll-margin-top:100px}
+@media(max-width:600px){.s292-contents{padding:13px}.s292-contents-list{column-count:1}}
+@media print{.s292-contents{background:white!important;border:1px solid #b7c4cb!important;break-inside:avoid-page!important}.s292-contents-note{display:none!important}.s292-contents-list a{color:#222!important;text-decoration:none!important}.s292-contents-list{column-count:2!important}}

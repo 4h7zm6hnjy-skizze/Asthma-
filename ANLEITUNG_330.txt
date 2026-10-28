@@ -1,0 +1,39 @@
+ASTHMA 3.3.0 — INHALTSVERZEICHNIS MONATS- / JAHRESBERICHT
+Stand: 28.10.2026
+
+NEU
+- Inhaltsverzeichnis direkt unter dem Berichtskopf in Monats- und Jahresstatistik.
+- Auf dem iPhone antippbare Abschnittslinks.
+- Automatisch aktualisierte Liste passend zu allen 19 Druck-/PDF-Auswahlen.
+- Beim Ausdruck wird das Inhaltsverzeichnis zusammen mit den ausgewählten Abschnitten gedruckt.
+- Lokal erzeugte PDF enthält ein eigenes Inhaltsverzeichnis am Anfang mit den tatsächlich berechneten Seitenzahlen.
+- Ausgewählte Krankenhausaufenthalte, Lungenarzttermine, Lungenfunktion und Diffusion sind darin enthalten.
+- Alle vorhandenen Gesundheitsdaten und Berichtskategorien bleiben unverändert.
+
+INSTALLATION: NUR MIT IPHONE
+1. In der bisherigen Asthma-App eine verschlüsselte Sicherung erstellen.
+2. Asthma_3.3.0_UPDATE_GitHub.zip herunterladen und in der iPhone-App „Dateien“ entpacken.
+3. In GitHub das Asthma-Repository 4h7zm6hnjy-skizze/Asthma- öffnen.
+4. NUR die acht Dateien aus dem Ordner GitHub_Update in den Repository-Hauptordner von main hochladen; vorhandene Dateien gleichen Namens ersetzen.
+5. App öffnen, entsperren, Einstellungen -> Nach Updates suchen -> Update installieren. Version 3.3.0 bestätigen.
+6. Statistik -> Monat oder Jahr wählen -> Statistik berechnen. Unter dem Berichtskopf das Inhaltsverzeichnis prüfen.
+7. Zur Probe nur Krankenhaus + Lungenarzt für den Druck markieren, PDF erzeugen und Inhaltsverzeichnis mit Seitenzahlen prüfen.
+
+TESTPROTOKOLL (Testdaten, nicht Original-Patientendaten)
+- Alle JavaScript-Dateien: Syntaxprüfung bestanden.
+- Inhaltsverzeichnis: 19 Einträge bei vollständiger Auswahl; Links weisen auf existente Abschnitte.
+- Nach Abwahl und erneuter Auswahl: Inhaltsverzeichnis aktualisiert.
+- PDF nur Krankenhaus/Lungenarzt: 2 Einträge und Seitenzahlen verifiziert.
+- PDF nur Diffusion: 1 Eintrag, andere Bereiche nicht enthalten.
+- Jahresbericht 2026: 19 Einträge, 15-seitige Test-PDF; Seitenzahlen innerhalb des Dokuments verifiziert.
+- Ansichten mit 390/768/1280 px: keine JavaScript-Laufzeitfehler im synthetischen Test.
+- Print-CSS bei nur Diffusion und nur Krankenhaus: Inhaltsverzeichnis bleibt sichtbar, nicht gewählte Berichtsteile sind ausgeblendet.
+- Erzeugte PDF visuell kontrolliert. Automatisierte Tests sind KEIN vollständiger Test auf einem echten iPhone mit realen Gesundheitsdaten.
+
+DATENSCHUTZ
+Die GitHub-Dateien sind reine App-Quelldateien und enthalten keine persönlichen Befunde, Bilder, Import-JSON oder gespeicherten Tresordaten.
+Die exportierten PDF-Berichte sind unverschlüsselt. Bitte nur sicher auf dem eigenen Gerät speichern oder bewusst teilen.
+
+HINWEIS
+Ein direktes Hochladen durch ChatGPT ins Repository ist in dieser Sitzung nicht bestätigt.
+Im GitHub-Repository muss das Update manuell eingespielt werden.

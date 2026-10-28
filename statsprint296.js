@@ -100,10 +100,40 @@
    const cur=window.ASTHMA_STATS25?.range?.()?.key,reportKey=window.ASTHMA_STATSP292?.getLastKey?.();if(cur&&reportKey&&cur!==reportKey){status('Zeitraum geändert: Bitte die Statistik neu berechnen.',true);return;}
    if(!confirm('Das PDF enthält unverschlüsselte Gesundheitsdaten. Lokal erstellen und danach sicher speichern?'))return;
    working=true;generateButton.disabled=true;pdfButton.disabled=true;reset();status('PDF wird vollständig auf deinem iPhone erstellt …');
-   try{const layout=new Layout();
-     for(const part of sections(selected)){if(!layout.pages.length)layout.page();if(part.type==='category')layout.category(part.node);else layout.old(part.node);}
-     // Remove the initial empty page when only a category has been selected.
-     if(layout.pages.length>1&&layout.pages[0].ops.length===2&&!layout.pages[0].images.length)layout.pages.shift();
+   try{
+     // First layout the actual report to obtain REAL start pages for all selected
+     // sections (including automatic page breaks inside tables / charts).
+     const bodyLayout=new Layout(),entries=[];
+     for(const part of sections(selected)){
+       const id=part.type==='category'?part.kind:part.node.dataset.s292Base;
+       const originalHeading=bodyLayout.heading;
+       let startPage=null;
+       if(id&&labels[id])bodyLayout.heading=function(...args){originalHeading.apply(this,args);if(startPage===null)startPage=this.pages.length;};
+       try{if(part.type==='category')bodyLayout.category(part.node);else bodyLayout.old(part.node);}
+       finally{bodyLayout.heading=originalHeading;}
+       if(id&&labels[id])entries.push({label:labels[id],page:startPage||bodyLayout.pages.length});
+     }
+     // A short front matter section with accurate page numbers. Drawing the
+     // contents separately prevents it from changing body layout / diagrams.
+     function contents(offset){
+       const toc=new Layout();toc.heading('Inhaltsverzeichnis',1);
+       const reportTitle=source.querySelector('.stats25-heading h2')?.textContent?.trim()||'Gesundheitsbericht';
+       toc.para(reportTitle,11,15,'#3d6475');
+       for(const [i,entry] of entries.entries()){
+         const number=String(i+1).padStart(2,'0');
+         const lines=wrap(number+'  '+entry.label,10,WIDTH-68);
+         const height=lines.length*15+8;toc.reserve(height);
+         lines.forEach((line,k)=>toc.textRaw(line,LEFT+4,toc.y-k*15,10,'#244b5e',false));
+         toc.textRaw(String(entry.page+offset),RIGHT-30,toc.y,10,'#194f68',true);
+         toc.y-=height;
+         toc.line([LEFT,toc.y+5,WIDTH,0],0.35,'#dbe7eb');
+       }
+       toc.para('Aufgeführt sind ausschließlich die für Druck und PDF ausgewählten Berichtsteile.',9,7,'#526e7a');
+       return toc;
+     }
+     let count=0,toc;
+     for(let i=0;i<4;i++){toc=contents(count);if(toc.pages.length===count)break;count=toc.pages.length;}
+     const layout={pages:[...toc.pages,...bodyLayout.pages]};
      const result=createPDF(layout);if(result.size<450||result.size>50*1024*1024)throw Error('PDF-Datei ist leer oder ungewöhnlich groß.');
      const period=String(reportKey||cur||new Date().toISOString().slice(0,10)).replace(/[^0-9-]/g,'_');outputName='Asthma_Statistik_'+period+'.pdf';output=result;signature=key();objectUrl=URL.createObjectURL(result);
      fallback.href=objectUrl;fallback.download=outputName;fallback.hidden=false;share.hidden=false;
