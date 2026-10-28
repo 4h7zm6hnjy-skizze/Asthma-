@@ -1,19 +1,7 @@
-ASTHMA – PRIVATE ORIGINALUNTERLAGEN UND IMPORTDATEIEN
-Stand 28.10.2026
-
-INHALT
-1. PRIVAT_Allianz_Zusatzversicherung_10_Originalfotos.json: 10 Originalbilder, zugeordnete Versicherungsdaten, Import in Asthma-App 3.2.5.
-2. PRIVAT_Lungenfunktion_2026-10-28.json: vollständige Messwerte und Originalbilder von Lungenfunktion und Diffusionsmessung, Import ab Version 3.2.4.
-3. Ordner Originalbilder_Ansehen: dieselben Dokumente als einzelne JPG/PNG-Bilder in Kategorien, ohne Import sofort sichtbar.
-
-SO IMPORTIERST DU AM IPHONE
-A. ZIP in der Dateien-App antippen (entpacken).
-B. Asthma-App mit dem bestehenden Passwort öffnen.
-C. ZUSATZVERSICHERUNG: 'Private Versicherungsdatei' -> Allianz-JSON auswählen -> 'Fotos und Vertragsdaten übernehmen'.
-D. LUNGENFUNKTION: Bereich 'Lunge / Lungenfunktion und Verlauf' -> 'Private Importdatei auswählen' -> Lungenfunktion-JSON wählen -> 'Geprüfte Befunde übernehmen'.
-E. Unter Einstellungen eine neue VOLLSTÄNDIGE, verschlüsselte Datensicherung erstellen.
-
-Hinweis: Das Antippen einer JSON in der iPhone-Dateivorschau kann eine leere/weiße Ansicht zeigen; JSON ist ein technisches Austauschformat und kein Fotodokument. Die Bilder liegen hier separat im Ordner Originalbilder_Ansehen.
-
-PRIVAT: Enthält persönliche Gesundheits- und Versicherungsdaten, unverschlüsselt. NICHT zu GitHub hochladen, NICHT öffentlich teilen.
-APP-VERSION: Die Importfelder benötigen zuerst die App-Version 3.2.5 (Versicherung) bzw. 3.2.4 (Lungenfunktion). Ein ZIP-Download installiert keine Änderung in deiner App.
+Asthma v3.2.6
+Dies ist die Vollversion des öffentlichen App-Codes ohne persönliche Importe.
+Die Dateien aus GitHub_Update nach GitHub übertragen (ohne den Ordner).
+Der Versicherungs-Import und die beiden Lungenbefunde liegen SEPARAT als private JSON-Dateien und dürfen nicht auf GitHub geladen werden.
+Nach dem Import sind die Daten im lokalen Tresor gespeichert.
+Vor Update verschlüsselte Gesamtsicherung erstellen.
+Ein iPhone-Test ist noch nicht erfolgt.

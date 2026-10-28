@@ -1,5 +1,5 @@
 {
-  "version": "3.2.5",
+  "version": "3.2.6",
   "released": "2026-10-28",
-  "notes": "Betriebliche Allianz Zusatzversicherung: Leistungen, Jahresbudgets, Erstattungsprotokoll, Originalfotos-Import in verschlüsselten Tresor, Zuordnung, zusätzliche Dokumente."
+  "notes": "Fehlerkorrektur: Diffusionsverlauf für 1T/7T/30T/1J/10J, bestätigter Import mit automatischer Aktualisierung der Spirometrie-Diagramme, transparentes Statusfeld und Anhang-Nachimport."
 }

@@ -141,6 +141,7 @@
   let timer;
   window.addEventListener('asthma:secure-change',e=>{if(e.detail?.group==='suite'){clearTimeout(timer);timer=setTimeout(()=>refresh().catch(()=>{}),80)}});
   window.addEventListener('asthma:profile-reset',()=>refresh().catch(()=>{}));
+  window.addEventListener('asthma:lung-study-imported',()=>refresh().catch(()=>{}));
   Object.defineProperty(window,'__ASTHMA_LUFU23_TEST',{value:Object.freeze({normalize,filterPeriod,trend,score}),configurable:false});
   refresh().catch(e=>{const p=$('lufu23-home-count');if(p)p.textContent='Messwerte konnten nicht gelesen werden: '+e.message});
 })();

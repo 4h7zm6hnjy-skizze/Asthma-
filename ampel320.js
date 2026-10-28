@@ -63,26 +63,6 @@
   ].join('');
   home.insertBefore(pane, home.querySelector('.home20-quick') || home.firstChild);
 
-  // Keep the Ampel directly below the profile, even when the later-loading
-  // daily overview and assessment cards insert themselves after that profile.
-  // Observe structural changes only; moving the same node preserves its state
-  // and listeners. The position check prevents a MutationObserver feedback loop.
-  const placeBelowPatientProfile = () => {
-    const patientProfile = document.getElementById('a27-personal-summary');
-    if (!patientProfile || !patientProfile.isConnected || !home.contains(patientProfile)) return false;
-    if (pane.parentNode !== patientProfile.parentNode || pane.previousElementSibling !== patientProfile) {
-      patientProfile.insertAdjacentElement('afterend', pane);
-    }
-    return true;
-  };
-  // A one-shot observer was insufficient: quality28.js loads AFTER this module
-  // and places "Heute im Blick" immediately after the same profile element.
-  // Keep watching until the page is unloaded so a later layout rebuild cannot
-  // displace the Ampel again.
-  const profileOrderObserver = new MutationObserver(() => { placeBelowPatientProfile(); });
-  profileOrderObserver.observe(home, {childList: true, subtree: true});
-  placeBelowPatientProfile();
-
   const st=elt('section','suite-subpanel as-stat');st.id='as-stat';
   st.innerHTML = [
     '<h3>Asthma-Ampel – dein Verlauf</h3><p>Bei mehreren Einträgen zählt für den Tagesdurchschnitt der letzte Status. Einzelne Messungen bleiben erhalten.</p>',
@@ -133,8 +113,7 @@
     records=items.filter(r=>r&&r.type==='self-rating'&&validDate(r.date)&&Number.isInteger(r.level)&&r.level>=1&&r.level<=5);
     records.sort((a,b)=>(b.date+'T'+(b.time||'')).localeCompare(a.date+'T'+(a.time||'')));
     const main=current();
-    const latest=records.filter(r=>r.date===iso()).sort((a,b)=>(String(b.time||'')+String(b.updatedAt||'')).localeCompare(String(a.time||'')+String(a.updatedAt||'')))[0];
-    $('as-today').textContent=latest?'Heute: '+BY_LEVEL[latest.level].title+' · '+(latest.time||'–')+' Uhr':'Heute noch kein Status gespeichert.';
+    $('as-today').textContent=main?'Heute: '+BY_LEVEL[main.level].title+' · '+(main.time||'–')+' Uhr':'Heute noch kein Status gespeichert.';
     if(!editing&&!extra)fill(main||null);
     statsRefresh();
   }
@@ -294,183 +273,18 @@
   }
   $('as-prev').addEventListener('click',()=>periodMove(-1));$('as-next').addEventListener('click',()=>periodMove(1));
   $('as-period').addEventListener('change',statsRefresh);$('as-date').addEventListener('change',statsRefresh);
-  // Native iPhone-PWAs may ignore window.print(). Build a real, fully offline PDF
-  // and offer iOS file sharing / saving / printing. Never send patient data away.
-  const PDF=(()=>{
- const PAGE_W=595.28,PAGE_H=841.89,MARGIN=43,LEFT=MARGIN,RIGHT=PAGE_W-MARGIN,TOP=PAGE_H-55,BOTTOM=53,WIDTH=RIGHT-LEFT;
- function sanitize(s){return String(s||'').replace(/\s+/g,' ').trim().replace(/₁/g,'1').replace(/₂/g,'2').replace(/₃/g,'3').replace(/₄/g,'4').replace(/⁻/g,'-').replace(/≥/g,'>=').replace(/≤/g,'<=').replace(/→/g,'->').replace(/↗/g,'->').replace(/↔/g,'<->').replace(/∅/g,'Durchschnitt').replace(/⌀/g,'Durchschnitt');}
- const cp1252={'€':128,'‚':130,'ƒ':131,'„':132,'…':133,'†':134,'‡':135,'ˆ':136,'‰':137,'Š':138,'‹':139,'Œ':140,'Ž':142,'‘':145,'’':146,'“':147,'”':148,'•':149,'–':150,'—':151,'˜':152,'™':153,'š':154,'›':155,'œ':156,'ž':158,'Ÿ':159};
- function pdfLiteral(text){let r='';for(const ch of sanitize(text)){const v=cp1252[ch]||ch.codePointAt(0);if(v===40||v===41||v===92)r+='\\'+String.fromCharCode(v);else if(v<32&&v!==9)r+=' ';else if(v>126&&v<256)r+='\\'+v.toString(8).padStart(3,'0');else if(v>=32&&v<127)r+=ch;else r+='?';}return '('+r+')';}
- const measure=document.createElement('canvas').getContext('2d');
- function wrap(text,size,maxWidth,bold=false){const words=sanitize(text).split(/\s+/).filter(Boolean);const out=[];let line='';measure.font=`${bold?'700 ':'400 '}${size}px Arial`;
-   for(let word of words){const split=[];if(measure.measureText(word).width>maxWidth){let sub='';for(const ch of word){if(sub&&measure.measureText(sub+ch).width>maxWidth){split.push(sub);sub=ch;}else sub+=ch;}if(sub)split.push(sub);}else split.push(word);
-     for(const part of split){const next=line?line+' '+part:part;if(line&&measure.measureText(next).width>maxWidth){out.push(line);line=part;}else line=next;}
-   }if(line)out.push(line);return out.length?out:[''];}
- const pdfNumber=x=>Number(x.toFixed(2)).toString();
- function canvasJpeg(svg){const vb=(svg.getAttribute('viewBox')||'0 0 690 235').split(/\s+/).map(Number);const w=vb[2]||690,h=vb[3]||235;const canvas=document.createElement('canvas');canvas.width=Math.min(1400,Math.round(w*1.6));canvas.height=Math.round(canvas.width*h/w);const ctx=canvas.getContext('2d');if(!ctx)throw Error('Canvas-Grafik ist auf diesem Gerät nicht verfügbar.');
-   ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.scale(canvas.width/w,canvas.height/h);
-   for(const el of svg.children){const tag=el.tagName.toLowerCase(),get=(name,defaultValue=0)=>Number(el.getAttribute(name)||defaultValue),paint=el.getAttribute('stroke')||'#367a91';
-     if(tag==='line'){ctx.beginPath();ctx.moveTo(get('x1'),get('y1'));ctx.lineTo(get('x2'),get('y2'));ctx.strokeStyle=paint;ctx.lineWidth=get('stroke-width',1);ctx.setLineDash((el.getAttribute('stroke-dasharray')||'').split(/[ ,]+/).filter(Boolean).map(Number));ctx.stroke();ctx.setLineDash([]);}
-     else if(tag==='polyline'){const points=(el.getAttribute('points')||'').trim().split(/\s+/).map(p=>p.split(',').map(Number)).filter(a=>a.length===2&&a.every(Number.isFinite));if(points.length){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.strokeStyle=paint;ctx.lineWidth=get('stroke-width',2);ctx.stroke();}}
-     else if(tag==='circle'){ctx.beginPath();ctx.arc(get('cx'),get('cy'),get('r',2),0,Math.PI*2);ctx.fillStyle=el.getAttribute('fill')||'#247e76';ctx.fill();}
-     else if(tag==='text'){ctx.fillStyle=el.getAttribute('fill')||'#526779';ctx.font=`${get('font-size',11)}px Arial`;ctx.textAlign=({end:'right',middle:'center'}[el.getAttribute('text-anchor')]||'left');ctx.fillText(Array.from(el.childNodes).filter(n=>n.nodeType===3).map(n=>n.nodeValue).join(''),get('x'),get('y'));}
-   }
-   const data=canvas.toDataURL('image/jpeg',0.89).split(',')[1];const raw=atob(data),buf=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)buf[i]=raw.charCodeAt(i);return {data:buf,width:canvas.width,height:canvas.height};
- }
- class Layout{
-   constructor(){this.pages=[];this.page();}
-   page(){this.current={ops:[],images:[]};this.pages.push(this.current);this.y=TOP;this.line([LEFT,BOTTOM-18,WIDTH,0],0.5,'#d6e3e7');this.textRaw('Asthma · privater Gesundheitsbericht',LEFT,BOTTOM-29,8,'#5f7d88');}
-   reserve(n){if(this.y-n<BOTTOM+14)this.page();}
-   textRaw(text,x,y,size=11,color='#203949',bold=false){const hex=color.replace('#','');const rgb=[0,2,4].map(n=>parseInt(hex.slice(n,n+2),16)/255).map(pdfNumber).join(' ');this.current.ops.push(`BT ${rgb} rg /${bold?'F2':'F1'} ${pdfNumber(size)} Tf 1 0 0 1 ${pdfNumber(x)} ${pdfNumber(y)} Tm ${pdfLiteral(text)} Tj ET`);}
-   para(text,size=10,gap=5,color='#203949',bold=false,indent=0){const lines=wrap(text,size,WIDTH-indent-3,bold),step=size*1.4;for(const l of lines){this.reserve(step);this.textRaw(l,LEFT+indent,this.y,size,color,bold);this.y-=step;}this.y-=gap;}
-   heading(text,level=2){const size=level===1?18:level===2?14:12;this.reserve(size*2.8);this.para(text,size,7,level===1?'#14536b':'#164b61',true);this.y-=3;}
-   line(arr,width=1,color='#d9e6e8'){const rgb=[0,2,4].map(n=>parseInt(color.slice(n+1,n+3),16)/255).map(pdfNumber).join(' ');this.current.ops.push(`${rgb} RG ${pdfNumber(width)} w ${arr.map(pdfNumber).join(' ')} re S`);}
-   rule(){this.reserve(10);this.line([LEFT,this.y-1,WIDTH,0],.7,'#b9d6da');this.y-=12;}
-   row(name,value){const first=wrap(name,10,WIDTH*.57),second=wrap(value,10,WIDTH*.38,true),count=Math.max(first.length,second.length);this.reserve(count*14+8);first.forEach((line,i)=>this.textRaw(line,LEFT,this.y-i*14,10,'#385f71'));second.forEach((line,i)=>this.textRaw(line,LEFT+WIDTH*.61,this.y-i*14,10,'#183e52',true));this.y-=count*14+7;this.rule();}
-   kpiGrid(cells){const width=(WIDTH-20)/3,height=71;for(let i=0;i<cells.length;i++){if(i%3===0){this.reserve(height+8);}const x=LEFT+(i%3)*(width+10);const y=this.y;this.current.ops.push('0.88 0.93 0.94 RG 0.65 w '+[x,y-height+12,width,height-8].map(pdfNumber).join(' ')+' re S');const title=wrap(cells[i].title,9,width-14).slice(0,2),value=wrap(cells[i].value,17,width-12,true);title.forEach((t,j)=>this.textRaw(t,x+8,y-8-j*11,9,'#4c6c7d'));this.textRaw(value[0]||'-',x+8,y-42,17,'#123e52',true);if(i%3===2||i===cells.length-1)this.y-=height+8;}this.y-=6;}
-   image(svg){const img=canvasJpeg(svg);const targetW=WIDTH-8,targetH=targetW*img.height/img.width;this.reserve(targetH+12);const idx=this.current.images.length+1;this.current.images.push({name:'Im'+idx,...img});this.current.ops.push(`q ${pdfNumber(targetW)} 0 0 ${pdfNumber(targetH)} ${pdfNumber(LEFT+4)} ${pdfNumber(this.y-targetH+4)} cm /Im${idx} Do Q`);this.y-=targetH+13;}
-   table(table){const heads=[...table.querySelectorAll('thead th')].map(x=>sanitize(x.textContent)),rows=[...table.querySelectorAll('tbody tr')].map(tr=>[...tr.querySelectorAll('td')].map(td=>sanitize(td.textContent)));if(!heads.length)return;
-     const colWidth=WIDTH/heads.length;const render=(cells,heading=false)=>{const font=heading?9:8,lines=cells.map(t=>wrap(t,font,colWidth-8,heading)),count=Math.max(1,...lines.map(x=>x.length)),height=count*11+6;this.reserve(height+8);if(heading){this.current.ops.push('0.91 0.96 0.97 rg '+[LEFT,this.y-height+7,WIDTH,height].map(pdfNumber).join(' ')+' re f');}for(let i=0;i<cells.length;i++){lines[i].forEach((s,j)=>this.textRaw(s,LEFT+5+i*colWidth,this.y-j*11,font,heading?'#174c61':'#233f50',heading));}this.y-=height;this.line([LEFT,this.y+3,WIDTH,0],0.4,'#e0e9eb');};
-     render(heads,true);for(const cells of rows){if(this.y< BOTTOM+55){this.page();render(heads,true);}render(cells,false);}this.y-=12;
-   }
-   old(node){if(node.classList?.contains('stats25-tiles')){const cells=[...node.querySelectorAll('.stats25-kpi')].map(c=>({title:c.querySelector('.stats25-label')?.textContent||'',value:c.querySelector('.stats25-figure')?.textContent||''}));this.kpiGrid(cells);return;}
-     if(node.classList?.contains('stats25-line')){this.row(node.querySelector('span')?.textContent||'',node.querySelector('strong')?.textContent||'');return;}
-     if(node.classList?.contains('stats25-kpi'))return;
-     const tag=node.tagName?.toLowerCase();if(tag==='h1'||tag==='h2'||tag==='h3'||tag==='h4'){this.heading(node.textContent,tag==='h2'?1:tag==='h3'?2:3);return;}
-     if(tag==='img'){return;}
-     if(tag==='table'){this.table(node);return;}
-     if(tag==='p'||tag==='small'||tag==='footer'){this.para(node.textContent,tag==='footer'?8:10,8,tag==='footer'?'#536a73':'#293f4a');return;}
-     if(tag==='li'){this.para('• '+node.textContent,9,5);return;}
-     const kids=[...node.children];if(kids.length){for(const child of kids)this.old(child);}else if(node.textContent?.trim())this.para(node.textContent,10,8);
-   }
-   category(node){this.page();const h=node.querySelector(':scope > h3');this.heading(h?.textContent||'Messwerte',1);for(const child of node.children){if(child===h)continue;if(child.classList.contains('s292-summary')){for(const item of child.children)this.para(item.textContent,9,5,'#2a5a6b',true);this.y-=4;}
-       else if(child.classList.contains('s292-chart-box')){const svg=child.querySelector('svg');if(svg)this.image(svg);const legends=[...child.querySelectorAll('.s292-legend span>span')].map(e=>e.textContent);if(legends.length)this.para(legends.join(' · '),8,8,'#526b75');for(const x of child.querySelectorAll('.s292-summary>span'))this.para(x.textContent,8.2,4,'#285568',true);const explanation=child.querySelector('p.s292-note');if(explanation)this.para(explanation.textContent,8,9,'#526b75');}
-       else if(child.classList.contains('s292-table-wrap')){const tab=child.querySelector('table');if(tab)this.table(tab);}
-       else if(child.tagName==='H4'){this.heading(child.textContent,3);}else if(child.matches('p'))this.para(child.textContent,9,8,'#556d76');
-     }}
- }
- function createPDF(layout){const objects=[null],add=v=>{objects.push(v);return objects.length-1;},font=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>'),bold=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>'),pages=add(''),kids=[];
-   for(const [index,page] of layout.pages.entries()){const xrefs=[];for(const img of page.images){const no=add({dictionary:`<< /Type /XObject /Subtype /Image /Width ${img.width} /Height ${img.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${img.data.length} >>`,stream:img.data});xrefs.push(`/${img.name} ${no} 0 R`);}
-     const ops=page.ops.concat([`BT 0.35 0.47 0.52 rg /F1 8 Tf 1 0 0 1 ${pdfNumber(RIGHT-58)} ${pdfNumber(BOTTOM-29)} Tm ${pdfLiteral(`${index+1} / ${layout.pages.length}`)} Tj ET`]).join('\n');const stream=new TextEncoder().encode(ops+'\n');const content=add({dictionary:`<< /Length ${stream.length} >>`,stream});const pageObj=add(`<< /Type /Page /Parent ${pages} 0 R /MediaBox [0 0 ${PAGE_W} ${PAGE_H}] /Resources << /Font << /F1 ${font} 0 R /F2 ${bold} 0 R >> /XObject << ${xrefs.join(' ')} >> >> /Contents ${content} 0 R >>`);kids.push(pageObj);}
-   objects[pages]=`<< /Type /Pages /Count ${kids.length} /Kids [${kids.map(x=>`${x} 0 R`).join(' ')}] >>`;const catalog=add(`<< /Type /Catalog /Pages ${pages} 0 R >>`);
-   const parts=[],offsets=[0];let total=0;const write=chunk=>{const a=typeof chunk==='string'?new TextEncoder().encode(chunk):chunk;parts.push(a);total+=a.length;};write('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
-   for(let i=1;i<objects.length;i++){offsets.push(total);write(i+' 0 obj\n');const obj=objects[i];if(typeof obj==='string')write(obj+'\n');else{write(obj.dictionary+'\nstream\n');write(obj.stream);write('\nendstream\n');}write('endobj\n');}
-   const xref=total;write(`xref\n0 ${objects.length}\n0000000000 65535 f \n`);for(let i=1;i<objects.length;i++)write(String(offsets[i]).padStart(10,'0')+' 00000 n \n');write(`trailer\n<< /Size ${objects.length} /Root ${catalog} 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
-   return new Blob(parts,{type:'application/pdf'});
- }
-
-    const pdfButton=$('as-print');
-    pdfButton.textContent='Ampel-PDF erstellen';
-    const tools=elt('div','as-pdf-tools');tools.id='as-pdf-tools';
-    tools.style.cssText='margin:12px 0;padding:13px;border:1px solid #a3cedb;background:#edf8fb;border-radius:12px;display:flex;flex-direction:column;gap:9px';
-    const message=elt('p','', 'Das PDF wird lokal auf deinem iPhone erstellt. Danach kannst du es in „Dateien“ speichern oder über das Teilen-Menü drucken.');
-    message.id='as-pdf-message';message.setAttribute('role','status');message.style.cssText='margin:0;font-size:14px;line-height:1.45;color:#1a576e';
-    const share=elt('button','btn btn-primary','PDF teilen / Drucken');share.type='button';share.id='as-pdf-share';share.hidden=true;
-    const download=elt('a','btn btn-outline','PDF herunterladen');download.id='as-pdf-download';download.hidden=true;download.download='Asthma_Ampel.pdf';
-    download.style.cssText='text-align:center';
-    const open=elt('a','btn btn-outline','PDF ansehen');open.id='as-pdf-open';open.hidden=true;open.target='_blank';open.rel='noopener noreferrer';open.style.cssText='text-align:center';
-    tools.append(message,share,download,open);pdfButton.insertAdjacentElement('afterend',tools);
-    let blob=null,fileName='',objectUrl=null,working=false,stamp='';
-    const setMessage=(s,bad=false)=>{message.textContent=s;message.style.color=bad?'#a52d25':'#1a576e'};
-    const selection=()=>[$('as-period').value,$('as-date').value,records.length,records.reduce((v,r)=>v+String(r.updatedAt||'').length,0)].join('|');
-    const clear=()=>{if(objectUrl)URL.revokeObjectURL(objectUrl);objectUrl=null;blob=null;share.hidden=true;download.hidden=true;open.hidden=true;};
-    const svgElement=(tag,props,parent)=>{const node=document.createElementNS('http://www.w3.org/2000/svg',tag);Object.entries(props).forEach(([k,v])=>node.setAttribute(k,String(v)));parent.append(node);return node;};
-    function makeDistribution(days){
-      const svg=svgElement('svg',{viewBox:'0 0 670 250'},document.createDocumentFragment());
-      LEVELS.forEach((l,i)=>{
-        const count=days.filter(d=>d.level===l.n).length,y=32+i*45;
-        svgElement('line',{x1:169,y1:y,x2:565,y2:y,stroke:'#e4ebef','stroke-width':18},svg);
-        if(count)svgElement('line',{x1:169,y1:y,x2:169+(count/days.length)*396,y2:y,stroke:l.color,'stroke-width':18},svg);
-        svgElement('text',{x:6,y:y+5,'font-size':15,fill:'#264a5b'},svg).textContent=l.short;
-        svgElement('text',{x:582,y:y+5,'font-size':15,fill:'#264a5b'},svg).textContent=count+' Tage';
-      });
-      return svg;
-    }
-    function calendarTable(period,days){
-      const table=document.createElement('table'),thead=document.createElement('thead'),hdr=document.createElement('tr');
-      for(const name of ['Mo','Di','Mi','Do','Fr','Sa','So']){const th=document.createElement('th');th.textContent=name;hdr.append(th)}
-      thead.append(hdr);table.append(thead);
-      const body=document.createElement('tbody'),mapped=new Map(days.map(r=>[r.date,r]));
-      const offset=(new Date(period.from+'T12:00:00Z').getUTCDay()+6)%7;
-      const cells=Array.from({length:offset},()=>''),last=Number(period.to.slice(8));
-      for(let k=1;k<=last;k++){
-        const day=period.from.slice(0,8)+String(k).padStart(2,'0'),r=mapped.get(day);
-        cells.push(k+(r?' ('+r.level+'/5)':''));
-      }
-      while(cells.length%7)cells.push('');
-      for(let i=0;i<cells.length;i+=7){const tr=document.createElement('tr');
-        for(const val of cells.slice(i,i+7)){const td=document.createElement('td');td.textContent=val;tr.append(td)}
-        body.append(tr);
-      }
-      table.append(body);return table;
-    }
-    function build(){
-      const period=range(),items=records.filter(r=>r.date>=period.from&&r.date<=period.to),days=daily(items),mean=average(days);
-      const doc=new Layout();
-      doc.heading('Asthma-Ampel - persönliche Statistik',1);
-      doc.para(period.title+'  |  Erstellt: '+new Date().toLocaleString('de-DE'),10,6,'#29546a');
-      doc.para('Subjektive Tagesbewertung auf einer Skala von 1 (kritisch) bis 5 (super). Keine medizinische Diagnosestellung.',9,10,'#516875');
-      doc.kpiGrid([ {title:'Dokumentierte Tage',value:String(days.length)}, {title:'Einträge',value:String(items.length)},
-        {title:'Durchschnitt Tagesstatus',value:mean===null?'-':mean.toFixed(1).replace('.',',')+'/5'},
-        {title:'Schlechte / kritische Tage',value:String(days.filter(d=>d.level<=2).length)}]);
-      doc.heading('Zeitlicher Verlauf',2);
-      const svg=$('as-trend').querySelector('svg');if(svg)doc.image(svg);else doc.para('In diesem Zeitraum liegen noch keine Einträge vor.',10,8);
-      doc.heading('Verteilung der Ampelstufen',2);
-      if(days.length)doc.image(makeDistribution(days));else doc.para('Keine dokumentierten Tage.',10,8);
-      if(period.mode==='month'){
-        doc.heading('Monatskalender',2);
-        doc.para('Zahlen in Klammern sind der letzte Tagesstatus, z. B. 4/5.',8,6,'#5c7080');
-        doc.table(calendarTable(period,days));
-      }
-      doc.heading('Einträge und Notizen',2);
-      const sorted=[...items].sort((a,b)=>(b.date+'T'+(b.time||'')).localeCompare(a.date+'T'+(a.time||'')));
-      if(!sorted.length)doc.para('Keine Einträge in diesem Zeitraum.',10,7);
-      for(const entry of sorted){
-        const level=BY_LEVEL[entry.level];
-        doc.para(germanDate(entry.date)+' | '+String(entry.time||'')+' Uhr | '+level.title+(entry.mode==='extra'?' (weitere Messung)':''),10,3,'#164f68',true);
-        const chosen=PRESETS.filter(([key])=>(entry.notes||[]).includes(key)).map(x=>x[1]);
-        if(chosen.length)doc.para('Vorgegebene Notizen: '+chosen.join('; '),9,4);
-        if(entry.custom)doc.para('Eigene Notiz: '+entry.custom,9,4);
-        const ss=SYMPTOMS.filter(([key])=>(entry.symptoms||[]).includes(key)).map(x=>x[1]);
-        if(ss.length)doc.para('Symptome: '+ss.join('; '),9,4);
-        if(entry.sprayCount!==null&&entry.sprayCount!==undefined)doc.para('Bedarfsspray: '+entry.sprayCount+' Anwendungen',9,4);
-        doc.rule();
-      }
-      doc.para('Hinweis: Diese PDF-Datei ist außerhalb des verschluesselten Asthma-Tresors nicht geschützt. Nicht automatisch an Dritte uebermitteln.',8,8,'#536e7c');
-      return {blob:createPDF(doc),pages:doc.pages.length,period};
-    }
-    function outputFile(){return new File([blob],fileName,{type:'application/pdf'});}
-    function make(){
-      if(working)return;
-      if(!confirm('Die PDF enthält persönliche Gesundheitsdaten und wird außerhalb der App nicht verschluesselt gespeichert. Lokal erstellen?'))return;
-      working=true;pdfButton.disabled=true;clear();setMessage('Die PDF-Datei wird lokal erstellt …');
-      try{statsRefresh();const result=build();blob=result.blob;
-        if(blob.size<450||blob.size>50*1024*1024)throw Error('Ungültige PDF-Dateigroesse.');
-        fileName='Asthma_Ampel_'+result.period.mode+'_'+result.period.from+'_'+result.period.to+'.pdf';
-        objectUrl=URL.createObjectURL(blob);download.href=objectUrl;download.download=fileName;open.href=objectUrl;
-        stamp=selection();share.hidden=false;download.hidden=false;open.hidden=false;
-        setMessage('PDF erstellt: '+Math.round(blob.size/1024)+' KB, '+result.pages+' Seiten. Jetzt „PDF teilen / Drucken“ wählen und auf dem iPhone „In Dateien sichern“ oder „Drucken“ antippen.');
-      }catch(e){clear();setMessage('PDF konnte nicht erstellt werden: '+(e?.message||e),true)}
-      finally{working=false;pdfButton.disabled=false}
-    }
-    async function shareFile(){
-      if(!blob){setMessage('Bitte zuerst „Ampel-PDF erstellen“ antippen.',true);return}
-      if(selection()!==stamp){clear();setMessage('Die Werte oder der Zeitraum wurden geändert. Bitte PDF neu erstellen.',true);return}
-      const file=outputFile();
-      if(typeof navigator.share==='function'&&(!navigator.canShare||navigator.canShare({files:[file]}))){
-        try{await navigator.share({files:[file],title:'Asthma-Ampel Statistik'});
-          setMessage('PDF an das Teilen-Menü übergeben. „In Dateien sichern“ speichert sie, „Drucken“ startet den iPhone-Druckdialog.');
-        }catch(e){if(e.name!=='AbortError')setMessage('Teilen nicht möglich. Alternativ „PDF herunterladen“ oder „PDF ansehen“ nutzen.',true)}
-      }else{setMessage('Teilen wird von diesem Browser nicht unterstuetzt. Bitte „PDF herunterladen“ oder „PDF ansehen“ nutzen.');}
-    }
-    pdfButton.addEventListener('click',make);
-    share.addEventListener('click',shareFile);
-    for(const id of ['as-period','as-date'])$(id).addEventListener('change',()=>{if(blob){clear();setMessage('Zeitraum geändert. Bitte PDF neu erstellen.')}});
-    window.addEventListener('asthma:secure-change',ev=>{if(ev.detail?.group==='ampel'&&blob){clear();setMessage('Messwerte geändert. Bitte PDF neu erstellen.')}});
-    window.addEventListener('pagehide',()=>{if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;}});
-    return Object.freeze({makePDF:make,getPDF:()=>blob,getMessage:()=>message.textContent,getFileName:()=>fileName});
-  })();
-  window.ASTHMA_AMPEL_PDF_TEST=PDF;
+  $('as-print').addEventListener('click',()=>{
+    const sheet=elt('section','as-print-sheet');sheet.id='as-print-sheet';
+    sheet.append(elt('h1','','Asthma-Ampel – Persönlicher Bericht'),elt('h2','',$('as-period-title').textContent));
+    ['as-kpis','as-trend','as-dist','as-calendar','as-entries'].forEach(id=>{
+      const copy=$(id).cloneNode(true);copy.querySelectorAll('button').forEach(b=>b.remove());sheet.append(copy);
+    });
+    sheet.append(elt('p','','Persönliche Selbsteinschätzung. Keine ärztliche Diagnostik. Dieser Ausdruck ist nicht verschlüsselt.'));
+    document.body.append(sheet);document.body.classList.add('as-printing');
+    const cleanup=()=>{document.body.classList.remove('as-printing');sheet.remove()};
+    window.addEventListener('afterprint',cleanup,{once:true});
+    try{window.print()}catch(err){cleanup();inform('Drucken fehlgeschlagen: '+err.message,true)}
+  });
   window.addEventListener('asthma:secure-change',e=>{
     if(e.detail?.group==='ampel'&&!busy)refresh().catch(err=>inform(err.message,true));
   });

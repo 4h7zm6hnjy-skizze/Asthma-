@@ -1,0 +1,7 @@
+#dlco326{padding:14px;margin:10px 0;background:#f8fcfd;border-radius:12px;border:1px solid #bad5e1;overflow:hidden}
+#dlco326 .dlco326-controls{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}
+#dlco326 label{font-size:15px;display:flex;flex-direction:column;gap:5px;flex:1;min-width:120px}
+#dlco326 select{width:100%;font:inherit;padding:10px;background:white;border:1px solid #a4b8c4;border-radius:8px;color:#193746}
+#dlco326 .dlco326-svg{display:block;width:100%;height:auto;max-width:720px;overflow:visible}
+#dlco326 .dlco326-muted{font-size:.85rem;color:#4c6675;line-height:1.4}
+#dlco326-graph{max-width:100%;overflow:hidden}#dlco326-summary{font-weight:650;margin:6px 0}
