@@ -1,0 +1,32 @@
+ASTHMA 3.2.9 – KALENDER, KRANKENHAUS UND LUNGENARZT
+Stand: 28.10.2026
+
+VOR DEM UPDATE:
+1. Deine bisherige Asthma-App mit dem bisherigen Passwort entsperren und eine verschlüsselte Datensicherung erstellen.
+2. UPDATE_ZIP in der iPhone-App Dateien entpacken.
+3. Die 9 einzelnen Dateien aus GitHub_Update im Hauptordner deines bestehenden GitHub-Repositories 4h7zm6hnjy-skizze/Asthma- hochladen. Gleichnamige Dateien ersetzen. Keine privaten JSONs auf GitHub hochladen.
+4. Danach in der Asthma-App Einstellungen > Nach Updates suchen > Update installieren. Kontrollieren: Version 3.2.9. Die alte App nicht löschen und keinen neuen Tresor erstellen.
+
+NEUE FUNKTIONEN
+* Im Kalender eigene Typen "Krankenhausaufenthalt" und "Lungenarzt / Pneumologie".
+* Krankenhaus: Aufnahmedatum und Entlassungsdatum (einschließlich), Ort und Notizen. Alle Aufenthaltstage werden als vollständig farbige Felder angezeigt.
+* Lungenarzt: Datum, optional Uhrzeit, Praxis und Notiz.
+* Monat/Jahr: eigene Berichtsteile, Zahl der Aufenthalte, tatsächliche Krankenhaus-Kalendertage im gewählten Zeitraum und Termindetails. Überlappende Tage nicht doppelt zählen.
+* Statistik > Bericht berechnen > Bereiche für Druck/PDF auswählen: Krankenhausaufenthalte und Lungenarzttermine getrennt an- oder abwählen.
+* Monatsende (28/29/30/31) statt pauschal Tag 31 korrigiert.
+* ICS-Export: Hospitalaufenthalte nur einmal, mit korrektem Enddatum, Termine mit Uhrzeit.
+
+WICHTIG
+* Das Update enthält keine echten Aufenthalts- oder Termindaten. Termine liegen im verschlüsselten lokalen App-Speicher; die App hat keinen Zugriff auf deine Chat-Fotos oder Arztunterlagen und kann aus einem Lungenfunktionstest keinen stationären Aufenthalt ableiten. Krankenhaus- oder Lungenarzttermine, die noch nicht als solche gespeichert sind, müssen einmalig in der App erfasst werden.
+* Alte allgemeine Arzttermine mit eindeutigem Begriff "Pneumologe", "Lungenarzt" usw. im Titel/Praxisfeld erscheinen automatisch im Bericht unter Lungenarzttermine. Keine automatische Umwandlung in Krankenhausaufenthalte.
+* Drucken/PDF ist nach Export unverschlüsselt; vertraulich behandeln.
+* Version ist als ZIP vorbereitet, NICHT automatisch auf GitHub installiert oder auf deinem iPhone getestet.
+
+TECHNISCHE PRÜFUNG
+* Sämtliche JavaScript-Dateien: Syntaxprüfung per node --check.
+* 16 gezielte Unit-/Strukturtests: Daten, Zeitraumgrenzen, überlappende Aufenthalte, Berichtsauswahl, Cache, keine personenbezogenen Daten im Update.
+* PDF-Auswahl: Codepfad der bestehenden lokalen PDF-Erzeugung geprüft; es gibt KEINEN vollständigen End-to-End-Test auf iPhone oder Browser, da Browserzugriff hier blockiert war.
+* Originaldaten und Tresorverwaltung nicht verändert.
+
+BEI PROBLEMEN:
+Vorherige App nicht löschen. Bildschirmfoto der Versionsanzeige, des Kalenders oder der Berichtsauswahl senden.

@@ -10,7 +10,8 @@
   ['pefSummary','Peak-Flow – Zusammenfassung'],['auSummary','Arbeitsunfähigkeit'],
   ['laborSummary','Laborwerte'],['medications','Medikamentenplan'],
   ['vitalsSummary','Blutsauerstoff / Blutdruck / Puls – Zusammenfassung'],
-  ['administration','Anträge, Termine, Tagebuch und Unterlagen']
+  ['administration','Anträge, Termine, Tagebuch und Unterlagen'],
+  ['hospital','Krankenhausaufenthalte'],['pulmonologist','Lungenarzttermine']
  ];
  const kinds=[['spo2','Blutsauerstoff – Diagramm'],['bp','Blutdruck – Diagramm'],['pulse','Puls – Diagramm'],
   ['weight','Gewicht – Diagramm'],['pef','Peak-Flow – Diagramm'],['lung','Lungenfunktion – Diagramme'],

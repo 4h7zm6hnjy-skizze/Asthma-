@@ -1,5 +1,5 @@
 {
-  "version": "3.2.8",
+  "version": "3.2.9",
   "released": "2026-10-28",
-  "notes": "Fehlerbehebung Berichte: Monats-/Jahresbericht mit Diffusionsdiagrammen, sämtlichen Befundwerten, vollständiger Einzelauswahl pro Berichtsteil und konsistentem lokalen PDF/Druckexport."
+  "notes": "Krankenhausaufenthalte (mit Aufnahme/Entlassung) und Lungenarzttermine im Kalender; tagesgenaue Markierung und eigene selektierbare Bereiche in Monats-/Jahresbericht sowie PDF/Druck. Bestehende Daten bleiben unverändert."
 }

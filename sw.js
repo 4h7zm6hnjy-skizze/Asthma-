@@ -1,5 +1,5 @@
-/* Asthma 3.2.8: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
-const VERSION='3.2.8-report-selection';
+/* Asthma 3.2.9: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
+const VERSION='3.2.9-hospital-calendar-stats';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
  './insurance325.js','./insurance325.css',
@@ -28,7 +28,7 @@ self.addEventListener('fetch',event=>{
   event.respondWith(fetch(event.request,{cache:'no-store'}).catch(()=>caches.match(event.request,{ignoreSearch:true})));return;
  }
  const important=['/insurance325.js','/insurance325.css','/diffusion324.js','/diffusion324.css','/dlco326.js','/dlco326.css','/stairs-shortcuts.js','/stairs-shortcuts.css','/secure17.js','/vital29.js','/vital-rescue291.js','/app.js','/design26.js',
-  '/quality28.js','/quality28.css','/suite15.js','/stats25.js','/statsprint296.js',
+  '/quality28.js','/quality28.css','/suite15.js','/calendar17.js','/styles.css','/stats25.js','/statsprint296.js',
   '/statsplus292.js','/labor18.js','/lufu23.js','/laborvergleich303.js','/offline303.js','/befundscan.js','/befund18-parser.js'];
  if(important.some(s=>path.endsWith(s))){
   event.respondWith(fetch(event.request,{cache:'no-store'}).then(r=>{

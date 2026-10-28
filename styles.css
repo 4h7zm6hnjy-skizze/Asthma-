@@ -533,3 +533,9 @@ body :is(input,select,textarea){font-size:max(16px,1rem)}
 .hilfe251-empty{font-size:13px;color:#526d7d}
 @media(max-width:700px){.hilfe251-grid{grid-template-columns:1fr}}
 @media(max-width:420px){.hilfe251-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.hilfe251-filters button{padding:8px;font-size:12px}.hilfe251-item{padding:14px}}
+
+/* Asthma 3.2.9: Krankenhausaufenthalt faerbt das komplette Kalenderkaestchen ein. */
+#kalender .cal-day.cal-hospital,html[data-design26] #kalender .cal-day.cal-hospital{background:#914569!important;color:#fff!important;border-color:#763650!important;}
+#kalender .cal-day.cal-hospital.cal-selected,html[data-design26] #kalender .cal-day.cal-hospital.cal-selected{outline:3px solid #214f70!important;outline-offset:1px!important;}
+#kalender .cal-day.cal-hospital .cal-dot{border:1px solid #fff!important;}
+#kalender #cal-hospital-fields[hidden]{display:none!important;}
