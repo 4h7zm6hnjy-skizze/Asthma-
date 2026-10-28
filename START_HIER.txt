@@ -1,41 +1,37 @@
-ASTHMA 3.2.1 – TREPPEN / KURZBEFEHLE
+ASTHMA 3.2.2 – REPARATUR DER WIEDERHERSTELLUNG
 
-1. Vorher eine verschlüsselte Sicherung in deiner bisherigen App erstellen.
-2. ZIP entpacken.
-3. NUR die neun Dateien aus GitHub_Update in denselben GitHub-Ordner
-   wie die vorhandene index.html hochladen und ersetzen.
-   Keine Dateien des bisherigen Repositorys löschen.
-   Die ZIP selbst nicht hochladen.
+Ursache im Code: Das Ampel-Modul speichert Datensätze in der Gruppe ampel.
+Der bisherige Export nimmt sie mit, aber Wiederherstellung, Import und
+Backupprüfung lehnen diese Gruppe ab. Dieser Fehler ist reproduziert und behoben.
+Ob deine verschlüsselte Sicherung genau daran scheitert, konnte hier ohne
+Entschlüsselung nicht bestätigt werden. Dein Passwort wird nicht benötigt
+und soll nicht hier oder bei GitHub angegeben werden.
 
-Laut Anleitung in deinem Ausgangsarchiv ist das Repository:
-https://github.com/4h7zm6hnjy-skizze/Asthma-/upload/main
-Die aktuelle Erreichbarkeit dieses Repositorys wurde nicht geprüft.
+INSTALLATION
+1. ZIP entpacken.
+2. Die 9 Dateien aus GitHub_Update im bisherigen Repository-Hauptordner
+   hochladen und gleichnamige Dateien ersetzen. Keine anderen Dateien löschen.
+   Repository laut vorhandener Anleitung:
+   https://github.com/4h7zm6hnjy-skizze/Asthma-/upload/main
+3. Veröffentlichung von GitHub Pages abwarten. Die Seite neu laden.
+   Wenn du in die bestehende App kommst, alternativ über Einstellungen
+   nach Updates suchen und installieren. Version 3.2.2 prüfen.
+4. Für normales Anmelden: weiterhin vorhandenes Passwort verwenden.
+   Eine Wiederherstellung ist nur nötig, wenn dieser Browser keinen Tresor hat.
+5. Wiederherstellung: Sicherungsdatei wählen und deren Passwort eingeben.
+   Das Sicherungspasswort wird auch zum späteren Anmelden übernommen.
+   Ein abweichendes neues Passwort ist nur noch eine optionale Auswahl.
+6. Sicherung geprüft wiederherstellen anklicken. Nach Erfolg Daten prüfen.
 
-4. Nach Veröffentlichung durch GitHub Pages in der App unter Einstellungen
-   nach Updates suchen und installieren. Version 3.2.1 kontrollieren.
-5. Arbeit → Treppenzähler → Treppen-Schnellauswahl.
-   Dort stehen der fertige Link und die Kurzbefehl-Anleitung.
+WICHTIG
+- Die private Sicherungsdatei NICHT bei GitHub hochladen!
+- Keine Website-Daten löschen, bestehende App nicht deinstallieren.
+- Deine ursprüngliche Sicherung unverändert behalten.
+- Safari und die bisherige Home-Bildschirm-App bleiben getrennte Speicher.
+  Eine Wiederherstellung in Safari erzeugt dort eine separate Kopie, keinen Sync.
+- Falls eine Fehlermeldung bleibt: exakten Wortlaut/Screenshot schicken.
+  Sie unterscheidet nun doppelte IDs, unbekannte IDs und fehlende Inhalte.
 
-NEU
-- 15 / 17 / 30 / 90 Stufen, danach Grund getrennt wählen.
-- Kühlanlage, Materialscheine, WC, Fertigteile runtergefahren,
-  Verpackung geholt, Pappe geschnitten, Spangen und eigener Grund.
-- Tagesgesamtzahl, keine Dauer/keine Zeitmessung.
-- Empfang aus Kurzbefehle mit Prüfung, Bestätigung und Duplikatschutz.
-- Einfügen des Übergabetextes in der bisherigen Home-Bildschirm-App,
-  falls Safari einen anderen lokalen Tresor verwendet.
-
-WICHTIG FÜR KURZBEFEHLE
-Auf dem iPhone ist einmalige Einrichtung nötig. Öffne
-KURZBEFEHLE_ANLEITUNG.html im Paket bzw. die Anleitung in der App.
-Zwei Varianten: einfacher Öffnen-Kurzbefehl (2 Aktionen) oder native
-Menüs mit Anzahl und Grund direkt in Kurzbefehle.
-Keine signierte .shortcut-Datei / kein iCloud-Installationslink enthalten.
-Speichern erfordert den vorhandenen entsperrten Tresor und Bestätigung.
-Kein dauerhaftes Sperrbildschirm-Widget und keine Hintergrundspeicherung.
-
-Falls Safari leer aussieht: NICHT neu einrichten. Die bisherige App öffnen.
-Keine Website-Daten löschen und die App nicht deinstallieren.
-
-Basis: dein Archiv Asthma--main 5.zip vom 26.10.2026.
-Das Update wurde nicht bei GitHub hochgeladen oder veröffentlicht.
+Das Paket enthält auch die Treppen-Erweiterung 3.2.1, damit sie erhalten bleibt.
+Ein direkter iPhone-Test und die Entschlüsselung deiner Sicherung wurden nicht
+hier durchgeführt. Die Reparatur ist mit künstlichen verschlüsselten Testdaten geprüft.

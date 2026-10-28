@@ -1,18 +1,29 @@
-Prüfbericht – Quellenfix 3
+PRÜFBERICHT 3.2.2
 
-Geprüft lokal:
-- python -m py_compile build_rechtsmonitor_feed.py: bestanden.
-- node --check rechtsmonitor.js sowie sw.js: bestanden.
-- Test-XML, offizielle HTML-Ersatzseite (synthetische HTML-Daten): bestanden.
-- Ausfall nur des Bundes-RSS, verbleibende Feeds erfolgreich: Archiv-Inhalte bleiben sichtbar und sind als archiviert gekennzeichnet.
-- Fehlerhafte GdB-Treffer zu Zeugnis-Gleichstellung/Tierarzneimitteln werden ausgeschlossen.
-- Frühere Filterversion 1: unsicheres RSS-Datum wird verworfen und ehemaliger Treffer auf „allgemein/Archiv“ herabgestuft.
-- Historische Wiederherstellung aus lokaler Git-Historie bei zuvor leerer JSON-Datei: bestanden.
-- Wenn ALLE Quellen ausfallen: bereits gespeicherte Feed-Datei wird nicht überschrieben.
-- G-BA-„Arzneimittel-Richtlinie“ mit Bindestrich erkannt.
+Hochgeladene Originaldatei: Asthma_AlleDaten_2026-10-28.asthma17.json.
+Äußeres Format: Asthma-v17-Vault, Salt 16 Bytes, AES-GCM-IV 12 Bytes,
+Archiv-ID archive, Chiffretext 109285 Bytes. Base64/JSON strukturell gültig.
+Das bestätigt nicht die Integrität oder Vollständigkeit der verschlüsselten Nutzdaten.
+Original weder verändert noch entschlüsselt; kein Passwort geraten.
 
-Nicht in der lokalen Testumgebung verifizierbar:
-- Tatsächliche Erreichbarkeit der Bundes- und G-BA-Webseiten aus GitHub Actions.
-- Tiefe der Git-Historie und die Wiederherstellung im echten GitHub-Runner nach einem flachen Checkout.
-- Echtes iPhone-Safari-Rendering und der private Passworttresor.
-- Rechtliche Vollständigkeit oder Aktualität von Meldungen.
+Reproduzierter Codefehler: Datengruppe ampel fehlt in drei Prüfpfaden,
+obwohl ampel320.js genau diese Gruppe schreibt und exportVault sie exportiert.
+Korrektur: einheitliche Validierung für neue Wiederherstellung, bestehenden
+Import und Backupprüfung; ampel zugelassen; Duplikate und fehlende Werte
+weiterhin vor Schreibzugriff zurückgewiesen. Keine Datensätze übersprungen.
+Standardmäßig Sicherungspasswort statt zusätzlichem neuen Passwort.
+
+Tests (JSDOM/Fake IndexedDB, echte WebCrypto-Verschlüsselung und secure17.js):
+- Alte Version mit gültiger verschlüsselter Ampel-Testsicherung: Fehler reproduziert.
+- Neue Version: vollständige Wiederherstellung, Ampel und Treppen enthalten.
+- Erneuter Export entschlüsselt und inhaltlich exakt mit Testquelle verglichen.
+- Backupprüfung akzeptiert die reparierte Gruppe.
+- Doppelte IDs, unbekannte Gruppen, fehlende Inhalte und falsches Passwort:
+  Fehler, keine Datensätze und keine Tresor-Metadaten geschrieben.
+- Standardwiederherstellung ohne Eintrag eines neuen Passwortes geprüft.
+- Vorhandene Treppen-Integrationstests erfolgreich.
+- Syntax aller fünf enthaltenen JS-Dateien geprüft, Offline-Dateiliste vollständig.
+
+Kein echter Safari/iPhone-Test. Andere App-Module wurden beim gezielten
+DOM-Integrationstest nicht geladen. Die Nutzdaten der echten Sicherung sind
+unbekannt; konkrete Fehlerursache dieser Datei daher noch nicht bestätigt.

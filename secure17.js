@@ -72,8 +72,7 @@
     const oldKey=await derive(backupPass,un64(archive.salt));let original;
     try{original=await unseal(archive.data,oldKey)}catch{throw Error('Backup-Passwort falsch oder Sicherung beschädigt')}
     if(original?.app!=='Asthma'||original?.schema!==17||!Array.isArray(original.rows)||original.rows.length>100000)throw Error('Ungültiger Backup-Inhalt');
-    const seen=new Set(),items=[];
-    for(const r of original.rows){if(!r||typeof r.id!=='string'||!/^(profile|cases|documents|diary|suite|calendar|labs|epef|au)\/[\w.\-\/]+$/.test(r.id)||seen.has(r.id))throw Error('Ungültige oder doppelte Datensatz-ID');seen.add(r.id);items.push(r)}
+    validateBackupRows(original.rows);const items=original.rows;
     const salt=crypto.getRandomValues(new Uint8Array(16)),newKey=await derive(pass,salt),rows=[];
     for(const item of items)rows.push(await sealed(item.id,item.value,newKey));
     const verify=await sealed('verifier',{ok:'asthma-v17'},newKey);
@@ -97,7 +96,7 @@
   const state=()=>({unlocked,encrypted:unlocked,local:true});
   // Backups are encrypted with same account password by re-encrypting the whole vault archive.
   async function exportVault(pass){requireUnlock();await pending();if(pass.length<12)throw Error('Backup-Passwort mindestens 12 Zeichen');const rows=await rawAll(),salt=crypto.getRandomValues(new Uint8Array(16)),backupKey=await derive(pass,salt),plain=[];for(const row of rows)plain.push({id:row.id,value:await unseal(row)});const envelope=await sealed('archive',{app:'Asthma',schema:17,rows:plain},backupKey);return {kind:'Asthma-v17-Vault',salt:b64(salt),data:envelope};}
-  async function importVault(archive,pass){requireUnlock();await pending();if(archive?.kind!=='Asthma-v17-Vault'||!archive.salt||!archive.data)throw Error('Unbekanntes Sicherungsformat');const temp=await derive(pass,un64(archive.salt));let data;try{data=await unseal(archive.data,temp)}catch{throw Error('Passwort falsch / Backup beschädigt')}if(data?.app!=='Asthma'||data?.schema!==17||!Array.isArray(data.rows)||data.rows.length>100000)throw Error('Ungültiger Sicherungsinhalt');const ids=new Set();const prepared=[];for(const v of data.rows){if(!v||typeof v.id!=='string'||!/^(profile|cases|documents|diary|suite|calendar|labs|epef|au)\/[\w.\-\/]+$/.test(v.id)||ids.has(v.id))throw Error('Ungültiger oder doppelter Eintrag');ids.add(v.id);prepared.push(await sealed(v.id,v.value));}const existing=await rawAll();const t=db.transaction('items','readwrite'),done=txComplete(t);const s=t.objectStore('items');existing.forEach(r=>s.delete(r.id));prepared.forEach(r=>s.put(r));await done;await initProfile();location.reload();}
+  async function importVault(archive,pass){requireUnlock();await pending();if(archive?.kind!=='Asthma-v17-Vault'||!archive.salt||!archive.data)throw Error('Unbekanntes Sicherungsformat');const temp=await derive(pass,un64(archive.salt));let data;try{data=await unseal(archive.data,temp)}catch{throw Error('Passwort falsch / Backup beschädigt')}if(data?.app!=='Asthma'||data?.schema!==17||!Array.isArray(data.rows)||data.rows.length>100000)throw Error('Ungültiger Sicherungsinhalt');validateBackupRows(data.rows);const prepared=[];for(const v of data.rows)prepared.push(await sealed(v.id,v.value));const existing=await rawAll();const t=db.transaction('items','readwrite'),done=txComplete(t);const s=t.objectStore('items');existing.forEach(r=>s.delete(r.id));prepared.forEach(r=>s.put(r));await done;await initProfile();location.reload();}
   // 2.8.0: backup integrity check only. No IndexedDB transactions with write access.
   async function verifyVaultBackup(archive,pass){
     requireUnlock();
@@ -107,17 +106,25 @@
     let data;
     try{data=await unseal(archive.data,backupKey)}catch{throw Error('Passwort falsch oder Sicherung beschädigt')}
     if(data?.app!=='Asthma'||data?.schema!==17||!Array.isArray(data.rows)||data.rows.length>100000)throw Error('Inhalt nicht kompatibel');
-    const seen=new Set(),groups=new Set();
-    for(const row of data.rows){
-      if(!row||typeof row.id!=='string'||!/^(profile|cases|documents|diary|suite|calendar|labs|epef|au)\/[\w.\-\/]+$/.test(row.id)||seen.has(row.id)||!('value' in row))throw Error('Beschädigter oder doppelter Datensatz');
-      seen.add(row.id);groups.add(row.id.split('/')[0]);
-    }
-    return {count:seen.size,groups:groups.size};
+    validateBackupRows(data.rows);
+    return {count:data.rows.length,groups:new Set(data.rows.map(r=>r.id.split('/')[0])).size};
   }
+  // All currently persisted groups, including the Ampel module, must round-trip.
+  function validateBackupRows(rows){
+    const seen=new Set();
+    rows.forEach((row,index)=>{
+      const position='Datensatz '+(index+1)+': ';
+      if(!row||typeof row.id!=='string'||!/^(profile|cases|documents|diary|suite|calendar|labs|epef|au|ampel)\/[\w.\-\/]+$/.test(row.id))throw Error(position+'Nicht unterstützte Datensatz-ID. Sicherung unverändert behalten.');
+      if(seen.has(row.id))throw Error(position+'Doppelte Datensatz-ID. Es wurde nichts übernommen.');
+      if(!Object.prototype.hasOwnProperty.call(row,'value')||row.value===null||typeof row.value!=='object')throw Error(position+'Datensatzinhalt fehlt oder ist ungültig.');
+      seen.add(row.id);
+    });
+  }
+
   const API={list:find,get:findOne,put,del:remove,replace,batchReplace,profileGet,profileSave,updateProfile,profileClear,state,lock,changePassword,exportVault,importVault,verifyVaultBackup};
   window.ASTHMA_SECURITY=API;
   const scripts=['content.js','app.js','antraege-data.js','antraege.js','meine-daten.js','lungenprofil.js','befundscan-parser.js','befund18-parser.js','befundscan.js','foto19.js','suite15.js','region16.js','nucala282.js','calendar17.js','labor18.js','laborvergleich303.js','offline303.js','hub20.js','scanner20.js','pdf20.js','jszip.min.js','vital29.js','weight292.js','epef21.js','lufu23.js','medplan24.js','gdb24.js','au25.js','stats25.js','statsplus292.js','statsprint296.js','medpref25.js','hilfsmittel251.js','design26.js','professional27.js','quality28.js','assessment29.js','versorgung30.js'];
-  async function startApp(){const app=$('secure-application');app.hidden=false;app.inert=false;$('secure-gate').hidden=true;for(const src of scripts){await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='./'+src+'?v=3.2.1';s.onload=resolve;s.onerror=()=>reject(Error(src+' konnte nicht geladen werden'));document.body.append(s)})}document.documentElement.classList.add('app-unlocked');bindBackupAndLock();if(window.__asthmaCleanupWarning){alert(window.__asthmaCleanupWarning+' Bitte unter Einstellungen → Alte Speicherreste bereinigen.');window.ASTHMA_NAV?.go('einstellungen')}let last=Date.now();const touch=()=>{last=Date.now()};['pointerdown','keydown','touchstart','scroll'].forEach(ev=>document.addEventListener(ev,touch,{passive:true}));window.setInterval(()=>{if(unlocked&&Date.now()-last>10*60*1000)lock()},60*1000);let hiddenAt=null;document.addEventListener('visibilitychange',()=>{if(document.hidden){hiddenAt=Date.now()}else if(hiddenAt!==null){const elapsed=Date.now()-hiddenAt;hiddenAt=null;if(elapsed>2*60*1000&&unlocked)lock()}});}
+  async function startApp(){const app=$('secure-application');app.hidden=false;app.inert=false;$('secure-gate').hidden=true;for(const src of scripts){await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='./'+src+'?v=3.2.2';s.onload=resolve;s.onerror=()=>reject(Error(src+' konnte nicht geladen werden'));document.body.append(s)})}document.documentElement.classList.add('app-unlocked');bindBackupAndLock();if(window.__asthmaCleanupWarning){alert(window.__asthmaCleanupWarning+' Bitte unter Einstellungen → Alte Speicherreste bereinigen.');window.ASTHMA_NAV?.go('einstellungen')}let last=Date.now();const touch=()=>{last=Date.now()};['pointerdown','keydown','touchstart','scroll'].forEach(ev=>document.addEventListener(ev,touch,{passive:true}));window.setInterval(()=>{if(unlocked&&Date.now()-last>10*60*1000)lock()},60*1000);let hiddenAt=null;document.addEventListener('visibilitychange',()=>{if(document.hidden){hiddenAt=Date.now()}else if(hiddenAt!==null){const elapsed=Date.now()-hiddenAt;hiddenAt=null;if(elapsed>2*60*1000&&unlocked)lock()}});}
   function bindBackupAndLock(){
     const status=$('secure-backup-status');if(window.__asthmaCleanupWarning){status.textContent=window.__asthmaCleanupWarning;status.classList.add('suite-error')}const cleanup=$('secure-cleanup');if(cleanup)cleanup.addEventListener('click',async()=>{if(!confirm('Alte lokale Datenbankreste nach Prüfung der neuen Tresor-Daten löschen?'))return;try{await eraseLegacy();status.textContent='Alte Speicherbereiche logisch gelöscht.'}catch(e){status.textContent='Bereinigung fehlgeschlagen: '+e.message}});
     $('secure-export-form').addEventListener('submit',async e=>{e.preventDefault();try{status.textContent='Verschlüsselte Sicherung wird erstellt …';const pass=$('secure-export-pass').value;const packageData=await exportVault(pass);const blob=new Blob([JSON.stringify(packageData)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Asthma_AlleDaten_'+new Date().toISOString().slice(0,10)+'.asthma17';a.click();setTimeout(()=>URL.revokeObjectURL(url),20000);$('secure-export-form').reset();status.textContent='Vollständige, passwortverschlüsselte Datei erstellt. Sicher aufbewahren.';}catch(err){status.textContent='Sicherung fehlgeschlagen: '+err.message}});
@@ -170,14 +177,16 @@
         if(existing||orphaned)return;
         setGateMode('create',false);
       });
+      $('secure-restore-different').addEventListener('change',()=>{const enabled=$('secure-restore-different').checked;$('secure-restore-new-fields').hidden=!enabled;$('secure-restore-new-password').disabled=!enabled;$('secure-restore-new-repeat').disabled=!enabled;});
       $('secure-restore-form').addEventListener('submit',async e=>{
         e.preventDefault();if(busy)return;busy=true;
         const button=$('secure-restore-submit');button.disabled=true;
         $('secure-error').textContent='Verschlüsseltes Backup wird geprüft …';
         try{
           if(await getMeta())throw Error('Hier ist bereits ein Tresor vorhanden; bitte regulär anmelden.');
-          const pass=$('secure-restore-new-password').value;
-          if(pass!==$('secure-restore-new-repeat').value)throw Error('Die beiden neuen Passwörter stimmen nicht überein.');
+          const different=$('secure-restore-different').checked;
+          const pass=different?$('secure-restore-new-password').value:$('secure-restore-pass').value;
+          if(different&&pass!==$('secure-restore-new-repeat').value)throw Error('Die beiden neuen Passwörter stimmen nicht überein.');
           const count=await restoreFresh(pass,$('secure-restore-file').files?.[0],$('secure-restore-pass').value);
           $('secure-error').textContent=count+' Datensätze aus Backup wiederhergestellt.';
           await startApp();

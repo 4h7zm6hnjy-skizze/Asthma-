@@ -1,0 +1,44 @@
+<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Asthma Treppen – Kurzbefehle einrichten</title><style>body{font:17px/1.6 system-ui,sans-serif;max-width:860px;margin:32px auto;padding:0 20px;color:#173b50;background:#f6fbfd}h1,h2{line-height:1.25}h2{margin-top:32px}li{margin:12px 0}code,pre{background:#e5eff5;overflow-wrap:anywhere;white-space:pre-wrap}pre{padding:12px;border-radius:8px}a{color:#075b77}</style><main><h1>Treppen per Kurzbefehl · Asthma 3.2.1</h1>
+<p>15 / 17 / 30 / 90 Stufen und den Grund getrennt wählen. Keine Dauer, kein Timer. Gespeichert wird nach Bestätigung im entsperrten vorhandenen Tresor.</p>
+<h2>1. Zuerst das GitHub-Update installieren</h2>
+<ol><li>Vorher in der bestehenden App eine verschlüsselte Sicherung erstellen.</li><li>Die ZIP-Datei entpacken. Den Inhalt des Ordners <b>GitHub_Update</b> in genau den Repository-Ordner hochladen, in dem bereits index.html liegt. Bestehende gleichnamige Dateien ersetzen. Nicht die ZIP-Datei selbst hochladen und keine zusätzlichen Unterordner anlegen.</li><li>GitHub Pages die Veröffentlichung abschließen lassen. In der App unter Einstellungen „Nach Updates suchen“ und „Update installieren“ wählen. Danach Version 3.2.1 prüfen. Website-Daten nicht löschen.</li><li>Unter Arbeit → Treppenzähler erscheint „Treppen-Schnellauswahl“. Anzahl und Grund ausprobieren. Den Testeintrag danach bei Bedarf über die vorhandene Bearbeiten-/Löschen-Funktion entfernen.</li></ol>
+<h2>2. Einfache Einrichtung – zwei Aktionen</h2>
+<p>Diese Variante öffnet die Auswahl in der App/Webseite. Sie zeigt nicht das native Kurzbefehle-Menü. Gegebenenfalls zuerst iPhone und Tresor entsperren.</p>
+<ol><li>In Arbeit → Treppenzähler → Treppen-Schnellauswahl den Button <b>Kurzbefehl-Link kopieren</b> verwenden. Dieser Link ist für deine Adresse bereits fertig. Alternativ die normale Adresse deiner Asthma-App kopieren (GitHub-Pages-Webseite, nicht die github.com-Codeansicht). Am Ende einen bestehenden #…-Teil entfernen und <code>#treppen-schnell</code> ergänzen. Beispiel: <code>https://DEIN-NAME.github.io/DEIN-REPOSITORY/#treppen-schnell</code>. Die Platzhalter durch deine echte Adresse ersetzen.</li><li>Apple „Kurzbefehle“ öffnen, +, neuer Kurzbefehl. Name: <b>Treppen erfassen</b>.</li><li>Aktion <b>URL</b> hinzufügen und die vollständige Adresse einsetzen.</li><li>Aktion <b>URLs öffnen</b> hinzufügen, als Eingabe die vorherige URL verwenden. Speichern.</li></ol>
+<h2>3. Auswahl direkt in Kurzbefehle – wie in der Vorschau</h2>
+<p>Für zwei native Auswahlmenüs diesen ausführlicheren Kurzbefehl anstelle der einfachen Variante erstellen. Aktionsnamen können je nach iOS-Version leicht abweichen. Eckige Platzhalter unten sind einzusetzende <b>Variablen</b>, kein wörtlich abzutippender Text.</p>
+<ol>
+<li>Aktion <b>Liste</b>: vier einzelne Einträge <code>15</code>, <code>17</code>, <code>30</code>, <code>90</code>.</li>
+<li><b>Aus Liste auswählen</b>, Eingabe: vorige Liste, Titel „Treppenanzahl“, Mehrfachauswahl aus.</li>
+<li><b>Variable festlegen</b>: <code>Stufen</code> = ausgewähltes Element.</li>
+<li>Neue <b>Liste</b> mit je einem Eintrag: <pre>Kühlanlage
+Materialscheine
+WC
+Fertigteile runtergefahren
+Verpackung geholt
+Pappe geschnitten
+Spangen</pre>Eigene Gründe dürfen ergänzt werden, höchstens 120 Zeichen, kein senkrechter Strich |.</li>
+<li><b>Aus Liste auswählen</b>, Eingabe: zweite Liste, Titel „Grund“, Mehrfachauswahl aus.</li>
+<li><b>Variable festlegen</b>: <code>Grund</code> = zweite Auswahl.</li>
+<li><b>Aktuelles Datum</b>, danach <b>Datum formatieren</b>: Format „Benutzerdefiniert“, Formatzeichenfolge <code>yyyyMMddHHmmss</code>. Groß-/Kleinschreibung beachten! Variable <code>Zeitstempel</code> auf dieses Ergebnis setzen. Dies dient nur dem Datum und dem Schutz vor doppelten Einträgen; keine Dauer wird gemessen.</li>
+<li><b>Zufallszahl</b> zwischen <code>100000</code> und <code>999999</code>. Variable <code>Kennung</code> auf das Ergebnis setzen.</li>
+<li><b>Text</b> mit exakt einer Zeile: <pre>AT1|[Zeitstempel]|[Kennung]|[Stufen]|[Grund]</pre>Alle vier eckigen Platzhalter durch die entsprechenden Kurzbefehle-Variablen ersetzen. Beispiel eines fertigen Textes (nicht als feste Vorlage verwenden): <code>AT1|20261027143000|654321|30|Kühlanlage</code>.</li>
+<li><b>Variable festlegen</b>: <code>Übergabe</code> = Text aus dem vorherigen Schritt.</li>
+<li><b>In Zwischenablage kopieren</b>: Eingabe ausdrücklich <code>Übergabe</code>. Wenn angeboten „Nur lokal“ einschalten und Ablauf auf einige Minuten begrenzen.</li>
+<li><b>URL codieren</b>: Eingabe ausdrücklich <code>Übergabe</code>, Modus „Codieren“. Variable <code>CodierteÜbergabe</code> auf das Ergebnis setzen.</li>
+<li><b>URL</b>: <code>https://DEINE-ECHTE-APP-ADRESSE/#treppen=[CodierteÜbergabe]</code>. Die echte Basisadresse deiner App einsetzen; [CodierteÜbergabe] als Variable einfügen. Kein Leerzeichen, kein zweites # und kein bestehender URL-Parameter mit persönlichen Daten.</li>
+<li><b>URLs öffnen</b>: die URL aus dem letzten Schritt öffnen. Kurzbefehl speichern.</li>
+</ol>
+<p>Nach den zwei Auswahlen öffnet sich die Webseite. Vorhandenen Tresor entsperren, Anzahl/Grund prüfen und <b>In diesem Tresor speichern</b> tippen. Derselbe Übergabetext wird in diesem Tresor nur einmal gezählt, solange der Eintrag vorhanden ist. Ein neu gestarteter Kurzbefehl erstellt einen neuen Eintrag.</p>
+<h2>4. Auf den Sperrbildschirm legen</h2>
+<ol><li>iPhone entsperren, Sperrbildschirm lange drücken → Anpassen → Sperrbildschirm.</li><li>Unten eine der belegten Steuerelement-Flächen über Minus entfernen, dann Plus.</li><li>„Kurzbefehl“ suchen und als auszuführenden Kurzbefehl „Treppen erfassen“ wählen → Fertig.</li><li>Zum Start das Steuerelement betätigen. Face ID bzw. Entsperren kann erforderlich sein. Alternativ denselben Kurzbefehl im Kontrollzentrum hinterlegen.</li></ol>
+<h2>Wenn Safari statt der bisherigen App öffnet</h2>
+<p>Safari und die installierte Home-Bildschirm-App können getrennte Datenspeicher haben. Wenn die bisherigen Daten fehlen, <b>keinen neuen Tresor anlegen</b>. Die vorhandene App über ihr gewohntes Symbol öffnen, entsperren → Arbeit → Treppen-Schnellauswahl → „Eintrag aus Kurzbefehl einfügen“. Übergabetext aus der Zwischenablage einfügen → Eintrag prüfen → speichern. Der Übergabetext ist auch an der Anmeldeseite sichtbar und kopierbar. Diese Variante funktioniert ohne Zugriff auf Safari-Daten.</p>
+<p>Die Tagesgesamtzahl steht in der App und nach dem Speichern in der Schnellauswahl. Sie wird nicht dauerhaft als Sperrbildschirm-Widget angezeigt. Es gibt keine automatische Hintergrundsynchronisierung.</p>
+<h2>Offline und Datenschutz</h2>
+<p>Die neue App-Version einmal online laden, damit die Dateien im Offline-Cache liegen. Danach funktioniert die Auswahl im bereits eingerichteten Browser/App-Speicher offline. Das Öffnen eines Links durch iOS bei fehlendem Netz muss am Gerät geprüft werden; alternativ die installierte App öffnen und den Übergabetext einfügen.</p>
+<p>Der Übergabetext enthält Anzahl, Grund, Erfassungsdatum und eine Zufallskennung, kein Passwort. Er liegt kurzzeitig unverschlüsselt in der Zwischenablage und gegebenenfalls im URL-Fragment. Fragmente werden nicht als Teil der HTTP-Anfrage an GitHub gesendet, können aber im Browserverlauf oder in Browser-Synchronisierung sichtbar sein. Nach erfolgreicher Übernahme entfernt die App das Fragment aus dem aktuellen Verlaufseintrag. Den Link nicht öffentlich teilen. Die Speicherung erfolgt im vorhandenen AES-GCM-Tresor.</p>
+<h2>Lieferumfang und Grenzen</h2>
+<p>Dies ist ein Update auf Grundlage der bereitgestellten Datei „Asthma--main 5.zip“ (App-Metadaten 3.1.8). Es enthält nur die neuen/geänderten Dateien, keine privaten Importdaten aus dem Ausgangsarchiv. Die bestehenden Ampel-, PDF- und übrigen Module werden in der Ausgangsfassung beibehalten.</p>
+<p>Eine fertig signierte .shortcut-Datei oder ein iCloud-Installationslink ist nicht enthalten. Hier steht kein Apple-Signierungsdienst zur Verfügung. Die oben beschriebenen Aktionen müssen einmal in Apple Kurzbefehle angelegt werden. Echte iPhone-Ausführung, Sperrbildschirm-Menü und Safari/PWA-Übergang sind noch am Gerät zu prüfen.</p>
+<p>Apple-Dokumentation: <a href="https://support.apple.com/guide/shortcuts/apdd7bf369da/ios">Auswahlmenüs in Kurzbefehle</a>; <a href="https://developer.apple.com/videos/play/wwdc2021/10232/">Signieren und Teilen von Kurzbefehlen</a>.</p></main></html>
