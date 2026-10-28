@@ -8,7 +8,7 @@
  const $=id=>document.getElementById(id);
  const source=$('stats25-report'),generateButton=$('stats25-print'),pdfButton=$('stats25-pdf');
  if(!source||!generateButton||!pdfButton)return;
- const labels={old:'Bisherige Statistik',spo2:'Blutsauerstoff (SpO2)',bp:'Blutdruck',pulse:'Puls',weight:'Gewicht',pef:'Peak-Flow',lung:'Lungenfunktion'};
+ const labels=Object.fromEntries([...(window.ASTHMA_STATSP292?.baseKinds||[]),...(window.ASTHMA_STATSP292?.kinds||[])]);
  const IDs=Object.keys(labels), PAGE_W=595.28,PAGE_H=841.89,MARGIN=43,LEFT=MARGIN,RIGHT=PAGE_W-MARGIN,TOP=PAGE_H-55,BOTTOM=53,WIDTH=RIGHT-LEFT;
  const $status=$('stats25-status');let output=null,outputName='',working=false,signature='';
  const ui=document.createElement('div');ui.id='as297-pdf-actions';ui.style.cssText='display:flex;flex-direction:column;gap:10px;margin:12px 0;padding:14px;border:1px solid #9bcbd4;background:#edf8fa;border-radius:12px';
@@ -19,10 +19,15 @@
  let objectUrl=null;
  function reset(){if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;}output=null;share.hidden=true;fallback.hidden=true;}
  function status(message,problem=false){if($status)$status.textContent=message;info.textContent=message;info.style.color=problem?'#a02b20':'#225969';}
- function picks(){const options=$('statsplus292-options');return Object.fromEntries(IDs.map(id=>{const box=[...(options?.querySelectorAll('input[type="checkbox"]')||[])].find(x=>x.value===id);return [id,box?box.checked:(id==='old')];}));}
+ function picks(){const options=$('statsplus292-options');return Object.fromEntries(IDs.map(id=>{const box=[...(options?.querySelectorAll('input[type="checkbox"]')||[])].find(x=>x.value===id);return [id,box?box.checked:false];}));}
  function key(){return [window.ASTHMA_STATSP292?.getLastKey?.()||'',...Object.entries(picks()).filter(x=>x[1]).map(x=>x[0])].join('_');}
  function sections(p){const children=[];
-   if(p.old){for(const child of source.children){if(child.id!=='statsplus292-appendix')children.push({type:'old',node:child});}}
+   const showBase=(window.ASTHMA_STATSP292?.baseKinds||[]).some(([id])=>p[id]);
+   for(const child of source.children){
+     if(child.id==='statsplus292-appendix')continue;
+     if(child.classList.contains('stats25-heading')||child.classList.contains('stats25-footer')){if(showBase)children.push({type:'old',node:child});}
+     else if(child.dataset.s292Base&&p[child.dataset.s292Base])children.push({type:'old',node:child});
+   }
    const appendix=source.querySelector('#statsplus292-appendix');
    if(appendix){for(const cat of appendix.querySelectorAll('.s292-category[data-s292-kind]'))if(p[cat.dataset.s292Kind])children.push({type:'category',node:cat,kind:cat.dataset.s292Kind});}
    return children;
@@ -72,7 +77,7 @@
      if(tag==='li'){this.para('• '+node.textContent,9,5);return;}
      const kids=[...node.children];if(kids.length){for(const child of kids)this.old(child);}else if(node.textContent?.trim())this.para(node.textContent,10,8);
    }
-   category(node){this.page();const h=node.querySelector(':scope > h3');this.heading(h?.textContent||'Messwerte',1);for(const child of node.children){if(child===h)continue;if(child.classList.contains('s292-summary')){for(const item of child.children)this.para(item.textContent,9,5,'#2a5a6b',true);this.y-=4;}
+   category(node){if(this.y<TOP-1)this.page();const h=node.querySelector(':scope > h3');this.heading(h?.textContent||'Messwerte',1);for(const child of node.children){if(child===h)continue;if(child.classList.contains('s292-summary')){for(const item of child.children)this.para(item.textContent,9,5,'#2a5a6b',true);this.y-=4;}
        else if(child.classList.contains('s292-chart-box')){const svg=child.querySelector('svg');if(svg)this.image(svg);const legends=[...child.querySelectorAll('.s292-legend span>span')].map(e=>e.textContent);if(legends.length)this.para(legends.join(' · '),8,8,'#526b75');for(const x of child.querySelectorAll('.s292-summary>span'))this.para(x.textContent,8.2,4,'#285568',true);const explanation=child.querySelector('p.s292-note');if(explanation)this.para(explanation.textContent,8,9,'#526b75');}
        else if(child.classList.contains('s292-table-wrap')){const tab=child.querySelector('table');if(tab)this.table(tab);}
        else if(child.tagName==='H4'){this.heading(child.textContent,3);}else if(child.matches('p'))this.para(child.textContent,9,8,'#556d76');
@@ -91,14 +96,14 @@
    if(!requested.length){status('Bitte mindestens einen Bereich auswählen.',true);return;}
    if(!source.querySelector('.stats25-heading')){status('Bitte zuerst auf „Statistik berechnen“ tippen.',true);return;}
    if(window.__s292Building){status('Diagramme werden noch berechnet. Bitte danach erneut versuchen.',true);return;}
-   if(requested.some(id=>id!=='old')&&!source.querySelector('#statsplus292-appendix')){status('Zusätzliche Diagramme fehlen. Bitte Statistik neu berechnen.',true);return;}
+   if(requested.some(id=>(window.ASTHMA_STATSP292?.kinds||[]).some(([key])=>key===id))&&!source.querySelector('#statsplus292-appendix')){status('Zusätzliche Diagramme fehlen. Bitte Statistik neu berechnen.',true);return;}
    const cur=window.ASTHMA_STATS25?.range?.()?.key,reportKey=window.ASTHMA_STATSP292?.getLastKey?.();if(cur&&reportKey&&cur!==reportKey){status('Zeitraum geändert: Bitte die Statistik neu berechnen.',true);return;}
    if(!confirm('Das PDF enthält unverschlüsselte Gesundheitsdaten. Lokal erstellen und danach sicher speichern?'))return;
    working=true;generateButton.disabled=true;pdfButton.disabled=true;reset();status('PDF wird vollständig auf deinem iPhone erstellt …');
-   try{const layout=new Layout();if(!selected.old)layout.pages=[];
+   try{const layout=new Layout();
      for(const part of sections(selected)){if(!layout.pages.length)layout.page();if(part.type==='category')layout.category(part.node);else layout.old(part.node);}
      // Remove the initial empty page when only a category has been selected.
-     if(!selected.old&&layout.pages.length>1&&layout.pages[0].ops.length===2&&!layout.pages[0].images.length)layout.pages.shift();
+     if(layout.pages.length>1&&layout.pages[0].ops.length===2&&!layout.pages[0].images.length)layout.pages.shift();
      const result=createPDF(layout);if(result.size<450||result.size>50*1024*1024)throw Error('PDF-Datei ist leer oder ungewöhnlich groß.');
      const period=String(reportKey||cur||new Date().toISOString().slice(0,10)).replace(/[^0-9-]/g,'_');outputName='Asthma_Statistik_'+period+'.pdf';output=result;signature=key();objectUrl=URL.createObjectURL(result);
      fallback.href=objectUrl;fallback.download=outputName;fallback.hidden=false;share.hidden=false;

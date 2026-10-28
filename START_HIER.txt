@@ -1,7 +1,0 @@
-Asthma v3.2.6
-Dies ist die Vollversion des öffentlichen App-Codes ohne persönliche Importe.
-Die Dateien aus GitHub_Update nach GitHub übertragen (ohne den Ordner).
-Der Versicherungs-Import und die beiden Lungenbefunde liegen SEPARAT als private JSON-Dateien und dürfen nicht auf GitHub geladen werden.
-Nach dem Import sind die Daten im lokalen Tresor gespeichert.
-Vor Update verschlüsselte Gesamtsicherung erstellen.
-Ein iPhone-Test ist noch nicht erfolgt.

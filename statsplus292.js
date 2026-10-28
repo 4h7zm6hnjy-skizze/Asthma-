@@ -5,7 +5,18 @@
 (()=>{
  const SEC=window.ASTHMA_SECURITY,$=id=>document.getElementById(id);
  if(!SEC||!$('stats25-report')||!$('stats25-build'))return;
- const kinds=[['spo2','Blutsauerstoff (SpO₂)'],['bp','Blutdruck'],['pulse','Puls'],['weight','Gewicht'],['pef','Peak-Flow (PEF und Hand-FEV₁)'],['lung','Ärztliche Lungenfunktion']];
+ const baseKinds=[
+  ['overview','Überblick'],['spirometrySummary','Lungenfunktion – Zusammenfassung'],
+  ['pefSummary','Peak-Flow – Zusammenfassung'],['auSummary','Arbeitsunfähigkeit'],
+  ['laborSummary','Laborwerte'],['medications','Medikamentenplan'],
+  ['vitalsSummary','Blutsauerstoff / Blutdruck / Puls – Zusammenfassung'],
+  ['administration','Anträge, Termine, Tagebuch und Unterlagen']
+ ];
+ const kinds=[['spo2','Blutsauerstoff – Diagramm'],['bp','Blutdruck – Diagramm'],['pulse','Puls – Diagramm'],
+  ['weight','Gewicht – Diagramm'],['pef','Peak-Flow – Diagramm'],['lung','Lungenfunktion – Diagramme'],
+  ['lungfull','Lungenfunktion – alle Befundwerte'],['diffusion','Diffusionsmessung – Diagramme'],
+  ['difffull','Diffusion – alle Befundwerte']];
+ const allKinds=[...baseKinds,...kinds];
  const num=v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))?Number(v):null;
  const iso=s=>/^\d{4}-\d\d-\d\d$/.test(s||'')?s:'';
  const fmt=s=>iso(s)?s.slice(8)+'.'+s.slice(5,7)+'.'+s.slice(0,4):'–';
@@ -13,24 +24,33 @@
  const node=(tag,cls,t)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(t!==undefined)el.textContent=String(t);return el;};
  const nsum=xs=>xs.length?xs.reduce((a,b)=>a+b,0)/xs.length:null;
  const makeDate=row=>String(row.date||'')+'T'+String(row.time||'12:00');
- const selected=Object.fromEntries([['old',true],...kinds.map(x=>[x[0],true])]);
+ const selected=Object.fromEntries(allKinds.map(x=>[x[0],true]));
  const controls=node('fieldset','s292-controls');controls.id='statsplus292-options';
- controls.append(node('legend','','Zusätzliche Druckbereiche wählen'));
- controls.append(node('p','s292-note','Der bisherige Bericht bleibt unverändert. Ausgewählte Messwerte und Diagramme werden auf zusätzlichen Seiten angehängt. Für Einzeldruck Bereiche abwählen.'));
+ controls.append(node('legend','','Monats-/Jahresbericht: Bereiche für Druck und PDF auswählen'));
+ controls.append(node('p','s292-note','Jedes Thema einzeln auswählbar. Nur markierte Abschnitte erscheinen im Ausdruck und in der lokal erzeugten PDF-Datei. Die Vorschau selbst enthält weiterhin alle Werte.')); 
  const options=node('div','s292-choices');
- for(const [id,label] of [['old','Bisherige Statistik'],...kinds]){
+ for(const [id,label] of allKinds){
    const holder=node('label','s292-option'),check=document.createElement('input');check.type='checkbox';check.value=id;check.checked=true;check.setAttribute('aria-label',label);
    check.addEventListener('change',()=>{selected[id]=check.checked;applySelection()});holder.append(check,node('span','',label));options.append(holder);
  }
- controls.append(options);const notice=node('p','s292-note');notice.id='s292-selection-status';controls.append(notice);
+ controls.append(options);
+ const selectionActions=node('div','s292-quick-select');
+ const allBtn=node('button','','Alle auswählen'),noneBtn=node('button','','Keine auswählen');
+ for(const b of [allBtn,noneBtn]){b.type='button';b.className='btn btn-outline';selectionActions.append(b);}
+ const setAll=checked=>{for(const c of options.querySelectorAll('input[type=checkbox]')){c.checked=checked;selected[c.value]=checked;}applySelection();controls.dispatchEvent(new Event('change',{bubbles:true}));};
+ allBtn.onclick=()=>setAll(true);noneBtn.onclick=()=>setAll(false);controls.append(selectionActions);
+ const notice=node('p','s292-note');notice.id='s292-selection-status';controls.append(notice);
  const toolbar=$('stats25-build').closest('.stats25-controls');toolbar?.insertAdjacentElement('afterend',controls);
  function applySelection(){
-   const report=$('stats25-report');const addon=$('statsplus292-appendix');
-   document.body.dataset.s292Old=selected.old?'on':'off';
+   const report=$('stats25-report'),addon=$('statsplus292-appendix');
+   const activeBase=baseKinds.some(([id])=>selected[id]);
+   document.body.dataset.s292Old=activeBase?'on':'off';
+   for(const [id] of baseKinds){const card=report?.querySelector('[data-s292-base="'+id+'"]');if(card)card.dataset.printEnabled=selected[id]?'true':'false';}
+   for(const child of report?.children||[]){if(child.classList.contains('stats25-heading')||child.classList.contains('stats25-footer'))child.dataset.printEnabled=activeBase?'true':'false';}
    for(const [id] of kinds){const card=addon?.querySelector('[data-s292-kind="'+id+'"]');if(card)card.dataset.printEnabled=selected[id]?'true':'false';}
    if(addon){addon.dataset.printEnabled=kinds.some(([id])=>selected[id])?'true':'false';let first=true;for(const [id] of kinds){const card=addon.querySelector('[data-s292-kind="'+id+'"]');if(card){card.dataset.printFirst=selected[id]&&first?'true':'false';if(selected[id])first=false;}}}
-   notice.textContent='Für Ausdruck/PDF ausgewählt: '+Object.values(selected).filter(Boolean).length+' Bereiche.';
-   report?.classList.toggle('s292-custom-print',!selected.old);
+   notice.textContent='Für Ausdruck/PDF ausgewählt: '+Object.values(selected).filter(Boolean).length+' von '+allKinds.length+' Bereichen.';
+   report?.classList.toggle('s292-custom-print',!activeBase);
  }
  applySelection();
  for(const id of ['stats25-print','stats25-pdf'])$(id)?.addEventListener('click',event=>{
@@ -180,10 +200,38 @@
      panel(root,'pef','Peak-Flow und FEV₁ (Heim-/Handmessung)',handRows,[{title:'PEF-Verlauf',unit:'l/min',series:[['pef','PEF','#217f9b']]},{title:'FEV₁-Verlauf (Handmessung)',unit:'l',series:[['fev1','FEV₁','#ce8248']]}],[['pef','PEF (l/min)',0],['fev1','FEV₁ (l)',2],['source','Herkunft',-2]],{pef:refs.pef});
      const lRows=lung.map(x=>({...x,fev1:num(x.fev1),fvc:num(x.fvc),fev1Liters:num(x.fev1Liters),fvcLiters:num(x.fvcLiters)}));
      panel(root,'lung','Ärztliche Lungenfunktion',lRows,[{title:'FEV₁ / FVC in % vom Soll',unit:'%',series:[['fev1','FEV₁ % Soll','#217f9b'],['fvc','FVC % Soll','#a662a1']]},{title:'FEV₁ / FVC in Litern',unit:'l',series:[['fev1Liters','FEV₁ l','#247e76'],['fvcLiters','FVC l','#d48748']]}],[['fev1','FEV₁ (% Soll)',1],['fvc','FVC (% Soll)',1],['fev1Liters','FEV₁ (l)',2],['fvcLiters','FVC (l)',2],['phase','Messphase',-2]],refs);
+
+     const allLung=lung.filter(x=>Array.isArray(x.testRows));
+     const allDiff=suite.filter(x=>x.type==='diffusion').map(x=>x.value).filter(within);
+     const metricCodes=[['DLCO_SB','DLCO'],['KCO_SB','KCO'],['VA_SB','VA']];
+     const diffusionRows=allDiff.map(x=>{
+       const row={date:x.date,time:x.time||'',phase:x.phase||'unbekannt'};
+       for(const [code,label] of metricCodes){const m=x.testRows?.find(r=>r.code===code);row[label+'Percent']=num(m?.percent);row[label+'Actual']=num(m?.actual);}
+       return row;
+     });
+     panel(root,'diffusion','Diffusionsmessung – DLCO, KCO und VA',diffusionRows,
+       [{title:'DLCO, KCO und VA – Prozent vom Soll',unit:'%',series:[['DLCOPercent','DLCO % Soll','#216b96'],['KCOPercent','KCO % Soll','#ad607d'],['VAPercent','VA % Soll','#23866b']]}],
+       [['DLCOPercent','DLCO % Soll',1],['KCOPercent','KCO % Soll',1],['VAPercent','VA % Soll',1],['DLCOActual','DLCO Ist',2],['KCOActual','KCO Ist',2],['VAActual','VA Ist (l)',2],['phase','Messphase',-2]]);
+     const labels={DLCO_SB:'DLCO',KCO_SB:'KCO',VA_SB:'Alveolarvolumen (VA)',Hb:'Hämoglobin',DLCOcSB:'DLCO korrigiert',KCOc_SB:'KCO korrigiert',TLC_SB:'TLC (Single Breath)',VIN_SB:'Einatemvolumen',TLC:'TLC (Body)',FVC:'FVC',FEV1:'FEV₁'};
+     function fullTests(id,title,records){const box=node('section','s292-category');box.dataset.s292Kind=id;box.append(node('h3','',title));
+       if(!records.length)box.append(node('p','s292-empty','Keine Befunde in diesem Zeitraum.'));
+       const ordered=[...records].sort((a,b)=>makeDate(a).localeCompare(makeDate(b)));
+       for(const rec of ordered){box.append(node('h4','',fmt(rec.date)+' '+(rec.time||'')+' – '+(rec.doctor||'Praxis nicht angegeben')));
+         if(rec.note)box.append(node('p','s292-note',rec.note));
+         const table=node('table','s292-table'),thead=node('thead'),head=node('tr');
+         for(const title of ['Parameter','Ist','Soll','% Soll','Z-Score'])head.append(node('th','',title));thead.append(head);table.append(thead);
+         const body=node('tbody');for(const measure of rec.testRows||[]){const row=node('tr');
+           for(const cell of [labels[measure.code]||measure.code,measure.actual,measure.predicted,measure.percent,measure.z])row.append(node('td','',cell===null||cell===undefined?'–':typeof cell==='number'?format(cell,2):String(cell)));
+           body.append(row);}table.append(body);const wrap=node('div','s292-table-wrap');wrap.append(table);box.append(wrap);
+       }
+       root.append(box);
+     }
+     fullTests('lungfull','Vollständige Lungenfunktionsbefunde',allLung);
+     fullTests('difffull','Vollständige Diffusionsmessungen (Single Breath)',allDiff);
      root.append(node('p','s292-disclaimer','Gemessene Verläufe sind keine Diagnose. Durchgezogene Linien zeigen Messwerte, gestrichelte Linien ausschließlich manuell hinterlegte persönliche Vergleiche. Bei auffälligen Werten ärztliche Beurteilung einholen. Diese gedruckten Gesundheitsdaten sind unverschlüsselt.'));
      report.append(root);lastKey=r.key;applySelection();
    })();loading=job;
    try{await job}finally{window.__s292Building=false;if(loading===job)loading=null;}
  }
- window.ASTHMA_STATSP292=Object.freeze({append,getLastKey:()=>lastKey});
+ window.ASTHMA_STATSP292=Object.freeze({append,getLastKey:()=>lastKey,applySelection,selected:()=>({...selected}),baseKinds,kinds});
 })();

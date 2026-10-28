@@ -1,5 +1,5 @@
 {
-  "version": "3.2.7",
+  "version": "3.2.8",
   "released": "2026-10-28",
-  "notes": "Import-Reparatur: Lungenfunktion und Diffusion per Dateiauswahl automatisch verschlüsselt speichern, Speicherbestätigung, JSON-Text-Alternative und Speicherdiagnose. Diffusionsdiagramm Tag/Woche/Monat/Jahr/10 Jahre bleibt erhalten."
+  "notes": "Fehlerbehebung Berichte: Monats-/Jahresbericht mit Diffusionsdiagrammen, sämtlichen Befundwerten, vollständiger Einzelauswahl pro Berichtsteil und konsistentem lokalen PDF/Druckexport."
 }

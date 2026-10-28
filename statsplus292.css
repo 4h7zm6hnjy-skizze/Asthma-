@@ -59,3 +59,8 @@
  body.stats25-print #statistik > :not(#stats25-report){display:none!important}
  body.stats25-print #stats25-report{position:static!important;left:auto!important;top:auto!important}
 }
+
+.s292-quick-select{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+body.stats25-print #stats25-report [data-print-enabled="false"]{display:none!important}
+body.stats25-print #stats25-report .s292-category[data-print-enabled="true"]{display:block!important}
+body.stats25-print .s292-category .s292-table-wrap{overflow:visible!important}
