@@ -1,19 +1,43 @@
-Prüfung 3.2.3
+PRÜFBERICHT 3.2.4
 
-Beobachtung: Screenshot zeigt weiße Seite nach Klick auf Einrichten.
-Code zuvor: Link auf separate HTML-Datei mit target=_blank.
-Die genaue Ursache auf dem iPhone wurde nicht reproduziert.
-Änderung: natives details/summary-Element mit direkt enthaltenem Anleitungstext.
-Kein window.open, iframe oder Fetch für den Anleitungstext.
+Basis: die hier zuletzt erstellte Version 3.2.3. Kein neuer Abruf des inzwischen
+möglicherweise veränderten GitHub-Repositorys. Vorhandene Treppen- und
+Wiederherstellungsreparaturen bleiben enthalten.
 
-Erfolgreiche Prüfungen:
-- JS-Syntax aller enthaltenen geänderten/neuen Skripte.
-- Alle vom Service Worker vorzuladenden Dateien vorhanden.
-- DOM-Test: Anleitung vorhanden, auf-/zuklappbar, URL bleibt unverändert.
-- Bestehende Treppen-Tests mit echter Verschlüsselung und simulierter IndexedDB.
-- Wiederherstellungstest: Ampel-Einträge verlustfrei wiederhergestellt und
-  erneut exportiert; Duplikate/fehlerhafte Daten abgewiesen, ohne Schreiben.
+Inhalt: allgemeines Diffusionsmodul, lokaler Import zweier Befundtypen,
+Bildergalerie mit aufsteigender Datums-/Uhrzeitsortierung, Bearbeitung/Löschen.
+Keine privaten Messwerte oder Befundbilder in diesem GitHub-Paket.
+Private Daten werden als separate JSON-Datei geliefert, nicht automatisch
+in einem fremden Browser oder in einer Cloud gespeichert.
 
-Grenzen: DOM-Test mit JSDOM, kein vollständiger Browser-/iPhone-Test,
-keine optische Prüfung auf dem echten Gerät. Die weiße Seite selbst wurde
-nicht reproduziert, der separate Fenster-/Seitenaufruf wurde entfernt.
+Erfolgreich geprüft:
+- 14 Body-/Spirometriezeilen und 13 Diffusionszeilen aus Fotos übertragen.
+- Beide Bilder anhand der tatsächlichen Quelldateien kontrolliert.
+- Schema: ungültiges Datum, negative Messwerte, doppelte Messzeilen,
+  doppelte Untersuchungen und unzulässiger Bildanhang werden abgewiesen.
+- DOM-Integration (JSDOM, Fake IndexedDB, echte WebCrypto und secure17.js):
+  Vorschau schreibt nichts; bestätigter Import verschlüsselt beide Befunde
+  samt Fotos; Wiederholung zählt nicht doppelt; Tabellenbearbeitung aktualisiert
+  vorhandene FEV1/FVC-Verlaufsfelder; Bildanhang bleibt erhalten; Löschen
+  eines Befunds lässt andere Befunde und Treppendaten bestehen.
+- Vollständiger verschlüsselter Tresorexport mit Backupprüfung erfolgreich.
+- Originalgalerie: zwei Bilder mit Datum/Uhrzeit und korrekter Reihenfolge.
+- Bestehende Treppen-Parser-/DOM-Tests erfolgreich.
+- Syntax aller enthaltenen Skripte und Vollständigkeit der Offline-Dateiliste.
+
+Grenzen:
+Kein echter iPhone-/Safari-Test oder visueller Browser-Test durchgeführt.
+Der DOM-Test lädt nicht alle unveränderten App-Module. Keine medizinische
+Validierung der Messdurchführung anhand der Fotos möglich.
+Gedruckte Prozentwerte sind übernommen, nicht aus gerundeten Zahlen neu
+berechnet. Fehlende numerische Z-Scores nicht aus der Grafik geschätzt.
+„Vor“ als Gerätebezeichnung dokumentiert; Bronchodilatationsphase bleibt
+unbekannt, da Medikamentenprotokoll aus den Fotos nicht hervorgeht.
+Hb-Messstatus im Diffusionsbericht ist unbekannt, kein Laborbefund erfunden.
+Einheiten der Body-Werte entsprechen der fachüblichen Zuordnung; auf dem
+Foto sind nicht für jede Tabellenzeile Einheiten ausdrücklich gedruckt.
+
+Fachliche Quellen (für Erklärungen, nicht für eine individuelle Diagnose):
+https://site.thoracic.org/advocacy-patients/patient-resources/pulmonary-function-tests
+https://publications.ersnet.org/content/erj/60/1/2101499
+https://www.thoracic.org/statements/resources/pft/DLCO.pdf

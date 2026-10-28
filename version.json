@@ -1,5 +1,5 @@
 {
-  "version": "3.2.3",
+  "version": "3.2.4",
   "released": "2026-10-28",
-  "notes": "Kurzbefehl-Anleitung direkt in der App aufklappbar, ohne neues Fenster oder zusätzliche Seitenanfrage. Wiederherstellungsreparatur 3.2.2 bleibt enthalten."
+  "notes": "Lungenfunktion: privater Befundimport mit Originalfotos, vollständige Messwerttabellen und eigener Bereich Diffusionsmessung (DLCO) mit Erklärung und Bearbeitung."
 }

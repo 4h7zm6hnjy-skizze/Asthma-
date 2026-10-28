@@ -178,6 +178,9 @@
     window.addEventListener('asthma:profile-reset',updateDashboard);window.addEventListener('storage',updateDashboard);
   }
   async function init(){bind();helpWizard();go(allowed.has(location.hash.slice(1))?location.hash.slice(1):($(location.hash.slice(1))?.closest('[data-nav-page]')?.dataset.navPage||'start'),{scroll:false});try{database=true;meta={secure:true};await refreshAll()}catch(e){flash('vault-state','Lokale Zusatzdatenbank nicht verfügbar: '+e.message,true)}}
+  // Refresh the existing lung-test list when another module imports/edits a report.
+  let lungRefreshTimer;
+  window.addEventListener('asthma:secure-change',event=>{if(event.detail?.group!=='suite'||!database||locked())return;clearTimeout(lungRefreshTimer);lungRefreshTimer=setTimeout(()=>Promise.all([renderMeasurements(),renderReports()]).then(()=>updateDashboard()).catch(e=>flash('measurement-msg','Verlauf konnte nicht aktualisiert werden: '+e.message)),150);});
   window.__asthmaSuiteTest=Object.freeze({go,chartSVG,safeNum,fmt});
   init();
 })();

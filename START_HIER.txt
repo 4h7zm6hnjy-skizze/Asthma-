@@ -1,21 +1,38 @@
-ASTHMA 3.2.3 – EINRICHTUNGSANLEITUNG OHNE WEISSE SEITE
+ASTHMA 3.2.4 – LUNGENFUNKTION UND DIFFUSIONSMESSUNG
 
-ZIP entpacken und die neun Dateien aus GitHub_Update in den bisherigen
-GitHub-Hauptordner hochladen. Gleichnamige Dateien ersetzen.
-Keine anderen Dateien löschen und keine privaten Sicherungen hochladen.
+GITHUB-UPDATE
+1. Dieses ZIP entpacken.
+2. Alle 12 Dateien IM Ordner GitHub_Update in den vorhandenen Repository-
+   Hauptordner hochladen und gleichnamige Dateien ersetzen.
+3. Veröffentlichung abwarten, dann in der bisherigen App unter Einstellungen
+   das Update installieren. Version 3.2.4 prüfen.
 
-Nach Veröffentlichung: in der App unter Einstellungen nach Updates suchen
-und Update installieren. Version 3.2.3 prüfen.
+DEINE PRIVATEN BEFUNDE EINFÜGEN
+Die separat gelieferte PRIVAT_Lungenfunktion_2026-10-28.json NICHT bei GitHub
+hochladen. Sie enthält die Messwerte UND beide vollständigen Originalfotos.
+1. Diese JSON-Datei in der iPhone-Dateien-App speichern.
+2. Asthma-App entsperren → Lunge / Lungenfunktion und Verlauf.
+3. Im neuen Bereich „Befunde: Lungenfunktion und Diffusionsmessung“
+   „Private Importdatei auswählen“ → die private JSON-Datei auswählen.
+4. Vorschau prüfen → „Geprüfte Befunde übernehmen“.
+5. Die Spirometrie erscheint im bestehenden FEV1/FVC-Verlauf. Unter dem
+   vollständigen Lungenfunktionsbefund kannst du zusätzlich auf
+   „Als aktuellen Lungenfunktionstest übernehmen“ tippen. Anschließend die
+   App neu öffnen, um alle Profilanzeigen zu aktualisieren.
 
-Arbeit → Treppenzähler → Kurzbefehl am iPhone einrichten:
-Die vollständige Anleitung klappt nun DIREKT UNTER DEM BUTTON auf.
-Kein neues Fenster, kein Seitenwechsel, keine zusätzliche Netzwerkanfrage
-für den Anleitungstext. Er ist im geladenen App-Skript enthalten.
-Die Anleitung lässt sich durch erneutes Tippen wieder schließen.
+NEU
+- Vollständige Tabellen: Soll, Ist, % Soll und numerisch vorhandener Z-Score.
+- Neuer Punkt „Diffusionsmessung (DLCO)“: Erklärung und wichtige Messwerte.
+- Beide Originalbilder eingebettet und verschlüsselt im Tresor gespeichert.
+- „Originalbefunde – chronologisch“: Bilder direkt sichtbar mit Datum/Uhrzeit,
+  ältester Befund zuerst; bei gleichem Zeitpunkt Lungenfunktion vor Diffusion.
+- Tabellen, Datum, Uhrzeit und Notizen sind bearbeitbar. Originalfotos bleiben
+  unverändert. Einzelne Befunde können gelöscht werden.
+- Neue Diffusionsmessungen können auch manuell erfasst werden.
+- Wiederholtes Importieren identischer Kennungen erzeugt keine Duplikate.
+- Daten/Fotos werden mit der vollständigen Tresorsicherung mitgesichert.
 
-Die Reparatur der Wiederherstellung (3.2.2) und die Treppen-Schnellauswahl
-sind weiterhin enthalten. Passwörter und lokale Datensätze werden durch
-Installation dieses Updates nicht verändert.
-
-Der Button zeigt eine Anleitung; er installiert keinen Apple-Kurzbefehl
-automatisch. Die Schritte in der Anleitung müssen einmal eingerichtet werden.
+Die Importdatei selbst ist unverschlüsselt. Privat aufbewahren. In der App
+werden die Befunde im vorhandenen verschlüsselten Tresor gespeichert.
+Keine automatische Änderung deines aktuellen Profils ohne den eigenen Button.
+Kein automatisch aus den Werten abgeleiteter Diagnose- oder Medikamentenplan.

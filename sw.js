@@ -1,7 +1,8 @@
-/* Asthma 3.2.3: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
-const VERSION='3.2.3-consistent-cache';
+/* Asthma 3.2.4: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
+const VERSION='3.2.4-consistent-cache';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
+ './diffusion324.js','./diffusion324.css',
  './stairs-shortcuts.js','./stairs-shortcuts.css','./KURZBEFEHLE_ANLEITUNG.html',
  './','./index.html','./styles.css','./content.js','./app.js','./antraege-data.js','./antraege.js',
  './meine-daten.js','./lungenprofil.js','./befundscan-parser.js','./befund18-parser.js','./befundscan.js',
@@ -25,7 +26,7 @@ self.addEventListener('fetch',event=>{
  if(path.endsWith('/version.json')||path.endsWith('/rechtsmonitor-feed.json')){
   event.respondWith(fetch(event.request,{cache:'no-store'}).catch(()=>caches.match(event.request,{ignoreSearch:true})));return;
  }
- const important=['/stairs-shortcuts.js','/stairs-shortcuts.css','/secure17.js','/vital29.js','/vital-rescue291.js','/app.js','/design26.js',
+ const important=['/diffusion324.js','/diffusion324.css','/stairs-shortcuts.js','/stairs-shortcuts.css','/secure17.js','/vital29.js','/vital-rescue291.js','/app.js','/design26.js',
   '/quality28.js','/quality28.css','/suite15.js','/stats25.js','/statsprint296.js',
   '/statsplus292.js','/labor18.js','/lufu23.js','/laborvergleich303.js','/offline303.js','/befundscan.js','/befund18-parser.js'];
  if(important.some(s=>path.endsWith(s))){

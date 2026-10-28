@@ -1,0 +1,7 @@
+#dl324{margin:18px 0;padding:16px;border:1px solid #b7d5df;border-radius:16px;background:#f6fbfd;color:#173b50;min-width:0}
+#dl324 details{margin:12px 0;padding:10px;border:1px solid #bcd4dd;border-radius:9px;background:white}#dl324 summary{cursor:pointer;font-weight:700;min-height:38px}
+#dl324 .dl324-card{padding:12px;margin:14px 0;border:1px solid #bcd4dd;border-radius:10px;background:white}#dl324 .dl324-table-wrap{overflow-x:auto}#dl324 table{width:100%;border-collapse:collapse;font-size:14px}#dl324 th,#dl324 td{padding:8px 5px;text-align:left;border-bottom:1px solid #d8e5eb}#dl324 td{white-space:nowrap}
+#dl324 img{max-width:100%;height:auto}#dl324 button{margin:6px 6px 6px 0;min-height:44px;white-space:normal}#dl324 input,#dl324 textarea{font-size:16px;max-width:100%;box-sizing:border-box}#dl324-form>label{display:block;margin:12px 0}#dl324-form input,#dl324-form textarea{display:block;width:100%;padding:8px}
+#dl324 .dl324-edit-grid fieldset{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;border:1px solid #bcd4dd;border-radius:10px;min-width:0}#dl324 .dl324-edit-grid label{min-width:0}#dl324-status{font-weight:600;white-space:pre-wrap}
+
+#dl324-originals figure{margin:18px 0;padding:10px;background:white;border:1px solid #bcd4dd;border-radius:10px}#dl324-originals figcaption{font-weight:700;margin:0 0 10px}#dl324-originals img{display:block;width:100%;max-width:750px;height:auto;margin:auto}
