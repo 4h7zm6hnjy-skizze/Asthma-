@@ -1,46 +1,30 @@
-ASTHMA – AMPEL 3.2.0
-====================
+ASTHMA 3.2.7 – iPHONE-UPDATE: SPEICHERN VON LUNGENFUNKTION UND DIFFUSION
 
-NEU
-- 5 farbige Lungen auf der Startseite: super / gut / geht so / nicht gut / kritisch
-- Mit einem Tipp wird dein Status verschlüsselt gespeichert.
-- 16 vorgegebene Notizen als Mehrfachauswahl.
-- Zusätzlich ein Häkchen „Eigene Notiz“ und ein Textfeld.
-- Optional: Beschwerden und Häufigkeit des Bedarfssprays.
-- Zweite/weitere Einträge pro Tag; bearbeiten und löschen.
-- Statistik: Tag, Woche, Monat, Jahr, 10 Jahre, Verlauf, Balkendiagramm, Monatskalender, Ausdruck/PDF.
-- Alte Statistik und alle bisherigen Daten bleiben unangetastet.
+WICHTIG: In diesen GitHub-Dateien stehen KEINE privaten Patientendaten oder Befundfotos.
+BITTE VOR DEM UPDATE: In der Asthma-App eine vollständige verschlüsselte Sicherung (.asthma17) erstellen, sicher ablegen und das bisherige App-Passwort behalten.
 
-SO GEHT ES AM EINFACHSTEN (Mac)
-1. ZIP-Datei entpacken.
-2. ASTHMA_UPDATE_3_2_0_MAC.command doppelt anklicken.
-3. Das Fenster erledigt Download, Prüfung und Vorbereitung automatisch. Wenn du am Mac bereits
-   für GitHub angemeldet bist, versucht das Programm auch den Upload.
-4. Bei Meldung „FERTIG“ am iPhone Asthma öffnen → Einstellungen → Nach Updates suchen.
+A) UPDATE (wenn die Version 3.2.6 bereits vollständig installiert ist)
+  Aus dem Ordner GitHub_Update nur diese 5 Dateien in den Stammordner des GitHub-Repositories ersetzen:
+  diffusion324.js, diffusion324.css, secure17.js, index.html, sw.js, version.json
+  (Es sind 6 Dateien.)
+  Danach Asthma-App öffnen und unter Einstellungen > Nach Updates suchen aktualisieren.
+  Im Profil / Einstellungen Version 3.2.7 prüfen.
+  App nicht deinstallieren. Keine Website-Daten löschen. Bestehenden Tresor entsperren.
 
-Wenn macOS die .command-Datei blockiert: Im Finder Rechtsklick → Öffnen. Wenn für GitHub
-keine Schreibanmeldung besteht, erscheint der Ordner FERTIG_ZUM_HOCHLADEN.
+B) LIEBER VOLLSTÄNDIGER CODE? Die ZIP Vollversion enthält alle 81 GitHub-Dateien.
+  Deren Inhalt aus GitHub_Update in den bestehenden Repository-Hauptordner hochladen und vorhandene Dateien ersetzen.
+  Niemals den privaten Import (JSON) oder andere personenbezogene Daten ins öffentliche GitHub-Repository hochladen.
 
-ALTERNATIVE: UPLOAD ÜBER GITHUB
-1. Den Mac-Befehl einmal ausführen (auch ein gescheiterter GitHub-Push erzeugt die fertigen
-   Dateien im Ordner FERTIG_ZUM_HOCHLADEN).
-2. In Safari (oder am Mac) https://github.com/4h7zm6hnjy-skizze/Asthma-/upload/main öffnen.
-3. Die sieben Dateien aus FERTIG_ZUM_HOCHLADEN im Hauptverzeichnis des Projekts hochladen,
-   bestehende gleichnamige Dateien ersetzen, Änderung „Commit“ bestätigen.
-4. Dann in der iPhone-Webapp unter Einstellungen „Nach Updates suchen“.
+C) PRIVATE DATEN IMPORTIEREN
+  In der App unter Lungenfunktion -> Befunde: Lungenfunktion und Diffusionsmessung:
+  "Private Importdatei auswählen" -> private JSON aus Dateien-App auswählen.
+  Die Version 3.2.7 speichert automatisch; kein weiterer Speichern-Klick nötig.
+  Prüfen, dass die Rückmeldung "Erfolgreich und verschlüsselt gespeichert" angezeigt wird.
+  Bei Problemen "Speicherfunktion prüfen" verwenden. Alternativ JSON-Text direkt ins Importtextfeld einfügen.
+  Das Diagramm unter Diffusionsmessung: Zeitverlauf bietet Tag, Woche, Monat, Jahr, 10 Jahre.
+  Mit nur einem Befund wird ein Punkt angezeigt; kein künstlicher Trend.
 
-SEHR WICHTIG
-- NICHT die App vom Home-Bildschirm löschen, NICHT Safari-Website-Daten löschen,
-  NICHT einen neuen Tresor anlegen.
-- Vorher eine verschlüsselte Sicherung innerhalb der App erstellen: Einstellungen →
-  Vollständige verschlüsselte Sicherung.
-- Das Update fasst deine lokal verschlüsselten Werte nicht an.
-- Es wird KEIN persönlicher medizinischer Datensatz nach GitHub übertragen.
-- Die Ampelfarben sind SELBSTBEWERTUNG, kein Notfallindikator. Bei schwerer Atemnot 112.
-- Das Update ist auf den GitHub-Code mit Basisversion 3.1.8 zugeschnitten.
-  Bei einer abweichenden neuen Version bricht die Vorbereitung zur Sicherheit ab.
+Die private Datei Asthma_28-10-2026_Lunge_und_Diffusion_OHNE_FOTOS.json bleibt außerhalb von GitHub.
+Daten werden lokal im verschlüsselten Tresor gespeichert. Der App-Updatecode allein trägt keine privaten Werte ein.
 
-GITHUB-SCHREIBRECHT
-Der ChatGPT-GitHub-Zugang konnte auf das Projekt nur lesend zugreifen (HTTP 403 bei Schreibversuchen).
-Daher konnte die Veröffentlichung nicht selbst durchgeführt werden. Das Paket macht sie
-am Mac weitgehend automatisch, wenn dein Mac die nötige GitHub-Anmeldung besitzt.
+TESTGRENZE: Desktop-Tests können die Speichersituation auf dem iPhone nicht garantieren. Keine iPhone-Installation aus der Ferne möglich.

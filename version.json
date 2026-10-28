@@ -1,5 +1,5 @@
 {
-  "version": "3.2.6",
+  "version": "3.2.7",
   "released": "2026-10-28",
-  "notes": "Fehlerkorrektur: Diffusionsverlauf für 1T/7T/30T/1J/10J, bestätigter Import mit automatischer Aktualisierung der Spirometrie-Diagramme, transparentes Statusfeld und Anhang-Nachimport."
+  "notes": "Import-Reparatur: Lungenfunktion und Diffusion per Dateiauswahl automatisch verschlüsselt speichern, Speicherbestätigung, JSON-Text-Alternative und Speicherdiagnose. Diffusionsdiagramm Tag/Woche/Monat/Jahr/10 Jahre bleibt erhalten."
 }

@@ -1,5 +1,5 @@
-/* Asthma 3.2.6: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
-const VERSION='3.2.6-insurance-cache';
+/* Asthma 3.2.7: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
+const VERSION='3.2.7-lung-import-repair';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
  './insurance325.js','./insurance325.css',

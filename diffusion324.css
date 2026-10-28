@@ -5,3 +5,5 @@
 #dl324 .dl324-edit-grid fieldset{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;border:1px solid #bcd4dd;border-radius:10px;min-width:0}#dl324 .dl324-edit-grid label{min-width:0}#dl324-status{font-weight:600;white-space:pre-wrap}
 
 #dl324-originals figure{margin:18px 0;padding:10px;background:white;border:1px solid #bcd4dd;border-radius:10px}#dl324-originals figcaption{font-weight:700;margin:0 0 10px}#dl324-originals img{display:block;width:100%;max-width:750px;height:auto;margin:auto}
+
+#dl324 .dl324-tip{font-size:.92rem;color:#375e73;line-height:1.45}#dl324 #dl324-paste textarea{display:block;width:100%;min-height:8rem;padding:10px;font-size:16px;box-sizing:border-box}#dl324 #dl324-status{border-left:4px solid #6a9ba8;padding-left:10px;min-height:22px}
