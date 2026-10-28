@@ -1,37 +1,21 @@
-ASTHMA 3.2.2 – REPARATUR DER WIEDERHERSTELLUNG
+ASTHMA 3.2.3 – EINRICHTUNGSANLEITUNG OHNE WEISSE SEITE
 
-Ursache im Code: Das Ampel-Modul speichert Datensätze in der Gruppe ampel.
-Der bisherige Export nimmt sie mit, aber Wiederherstellung, Import und
-Backupprüfung lehnen diese Gruppe ab. Dieser Fehler ist reproduziert und behoben.
-Ob deine verschlüsselte Sicherung genau daran scheitert, konnte hier ohne
-Entschlüsselung nicht bestätigt werden. Dein Passwort wird nicht benötigt
-und soll nicht hier oder bei GitHub angegeben werden.
+ZIP entpacken und die neun Dateien aus GitHub_Update in den bisherigen
+GitHub-Hauptordner hochladen. Gleichnamige Dateien ersetzen.
+Keine anderen Dateien löschen und keine privaten Sicherungen hochladen.
 
-INSTALLATION
-1. ZIP entpacken.
-2. Die 9 Dateien aus GitHub_Update im bisherigen Repository-Hauptordner
-   hochladen und gleichnamige Dateien ersetzen. Keine anderen Dateien löschen.
-   Repository laut vorhandener Anleitung:
-   https://github.com/4h7zm6hnjy-skizze/Asthma-/upload/main
-3. Veröffentlichung von GitHub Pages abwarten. Die Seite neu laden.
-   Wenn du in die bestehende App kommst, alternativ über Einstellungen
-   nach Updates suchen und installieren. Version 3.2.2 prüfen.
-4. Für normales Anmelden: weiterhin vorhandenes Passwort verwenden.
-   Eine Wiederherstellung ist nur nötig, wenn dieser Browser keinen Tresor hat.
-5. Wiederherstellung: Sicherungsdatei wählen und deren Passwort eingeben.
-   Das Sicherungspasswort wird auch zum späteren Anmelden übernommen.
-   Ein abweichendes neues Passwort ist nur noch eine optionale Auswahl.
-6. Sicherung geprüft wiederherstellen anklicken. Nach Erfolg Daten prüfen.
+Nach Veröffentlichung: in der App unter Einstellungen nach Updates suchen
+und Update installieren. Version 3.2.3 prüfen.
 
-WICHTIG
-- Die private Sicherungsdatei NICHT bei GitHub hochladen!
-- Keine Website-Daten löschen, bestehende App nicht deinstallieren.
-- Deine ursprüngliche Sicherung unverändert behalten.
-- Safari und die bisherige Home-Bildschirm-App bleiben getrennte Speicher.
-  Eine Wiederherstellung in Safari erzeugt dort eine separate Kopie, keinen Sync.
-- Falls eine Fehlermeldung bleibt: exakten Wortlaut/Screenshot schicken.
-  Sie unterscheidet nun doppelte IDs, unbekannte IDs und fehlende Inhalte.
+Arbeit → Treppenzähler → Kurzbefehl am iPhone einrichten:
+Die vollständige Anleitung klappt nun DIREKT UNTER DEM BUTTON auf.
+Kein neues Fenster, kein Seitenwechsel, keine zusätzliche Netzwerkanfrage
+für den Anleitungstext. Er ist im geladenen App-Skript enthalten.
+Die Anleitung lässt sich durch erneutes Tippen wieder schließen.
 
-Das Paket enthält auch die Treppen-Erweiterung 3.2.1, damit sie erhalten bleibt.
-Ein direkter iPhone-Test und die Entschlüsselung deiner Sicherung wurden nicht
-hier durchgeführt. Die Reparatur ist mit künstlichen verschlüsselten Testdaten geprüft.
+Die Reparatur der Wiederherstellung (3.2.2) und die Treppen-Schnellauswahl
+sind weiterhin enthalten. Passwörter und lokale Datensätze werden durch
+Installation dieses Updates nicht verändert.
+
+Der Button zeigt eine Anleitung; er installiert keinen Apple-Kurzbefehl
+automatisch. Die Schritte in der Anleitung müssen einmal eingerichtet werden.
