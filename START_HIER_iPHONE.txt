@@ -1,0 +1,20 @@
+ASTHMA 3.2.5 – ALLIANZ ZUSATZVERSICHERUNG (iPHONE)
+
+WICHTIG: In dieser GitHub-Datei sind KEINE privaten Fotos und KEINE persönlichen Versicherungsdaten enthalten.
+
+UPDATE EINBAUEN (bestehende Version 3.2.4):
+1. ZIP in der iPhone-App „Dateien“ entpacken.
+2. Nur die 8 Dateien AUS GitHub_Update in den HAUPTORDNER deines Asthma-GitHub-Repositories hochladen. Vorhandene Dateien gleichen Namens ersetzen.
+3. Die alte Asthma-App mit deinem bisherigen Passwort öffnen. Einstellungen > Nach Updates suchen > Update installieren. Version 3.2.5 prüfen. Nicht neuen Tresor anlegen!
+
+ORIGINALFOTOS UND VERTRAGSDATEN SICHER ÜBERNEHMEN:
+4. Die SEPARATE Datei PRIVAT_Allianz_Zusatzversicherung_10_Originalfotos.json in der iPhone-App „Dateien“ speichern. Diese NICHT auf GitHub hochladen und nicht öffentlich teilen. Sie enthält die echten Fotos und persönlichen Vertragsdaten, noch unverschlüsselt.
+5. Asthma-App entsperren > Zusatzversicherung > „Private Versicherungsdatei“ > JSON auswählen > „Fotos und Vertragsdaten übernehmen“.
+6. In der Vorschau die Ordner Gesundheitsbudget, Krankenhaus, Zahnversicherung, Paketübersicht, Datenschutz und Vertragsdaten prüfen.
+7. Unter Einstellungen eine neue VOLLSTÄNDIGE, verschlüsselte Asthma-Tresorsicherung erstellen. Die persönlichen Fotos sind danach darin enthalten.
+
+Die bisherigen Messwerte, Befunde und Kalendereinträge werden durch das App-Update und den Versicherungsimport nicht überschrieben. Import bricht bei Fehlern mit Meldung ab und lässt bereits übernommene Bilder stehen. Bereits importierte Dokumente werden beim erneuten Import anhand ihrer Kennung übersprungen.
+
+Änderungen: Neue Rubrik Zusatzversicherung mit Tarifleistungen und Einschränkungen, Versicherungsdaten, Dokumentengalerie, Jahresbudgets und manueller Erstattungsverwaltung. Import von 10 richtig zugeordneten Originalfotos. Zwei bereits im Ausgangsmaterial unvollständige JPEGs wurden als Anzeigekopien technisch neu gespeichert; ihre unveränderten Originaldateien werden zusätzlich im Tresor archiviert.
+
+Die tatsächlichen Erstattungsansprüche ergeben sich aus den vollständigen individuellen Versicherungsbedingungen.

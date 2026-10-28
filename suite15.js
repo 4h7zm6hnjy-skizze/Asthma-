@@ -19,7 +19,7 @@
   const csv=(rows,filename)=>{if(!confirm('Diese CSV-Datei ist unverschlüsselt und kann private Gesundheitsangaben enthalten. Fortfahren?'))return;download(new Blob(['\uFEFF'+rows.map(row=>row.map(escCSV).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8'}),filename)};
   const uuid=()=>uid();
   // A. Navigation: jede Ansicht ist einzeln aufrufbar und direkt verlinkbar.
-  const allowed=new Set(['start','profil','region','kalender','lungenwerte','vitalwerte','peakflow','befunde','labor','therapie','hilfen','antraege','akte','arbeit','bericht','statistik','wissen','einstellungen','mehr']);
+  const allowed=new Set(['start','profil','region','kalender','lungenwerte','vitalwerte','peakflow','befunde','labor','therapie','hilfen','antraege','akte','arbeit','bericht','statistik','wissen','einstellungen','mehr','versicherung']);
   function go(page,{scroll=true}={}){
     if(!allowed.has(page))page='start';
     qa('[data-nav-page]').forEach(el=>{el.hidden=el.dataset.navPage!==page});
