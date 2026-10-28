@@ -1,5 +1,5 @@
-/* Asthma 3.2.2: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
-const VERSION='3.2.2-consistent-cache';
+/* Asthma 3.2.3: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
+const VERSION='3.2.3-consistent-cache';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
  './stairs-shortcuts.js','./stairs-shortcuts.css','./KURZBEFEHLE_ANLEITUNG.html',

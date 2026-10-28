@@ -1,5 +1,5 @@
 {
-  "version": "3.2.2",
+  "version": "3.2.3",
   "released": "2026-10-28",
-  "notes": "Sicherungen mit Ampel-Daten wiederherstellbar. Einheitliche Prüfung vor Schreiben, getrennte Fehlerdiagnose. Wiederherstellung verwendet standardmäßig das Sicherungspasswort."
+  "notes": "Kurzbefehl-Anleitung direkt in der App aufklappbar, ohne neues Fenster oder zusätzliche Seitenanfrage. Wiederherstellungsreparatur 3.2.2 bleibt enthalten."
 }

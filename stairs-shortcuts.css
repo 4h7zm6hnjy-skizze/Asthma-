@@ -11,3 +11,10 @@
 @media print{.tq-panel,.tq-gate,#tq-dialog{display:none!important}}
 
 .tq-panel label{display:block;margin-top:15px}.tq-panel input{width:100%;box-sizing:border-box;font-size:16px;padding:10px;border:1px solid #9dbbce;border-radius:8px}
+
+#tq-help{margin:14px 0;border:1px solid #aacbd8;border-radius:10px;background:#fff;min-width:0}
+#tq-help>summary{cursor:pointer;padding:14px;color:#075b77;font-weight:700;min-height:44px;box-sizing:border-box}
+#tq-help .tq-help-body{padding:0 14px 14px;font-size:16px;line-height:1.6;overflow-wrap:anywhere}
+#tq-help h4,#tq-help h5{font-size:1.05rem;line-height:1.35;margin:20px 0 12px}
+#tq-help pre,#tq-help code{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9em;background:#edf5f9}
+#tq-help pre{padding:10px;border-radius:8px}#tq-help ol{padding-left:24px}#tq-help li{margin:12px 0}
