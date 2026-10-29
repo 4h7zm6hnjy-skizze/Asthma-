@@ -22,6 +22,7 @@
     {name:'postalCode',label:'Postleitzahl',type:'text',size:12},
     {name:'city',label:'Wohnort',type:'text',size:120},
     {name:'birthDate',label:'Geburtsdatum',type:'date'},
+    {name:'heightCm',label:'Körpergröße (cm)',type:'number',min:90,max:250,step:'0.1'},
     {name:'weightKg',label:'Gewicht in Kilogramm',type:'number',min:1,max:500,step:'0.1'},
     {name:'weightDate',label:'Datum der Gewichtsmessung (optional)',type:'date'},
     {name:'doctor',label:'Behandelnde Praxis (optional)',type:'text',size:120,wide:true},
@@ -55,6 +56,15 @@
     label.append(text,input);grid.append(label);
   }
   form.append(grid);
+  const calc=document.createElement('div');calc.id='pp347-profile-body';calc.className='pp347-body';calc.setAttribute('aria-live','polite');form.append(calc);
+  const drawBody=()=>{
+    const calcAPI=window.PNEUMOPRO_AMPEL347,ref=calcAPI?.body(form.elements.heightCm.value,form.elements.weightKg.value);
+    if(!ref){calc.textContent='Für BMI und Körperoberfläche bitte Körpergröße und Gewicht eintragen.';return;}
+    const n=(v,d)=>v.toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
+    calc.replaceChildren();const row=document.createElement('strong');row.textContent='BMI: '+n(ref.bmi,1)+' kg/m² · Körperoberfläche: '+n(ref.bsa,2)+' m²';calc.append(row);
+    const p=document.createElement('p');p.textContent='BMI-Orientierungsbereich für Erwachsene: '+n(ref.weightMin,1)+'–'+n(ref.weightMax,1)+' kg (BMI 18,5 bis unter 25). Keine persönliche Therapie- oder Gewichts-Vorgabe.';calc.append(p);
+  };
+  grid.addEventListener('input',event=>{if(['heightCm','weightKg'].includes(event.target.name))drawBody()});
   const actions=document.createElement('div');actions.className='a27-form-actions';
   const save=document.createElement('button');save.type='submit';save.className='btn btn-primary';save.textContent='Persönliche Daten verschlüsselt speichern';
   const msg=document.createElement('p');msg.id='a27-profile-msg';msg.setAttribute('role','status');msg.setAttribute('aria-live','polite');
@@ -78,7 +88,7 @@
     }
     msg.textContent='';
     document.querySelectorAll('#a27-profile input[type=date]').forEach(el=>el.max=today());
-    refreshName();
+    refreshName();drawBody();
   };
   form.addEventListener('submit',async event=>{
     event.preventDefault();if(save.disabled)return;
@@ -93,6 +103,11 @@
       msg.textContent='Bitte ein Gewicht zwischen 1 und 500 kg eintragen.';return;
     }
     personal.weightKg=kg===''?null:Number(kg);
+    const h=personal.heightCm.replace(',','.');
+    if(h!==''&&(!Number.isFinite(Number(h))||Number(h)<90||Number(h)>250)){
+      msg.textContent='Bitte eine Körpergröße zwischen 90 und 250 cm eingeben.';return;
+    }
+    personal.heightCm=h===''?null:Number(h);
     save.disabled=true;msg.textContent='Daten werden verschlüsselt gespeichert …';
     try{
       await SEC.updateProfile({personal:{...readPersonal(),...personal}});
@@ -130,6 +145,9 @@
     if(kg!==null&&Number.isFinite(kg)&&kg>=1&&kg<=500){
       details.push('Gewicht: '+kg.toLocaleString('de-DE',{maximumFractionDigits:1})+' kg');
     }
+    const h=window.PNEUMOPRO_AMPEL347?.heightCm(p.heightCm),result=window.PNEUMOPRO_AMPEL347?.body(h,kg);
+    if(h!==null&&h!==undefined)details.push('Größe: '+h.toLocaleString('de-DE',{maximumFractionDigits:1})+' cm');
+    if(result)details.push('BMI: '+result.bmi.toLocaleString('de-DE',{maximumFractionDigits:1})+' · KOF: '+result.bsa.toLocaleString('de-DE',{maximumFractionDigits:2})+' m²');
     const city=String(p.city||'').trim();
     if(city)details.push('Wohnort: '+city.slice(0,120));
     patientDetails.textContent=details.join(' · ');

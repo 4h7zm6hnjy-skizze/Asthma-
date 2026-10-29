@@ -111,7 +111,8 @@
      return ordered.sort((a,b)=>a-b).map(i=>pts[i]);
    };
    const nums=values.flatMap(x=>series.map(([k])=>num(x[k])).filter(x=>x!==null));
-   const refVals=series.map(([k])=>num(refs[k])).filter(v=>v!==null);
+   const band=unit==='kg'?window.PNEUMOPRO_AMPEL347?.body(SEC.profileGet()?.personal?.heightCm,values.at(-1)?.value):null;
+   const refVals=series.map(([k])=>num(refs[k])).filter(v=>v!==null).concat(band?[band.weightMin,band.weightMax]:[]);
    let min=Math.min(...nums,...refVals),max=Math.max(...nums,...refVals),pad=max===min?Math.max(1,max*.06):(max-min)*.13;
    min=Math.max(0,min-pad);max+=pad;if(min===max)max=min+1;
    const y=v=>T+(H-T-B)*(max-v)/(max-min);
@@ -119,6 +120,7 @@
    const finish=Date.parse(values.at(-1).date+'T'+(values.at(-1).time||'12:00'))||start;
    const x=val=>{const ts=Date.parse(val.date+'T'+(val.time||'12:00'))||start;return L+(W-L-R)*(finish===start?0.5:(ts-start)/(finish-start));};
    function shape(kind,attrs,content){const el=document.createElementNS(svgNS,kind);for(const [key,v] of Object.entries(attrs||{}))el.setAttribute(key,String(v));if(content!==undefined)el.textContent=String(content);svg.append(el);return el;}
+   if(band){const highY=y(band.weightMax),lowY=y(band.weightMin);shape('rect',{x:L,y:highY,width:W-L-R,height:Math.max(1,lowY-highY),fill:'#d9f3e5',opacity:.9});shape('line',{x1:L,x2:W-R,y1:highY,y2:highY,stroke:'#277847','stroke-dasharray':'6 4'});shape('line',{x1:L,x2:W-R,y1:lowY,y2:lowY,stroke:'#277847','stroke-dasharray':'6 4'});shape('text',{x:W-R-5,y:Math.max(T+13,highY-5),'font-size':12,'text-anchor':'end',fill:'#186f48'},'BMI 18,5–<25');}
    // Show explicit units, numeric scales and (bounded) real measurement labels.
    shape('text',{x:L,y:20,'font-size':14,'font-weight':'700',fill:'#244d61'},'Messwert ('+(unit||'Einheit')+')');
    for(let i=0;i<6;i++){const value=min+(max-min)*(5-i)/5,yy=T+(H-T-B)*i/5;shape('line',{x1:L,x2:W-R,y1:yy,y2:yy,stroke:'#d5e1e8','stroke-width':1});shape('text',{x:L-9,y:yy+4,'text-anchor':'end','font-size':12,fill:'#405967'},format(value,digits));}
@@ -142,7 +144,7 @@
        }
      }
 
-     for(const p of pts){const bp=unit==='mmHg'&&series.some(a=>a[0]==='diastolic')?window.ASTHMA_BPA344?.classifyPart(p[key],key==='value'?'systolic':'diastolic'):null;const el=shape('circle',{cx:x(p),cy:y(num(p[key])),r:pts.length>160?2.1:4.7,fill:bp?.color||color,stroke:'#fff','stroke-width':1});const tip=document.createElementNS(svgNS,'title');tip.textContent=fmt(p.date)+' '+(p.time||'')+' · '+label+': '+format(num(p[key]),digits)+' '+unit;if(bp)tip.textContent+=' · '+bp.label;el.append(tip);}
+     for(const p of pts){const bp=unit==='mmHg'&&series.some(a=>a[0]==='diastolic')?window.ASTHMA_BPA344?.classifyPart(p[key],key==='value'?'systolic':'diastolic'):null;const pp=unit==='%'?(series.length===1&&label==='SpO₂'?window.PNEUMOPRO_AMPEL347?.classify('spo2',p[key]):key==='fev1'||key==='fvc'?window.PNEUMOPRO_AMPEL347?.classify(key,p[key]):null):unit==='/min'&&label==='Puls'?window.PNEUMOPRO_AMPEL347?.classify('pulse',p[key]):null;const el=shape('circle',{cx:x(p),cy:y(num(p[key])),r:pts.length>160?2.1:4.7,fill:bp?.color||pp?.color||color,stroke:'#fff','stroke-width':1});const tip=document.createElementNS(svgNS,'title');tip.textContent=fmt(p.date)+' '+(p.time||'')+' · '+label+': '+format(num(p[key]),digits)+' '+unit;if(bp)tip.textContent+=' · '+bp.label;if(pp)tip.textContent+=' · '+pp.label;el.append(tip);}
      const chosen=selectLabels(pts.map(p=>[p,num(p[key])]),series.length>1?4:7);
      for(const [p,val] of chosen){
        let yy=y(val)+(seriesIndex%2?21:-12);
@@ -223,6 +225,7 @@
      panel(root,'pulse','Puls',pulse,[{title:'Pulsverlauf',unit:'/min',series:[['value','Puls','#9366b8']]}],[['value','Puls (/min)',0],['source','Messquelle',-2]],{value:refs.pulse});
      const weight=weights.map(x=>({...x,value:num(x.kg)}));
      panel(root,'weight','Gewicht',weight,[{title:'Gewichtsverlauf',unit:'kg',series:[['value','Gewicht','#3c8c77']]}],[['value','Gewicht (kg)',1],['note','Notiz',-2]],{});
+     const weightBand=window.PNEUMOPRO_AMPEL347?.body(SEC.profileGet()?.personal?.heightCm,weight.at(-1)?.value??SEC.profileGet()?.personal?.weightKg);if(weightBand){const w=root.querySelector('[data-s292-kind="weight"]');if(w)w.append(node('p','s292-note','Grüner Zielbereich im Diagramm: '+format(weightBand.weightMin,1)+'–'+format(weightBand.weightMax,1)+' kg (BMI 18,5 bis unter 25). Allgemeine Erwachsenen-Orientierung, keine individuelle ärztliche Gewichtsempfehlung.'));}
      if(!weights.length){const x=SEC.profileGet()?.personal?.weightKg;const w=num(x);const target=root.querySelector('[data-s292-kind="weight"]');target?.append(node('p','s292-note',w!==null&&w>0?'Im Profil hinterlegtes aktuelles Gewicht: '+format(w,1)+' kg. Ein zeitlicher Gewichtsverlauf entsteht erst durch datierte Gewichtseinträge.':'Für einen Gewichtsverlauf unter Vitalwerte regelmäßig Messungen speichern.'));}
      const handRows=pef.map(x=>({ ...x, pef:num(x.pef),fev1:num(x.fev1)})).filter(x=>x.pef!==null||x.fev1!==null);
      panel(root,'pef','Peak-Flow und FEV₁ (Heim-/Handmessung)',handRows,[{title:'PEF-Verlauf',unit:'l/min',series:[['pef','PEF','#217f9b']]},{title:'FEV₁-Verlauf (Handmessung)',unit:'l',series:[['fev1','FEV₁','#ce8248']]}],[['pef','PEF (l/min)',0],['fev1','FEV₁ (l)',2],['source','Herkunft',-2]],{pef:refs.pef});

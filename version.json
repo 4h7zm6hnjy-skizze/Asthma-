@@ -1,5 +1,5 @@
 {
-  "version": "3.4.6",
+  "version": "3.4.7",
   "released": "2026-10-29",
-  "notes": "Enthält Asthma-Update 3.4.5 (Offline-Betrieb, Statistik/PDF, Arzt-/Krankenhausberichte). Umbenennung in PneumoPro bei unverändertem Logo, gleicher verschlüsselter Datenbank und bestehender Installation. Sicherer Passwortwechsel mit aktuellem Passwort und Bestätigung; Passwort-vergessen-Hilfe mit schreibgeschützter Backup-Prüfung."
+  "notes": "PneumoPro: Körpergröße im persönlichen Profil, automatische BMI- und Körperoberflächenberechnung (Mosteller), allgemeiner BMI-Gewichtsorientierungsbereich als grünes Band im 10-Jahres-Gewichtsdiagramm und Statistik-PDF; erweiterte Ampel für SpO₂, Ruhepuls, Lungenfunktion sowie Blutdruck, mit Sicherheits- und Referenzhinweisen. Bestehende 3.4.6-Funktionen, Offline-Speicher, Tresor und Logo unverändert."
 }

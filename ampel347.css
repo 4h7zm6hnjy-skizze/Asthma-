@@ -1,0 +1,9 @@
+/* PneumoPro 3.4.7 – gemeinsame, barrierearme Statusanzeigen */
+.pp347-card{border-left:6px solid var(--pp347-tone,#7c8992)!important}
+.pp347-status{display:inline-block;margin:10px 0 2px;border:2px solid var(--pp347-tone,#64748b);color:var(--pp347-tone,#64748b);background:#fff;padding:7px 9px;border-radius:10px;font-weight:800;font-size:.79rem;line-height:1.35;overflow-wrap:anywhere}
+.pp347-record{border-left:5px solid var(--pp347-tone,#7c8992)!important;padding-left:12px!important}
+.pp347-note{font-size:.82rem;line-height:1.5;color:#526979;margin:10px 0}
+.pp347-body{background:#f2f9fc;border:1px solid #bddbe7;border-radius:13px;padding:12px;margin:12px 0;line-height:1.6;color:#214956}
+.pp347-body strong{color:#155b72}
+.pp347-weight-band{color:#1a7a4d;font-weight:750}
+@media print {.pp347-status{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
