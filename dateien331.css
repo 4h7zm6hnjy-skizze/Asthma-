@@ -1,0 +1,25 @@
+/* Asthma 3.3.1: einfache iPhone-Ansicht zum Hochladen und Fotografieren */
+#dateien{max-width:1060px;margin-inline:auto}
+#dateien .dh331-wrap{display:grid;gap:18px;padding-bottom:28px}
+#dateien h3{margin:0 0 10px}
+#dateien .dh331-categories{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#dateien .dh331-categories button{display:flex;align-items:center;gap:11px;min-height:72px;text-align:left;padding:13px;border-radius:14px;border:1px solid #bad0da;background:#fff;color:#183a4b;font-size:16px;font-weight:650;cursor:pointer}
+#dateien .dh331-categories button span{font-size:24px}
+#dateien .dh331-categories button[aria-pressed="true"]{border:2px solid #18788e;background:#dff2f6;box-shadow:inset 0 0 0 1px #18788e}
+#dateien .dh331-panel{padding:16px;border:1px solid #cbdee5;border-radius:15px;background:#f5fafd}
+#dateien .dh331-picker{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+#dateien .dh331-picker label{display:flex;align-items:center;justify-content:center;min-height:54px;position:relative;cursor:pointer;text-align:center;padding:11px;font-size:16px}
+#dateien .dh331-picker input{position:absolute;bottom:0;left:0;opacity:0;width:1px;height:1px}
+#dateien .dh331-picker label:focus-within{outline:3px solid #147b93;outline-offset:2px}
+#dateien .dh331-date{margin:12px 0}
+#dateien .dh331-date label{display:grid;gap:7px;margin:10px 0}
+#dateien .dh331-date input{padding:9px;max-width:260px;font-size:16px}
+#dateien .dh331-hint{font-size:.87rem;color:#4b6674}
+#dateien .dh331-status{min-height:48px;padding:12px;background:#e5f5ee;border-radius:10px;overflow-wrap:anywhere}
+#dateien .dh331-status.dh331-error{background:#fbe6e3;color:#893b35}
+#dateien .dh331-follow:not([hidden]){display:flex;flex-wrap:wrap;gap:9px;padding-top:10px}
+#dateien .dh331-document{background:#fff;border:1px solid #cedfe6;border-radius:12px;padding:12px;margin:9px 0;overflow-wrap:anywhere}
+#dateien .dh331-document strong,#dateien .dh331-document small{display:block;margin-bottom:6px}
+#dateien .dh331-document small{color:#506b79}
+#dateien .dh331-row-buttons{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+@media(max-width:570px){#dateien .dh331-categories,#dateien .dh331-picker{grid-template-columns:1fr}#dateien .dh331-categories button{min-height:62px}}

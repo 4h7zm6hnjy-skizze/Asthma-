@@ -1,5 +1,5 @@
 {
-  "version": "3.3.0",
-  "released": "2026-10-28",
-  "notes": "Inhaltsverzeichnis für Monats- und Jahresberichte: antippbare Abschnittslinks, dynamische Druckauswahl sowie PDF-Inhaltsverzeichnis mit echten Seitenzahlen."
+  "version": "3.3.1",
+  "released": "2026-10-29",
+  "notes": "Neuer zentraler Bereich Dateien & Scannen: Lungenfunktion, Labor, Arztbriefe und Entlassungsberichte. Bestehende Importer und verschlüsselter Dokumentenspeicher bleiben erhalten."
 }

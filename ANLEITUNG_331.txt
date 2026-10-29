@@ -1,0 +1,39 @@
+ASTHMA-UPDATE 3.3.1 – DATEIEN & SCANNEN
+29.10.2026
+
+NEU
+- Eigener Bereich "Dateien & Scannen" in Hauptnavigation, Startseite und unterer Schnellnavigation.
+- Nur die Art auswählen: Lungenfunktion, Labor, Arztbriefe, Entlassungsberichte, Sonstige Befunde.
+- Danach "Datei auswählen" oder "Kamera öffnen / scannen".
+- PDF/Fotos von Arztbriefen und Entlassungsberichten werden mit Kategorie und optionalem Dokumentdatum im bestehenden verschlüsselten Tresor gespeichert.
+- Arztbriefe und Entlassungsberichte erscheinen in einem eigenen chronologischen Bereich, mit Öffnen und Löschen.
+- Lungenfunktions-JSON wird an den bisherigen geprüften Import weitergereicht; Lungenfunktionsdiagramme und Berichte verwenden weiterhin die bestehenden Messwert-Datensätze.
+- Labor-JSON wird an die bestehende Laborakte zur Prüfung vor dem Import weitergereicht.
+- Fotos und PDFs werden als Originaldateien gespeichert, nicht automatisch in Messwerte umgerechnet.
+- Keine Änderung oder Löschung alter Daten, keine neue Datenbank, keine Weitergabe an Server.
+
+INSTALLATION MIT IPHONE
+1. UNBEDINGT zuvor in der bisherigen Asthma-App unter Einstellungen ein verschlüsseltes Backup erstellen und sicher aufheben.
+2. ZIP herunterladen, in der iPhone-App "Dateien" öffnen und entpacken.
+3. GitHub-Repository 4h7zm6hnjy-skizze/Asthma- in Safari öffnen, Branch main.
+4. Aus dem Ordner GitHub_Update genau die 10 dort enthaltenen Dateien in den Repository-Hauptordner hochladen. Bestehende Dateien gleichen Namens aktualisieren/ersetzen. Den Ordner selbst nicht als Unterordner auf GitHub erstellen.
+5. Änderung committen und GitHub-Pages-Bereitstellung abwarten.
+6. Asthma-App öffnen, vorhandenen Tresor mit dem bisherigen Passwort entsperren. Einstellungen → Nach Updates suchen → Update installieren. Angezeigte Version 3.3.1 prüfen.
+7. In der oberen Navigation oder unten auf „Dateien“ tippen. Zuerst einen unwichtigen Test-PDF-Upload probieren; kontrollieren, ob er in „Meine Akte → Dokumente“ auftaucht. Anschließend in der neuen Seite löschen.
+
+WICHTIG
+- NICHT die ZIP-Datei selbst in GitHub hochladen, sondern die Dateien AUS dem GitHub_Update-Ordner.
+- KEINE privaten Befunde, JSON-Importdateien oder Patientenfotos in das öffentliche GitHub-Repository laden.
+- Die App kann vorhandene PDF- und Bilddateien lokal verschlüsselt speichern. Kamera-Scannen bedeutet Fotoaufnahme; kein automatisches OCR und kein eingebautes mehrseitiges Scan-PDF. Auf dem iPhone kann man für ein mehrseitiges PDF die Scannerfunktion der Dateien-App verwenden und das fertige PDF in die Asthma-App importieren.
+- Maximal 12 MB pro Originaldokument. Bestehende Grenzwerte gelten weiterhin.
+- Der Laborimport muss in der Laborakte bestätigt werden.
+- Bestehende Monats-/Jahresberichte und Diagramme wurden nicht umgebaut; nur valide gespeicherte Messwerte gehen in ihre bisherigen Auswertungen ein.
+
+TECHNISCHE PRUEFUNG
+- Syntaxprüfung aller geänderten JS-Dateien: bestanden.
+- Mobilansicht bei 390px: ohne horizontales Scrollen geprüft.
+- Neue zentrale Kategorien und Button-Reaktionen: bestanden im simulierten Browser.
+- Arztbrief-/Entlassungsbericht-Ablage und Dokumentenliste: bestanden mit Testdaten.
+- Übergabe einer Lungenfunktionsdatei an den bisherigen Import: bestanden im simulierten Browser.
+- Kein erfolgreicher Live-Upload in das GitHub-Repository (GitHub-Schnittstelle meldete 403).
+- Keine Prüfung auf einem realen iPhone oder mit realem verschlüsseltem Nutzerbestand.
