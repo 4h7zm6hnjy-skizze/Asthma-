@@ -1,5 +1,5 @@
 'use strict';
-/* Asthma 3.4.0: Klar beschriftete, aktuelle Werte und Gewichtsdiagramm.
+/* Asthma 3.4.1: Klar beschriftete, aktuelle Werte und Gewichtsdiagramm.
    Nur lesender Zugriff auf die vorhandenen Datensätze, keine Migration. */
 (()=>{
  const S=window.ASTHMA_SECURITY,$=id=>document.getElementById(id);
@@ -47,5 +47,5 @@
  }
  let timer;window.addEventListener('asthma:secure-change',e=>{if(e.detail?.group==='suite'){clearTimeout(timer);timer=setTimeout(()=>refresh().catch(()=>{}),120)}});window.addEventListener('asthma:lung-study-imported',()=>refresh().catch(()=>{}));
  refresh().catch(e=>{const out=$('m340-vital-cards');if(out)out.textContent='Daten konnten nicht geladen werden: '+e.message});
- window.__ASTHMA_METRICS340_TEST=Object.freeze({version:'3.4.0',cutoff});
+ window.__ASTHMA_METRICS340_TEST=Object.freeze({version:'3.4.1',cutoff});
 })();

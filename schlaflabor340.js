@@ -1,5 +1,5 @@
 'use strict';
-/* Asthma 3.4.0 – Schlaflaborakte, lokale AES-GCM-Speicherung in bestehender suite.
+/* Asthma 3.4.1 – Schlaflaborakte, lokale AES-GCM-Speicherung in bestehender suite.
    Nur dokumentierte Werte, keine automatischen medizinischen Diagnosen. */
 (()=>{
  const S=window.ASTHMA_SECURITY,NAV=window.ASTHMA_NAV,$=id=>document.getElementById(id);
@@ -151,5 +151,5 @@
  form.addEventListener('submit',save);$('sl340-cancel').addEventListener('click',reset);metric.addEventListener('change',plotChart);period.addEventListener('change',plotChart);
  window.addEventListener('asthma:secure-change',ev=>{if(ev.detail?.group==='suite'||ev.detail?.group==='documents'){clearTimeout(debounce);debounce=setTimeout(()=>refresh().catch(e=>say(e.message,true)),130)}});
  reset();refresh().catch(e=>say('Schlaflaborakte konnte nicht geladen werden: '+e.message,true));
- window.__ASTHMA_SCHLAF340_TEST=Object.freeze({fields:fields.map(x=>x[0]),version:'3.4.0',afterPeriod});
+ window.__ASTHMA_SCHLAF340_TEST=Object.freeze({fields:fields.map(x=>x[0]),version:'3.4.1',afterPeriod});
 })();

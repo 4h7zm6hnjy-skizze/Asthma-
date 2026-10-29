@@ -1,0 +1,10 @@
+ASTHMA 3.4.1 - UPLOAD UND SCHLAFBEFUND
+
+1. VORHER unter Einstellungen ein verschlüsseltes Backup erstellen.
+2. Den Ordner GitHub_Update aus der Update-ZIP in das GitHub-Repository (main, Hauptordner) hochladen. Gleichnamige APP-Dateien ersetzen. Die private Import-JSON und die Befundbilder NICHT auf GitHub hochladen.
+3. Asthma-App auf dem iPhone öffnen, Tresor entsperren, unter Einstellungen Update suchen; Version 3.4.1 prüfen.
+4. Schlaflabor öffnen > BEFUND MIT ORIGINALDIAGRAMMEN IMPORTIEREN > die SEPARATE Datei Schlaflabor_20-09-2022_Werte_und_5_Originaldiagramme_PRIVAT_IMPORT.json wählen. Import bestätigen.
+5. AHI, RDI, ODI usw. und die Galerie der 5 Originalbilder kontrollieren.
+6. Monats-/Jahresbericht neu berechnen. Schlaflabor-Werte und Schlaflabor-Originaldiagramme sind dort einzeln an-/abwählbar. PDF erneut erzeugen.
+
+WICHTIG: Die Importdatei enthält unverschlüsselte sensible Gesundheitsdaten. Sie wird NUR in der entsperrten App verschlüsselt gespeichert. Die importierte Datei selbst bleibt unverschlüsselt im iPhone-Dateisystem; deshalb sicher aufbewahren bzw. nach bestätigter Datensicherung entfernen. Originaldiagramme sind keine aus Einzelwerten neu errechneten Zeitreihen. Der Bericht ist eine ambulante Polygraphie, keine EEG-Polysomnographie.

@@ -1,5 +1,5 @@
 {
-  "version": "3.4.0",
+  "version": "3.4.1",
   "released": "2026-10-29",
-  "notes": "Seitliches Menü, klare Messwertkarten und großes Gewichtsdiagramm; neuer Schlaflabor-Bereich mit Atemstörungen (AHI/REI/ODI), Sauerstoffdaten, Schlafphasen, PAP-Einstellungen, Originaldokumenten, Langzeitdiagrammen und einzeln auswählbarem Statistikabschnitt."
+  "notes": "Schlaflabor 20./21.09.2022: sicherer privater Import, fünf Originalbilder und Nachtkurven, eigene Diagrammgalerie und separat auswählbare Originalbilder in Monats-/Jahres-PDFs. Verbesserte AHI-Darstellung der Polygraphie."
 }

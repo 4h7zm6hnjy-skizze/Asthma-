@@ -1,0 +1,10 @@
+/* Asthma 3.4.1 – privater Bildimport und responsive Diagrammgalerie */
+.sl341-import,.sl341-gallery{border:2px solid #9dc9d2!important;background:#f3fbfd}
+.sl341-import .sl341-file-label{position:relative;display:inline-flex;align-items:center;justify-content:center;min-height:52px;cursor:pointer}
+.sl341-import .sl341-file-label input{position:absolute;width:1px;height:1px;opacity:0;left:0;bottom:0}
+.sl341-import .sl341-file-label:focus-within{outline:3px solid #0d7596;outline-offset:3px}
+.sl341-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(290px,100%),1fr));gap:14px;margin:14px 0}
+.sl341-figure{margin:0;background:white;padding:11px;border:1px solid #bfd4df;border-radius:12px;display:flex;flex-direction:column;align-items:stretch;gap:11px;overflow:hidden}
+.sl341-figure img{display:block;width:100%;height:auto;max-height:370px;object-fit:contain;background:#f6f8f9;cursor:zoom-in;border:1px solid #d8e3ea}
+.sl341-figure figcaption{font-size:14px;font-weight:800;line-height:1.45;color:#1f5064;overflow-wrap:anywhere}
+.sl341-gallery h3,.sl341-import h3{font-weight:950!important;letter-spacing:.3px}

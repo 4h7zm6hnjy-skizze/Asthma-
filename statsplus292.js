@@ -16,7 +16,7 @@
  const kinds=[['spo2','Blutsauerstoff – Diagramm'],['bp','Blutdruck – Diagramm'],['pulse','Puls – Diagramm'],
   ['weight','Gewicht – Diagramm'],['pef','Peak-Flow – Diagramm'],['lung','Lungenfunktion – Diagramme'],
   ['lungfull','Lungenfunktion – alle Befundwerte'],['diffusion','Diffusionsmessung – Diagramme'],
-  ['difffull','Diffusion – alle Befundwerte'], ['sleep','Schlaflabor – Messwerte und Befunde']];
+  ['difffull','Diffusion – alle Befundwerte'], ['sleep','Schlaflabor – Messwerte und Befunde'], ['sleepimages','Schlaflabor – Originaldiagramme und Befundseiten']];
  const allKinds=[...baseKinds,...kinds];
  const num=v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))?Number(v):null;
  const iso=s=>/^\d{4}-\d\d-\d\d$/.test(s||'')?s:'';
@@ -26,6 +26,7 @@
  const nsum=xs=>xs.length?xs.reduce((a,b)=>a+b,0)/xs.length:null;
  const makeDate=row=>String(row.date||'')+'T'+String(row.time||'12:00');
  const selected=Object.fromEntries(allKinds.map(x=>[x[0],true]));
+ let sleepImageUrls=[];
  const controls=node('fieldset','s292-controls');controls.id='statsplus292-options';
  controls.append(node('legend','','Monats-/Jahresbericht: Bereiche für Druck und PDF auswählen'));
  controls.append(node('p','s292-note','Jedes Thema einzeln auswählbar. Nur markierte Abschnitte erscheinen im Ausdruck und in der lokal erzeugten PDF-Datei. Die Vorschau selbst enthält weiterhin alle Werte.')); 
@@ -259,16 +260,17 @@
      const documents=(await SEC.list('documents')).filter(x=>x&&x.kind==='Schlaflaborbericht');
      const studies=suite.filter(x=>x.type==='sleep340').map(x=>x.value).filter(within);
      const sleepRows=studies.map(x=>({date:x.date,time:x.time||'12:00',type:x.studyType,
-       ahi:x.studyType==='psg'?num(x.ahi):null,
+       ahi:x.studyType==='psg'?num(x.ahi):null,polyAhi:x.studyType==='polygraphy'?num(x.ahi):null,
        rei:x.studyType==='polygraphy'?num(x.rei):null,
        odi:num(x.odi),spo2min:num(x.spo2min),efficiency:num(x.efficiency),residualAhi:x.studyType==='pap'?num(x.residualAhi):null}));
      panel(root,'sleep','Schlaflabor – Messwerte und Untersuchungen',sleepRows,
        [{title:'AHI – Polysomnographie',unit:'Ereignisse/h',series:[['ahi','AHI','#1b7c90']]},
+        {title:'AHI – ambulante Polygraphie',unit:'Ereignisse/h',series:[['polyAhi','AHI (Polygraphie)','#1b7c90']]},
         {title:'REI – Polygraphie',unit:'Ereignisse/h',series:[['rei','REI','#aa7040']]},
         {title:'ODI – Sauerstoffabfallindex',unit:'Abfälle/h',series:[['odi','ODI','#8b5daa']]},
         {title:'SpO₂ – Tiefstwert im Schlaf',unit:'%',series:[['spo2min','SpO₂ Min','#366fa1']]},
         {title:'Rest-AHI – PAP-Geräteauswertung',unit:'Ereignisse/h',series:[['residualAhi','Rest-AHI','#258578']]}],
-       [['ahi','AHI (Ereignisse/h)',1],['rei','REI (Ereignisse/h)',1],['odi','ODI (Abfälle/h)',1],
+       [['ahi','AHI (Ereignisse/h)',1],['polyAhi','AHI Polygraphie (Ereignisse/h)',1],['rei','REI (Ereignisse/h)',1],['odi','ODI (Abfälle/h)',1],
         ['spo2min','SpO₂ Minimum (%)',1],['efficiency','Schlafeffizienz (%)',1],['residualAhi','Rest-AHI PAP (/h)',1],['type','Untersuchungsart',-2]]);
      const sleepBox=root.querySelector('[data-s292-kind="sleep"]');
      const sleepLabels={
@@ -313,6 +315,23 @@
          if(attachments.length)sleepBox.append(node('p','s292-note','Gespeicherte Originale (in der privaten Akte): '+attachments.map(d=>String(d.name||'Dokument').slice(0,160)).join(' · ')));
        }
      }
+     // Dokumentenfotos sind NUR aus dem lokalen verschlüsselten Tresor gelesen.
+     // Kein Rohbild im öffentlichen JavaScript, kein Serverupload.
+     sleepImageUrls.forEach(u=>URL.revokeObjectURL(u));sleepImageUrls=[];
+     const imgBox=node('section','s292-category s341-report');imgBox.dataset.s292Kind='sleepimages';
+     imgBox.append(node('h3','','Schlaflabor – Originaldiagramme und Befundseiten'));
+     const selectedStudyIds=new Set(studies.map(rec=>rec.id));
+     const linked=documents.filter(d=>selectedStudyIds.has(d.studyId)&&d.blob instanceof Blob&&String(d.mime||d.blob.type).startsWith('image/'))
+       .sort((a,b)=>(a.documentDate||'').localeCompare(b.documentDate||'')||(a.sortIndex||99)-(b.sortIndex||99));
+     if(!linked.length)imgBox.append(node('p','s292-note','Keine Originaldiagramme im gewählten Zeitraum im verschlüsselten Tresor gespeichert.'));
+     for(const d of linked){
+       const figure=node('figure','s341-report-image');
+       const caption=node('figcaption','',fmt(d.documentDate||studies.find(s=>s.id===d.studyId)?.date)+' · '+(d.caption||d.name||'Originaldiagramm'));
+       const image=document.createElement('img');const url=URL.createObjectURL(d.blob);sleepImageUrls.push(url);
+       image.src=url;image.alt=d.caption||d.name||'Schlaflabor Originaldiagramm';image.loading='eager';
+       figure.append(caption,image);imgBox.append(figure);
+     }
+     root.append(imgBox);
      root.append(node('p','s292-disclaimer','Gemessene Verläufe sind keine Diagnose. Durchgezogene Linien zeigen Messwerte, gestrichelte Linien ausschließlich manuell hinterlegte persönliche Vergleiche. Bei auffälligen Werten ärztliche Beurteilung einholen. Diese gedruckten Gesundheitsdaten sind unverschlüsselt.'));
      report.append(root);lastKey=r.key;applySelection();
    })();loading=job;
