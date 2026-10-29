@@ -16,7 +16,7 @@
  const kinds=[['spo2','Blutsauerstoff – Diagramm'],['bp','Blutdruck – Diagramm'],['pulse','Puls – Diagramm'],
   ['weight','Gewicht – Diagramm'],['pef','Peak-Flow – Diagramm'],['lung','Lungenfunktion – Diagramme'],
   ['lungfull','Lungenfunktion – alle Befundwerte'],['diffusion','Diffusionsmessung – Diagramme'],
-  ['difffull','Diffusion – alle Befundwerte'], ['sleep','Schlaflabor – Messwerte und Befunde'], ['sleepimages','Schlaflabor – Originaldiagramme und Befundseiten'], ['walk','Gehtest – Messwerte und Verlauf'], ['walkimages','Gehtest – Originalbefund'], ['imaging','Röntgen & CT – Diagnoseprotokolle'], ['imagingimages','Röntgen & CT – Bildvorschauen'], ['lungdiseases','Lungenerkrankungen – Diagnose- und Testprotokoll'], ['lungrights','Reha, Hilfsmittel & Rechte – Anträge']];
+  ['difffull','Diffusion – alle Befundwerte'], ['sleep','Schlaflabor – Messwerte und Befunde'], ['sleepimages','Schlaflabor – Originaldiagramme und Befundseiten'], ['walk','Gehtest – Messwerte und Verlauf'], ['walkimages','Gehtest – Originalbefund'], ['imaging','Röntgen & CT – Diagnoseprotokolle'], ['imagingimages','Röntgen & CT – Bildvorschauen'], ['lungdiseases','Lungenerkrankungen – Diagnose- und Testprotokoll'], ['lungrights','Reha, Hilfsmittel & Rechte – Anträge'], ['providers','Ärzte & Krankenhäuser – Termine und Dokumente'], ['stairs','Treppenbelastung – Stufen und Gründe']];
  const allKinds=[...baseKinds,...kinds];
  const num=v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))?Number(v):null;
  const iso=s=>/^\d{4}-\d\d-\d\d$/.test(s||'')?s:'';
@@ -200,7 +200,7 @@
    if(loading)await loading;
    const job=(async()=>{
      window.__s292Building=true;
-     const [suite,epef,diary]=await Promise.all(['suite','epef','diary'].map(name=>SEC.list(name)));
+     const [suite,epef,diary,providerDocs,providerDates,providerLabs]=await Promise.all(['suite','epef','diary','documents','calendar','labs'].map(name=>SEC.list(name)));
      const within=v=>iso(v?.date)&&v.date>=r.from&&v.date<=r.to;
      const vit=suite.filter(x=>x.type==='vital29').map(x=>x.value).filter(within);
      const weights=suite.filter(x=>x.type==='weight292').map(x=>x.value).filter(within).filter(x=>isValid(x.kg,'weight'));
@@ -422,6 +422,66 @@
      for(const a of aids)rights.append(node('p','s292-note',(diseaseNames[a.condition]||a.condition)+' · '+(lungAidTitles[a.type]||a.type)+' · '+a.status+' · Antrag '+fmt(a.date)+(a.authority?' · '+a.authority:'')+(a.deadline?' · Frist laut Eingabe '+fmt(a.deadline):'')+(a.note?' · '+a.note:'')));
      rights.append(node('p','s292-note','Die Aufstellung ist keine automatische Rechtsprüfung. Fristen immer anhand des Originalbescheids prüfen.'));
      root.append(rights);
+     // Consolidated doctor's / hospital chapter: never duplicate clinical records,
+     // and only include entries that actually fall within this report period.
+     const facilities=suite.filter(x=>x.type==='provider343').map(x=>x.value).filter(x=>x?.id&&x?.name);
+     const appointments=providerDates.filter(x=>within(x));
+     const medicalDocs=providerDocs.filter(x=>{
+       const d=x.documentDate||x.date||x.createdAt?.slice(0,10)||'';
+       return iso(d)&&d>=r.from&&d<=r.to;
+     });
+     const providerLabRows=providerLabs.filter(x=>within(x));
+     const providerClinical=suite.filter(x=>['measurements','diffusion','sleep340','walk342','imaging343','lung344test'].includes(x.type)&&within(x.value));
+     const manualProviderLinks=new Map(suite.filter(x=>x.type==='providerlink343'&&x.value?.entityKey&&x.value?.providerId).map(x=>[x.value.entityKey,x.value.providerId]));
+     const providerSection=node('section','s292-category');providerSection.dataset.s292Kind='providers';
+     providerSection.append(node('h3','','Ärzte & Krankenhäuser – Termine, Befunde und Originaldateien'));
+     const normalizeName=v=>String(v||'').normalize('NFKC').trim().toLocaleLowerCase('de-DE').replace(/\s+/g,' ');
+     const facilityFor=(row,group='')=>{
+       const explicit=manualProviderLinks.get(group+'|'+String(row?.id||''));
+       if(explicit){const linked=facilities.find(p=>p.id===explicit);if(linked)return linked;}
+       if(row?.providerId){const exact=facilities.find(p=>p.id===row.providerId);if(exact)return exact;}
+       const sources=[row?.providerName,row?.doctor,row?.clinic,row?.hospitalName,row?.hospital,row?.place,row?.practice].map(normalizeName).filter(Boolean);
+       const matches=facilities.filter(p=>{
+         const names=[p.name,...String(p.aliases||'').split(';')].map(normalizeName).filter(Boolean);
+         return sources.some(s=>names.includes(s));
+       });
+       return matches.length===1?matches[0]:null;
+     };
+     const providerItems=[];
+     for(const v of appointments)providerItems.push({date:v.date,kind:'Arzttermin',title:v.title||'Termin',row:v,provider:facilityFor(v,'calendar')});
+     for(const v of medicalDocs){providerItems.push({date:v.documentDate||v.date||v.createdAt?.slice(0,10),kind:v.kind||'Dokument',title:v.name||'Datei',row:v,provider:facilityFor(v,'documents')});}
+     for(const v of providerLabRows){providerItems.push({date:v.date,kind:'Labor',title:(v.marker||v.label||'Laborwert')+': '+(v.value??'–')+(v.unit?' '+v.unit:''),row:v,provider:facilityFor(v,'labs')});}
+     for(const item of providerClinical){
+       const v=item.value;
+       const provider=facilityFor(v,'suite')||facilities.find(p=>manualProviderLinks.get('suite|'+String(item.key||v.id))===p.id)||null;
+       const kind={measurements:'Lungenfunktion',diffusion:'Diffusionsmessung',sleep340:'Schlaflabor',walk342:'Gehtest',imaging343:'Röntgen/CT',lung344test:'Lungenerkrankungstest'}[item.type]||item.type;
+       if(!provider&&!v.doctor&&!v.clinic&&!v.providerId)continue;
+       providerItems.push({date:v.date,kind,title:v.test||v.region||v.studyType||kind,row:v,provider});
+     }
+     providerItems.sort((a,b)=>(a.date||'').localeCompare(b.date||'')||a.kind.localeCompare(b.kind));
+     providerSection.append(node('p','s292-note',facilities.length+' hinterlegte Arzt-/Klinikakten · '+appointments.length+' Termine · '+medicalDocs.length+' Dokumente · '+providerLabRows.length+' Laborwerte · '+providerClinical.length+' klinische Untersuchungen im Berichtszeitraum. Bei fehlenden Einrichtungenamen werden Einträge als nicht zugeordnet angezeigt.'));
+     if(!providerItems.length)providerSection.append(node('p','s292-note','Keine dokumentierten Arzttermine, Laborwerte oder Originaldateien in diesem Zeitraum.'));
+     for(const provider of facilities){
+       const items=providerItems.filter(item=>item.provider?.id===provider.id);
+       if(!items.length)continue;
+       providerSection.append(node('h4','',provider.name+' · '+({hospital:'Krankenhaus',pulmonologist:'Lungenarzt',gp:'Hausarzt',other:'Behandlungsstelle'}[provider.kind]||'Praxis')));
+       for(const item of items)providerSection.append(node('p','s292-note',fmt(item.date)+' · '+item.kind+' · '+item.title));
+     }
+     for(const item of providerItems.filter(item=>!item.provider))providerSection.append(node('p','s292-note',fmt(item.date)+' · '+item.kind+' · '+item.title+' · '+(item.row?.clinic||item.row?.doctor||item.row?.providerName||item.row?.place||'Nicht zugeordnet')));
+     providerSection.append(node('p','s292-note','Nur Metadaten und dokumentierte Angaben werden gelistet; Originaldateien bleiben verschlüsselt im Tresor und werden hier nicht automatisch als unverschlüsselte Kopie eingebettet.'));
+     root.append(providerSection);
+     // Kurzbefehle/Treppenzähler: original daily counts are retained and dated.
+     const stairEntries=suite.filter(x=>x.type==='stairs').map(x=>x.value).filter(within).sort((a,b)=>(a.date+' '+(a.time||'')).localeCompare(b.date+' '+(b.time||'')));
+     const stairSection=node('section','s292-category');stairSection.dataset.s292Kind='stairs';stairSection.append(node('h3','','Treppenbelastung – dokumentierte Stufen'));
+     const totalSteps=stairEntries.reduce((sum,r)=>sum+(Number.isFinite(Number(r.steps))&&Number(r.steps)>0?Number(r.steps):0),0);
+     stairSection.append(node('p','s292-note',stairEntries.length+' erfasste Treppeneinträge · '+totalSteps.toLocaleString('de-DE')+' Stufen im Berichtszeitraum. Einträge sind keine automatische Belastungs- oder Höhenmessung.'));
+     if(!stairEntries.length)stairSection.append(node('p','s292-note','Keine Treppenprotokolle im ausgewählten Zeitraum.'));
+     const dailyTotals=new Map();for(const r of stairEntries){const n=Number(r.steps);if(Number.isFinite(n)&&n>0)dailyTotals.set(r.date,(dailyTotals.get(r.date)||0)+n);}
+     for(const [date,steps] of dailyTotals)stairSection.append(node('p','s292-note',fmt(date)+' · '+steps.toLocaleString('de-DE')+' Stufen'));
+     for(const r of stairEntries)stairSection.append(node('p','s292-note',(r.time||'–')+' · '+String(r.steps||'–')+' Stufen'+(r.reason?' · Grund: '+r.reason:'')));
+     root.append(stairSection);
+
+
      root.append(node('p','s292-disclaimer','Gemessene Verläufe sind keine Diagnose. Durchgezogene Linien zeigen Messwerte, gestrichelte Linien ausschließlich manuell hinterlegte persönliche Vergleiche. Bei auffälligen Werten ärztliche Beurteilung einholen. Diese gedruckten Gesundheitsdaten sind unverschlüsselt.'));
      report.append(root);lastKey=r.key;applySelection();
    })();loading=job;

@@ -1,5 +1,5 @@
 {
-  "version": "3.4.4",
+  "version": "3.4.6",
   "released": "2026-10-29",
-  "notes": "Optionale Fachbereiche Asthma, COPD, Lungenkrebs, Fibrose, Bronchiektasen, Emphysem, pulmonale Hypertonie, Pneumonie, Embolie, Alpha-1-Mangel. Eigene Untersuchungseinträge, Reha-/Hilfsmittel-/Rechte-Ratgeber und Antragstracker; farbige Blutdruck-Ampel in Karten, Messhistorie, Diagrammen und Berichten. Vorherige Röntgen-/CT- und Ärzte-Akten enthalten."
+  "notes": "Enthält Asthma-Update 3.4.5 (Offline-Betrieb, Statistik/PDF, Arzt-/Krankenhausberichte). Umbenennung in PneumoPro bei unverändertem Logo, gleicher verschlüsselter Datenbank und bestehender Installation. Sicherer Passwortwechsel mit aktuellem Passwort und Bestätigung; Passwort-vergessen-Hilfe mit schreibgeschützter Backup-Prüfung."
 }

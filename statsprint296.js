@@ -118,11 +118,16 @@
    if(!confirm('Das PDF enthält unverschlüsselte Gesundheitsdaten. Lokal erstellen und danach sicher speichern?'))return;
    working=true;generateButton.disabled=true;pdfButton.disabled=true;reset();status('PDF wird vollständig auf deinem iPhone erstellt …');
    try{
-     if(selected.sleepimages||selected.walkimages||selected.imagingimages){
-       for(const img of source.querySelectorAll('[data-s292-kind="sleepimages"] img, [data-s292-kind="walkimages"] img, [data-s292-kind="imagingimages"] img')){
-         if(!img.complete||img.naturalWidth===0){if(typeof img.decode==='function')await img.decode();}
-         if(!img.naturalWidth)throw Error('Ein Originaldiagramm konnte nicht geladen werden.');
-         img.__asthmaPdfJpeg=pdfRaster(img);
+     let unreadableImages=0;
+     for(const kind of ['sleepimages','walkimages','imagingimages']){
+       if(!selected[kind])continue;
+       for(const img of source.querySelectorAll('[data-s292-kind="'+kind+'"] img')){
+         delete img.__asthmaPdfJpeg;
+         try{
+           if(!img.complete||img.naturalWidth===0){if(typeof img.decode==='function')await img.decode();}
+           if(!img.naturalWidth)throw Error('Bild nicht dekodierbar');
+           img.__asthmaPdfJpeg=pdfRaster(img);
+         }catch(error){unreadableImages++;}
        }
      }
      // First layout the actual report to obtain REAL start pages for all selected
@@ -159,15 +164,15 @@
      for(let i=0;i<4;i++){toc=contents(count);if(toc.pages.length===count)break;count=toc.pages.length;}
      const layout={pages:[...toc.pages,...bodyLayout.pages]};
      const result=createPDF(layout);if(result.size<450||result.size>50*1024*1024)throw Error('PDF-Datei ist leer oder ungewöhnlich groß.');
-     const period=String(reportKey||cur||new Date().toISOString().slice(0,10)).replace(/[^0-9-]/g,'_');outputName='Asthma_Statistik_'+period+'.pdf';output=result;signature=key();objectUrl=URL.createObjectURL(result);
+     const period=String(reportKey||cur||new Date().toISOString().slice(0,10)).replace(/[^0-9-]/g,'_');outputName='PneumoPro_Statistik_'+period+'.pdf';output=result;signature=key();objectUrl=URL.createObjectURL(result);
      fallback.href=objectUrl;fallback.download=outputName;fallback.hidden=false;share.hidden=false;
-     status('PDF erstellt ('+Math.round(result.size/1024)+' KB, '+layout.pages.length+' Seiten). Jetzt „PDF teilen / In Dateien sichern“ wählen. Auch Drucken ist über das Teilen-Menü möglich.');
+     status('PDF erstellt ('+Math.round(result.size/1024)+' KB, '+layout.pages.length+' Seiten). '+(unreadableImages?unreadableImages+' Originalbild(er) konnten nicht eingebettet werden; bitte im Tresor prüfen. ':'')+'Jetzt „PDF teilen / In Dateien sichern“ wählen. Auch Drucken ist über das Teilen-Menü möglich.');
    }catch(error){reset();status('PDF konnte nicht erstellt werden: '+(error?.message||String(error)),true);}
    finally{working=false;generateButton.disabled=false;pdfButton.disabled=false;}
  }
  async function sharePDF(){if(!output){status('Bitte zuerst das PDF erstellen.',true);return;}if(signature!==key()){status('Auswahl verändert. Bitte das PDF erneut erstellen.',true);return;}
    const file=new File([output],outputName,{type:'application/pdf'});
-   if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){try{await navigator.share({files:[file],title:'Asthma-Statistik'});status('PDF an das iPhone-Teilen-Menü übergeben. Bei „In Dateien sichern“ den Speicherort auswählen.');}catch(err){if(err?.name!=='AbortError')status('Teilen konnte nicht geöffnet werden. Nutze „PDF herunterladen“ darunter.',true);}}
+   if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){try{await navigator.share({files:[file],title:'PneumoPro-Statistik'});status('PDF an das iPhone-Teilen-Menü übergeben. Bei „In Dateien sichern“ den Speicherort auswählen.');}catch(err){if(err?.name!=='AbortError')status('Teilen konnte nicht geöffnet werden. Nutze „PDF herunterladen“ darunter.',true);}}
    else{status('Das iPhone bietet hier kein Teilen von PDF-Dateien an. Nutze „PDF herunterladen“.');fallback.click();}
  }
  share.addEventListener('click',sharePDF);

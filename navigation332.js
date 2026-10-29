@@ -46,9 +46,9 @@
   ];
   const side=document.createElement('aside');side.id='n332-sidebar';side.className='n332-sidebar';
   side.setAttribute('role','dialog');side.setAttribute('aria-modal','true');
-  side.setAttribute('aria-label','Asthma – seitliches Navigationsmenü');side.setAttribute('aria-hidden','true');side.inert=true;
+  side.setAttribute('aria-label','PneumoPro – seitliches Navigationsmenü');side.setAttribute('aria-hidden','true');side.inert=true;
   const title=document.createElement('div');title.className='n332-side-top';
-  title.innerHTML='<div><strong>ASTHMA · MENÜ</strong><small>Wähle den gewünschten Bereich</small></div>';
+  title.innerHTML='<div><strong>PNEUMOPRO · MENÜ</strong><small>Wähle den gewünschten Bereich</small></div>';
   const close=document.createElement('button');close.type='button';close.className='n332-close';
   close.setAttribute('aria-label','Seitenmenü schließen');close.textContent='✕';title.append(close);side.append(title);
   const scroll=document.createElement('nav');scroll.className='n332-side-scroll';scroll.setAttribute('aria-label','Alle App-Bereiche');

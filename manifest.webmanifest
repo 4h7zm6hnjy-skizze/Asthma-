@@ -1,7 +1,7 @@
 {
-  "name": "Asthma – privater Gesundheitsmanager",
-  "short_name": "Asthma",
-  "description": "Privater Asthma-Gesundheitsmanager mit Lungenwerten, Peak-Flow, Kalender, Akte und verschlüsseltem Speicher.",
+  "name": "PneumoPro – Lungen- und Gesundheitsmanager",
+  "short_name": "PneumoPro",
+  "description": "Privater Lungen- und Gesundheitsmanager für Lungenfunktion, Labor, Befunde, Medikamente, Kalender, Gesundheitsakte und verschlüsselte Daten.",
   "lang": "de-DE",
   "start_url": "./",
   "scope": "./",

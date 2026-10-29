@@ -169,7 +169,23 @@
     $('crop-cancel').addEventListener('click',cancelCrop);$('crop-apply').addEventListener('click',()=>applyCrop().catch(e=>flash('scan-enhance-status',e.message,true)));
     // A scanner scan can be added to the longitudinal history after manual checking.
     window.addEventListener('asthma:lung-imported',event=>{if(event.detail?.saved){updateDashboard();renderMeasurements().catch(()=>{});renderReports().catch(()=>{});return;}const p=window.ASTHMA_PROFILE_BRIDGE?.get();if(!p)return;updateDashboard();if(confirm('Erkannte und bestätigte Werte zusätzlich dauerhaft im Untersuchungsverlauf speichern?')){if($('scan-phase'))$('measurement-phase').value=['vor','nach'].includes($('scan-phase').value)?$('scan-phase').value:'unbekannt';saveCurrentMeasurement('scanner').catch(e=>flash('scan-enhance-status',e.message,true))}});
-    $('vault-form').addEventListener('submit',async e=>{e.preventDefault();try{if(!confirm('Gesamtes Tresor-Passwort ändern? Das bisherige Passwort funktioniert anschließend nicht mehr.'))return;await SEC.changePassword($('vault-pass').value);$('vault-pass').value='';setVaultMessage();flash('vault-state','Passwort erfolgreich geändert. Alte Backups behalten ihr jeweiliges Backup-Passwort.')}catch(e){flash('vault-state','Passwortwechsel fehlgeschlagen: '+e.message,true)}});
+    let passwordChangeRunning=false;
+    $('vault-form').addEventListener('submit',async e=>{
+      e.preventDefault();if(passwordChangeRunning)return;
+      const button=$('vault-open');passwordChangeRunning=true;button.disabled=true;
+      try{
+        const current=$('vault-current-pass').value,next=$('vault-pass').value,repeat=$('vault-confirm').value;
+        if(next.length<12)throw Error('Neues Passwort muss mindestens 12 Zeichen enthalten.');
+        if(next!==repeat)throw Error('Die neuen Passwörter stimmen nicht überein.');
+        if(current===next)throw Error('Das neue Passwort muss sich vom bisherigen unterscheiden.');
+        await SEC.verifyCurrentPassword(current);
+        if(!confirm('Gesamtes Tresor-Passwort jetzt ändern? Alle lokalen Gesundheitsdaten werden neu verschlüsselt. Die bisherigen Backup-Passwörter bleiben erhalten.'))return;
+        await SEC.changePassword(next);
+        $('vault-form').reset();
+        flash('vault-state','Passwort erfolgreich geändert. Für die nächste Anmeldung gilt nur das neue Passwort. Alte Backups behalten ihr jeweiliges Backup-Passwort.');
+      }catch(err){flash('vault-state','Passwortwechsel fehlgeschlagen: '+(err.message||err),true)}
+      finally{passwordChangeRunning=false;button.disabled=false;}
+    });
     $('vault-lock').addEventListener('click',()=>SEC.lock());
     $('suite-export').addEventListener('submit',async e=>{e.preventDefault();try{const pass=$('suite-backup-pass').value;if(pass.length<12)throw Error('Passwort zu kurz');const obj=await secureExport(pass);download(new Blob([JSON.stringify(obj)],{type:'application/json'}),`Asthma_Zusatzdaten_${today()}.asthma15`);$('suite-backup-pass').value='';flash('suite-backup-message','Verschlüsseltes Zusatzdaten-Backup erstellt. Die ältere Antragsakte wird weiterhin separat über „Meine Akte“ gesichert.')}catch(e){flash('suite-backup-message','Backup fehlgeschlagen: '+e.message,true)}});
     $('suite-import').addEventListener('submit',async e=>{e.preventDefault();try{const f=$('suite-backup-file').files[0];if(!f||f.size>12*1024*1024)throw Error('Datei fehlt oder ist zu groß (max. 12 MB)');const success=await secureImport(await f.text(),$('suite-import-pass').value);if(!success)return;$('suite-import').reset();await refreshAll();flash('suite-backup-message','Zusatzdaten wiederhergestellt. Bei verschlüsseltem Tresor Passwort erneut eingeben.')}catch(e){flash('suite-backup-message','Import abgelehnt. Vorhandene Daten blieben erhalten: '+e.message,true)}});

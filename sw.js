@@ -1,5 +1,5 @@
 /* Asthma 3.3.0: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
-const VERSION='3.4.4-lungdisease-bp-legal';
+const VERSION='3.4.6-pneumopro-cumulative';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
  './bpampel344.js','./bpampel344.css','./lungenkrankheiten344.js','./lungenkrankheiten344.css',
@@ -44,7 +44,10 @@ self.addEventListener('fetch',event=>{
    return r;
   }).catch(()=>caches.match('./index.html')));return;
  }
+ // Dynamic modules are requested with ?v=VERSION, while install precaches them
+ // without a query. When offline, retry the already installed, same-version asset
+ // ignoring ONLY the query string. The installed cache remains version-scoped.
  event.respondWith(caches.match(event.request).then(cached=>cached||fetch(event.request).then(r=>{
   if(r.ok){const clone=r.clone();caches.open(CACHE).then(c=>c.put(event.request,clone)).catch(()=>{})}return r;
- })));
+ }).catch(()=>caches.open(CACHE).then(c=>c.match(event.request,{ignoreSearch:true})))));
 });

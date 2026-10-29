@@ -539,3 +539,26 @@ body :is(input,select,textarea){font-size:max(16px,1rem)}
 #kalender .cal-day.cal-hospital.cal-selected,html[data-design26] #kalender .cal-day.cal-hospital.cal-selected{outline:3px solid #214f70!important;outline-offset:1px!important;}
 #kalender .cal-day.cal-hospital .cal-dot{border:1px solid #fff!important;}
 #kalender #cal-hospital-fields[hidden]{display:none!important;}
+
+/* 3.4.6: Passwort-Hilfe; kein Einfluss auf Logo oder Aktenlayout. */
+.secure-forgot-toggle{display:block;margin:.75rem auto 0;text-decoration:underline;text-underline-offset:3px}
+.secure-forgot-panel{margin:1rem 0;padding:1rem;border:1px solid #bbd4dc;border-radius:14px;background:#f4fafc;overflow-wrap:anywhere}
+.secure-forgot-panel h2{font-size:1.12rem;margin:0 0 .6rem;color:#123b52}
+.secure-forgot-panel p{font-size:.91rem;line-height:1.55}
+.secure-forgot-panel form{display:grid;gap:.6rem;margin:1rem 0}
+.secure-forgot-panel form button{white-space:normal}
+#secure-backup-check-status{font-weight:650;color:#244d5d;white-space:normal;overflow-wrap:anywhere}
+
+/* 3.4.6: PneumoPro-Schriftzug; alle Logo-Dateien bleiben unverändert. */
+.pneumo-wordmark{font-weight:800;color:#15475c;letter-spacing:-.045em;line-height:1.12}
+.pneumo-brand-icon{width:42px;height:42px;object-fit:contain;flex-shrink:0}
+.pneumo-header-wordmark{font-size:clamp(1.28rem,3.4vw,1.85rem);white-space:nowrap}
+.pneumo-login-wordmark{display:block;text-align:center;margin:8px auto 12px;font-size:clamp(1.65rem,5vw,2.1rem)}
+.pneumo-footer-brand{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.pneumo-footer-brand .pneumo-wordmark{font-size:1.36rem}
+@media(max-width:375px){.pneumo-header-wordmark{font-size:1.2rem}.pneumo-brand-icon{width:34px;height:34px}}
+@media print{.pneumo-footer-brand .pneumo-brand-icon{display:none}}
+
+/* PneumoPro im druckbaren Gesundheitsbericht. */
+.pneumo-report-brand{display:block;font-size:1.4rem;font-weight:800;color:#15475c;margin:0 0 7px}
+.stats25-heading .a281-report-logo{width:46px;height:46px;max-height:46px;object-fit:contain;margin-bottom:6px}
