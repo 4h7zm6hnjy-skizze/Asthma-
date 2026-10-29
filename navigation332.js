@@ -1,5 +1,5 @@
 'use strict';
-/* Asthma 3.4.2 – einheitliche, ausklappbare Navigation; verändert keine Gesundheitsdaten.
+/* Asthma 3.4.3 – einheitliche, ausklappbare Navigation; verändert keine Gesundheitsdaten.
    Die ursprüngliche Bereichsnavigation bleibt als technische Rückfallebene im DOM. */
 (()=>{
   const NAV=window.ASTHMA_NAV;
@@ -20,6 +20,7 @@
       ['kalender','Kalender','Termine und Klinikaufenthalte']
     ]},
     {id:'akte',name:'2 · BEFUNDE, LABOR & AKTE',open:true,items:[
+      ['bildgebung','RÖNTGEN & CT · BILDGEBUNG','Bilder, CT-Serien und Diagnoseprotokolle'],
       ['dateien','Dateien & Scannen','Alle Unterlagen hochladen'],
       ['labor','Labor & Blutwerte','Laborbefunde und Messreihen'],
       ['befunde','Befundscanner','Fototext und Werte prüfen'],
@@ -171,5 +172,5 @@
   }
   sync();
   document.documentElement.classList.add('n332-ready');
-  window.__ASTHMA_NAV332_TEST=Object.freeze({version:'3.4.2',groups:groups.map(g=>({name:g.name,ids:g.items.map(i=>i[0])})),open:show,close:hide,sync});
+  window.__ASTHMA_NAV332_TEST=Object.freeze({version:'3.4.3',groups:groups.map(g=>({name:g.name,ids:g.items.map(i=>i[0])})),open:show,close:hide,sync});
 })();

@@ -16,7 +16,7 @@
  const kinds=[['spo2','Blutsauerstoff – Diagramm'],['bp','Blutdruck – Diagramm'],['pulse','Puls – Diagramm'],
   ['weight','Gewicht – Diagramm'],['pef','Peak-Flow – Diagramm'],['lung','Lungenfunktion – Diagramme'],
   ['lungfull','Lungenfunktion – alle Befundwerte'],['diffusion','Diffusionsmessung – Diagramme'],
-  ['difffull','Diffusion – alle Befundwerte'], ['sleep','Schlaflabor – Messwerte und Befunde'], ['sleepimages','Schlaflabor – Originaldiagramme und Befundseiten'], ['walk','Gehtest – Messwerte und Verlauf'], ['walkimages','Gehtest – Originalbefund']];
+  ['difffull','Diffusion – alle Befundwerte'], ['sleep','Schlaflabor – Messwerte und Befunde'], ['sleepimages','Schlaflabor – Originaldiagramme und Befundseiten'], ['walk','Gehtest – Messwerte und Verlauf'], ['walkimages','Gehtest – Originalbefund'], ['imaging','Röntgen & CT – Diagnoseprotokolle'], ['imagingimages','Röntgen & CT – Bildvorschauen']];
  const allKinds=[...baseKinds,...kinds];
  const num=v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))?Number(v):null;
  const iso=s=>/^\d{4}-\d\d-\d\d$/.test(s||'')?s:'';
@@ -369,6 +369,42 @@
        walkImageBox.append(figure);
      }
      root.append(walkImageBox);
+     // Röntgen/CT: nur vom Anwender bestätigte, vorhandene ärztliche Befundtexte.
+     const examinations=suite.filter(x=>x.type==='imaging343').map(x=>x.value).filter(within).sort((a,b)=>a.date.localeCompare(b.date));
+     const imagingSection=node('section','s292-category');imagingSection.dataset.s292Kind='imaging';
+     imagingSection.append(node('h3','','Röntgen & CT – Diagnoseprotokolle'));
+     if(!examinations.length)imagingSection.append(node('p','s292-note','Keine Röntgen-/CT-Untersuchungen im gewählten Zeitraum.'));
+     for(const rec of examinations){
+       imagingSection.append(node('h4','',fmt(rec.date)+' · '+(rec.modality==='ct'?'CT':'Röntgen')+' · '+(rec.region||'Körperregion nicht angegeben')));
+       const parts=[['Klinik',rec.clinic],['Arzt',rec.doctor],['Kontrastmittel',rec.contrast==='yes'?'mit':rec.contrast==='no'?'ohne':rec.contrast==='both'?'mit und ohne':'nicht angegeben'],['CTDIvol (mGy)',rec.ctdi],['DLP (mGy·cm)',rec.dlp],['Indikation',rec.indication],['Radiologischer Befund',rec.findings],['Ärztliche Beurteilung / Diagnose',rec.assessment],['Vergleich mit Voruntersuchungen',rec.comparison],['Weiteres Vorgehen',rec.recommendation],['Eigene Notizen',rec.notes]];
+       for(const [label,value] of parts)if(value!==undefined&&value!==null&&value!=='')imagingSection.append(node('p','s292-note',label+': '+String(value)));
+     }
+     imagingSection.append(node('p','s292-note','Protokollierte ärztliche Angaben – keine selbstständige Diagnose aus Bildpixeln.'));
+     root.append(imagingSection);
+     const imgSection=node('section','s292-category s341-report');imgSection.dataset.s292Kind='imagingimages';
+     imgSection.append(node('h3','','Röntgen & CT – Bildvorschauen / Originaldateien'));
+     const examIds=new Set(examinations.map(x=>x.id));
+     const imgDocs=(await SEC.list('documents')).filter(d=>d.kind==='Bildgebung'&&examIds.has(d.studyId)&&d.blob instanceof Blob);
+     if(!imgDocs.length)imgSection.append(node('p','s292-note','Keine Röntgen-/CT-Originaldateien in diesem Zeitraum gespeichert.'));
+     let count=0;
+     for(const d of imgDocs){
+       const figure=node('figure','s341-report-image');figure.append(node('figcaption','',fmt(d.documentDate||'')+' · '+(d.name||'Bildgebung')));
+       const isImage=/\.(jpg|jpeg|png|webp)$/i.test(d.name||'');const isDicom=/\.(dcm|dicom|ima)$/i.test(d.name||'');
+       if(count<12&&(isImage||isDicom)){
+         try{
+           let url;
+           if(isDicom){
+             const parsed=await window.ASTHMA_DICOM343.parse(d.blob);const canvas=document.createElement('canvas');window.ASTHMA_DICOM343.render(parsed,canvas,0);
+             const copy=document.createElement('canvas'),scale=Math.min(1,850/Math.max(canvas.width,canvas.height));copy.width=Math.max(1,Math.round(canvas.width*scale));copy.height=Math.max(1,Math.round(canvas.height*scale));copy.getContext('2d').drawImage(canvas,0,0,copy.width,copy.height);
+             url=copy.toDataURL('image/jpeg',0.73);
+           }else{url=URL.createObjectURL(d.blob);sleepImageUrls.push(url);}
+           const pic=document.createElement('img');pic.src=url;pic.alt='Radiologisches Originalbild, keine automatische Diagnose';pic.loading='eager';figure.append(pic);count++;
+         }catch(err){figure.append(node('p','s292-note','Keine Vorschau für dieses Bildformat; Originaldatei ist in der Akte vorhanden.'));}
+       }else figure.append(node('p','s292-note','Originaldatei in der privaten Akte; Vorschau im Bildgebung-Bereich (oder PDF/komprimiertes DICOM).'));
+       imgSection.append(figure);
+     }
+     root.append(imgSection);
+
      root.append(node('p','s292-disclaimer','Gemessene Verläufe sind keine Diagnose. Durchgezogene Linien zeigen Messwerte, gestrichelte Linien ausschließlich manuell hinterlegte persönliche Vergleiche. Bei auffälligen Werten ärztliche Beurteilung einholen. Diese gedruckten Gesundheitsdaten sind unverschlüsselt.'));
      report.append(root);lastKey=r.key;applySelection();
    })();loading=job;

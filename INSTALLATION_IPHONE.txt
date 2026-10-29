@@ -1,9 +1,25 @@
-Asthma 2.9.5 – Klickbare Bedarfsanwendungen und Beschwerde-Nächte (nur iPhone)
+ASTHMA 3.4.3 – BILDGEBUNG: RÖNTGEN & CT
 
-1. In der bisherigen App eine verschlüsselte .asthma17-Sicherung erstellen und in iPhone Dateien ablegen.
-2. ZIP in Dateien entpacken.
-3. Die sieben Projektdateien (NICHT die Textanleitung und NICHT das ZIP selbst) in das HAUPTVERZEICHNIS des bestehenden GitHub-Repositories Asthma- hochladen und Commit changes bestätigen.
-4. Die bisherige WebApp öffnen, anmelden, Tagesübersicht Heute im Blick aufsuchen.
-5. Auf Bedarfsanwendungen oder Nächte mit Beschwerden tippen: Das bereits vorhandene Eingabeformular klappt auf, die entsprechende Eingabe erhält Fokus. Erst nach explizitem Speichern entstehen verschlüsselte Tagebucheinträge.
-6. App NICHT löschen, Safari-/Website-Daten NICHT löschen.
-Hinweis: Die Felder zeigen die Summe der dokumentierten vergangenen 7 Tage bzw. Anzahl der dokumentierten Nächte über 30 Tage. Für einen heutigen Eintrag kann die Tagesübersicht benutzt werden. Kein Zugriff auf echte iPhone-Daten in Tests.
+INSTALLATION AM IPHONE
+1. Unter Einstellungen in der Asthma-App zuerst eine passwortverschlüsselte Gesamtsicherung erstellen.
+2. Diese ZIP in der iPhone-Dateien-App entpacken.
+3. NUR die Dateien aus GitHub_Update im Hauptordner des vorhandenen GitHub-Repositories Asthma- hochladen. Gleichnamige Dateien ersetzen. Keine Gesundheitsdaten auf GitHub laden.
+4. Änderungen in GitHub speichern und in der installierten Asthma-App Einstellungen -> Nach Updates suchen öffnen.
+5. Prüfen, ob Version 3.4.3 angezeigt wird. Bei alten Ansichten die Home-Bildschirm-App ganz schließen und neu öffnen.
+6. Über das ausklappbare Menü RÖNTGEN & CT öffnen.
+
+FUNKTIONEN
+- Separate Auswahl Röntgen/CT, chronologische private Untersuchungsakte.
+- Diagnoseprotokoll: Datum, Klinik, Körperregion, Fragestellung, Kontrastmittel, radiologischer Originalbefund, ärztliche Beurteilung, Vergleich, Therapie/Empfehlung, Notizen; bei CT CTDIvol und DLP.
+- Mehrere Originaldateien pro Untersuchung, inklusive JPEG, PNG, WebP, PDF, HEIC (geräteabhängig), DICOM (.dcm/.ima) und ZIP mit DICOM-Serie.
+- Bildvorschau, Bildgröße, DICOM-Fensterung und Multi-Frame-Navigation; Originaldateien sind exportierbar.
+- Separate Statistik-/PDF-Auswahl für Diagnoseprotokolle und Bildvorschauen.
+- Untersuchungstext und Bildoriginale werden im bestehenden verschlüsselten lokalen Tresor gespeichert und in die vorhandene Tresorsicherung einbezogen.
+
+WICHTIGE GRENZEN
+- JPEG2000/JPEG-LS/RLE-komprimierte DICOMs und manche TIFF-/HEIC-Dateien sind nicht im Browser anzeigbar. Originaldateien bleiben speicherbar/downloadbar. Bei Bedarf in Radiologie-Software als PNG/JPG oder unkomprimiertes DICOM exportieren.
+- DICOMDIR enthält nur einen Index. Benötigt werden die eigentlichen DICOM-Bilddateien.
+- Pro Datei max. 32 MB, ZIP max. 50 MB, pro Import 40 Bilder und max. 80 MB entpackt. Große CT-Serien in Teilmengen importieren. Auf iPhones kann der verfügbare sichere Speicher begrenzt sein.
+- Nicht medizinisch zertifizierter Bildbetrachter; keine automatische Befundung oder eigenständige Diagnose.
+- Nicht auf GitHub stellen: Röntgenbilder, CT-Bilder, DICOM, Arztbriefe, Passwörter oder private Backups. Der Code kann öffentlich sein, die Befunde nicht.
+- PDFs aus der Statistik oder dem Diagnoseprotokoll sind unverschlüsselt und müssen separat sicher verwahrt werden.

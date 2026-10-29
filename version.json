@@ -1,5 +1,5 @@
 {
-  "version": "3.4.2",
+  "version": "3.4.3",
   "released": "2026-10-29",
-  "notes": "Neuer Gehtest-/Belastungstestbereich mit 6-Minuten-Gehstrecke, BGA vor/nach, leicht verständlichen Werten, Trenddiagrammen, privatem Originalimport und einzeln auswählbaren Teilen für Monats-/Jahresbericht. Ergänzte Messwerterklärungen."
+  "notes": "Bildgebung: getrennte Röntgen- und CT-Befunde, ärztliches Diagnoseprotokoll, verschlüsselte Originale, lokale Bild-/PDF-/DICOM-Vorschau, DICOM-ZIP-Import und getrennte Monats-/Jahres-PDF-Auswahl."
 }
