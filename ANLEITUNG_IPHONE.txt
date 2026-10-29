@@ -1,19 +1,15 @@
-ASTHMA-AMPEL DIREKT UNTER PATIENTENPROFIL – iPHONE
+ASTHMA 3.4.2 – GEHTEST / BELASTUNGSTEST
 
-Nur eine Datei muss ersetzt werden: ampel320.js
+WICHTIG: Nur die Dateien aus GitHub_Update in dein GitHub-Repository hochladen.
+Die PERSOENLICHE JSON-Importdatei mit medizinischen Werten und Originalfoto NICHT auf GitHub hochladen.
 
-1. Öffne mit deinem iPhone Safari und https://github.com/4h7zm6hnjy-skizze/Asthma-
-2. Stelle sicher, dass du bei GitHub angemeldet bist.
-3. Tippe auf „Add file“ und dann „Upload files“.
-   Ggf. in Safari über das Menü aA / Website-Einstellungen die Desktop-Website anfordern.
-4. Wähle aus der Dateien-App nur die heruntergeladene Datei ampel320.js aus.
-5. Bestätige „Commit changes“ (Änderungen speichern). Falls GitHub das Ersetzen
-   einer bestehenden Datei auf diesem Weg nicht erlaubt: Datei auf GitHub öffnen,
-   Stift-Symbol / „Edit this file“ wählen und den Inhalt ersetzen.
-6. Beende die Asthma-App vollständig und öffne sie erneut bei bestehender
-   Internetverbindung. Du kannst alternativ im gleichen Safari-Profil neu laden.
+1. In der App eine verschlüsselte Gesamtsicherung erstellen.
+2. Update-ZIP in der iPhone-Dateien-App entpacken.
+3. Dateien aus GitHub_Update im Repository-Hauptordner ablegen / gleichnamige überschreiben.
+4. Asthma-App öffnen -> Einstellungen -> Nach Updates suchen. Version 3.4.2 prüfen.
+5. Seitenleiste -> Gehtest / Belastungstest -> Privaten Gehtest-Befund importieren.
+6. Datei Gehtest_29-10-2026_Werte_Originalbild_PRIVAT_IMPORT.json auswählen und Import bestätigen.
+7. Unter Statistik & PDF gibt es getrennte Auswahl für Gehtest-Werte und Originalbefund.
 
-Das In-App-Update meldet weiterhin Version 3.2.0, weil ausschließlich
- die Position geändert wird. Kein Löschen der App, keine Datenbereinigung!
-Die Änderung verschiebt nur das vorhandene Bedienelement unter „Patientenprofil“.
-Gespeicherte Einträge, Notizen, Auswertungen und die Datenbank bleiben unverändert.
+Die App verschlüsselt die Werte lokal. Keine automatische Texterkennung aus Bildern; Werte müssen geprüft werden.
+Nicht im öffentlichen GitHub speichern: Patientenfotos, Befunde, Passwörter und Backups.

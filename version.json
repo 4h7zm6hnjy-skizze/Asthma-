@@ -1,5 +1,5 @@
 {
-  "version": "3.4.1",
+  "version": "3.4.2",
   "released": "2026-10-29",
-  "notes": "Schlaflabor 20./21.09.2022: sicherer privater Import, fünf Originalbilder und Nachtkurven, eigene Diagrammgalerie und separat auswählbare Originalbilder in Monats-/Jahres-PDFs. Verbesserte AHI-Darstellung der Polygraphie."
+  "notes": "Neuer Gehtest-/Belastungstestbereich mit 6-Minuten-Gehstrecke, BGA vor/nach, leicht verständlichen Werten, Trenddiagrammen, privatem Originalimport und einzeln auswählbaren Teilen für Monats-/Jahresbericht. Ergänzte Messwerterklärungen."
 }

@@ -93,7 +93,7 @@
      if(tag==='li'){this.para('• '+node.textContent,9,5);return;}
      const kids=[...node.children];if(kids.length){for(const child of kids)this.old(child);}else if(node.textContent?.trim())this.para(node.textContent,10,8);
    }
-   category(node){if(this.y<TOP-1)this.page();if(node.dataset.s292Kind==='sleepimages'){const first=node.querySelector('.s341-report-image img'),j=first?.__asthmaPdfJpeg;if(j){const w=Math.min(WIDTH-8,((TOP-BOTTOM)-112)*j.width/j.height),h=w*j.height/j.width;this.reserve(h+83);}}const h=node.querySelector(':scope > h3');this.heading(h?.textContent||'Messwerte',1);for(const child of node.children){if(child===h)continue;if(child.classList.contains('s292-summary')){for(const item of child.children)this.para(item.textContent,9,5,'#2a5a6b',true);this.y-=4;}
+   category(node){if(this.y<TOP-1)this.page();if(['sleepimages','walkimages'].includes(node.dataset.s292Kind)){const first=node.querySelector('.s341-report-image img'),j=first?.__asthmaPdfJpeg;if(j){const w=Math.min(WIDTH-8,((TOP-BOTTOM)-112)*j.width/j.height),h=w*j.height/j.width;this.reserve(h+83);}}const h=node.querySelector(':scope > h3');this.heading(h?.textContent||'Messwerte',1);for(const child of node.children){if(child===h)continue;if(child.classList.contains('s292-summary')){for(const item of child.children)this.para(item.textContent,9,5,'#2a5a6b',true);this.y-=4;}
        else if(child.classList.contains('s292-chart-box')){const svg=child.querySelector('svg');if(svg)this.image(svg);const legends=[...child.querySelectorAll('.s292-legend span>span')].map(e=>e.textContent);if(legends.length)this.para(legends.join(' · '),8,8,'#526b75');for(const x of child.querySelectorAll('.s292-summary>span'))this.para(x.textContent,8.2,4,'#285568',true);const explanation=child.querySelector('p.s292-note');if(explanation)this.para(explanation.textContent,8,9,'#526b75');}
        else if(child.classList.contains('s292-table-wrap')){const tab=child.querySelector('table');if(tab)this.table(tab);}
        else if(child.classList.contains('s341-report-image')){const cap=child.querySelector('figcaption'),pic=child.querySelector('img'),j=pic?.__asthmaPdfJpeg;if(j){const w=Math.min(WIDTH-8,((TOP-BOTTOM)-112)*j.width/j.height);const h=w*j.height/j.width;const lines=cap?wrap(cap.textContent,10,WIDTH,true).length:0;this.reserve(h+lines*14+29);}if(cap)this.para(cap.textContent,10,8,'#194d67',true);if(pic)this.photo(pic);}
@@ -118,8 +118,8 @@
    if(!confirm('Das PDF enthält unverschlüsselte Gesundheitsdaten. Lokal erstellen und danach sicher speichern?'))return;
    working=true;generateButton.disabled=true;pdfButton.disabled=true;reset();status('PDF wird vollständig auf deinem iPhone erstellt …');
    try{
-     if(selected.sleepimages){
-       for(const img of source.querySelectorAll('[data-s292-kind="sleepimages"] img')){
+     if(selected.sleepimages||selected.walkimages){
+       for(const img of source.querySelectorAll('[data-s292-kind="sleepimages"] img, [data-s292-kind="walkimages"] img')){
          if(!img.complete||img.naturalWidth===0){if(typeof img.decode==='function')await img.decode();}
          if(!img.naturalWidth)throw Error('Ein Originaldiagramm konnte nicht geladen werden.');
          img.__asthmaPdfJpeg=pdfRaster(img);

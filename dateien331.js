@@ -10,6 +10,7 @@
   const kinds={
     lunge:{title:'Lungenfunktion',docKind:'Lungenfunktionstest',hint:'JSON-Dateien mit Messwerten werden in die bestehende Lungenfunktion übernommen. Fotos und PDFs bleiben als Originalbefund erhalten.'},
     labor:{title:'Labor',docKind:'Bluttest',hint:'Labor-JSON wird in der bestehenden Laborakte zur Kontrolle geöffnet. Fotos und PDFs werden als Originalbefund gespeichert.'},
+    gehtest:{title:'Gehtest / Belastungstest',docKind:'Gehtestbericht',hint:'Private Gehtest-JSON über die Gehtest-Importfunktion auswählen; Originalbilder und PDF hier verschlüsselt ablegen.'},
     arzt:{title:'Arztbriefe',docKind:'Arztbrief',hint:'Arztbrief fotografieren oder PDF auswählen. Der Originalbericht wird verschlüsselt gespeichert.'},
     entlassung:{title:'Entlassungsberichte',docKind:'Entlassungsbericht',hint:'Entlassungsbericht fotografieren oder PDF auswählen. Das Original wird verschlüsselt gespeichert.'},
     sonstiges:{title:'Sonstige Befunde',docKind:'Sonstiges',hint:'Weitere medizinische Dokumente als Foto oder PDF verschlüsselt ablegen.'}
@@ -23,6 +24,7 @@
       <div class="dh331-categories" role="group" aria-label="Art des Dokuments">
         <button type="button" data-dh-kind="lunge" aria-pressed="true"><span aria-hidden="true">◷</span>Lungenfunktion</button>
         <button type="button" data-dh-kind="labor" aria-pressed="false"><span aria-hidden="true">◈</span>Labor</button>
+        <button type="button" data-dh-kind="gehtest" aria-pressed="false"><span aria-hidden="true">↗</span>Gehtest / Belastung</button>
         <button type="button" data-dh-kind="arzt" aria-pressed="false"><span aria-hidden="true">▤</span>Arztbriefe</button>
         <button type="button" data-dh-kind="entlassung" aria-pressed="false"><span aria-hidden="true">▣</span>Entlassungsberichte</button>
         <button type="button" data-dh-kind="sonstiges" aria-pressed="false"><span aria-hidden="true">＋</span>Sonstige Befunde</button>
@@ -97,6 +99,11 @@
     setTimeout(()=>{if(!finished)monitor.disconnect();},15000);
     followButton('Lungenfunktion / Diagramme öffnen',()=>NAV.go('lungenwerte'));
   }
+  async function walkJson(file){
+    if(file.size>20*1024*1024)throw Error('Gehtestdatei zu groß.');
+    const data=JSON.parse(await file.text());if(data.kind!=='Asthma-Walk-Test-v1')throw Error('Keine Gehtest-Importdatei.');
+    forwardFile(file,'w342-import');setStatus('Gehtestdatei an den privaten Import weitergegeben. Bestätigung im Gehtestbereich.');followButton('Gehtest öffnen',()=>NAV.go('gehttest'));
+  }
   async function laborJson(file){
     if(file.size>12*1024*1024)throw Error('Labor-Importdatei zu groß (maximal 12 MB).');
     const obj=JSON.parse(await file.text());
@@ -123,6 +130,7 @@
     await refreshArchive();
     setStatus(kinds[category].docKind+' verschlüsselt gespeichert: '+file.name);
     if(file.type.startsWith('image/')){
+      if(category==='gehtest')followButton('Gehtest und Erklärung öffnen',()=>NAV.go('gehttest'));
       if(category==='lunge')followButton('Messwerte im Befundscanner prüfen',()=>{try{forwardFile(file,'scan-gallery');NAV.go('befunde')}catch(e){setStatus(e.message,true)}});
       if(category==='labor')followButton('Laborbild zur Werteerfassung öffnen',()=>{try{forwardFile(file,'lab-file');NAV.go('labor')}catch(e){setStatus(e.message,true)}});
     }
@@ -135,8 +143,8 @@
       if(!SEC.state().unlocked)throw Error('Bitte zuerst die Gesundheitsakte entsperren.');
       setStatus('Prüfe Datei '+file.name+' …');
       const category=chosen,day=$('dh331-date').value;
-      if((category==='lunge'||category==='labor')&&/\.json$/i.test(file.name||'')){
-        if(category==='lunge')await lungJson(file);else await laborJson(file);
+      if((category==='lunge'||category==='labor'||category==='gehtest')&&/\.json$/i.test(file.name||'')){
+        if(category==='lunge')await lungJson(file);else if(category==='labor')await laborJson(file);else await walkJson(file);
       }else await original(file,category,day);
     }catch(err){setStatus('Datei nicht übernommen: '+(err?.message||String(err)),true);}
     finally{field.value='';busy=false;}

@@ -83,3 +83,6 @@ body.stats25-print .s292-category .s292-table-wrap{overflow:visible!important}
 .s341-report-image figcaption{font-weight:850;font-size:14px;color:#174c64;margin-bottom:12px}
 .s341-report-image img{display:block;width:100%;max-height:670px;object-fit:contain;background:white}
 @media print{.s341-report-image{break-inside:avoid-page;page-break-inside:avoid;box-shadow:none}.s341-report-image img{max-height:220mm;object-fit:contain}}
+
+/* Walk report image layout uses the existing local image renderer. */
+[data-s292-kind=walkimages] .s341-report-image{break-inside:avoid-page;page-break-inside:avoid} 

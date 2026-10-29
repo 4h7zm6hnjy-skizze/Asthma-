@@ -1,5 +1,5 @@
 'use strict';
-/* Asthma 3.4.1 – einheitliche, ausklappbare Navigation; verändert keine Gesundheitsdaten.
+/* Asthma 3.4.2 – einheitliche, ausklappbare Navigation; verändert keine Gesundheitsdaten.
    Die ursprüngliche Bereichsnavigation bleibt als technische Rückfallebene im DOM. */
 (()=>{
   const NAV=window.ASTHMA_NAV;
@@ -15,6 +15,7 @@
       ['vitalwerte','Vitalwerte & Gewicht','SpO₂, Blutdruck, Puls und Gewichtsdiagramm'],
       ['peakflow','Peak-Flow','Atemwerte und ePEF-Tagebuch'],
       ['schlaflabor','SCHLAFLABOR & SCHLAFWERTE','AHI, Sauerstoff, Schlafphasen und CPAP'],
+      ['gehttest','GEHTEST / BELASTUNGSTEST','6-Minuten-Gehtest, Blutgase und Verlaufsdiagramme'],
       ['therapie','Therapie & Medikamente','Medikamentenplan und Behandlung'],
       ['kalender','Kalender','Termine und Klinikaufenthalte']
     ]},
@@ -170,5 +171,5 @@
   }
   sync();
   document.documentElement.classList.add('n332-ready');
-  window.__ASTHMA_NAV332_TEST=Object.freeze({version:'3.4.1',groups:groups.map(g=>({name:g.name,ids:g.items.map(i=>i[0])})),open:show,close:hide,sync});
+  window.__ASTHMA_NAV332_TEST=Object.freeze({version:'3.4.2',groups:groups.map(g=>({name:g.name,ids:g.items.map(i=>i[0])})),open:show,close:hide,sync});
 })();

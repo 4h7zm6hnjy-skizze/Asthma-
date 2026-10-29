@@ -16,7 +16,7 @@
  const kinds=[['spo2','Blutsauerstoff – Diagramm'],['bp','Blutdruck – Diagramm'],['pulse','Puls – Diagramm'],
   ['weight','Gewicht – Diagramm'],['pef','Peak-Flow – Diagramm'],['lung','Lungenfunktion – Diagramme'],
   ['lungfull','Lungenfunktion – alle Befundwerte'],['diffusion','Diffusionsmessung – Diagramme'],
-  ['difffull','Diffusion – alle Befundwerte'], ['sleep','Schlaflabor – Messwerte und Befunde'], ['sleepimages','Schlaflabor – Originaldiagramme und Befundseiten']];
+  ['difffull','Diffusion – alle Befundwerte'], ['sleep','Schlaflabor – Messwerte und Befunde'], ['sleepimages','Schlaflabor – Originaldiagramme und Befundseiten'], ['walk','Gehtest – Messwerte und Verlauf'], ['walkimages','Gehtest – Originalbefund']];
  const allKinds=[...baseKinds,...kinds];
  const num=v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))?Number(v):null;
  const iso=s=>/^\d{4}-\d\d-\d\d$/.test(s||'')?s:'';
@@ -332,6 +332,43 @@
        figure.append(caption,image);imgBox.append(figure);
      }
      root.append(imgBox);
+     // Neue Gehtests: eigene Messreihe und zeitliche Vor-/Nachbelastungswerte.
+     const walks=suite.filter(x=>x.type==='walk342').map(x=>x.value).filter(within);
+     const walkRows=walks.map(x=>({date:x.date,time:x.timePost||x.timePre||'',distance:num(x.distance),duration:num(x.duration),
+       spo2Pre:num(x.spo2Pre),spo2Post:num(x.spo2Post),sao2Pre:num(x.sao2Pre),sao2Post:num(x.sao2Post),
+       po2Pre:num(x.po2Pre),po2Post:num(x.po2Post),pco2Pre:num(x.pco2Pre),pco2Post:num(x.pco2Post),
+       phPre:num(x.phPre),phPost:num(x.phPost),bePre:num(x.bePre),bePost:num(x.bePost),hco3Pre:num(x.hco3Pre),hco3Post:num(x.hco3Post),
+       clinic:x.doctor||'',testType:x.testType||'six',oxygen:x.oxygen||'unknown'}));
+     panel(root,'walk','Gehtest / Belastungstest – 6-Minuten-Gehtest und Blutgase',walkRows,
+       [{title:'Gehstrecke',unit:'m',series:[['distance','Gehstrecke','#207e97']]},
+        {title:'SaO₂ vor/nach Belastung',unit:'%',series:[['sao2Pre','Vorher','#9c6e45'],['sao2Post','Nachher','#2c807c']]},
+        {title:'SpO₂ vor/nach Belastung',unit:'%',series:[['spo2Pre','Vorher','#9c6e45'],['spo2Post','Nachher','#2c807c']]},
+        {title:'pH vor/nach Belastung',unit:'pH',series:[['phPre','Vorher','#8b618d'],['phPost','Nachher','#2c807c']]}],
+       [['distance','Gehstrecke (m)',1],['duration','Belastung (min)',1],['spo2Pre','SpO₂ vorher (%)',1],['spo2Post','SpO₂ nachher (%)',1],
+        ['sao2Pre','SaO₂ vorher (%)',1],['sao2Post','SaO₂ nachher (%)',1],
+        ['po2Pre','pO₂ vorher (Einheit prüfen)',1],['po2Post','pO₂ nachher (Einheit prüfen)',1],
+        ['pco2Pre','pCO₂ vorher (Einheit prüfen)',1],['pco2Post','pCO₂ nachher (Einheit prüfen)',1],
+        ['phPre','pH vorher',2],['phPost','pH nachher',2],['bePre','BE vorher',1],['bePost','BE nachher',1],
+        ['hco3Pre','HCO₃ vorher',1],['hco3Post','HCO₃ nachher',1],['clinic','Klinik',-2]]);
+     const walkBox=root.querySelector('[data-s292-kind="walk"]');
+     if(walkBox)for(const rec of [...walks].sort((a,b)=>a.date.localeCompare(b.date))){
+       walkBox.append(node('h4','',fmt(rec.date)+' · '+(rec.doctor||'Ort unbekannt')));
+       walkBox.append(node('p','s292-note','Test: '+(rec.testType==='six'?'6-Minuten-Gehtest':'Belastungstest')+'; '+(rec.oxygen==='no'?'ohne zusätzliches O₂':rec.oxygen==='yes'?'mit O₂':'O₂ nicht dokumentiert')+'; BGA-Probenart: '+(rec.sampleType||'unbekannt')+'; Gaswerte: '+(rec.gasUnit==='unknown'?'Einheit im Befund nicht angegeben':rec.gasUnit)+'.'));
+       if(rec.comment)walkBox.append(node('p','s292-note',rec.comment));
+       if(rec.note)walkBox.append(node('p','s292-note',rec.note));
+     }
+     const walkAttachments=(await SEC.list('documents')).filter(d=>d.kind==='Gehtestbericht'&&walks.some(w=>w.id===d.studyId)&&d.blob instanceof Blob);
+     const walkImageBox=node('section','s292-category s341-report');walkImageBox.dataset.s292Kind='walkimages';
+     walkImageBox.append(node('h3','','Gehtest – Originalbefunde'));
+     if(!walkAttachments.length)walkImageBox.append(node('p','s292-note','Keine Originalbefunde in diesem Zeitraum gespeichert.'));
+     for(const d of walkAttachments){
+       const figure=node('figure','s341-report-image');figure.append(node('figcaption','',fmt(d.documentDate||'')+' · '+(d.caption||d.name||'Gehtestbefund')));
+       if(String(d.mime||d.blob.type).startsWith('image/')){
+         const image=document.createElement('img'),url=URL.createObjectURL(d.blob);sleepImageUrls.push(url);image.src=url;image.alt=d.caption||'Gehtestbefund';image.loading='eager';figure.append(image);
+       }else figure.append(node('p','s292-note','Original-PDF in der privaten Akte: '+d.name));
+       walkImageBox.append(figure);
+     }
+     root.append(walkImageBox);
      root.append(node('p','s292-disclaimer','Gemessene Verläufe sind keine Diagnose. Durchgezogene Linien zeigen Messwerte, gestrichelte Linien ausschließlich manuell hinterlegte persönliche Vergleiche. Bei auffälligen Werten ärztliche Beurteilung einholen. Diese gedruckten Gesundheitsdaten sind unverschlüsselt.'));
      report.append(root);lastKey=r.key;applySelection();
    })();loading=job;
