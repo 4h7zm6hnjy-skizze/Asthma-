@@ -1,5 +1,5 @@
 {
-  "version": "3.4.7",
+  "version": "3.4.8",
   "released": "2026-10-29",
-  "notes": "PneumoPro: Körpergröße im persönlichen Profil, automatische BMI- und Körperoberflächenberechnung (Mosteller), allgemeiner BMI-Gewichtsorientierungsbereich als grünes Band im 10-Jahres-Gewichtsdiagramm und Statistik-PDF; erweiterte Ampel für SpO₂, Ruhepuls, Lungenfunktion sowie Blutdruck, mit Sicherheits- und Referenzhinweisen. Bestehende 3.4.6-Funktionen, Offline-Speicher, Tresor und Logo unverändert."
+  "notes": "PneumoPro: neuer separater Bereich Bewertung der Daten mit ausführlicher Ampel-Einordnung, 10 letzten Messungen je Art, Vergleich mit 10 vorherigen, getrennten Lungenfunktionsphasen/Messquellen, Laborreferenzen, Gewicht/BMI und jederzeitiger Neubewertung. Vorversion 3.4.7 vollständig enthalten."
 }

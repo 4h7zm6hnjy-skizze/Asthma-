@@ -14,6 +14,7 @@
       ['lungenkrankheiten','LUNGENERKRANKUNGEN · COPD / KREBS / WEITERE','Diagnostik, Befunde, Reha und Rechte'],
       ['lungenwerte','Lungenfunktion','FEV₁, FVC und Verlauf'],
       ['vitalwerte','Vitalwerte & Gewicht','SpO₂, Blutdruck, Puls und Gewichtsdiagramm'],
+      ['bewertung','BEWERTUNG DER DATEN','Letzte 10 Messungen, Ampel und Neubewertung'],
       ['peakflow','Peak-Flow','Atemwerte und ePEF-Tagebuch'],
       ['schlaflabor','SCHLAFLABOR & SCHLAFWERTE','AHI, Sauerstoff, Schlafphasen und CPAP'],
       ['gehttest','GEHTEST / BELASTUNGSTEST','6-Minuten-Gehtest, Blutgase und Verlaufsdiagramme'],

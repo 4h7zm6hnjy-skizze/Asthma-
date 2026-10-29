@@ -1,0 +1,32 @@
+/* PneumoPro 3.4.8 – private data review */
+#bewertung{max-width:1150px;margin-inline:auto}
+#bewertung h2{font-size:1.16rem;margin:18px 0 12px}
+.b348-intro{font-size:.94rem;line-height:1.6;color:#456271;max-width:78ch}
+.b348-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 0}
+.b348-actions button{min-height:48px}
+.b348-stamp,.b348-context,.b348-chart-label{font-size:.86rem;line-height:1.6;color:#536c78}
+.b348-overview{margin:14px 0;padding:14px;background:#f3f8fb;border:1px solid #c9dae3;border-radius:14px}
+.b348-focus{border-left:5px solid #bc5b13;padding:12px 14px;background:#fff8f2;border-radius:8px;margin-top:8px}
+.b348-focus ul{margin:8px 0 0;padding-left:20px;line-height:1.65}
+.b348-category{margin:20px 0}
+.b348-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,310px),1fr));gap:14px}
+.b348-card{background:#fff;border:1px solid #d7e4e8;border-left:5px solid var(--b348-tone,#607782);padding:16px;border-radius:14px;min-width:0;overflow-wrap:anywhere;box-shadow:0 2px 9px rgba(15,54,74,.035)}
+.b348-card-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px}
+.b348-card h3{font-size:1.03rem;line-height:1.4;max-width:100%;margin:0}
+.b348-badge{--b348-tone:#596b76;display:inline-block;color:var(--b348-tone);border:1px solid var(--b348-tone);border-radius:8px;padding:4px 7px;font-weight:700;font-size:.75rem;max-width:100%;overflow-wrap:anywhere}
+.b348-numbers{font-size:1.02rem;font-weight:700;margin:12px 0 7px}
+.b348-metrics{display:grid;grid-template-columns:1fr;gap:4px;font-size:.89rem;color:#2f5365;line-height:1.5}
+.b348-graph{margin-top:10px;border-radius:8px;background:#f8fbfc;padding:6px}
+.b348-graph svg{display:block;width:100%;max-height:106px}
+.b348-chart-label{display:block}
+.b348-details{margin-top:9px;border-top:1px solid #e1ebef;padding-top:9px}
+.b348-details summary{font-size:.9rem;font-weight:700;color:#21556d;cursor:pointer;padding:6px 0}
+.b348-table-wrap{width:100%;overflow-x:auto}
+.b348-table{border-collapse:collapse;width:100%;font-size:.8rem;min-width:330px}
+.b348-table td,.b348-table th{border-bottom:1px solid #e6edf0;padding:8px 6px;text-align:left;vertical-align:top}
+.b348-table th{font-weight:700}
+#bew348-message{min-height:20px;font-size:.88rem;font-weight:600;color:#375869}
+@media(max-width:480px){.b348-card{padding:12px}.b348-card-head{display:block}.b348-card-head>.b348-badge{margin-top:7px}}
+@media print{#bewertung .b348-actions{display:none}.b348-card{break-inside:avoid}.b348-category{break-before:auto}}
+
+.b348-finding{font-size:.89rem;font-weight:650;color:#204f62;line-height:1.5;margin:10px 0}
