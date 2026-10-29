@@ -154,6 +154,7 @@
  }
  async function refresh(){const id=++refreshCount;const [suite,docs]=await Promise.all([SEC.list('suite'),SEC.list('documents')]);if(id!==refreshCount)return;records=suite.filter(x=>x.type==='imaging343').map(x=>x.value).filter(x=>x&&validDate(x.date));documents=docs;renderRecords();}
  let timer;window.addEventListener('asthma:secure-change',ev=>{if(['suite','documents'].includes(ev.detail?.group)){clearTimeout(timer);timer=setTimeout(()=>refresh().catch(e=>say(e.message,true)),130)}});
+ window.ASTHMA_IMAGING343_OPEN=doc=>{NAV.go('bildgebung');showImage(doc)};
  reset();refresh().catch(e=>say('Befunde konnten nicht geladen werden: '+e.message,true));
  window.__ASTHMA_IMAGING343_TEST=Object.freeze({version:'3.4.3',types:['xray','ct'],protocol:true,local:true});
 })();

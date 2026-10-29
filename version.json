@@ -1,5 +1,5 @@
 {
-  "version": "3.4.3",
+  "version": "3.4.4",
   "released": "2026-10-29",
-  "notes": "Bildgebung: getrennte Röntgen- und CT-Befunde, ärztliches Diagnoseprotokoll, verschlüsselte Originale, lokale Bild-/PDF-/DICOM-Vorschau, DICOM-ZIP-Import und getrennte Monats-/Jahres-PDF-Auswahl."
+  "notes": "Optionale Fachbereiche Asthma, COPD, Lungenkrebs, Fibrose, Bronchiektasen, Emphysem, pulmonale Hypertonie, Pneumonie, Embolie, Alpha-1-Mangel. Eigene Untersuchungseinträge, Reha-/Hilfsmittel-/Rechte-Ratgeber und Antragstracker; farbige Blutdruck-Ampel in Karten, Messhistorie, Diagrammen und Berichten. Vorherige Röntgen-/CT- und Ärzte-Akten enthalten."
 }

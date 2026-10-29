@@ -1,0 +1,21 @@
+ASTHMA 3.4.4 – INSTALLATION AM iPHONE
+
+NEU: LUNGENERKRANKUNGEN + REHA, HILFSMITTEL & RECHTE + BLUTDRUCK-AMPEL
+ENTHÄLT AUCH: 3.4.3 Röntgen/CT und Ärzte & Krankenhäuser
+
+1. In der aktuellen Asthma-App unter Einstellungen unbedingt zuerst eine verschlüsselte GESAMTSICHERUNG erstellen und extern sicher verwahren.
+2. Die ZIP in der iPhone-App „Dateien“ speichern und entpacken.
+3. NUR die Dateien im Ordner „GitHub_Update“ in den HAUPTORDNER deines GitHub-Repositories Asthma- hochladen und gleichnamige Dateien ersetzen.
+4. GitHub-Änderungen speichern. Die bestehende Asthma-App öffnen, nicht den Browser-Speicher löschen und die Gesundheitsakte NICHT neu einrichten.
+5. Unter Einstellungen → Nach Updates suchen auf Version 3.4.4 aktualisieren.
+6. Im Seitenmenü auf LUNGENERKRANKUNGEN tippen, Erkrankung auswählen und nur ärztlich dokumentierte Befunde als Status/Untersuchung eintragen. Die geöffnete Liste ist keine Diagnose.
+7. Im gleichen Bereich Reha/Hilfsmittel/Rechte öffnen und auf Wunsch Anträge und Bescheide dokumentieren. Vorhandene Anträge bleiben im normalen Antragszentrum.
+8. Unter Vitalwerte & Gewicht den Blutdruck öffnen. Die Ampel färbt systolische und diastolische Werte einzeln; die Farben erscheinen auch im Verlauf und in den Berichtsgrafiken.
+9. Unter Statistik/Monats- und Jahresbericht die neuen Kapitel Lungenerkrankungen und Reha/Hilfsmittel/Rechte nach Bedarf an- oder abwählen.
+
+DATENSCHUTZ: Keine privaten Befunde, Arztberichte, Fotos, DICOM-Dateien, Diagnosen oder Backup-Dateien in dein öffentliches GitHub-Repository laden. Die ZIP enthält nur App-Code und öffentliche Hilfetexte. Alle persönlichen Einträge bleiben lokal in der verschlüsselten Gesundheitsakte.
+
+MEDIZIN: Die Ampel dient nur zur groben Einordnung für Erwachsene und berücksichtigt nicht individuell vereinbarte Zielwerte, Messmethode oder akute Beschwerden. Sie stellt keine Diagnose. Bei Brustschmerz, schwerer Atemnot, Lähmung oder Sprachstörung: 112.
+RECHT: Hinweise ersetzen keine Rechtsberatung; Ansprüche und Fristen anhand Bescheid und offizieller Stellen individuell prüfen.
+
+HINWEIS: Diese ZIP aktualisiert die App-Programmdateien. Sie importiert nicht automatisch die privaten Gehtest- oder Schlaflabor-JSON-Dateien; deren Import muss separat im entsperrten Tresor erfolgen.

@@ -16,7 +16,7 @@
  const kinds=[['spo2','Blutsauerstoff – Diagramm'],['bp','Blutdruck – Diagramm'],['pulse','Puls – Diagramm'],
   ['weight','Gewicht – Diagramm'],['pef','Peak-Flow – Diagramm'],['lung','Lungenfunktion – Diagramme'],
   ['lungfull','Lungenfunktion – alle Befundwerte'],['diffusion','Diffusionsmessung – Diagramme'],
-  ['difffull','Diffusion – alle Befundwerte'], ['sleep','Schlaflabor – Messwerte und Befunde'], ['sleepimages','Schlaflabor – Originaldiagramme und Befundseiten'], ['walk','Gehtest – Messwerte und Verlauf'], ['walkimages','Gehtest – Originalbefund'], ['imaging','Röntgen & CT – Diagnoseprotokolle'], ['imagingimages','Röntgen & CT – Bildvorschauen']];
+  ['difffull','Diffusion – alle Befundwerte'], ['sleep','Schlaflabor – Messwerte und Befunde'], ['sleepimages','Schlaflabor – Originaldiagramme und Befundseiten'], ['walk','Gehtest – Messwerte und Verlauf'], ['walkimages','Gehtest – Originalbefund'], ['imaging','Röntgen & CT – Diagnoseprotokolle'], ['imagingimages','Röntgen & CT – Bildvorschauen'], ['lungdiseases','Lungenerkrankungen – Diagnose- und Testprotokoll'], ['lungrights','Reha, Hilfsmittel & Rechte – Anträge']];
  const allKinds=[...baseKinds,...kinds];
  const num=v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))?Number(v):null;
  const iso=s=>/^\d{4}-\d\d-\d\d$/.test(s||'')?s:'';
@@ -142,7 +142,7 @@
        }
      }
 
-     for(const p of pts){const el=shape('circle',{cx:x(p),cy:y(num(p[key])),r:pts.length>160?1.6:3.3,fill:color});const tip=document.createElementNS(svgNS,'title');tip.textContent=fmt(p.date)+' '+(p.time||'')+' · '+label+': '+format(num(p[key]),digits)+' '+unit;el.append(tip);}
+     for(const p of pts){const bp=unit==='mmHg'&&series.some(a=>a[0]==='diastolic')?window.ASTHMA_BPA344?.classifyPart(p[key],key==='value'?'systolic':'diastolic'):null;const el=shape('circle',{cx:x(p),cy:y(num(p[key])),r:pts.length>160?2.1:4.7,fill:bp?.color||color,stroke:'#fff','stroke-width':1});const tip=document.createElementNS(svgNS,'title');tip.textContent=fmt(p.date)+' '+(p.time||'')+' · '+label+': '+format(num(p[key]),digits)+' '+unit;if(bp)tip.textContent+=' · '+bp.label;el.append(tip);}
      const chosen=selectLabels(pts.map(p=>[p,num(p[key])]),series.length>1?4:7);
      for(const [p,val] of chosen){
        let yy=y(val)+(seriesIndex%2?21:-12);
@@ -218,6 +218,7 @@
      panel(root,'spo2','Blutsauerstoff (SpO₂)',spo,[{title:'SpO₂-Verlauf',unit:'%',series:[['value','SpO₂','#108596']]}],[['value','SpO₂ (%)',1],['source','Messquelle',-2]],{value:refs.value});
      const bp=vit.filter(x=>x.kind==='bp'&&isValid(x.value,'bp')&&isValid(x.diastolic,'bp'));
      panel(root,'bp','Blutdruck',bp,[{title:'Systolisch und diastolisch',unit:'mmHg',series:[['value','Systolisch','#ab536e'],['diastolic','Diastolisch','#4165b0']]}],[['value','Systolisch (mmHg)',0],['diastolic','Diastolisch (mmHg)',0],['source','Messort',-2]],{value:refs.systolic,diastolic:refs.diastolic});
+     const bpBlock=root.querySelector('[data-s292-kind="bp"]');if(bpBlock&&window.ASTHMA_BPA344){const count={};for(const r of bp){const cat=window.ASTHMA_BPA344.classify(r.value,r.diastolic);count[cat.key]=(count[cat.key]||0)+1;}const legend=node('p','s292-note','Blutdruck-Ampel: '+Object.entries(window.ASTHMA_BPA344.codes).map(([k,v])=>v.label+': '+(count[k]||0)).join(' · ')+'. Einzelwerte sind keine Diagnose; ärztliche Zielwerte gehen vor.');bpBlock.append(legend);}
      const pulse=vit.filter(x=>x.kind==='pulse'&&isValid(x.value,'pulse'));
      panel(root,'pulse','Puls',pulse,[{title:'Pulsverlauf',unit:'/min',series:[['value','Puls','#9366b8']]}],[['value','Puls (/min)',0],['source','Messquelle',-2]],{value:refs.pulse});
      const weight=weights.map(x=>({...x,value:num(x.kg)}));
@@ -405,6 +406,22 @@
      }
      root.append(imgSection);
 
+     // Eigenständige Lungenerkrankungen und Sozialrecht, bereits gespeicherte Werte bleiben in ihren Originalmodulen.
+     const diseaseNames={asthma:'Asthma',copd:'COPD',cancer:'Lungenkrebs',fibrosis:'Lungenfibrose / ILD',bronchiectasis:'Bronchiektasen',emphysema:'Lungenemphysem',ph:'Pulmonale Hypertonie',pneumonia:'Lungenentzündung',embolism:'Lungenembolie',aat:'Alpha-1-Antitrypsinmangel',other:'Andere Lungenerkrankung'};
+     const lungState=suite.filter(x=>x.type==='lung344').map(x=>x.value).filter(x=>x&&x.status!=='none'&&x.date&&within(x));
+     const lungTests=suite.filter(x=>x.type==='lung344test').map(x=>x.value).filter(within);
+     const illnesses=node('section','s292-category');illnesses.dataset.s292Kind='lungdiseases';illnesses.append(node('h3','','Lungenerkrankungen – dokumentierte Einordnung und Untersuchungen'));
+     if(!lungState.length&&!lungTests.length)illnesses.append(node('p','s292-note','Keine zusätzlich dokumentierte ärztliche Einordnung oder Untersuchungen im ausgewählten Zeitraum. Die Krankheitsmodule stellen keine Diagnosen.'));
+     for(const d of lungState){const t=node('p','s292-note',(diseaseNames[d.condition]||d.condition)+' · Status: '+({confirmed:'ärztlich bestätigt',suspected:'ärztlich dokumentierter Verdacht',investigation:'Abklärung läuft',excluded:'ärztlich ausgeschlossen'}[d.status]||d.status)+' · '+fmt(d.date)+' · '+(d.doctor||'Arzt nicht angegeben'));illnesses.append(t);if(d.diagnosis)illnesses.append(node('p','s292-note','Ärztlicher Wortlaut: '+d.diagnosis));}
+     for(const x of lungTests){illnesses.append(node('p','s292-note',fmt(x.date)+' · '+(diseaseNames[x.condition]||x.condition)+' · '+x.test+': '+x.result+(x.unit?' '+x.unit:'')+(x.reference?' (Referenz '+x.reference+')':'')+(x.doctor?' · '+x.doctor:'')));}
+     root.append(illnesses);
+     const lungAidTitles={reha:'Lungen-Reha',choice:'Wunsch- und Wahlrecht',tools:'Hilfsmittel',ltot:'Sauerstoff/Beatmung',disability:'GdB/Gleichstellung',bem:'BEM/Arbeitsplatz',dmp:'DMP',cancerreha:'Onkologische Reha',oncology:'Krebsberatung',palliative:'Palliativversorgung',objection:'Widerspruch',care:'Pflegegrad/Pflegehilfsmittel'};
+     const aids=suite.filter(x=>x.type==='lung344aid').map(x=>x.value).filter(x=>x&&x.date&&within(x));
+     const rights=node('section','s292-category');rights.dataset.s292Kind='lungrights';rights.append(node('h3','','Reha, Hilfsmittel & Rechte – dokumentierte Vorgänge'));
+     if(!aids.length)rights.append(node('p','s292-note','Keine neuen Anträge in diesem Zeitraum protokolliert. Vorhandene Anträge können zusätzlich unter „Anträge“ verwaltet werden.'));
+     for(const a of aids)rights.append(node('p','s292-note',(diseaseNames[a.condition]||a.condition)+' · '+(lungAidTitles[a.type]||a.type)+' · '+a.status+' · Antrag '+fmt(a.date)+(a.authority?' · '+a.authority:'')+(a.deadline?' · Frist laut Eingabe '+fmt(a.deadline):'')+(a.note?' · '+a.note:'')));
+     rights.append(node('p','s292-note','Die Aufstellung ist keine automatische Rechtsprüfung. Fristen immer anhand des Originalbescheids prüfen.'));
+     root.append(rights);
      root.append(node('p','s292-disclaimer','Gemessene Verläufe sind keine Diagnose. Durchgezogene Linien zeigen Messwerte, gestrichelte Linien ausschließlich manuell hinterlegte persönliche Vergleiche. Bei auffälligen Werten ärztliche Beurteilung einholen. Diese gedruckten Gesundheitsdaten sind unverschlüsselt.'));
      report.append(root);lastKey=r.key;applySelection();
    })();loading=job;

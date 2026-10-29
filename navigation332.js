@@ -11,6 +11,7 @@
   const groups=[
     {id:'werte',name:'1 · MEINE GESUNDHEITSWERTE',open:true,items:[
       ['start','Übersicht','Die wichtigsten Informationen'],
+      ['lungenkrankheiten','LUNGENERKRANKUNGEN · COPD / KREBS / WEITERE','Diagnostik, Befunde, Reha und Rechte'],
       ['lungenwerte','Lungenfunktion','FEV₁, FVC und Verlauf'],
       ['vitalwerte','Vitalwerte & Gewicht','SpO₂, Blutdruck, Puls und Gewichtsdiagramm'],
       ['peakflow','Peak-Flow','Atemwerte und ePEF-Tagebuch'],
@@ -20,6 +21,7 @@
       ['kalender','Kalender','Termine und Klinikaufenthalte']
     ]},
     {id:'akte',name:'2 · BEFUNDE, LABOR & AKTE',open:true,items:[
+      ['behandler','ÄRZTE & KRANKENHÄUSER','Alle Termine, Bilder und Befunde je Praxis oder Klinik'],
       ['bildgebung','RÖNTGEN & CT · BILDGEBUNG','Bilder, CT-Serien und Diagnoseprotokolle'],
       ['dateien','Dateien & Scannen','Alle Unterlagen hochladen'],
       ['labor','Labor & Blutwerte','Laborbefunde und Messreihen'],
