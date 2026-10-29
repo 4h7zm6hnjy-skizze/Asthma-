@@ -1,5 +1,5 @@
 {
-  "version": "3.3.1",
+  "version": "3.4.0",
   "released": "2026-10-29",
-  "notes": "Neuer zentraler Bereich Dateien & Scannen: Lungenfunktion, Labor, Arztbriefe und Entlassungsberichte. Bestehende Importer und verschlüsselter Dokumentenspeicher bleiben erhalten."
+  "notes": "Seitliches Menü, klare Messwertkarten und großes Gewichtsdiagramm; neuer Schlaflabor-Bereich mit Atemstörungen (AHI/REI/ODI), Sauerstoffdaten, Schlafphasen, PAP-Einstellungen, Originaldokumenten, Langzeitdiagrammen und einzeln auswählbarem Statistikabschnitt."
 }

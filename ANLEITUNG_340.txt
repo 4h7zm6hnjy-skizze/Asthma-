@@ -1,0 +1,49 @@
+ASTHMA 3.4.0 – KLARE NAVIGATION, GEWICHT & SCHLAFLABOR
+Stand: 29.10.2026
+
+NEU:
+- Ausklappbare Seitenleiste mit klaren Gruppen: Gesundheitswerte, Akte/Labor, Verwaltung.
+- Häufige Werte unten, Akte und Dokumente hinter der Menütaste.
+- Größere, klar beschriftete Messwertkarten für Sauerstoff, Blutdruck, Puls, Gewicht und Lungenfunktion.
+- Gewichtsdiagramm unter Vitalwerte: Tag, Woche, Monat, Jahr, 10 Jahre und Alle; mit Verlauf in kg.
+- Neuer Schlaflabor-Bereich: PSG, ambulante Polygraphie, PAP-Gerätedaten,
+  Atemstörungen, SpO2, Schlafphasen, Schlafzeit, Puls, Epworth und Therapie.
+- Schlaflabor-Messungen speichern, bearbeiten, löschen, im Verlauf darstellen.
+- Originalberichte (Foto oder PDF bis 12 MB) im lokalen Tresor aufbewahren.
+- Schlaflabor im Monats-/Jahresbericht einzeln für Druck und PDF auswählbar.
+- Keine automatischen Diagnosen; unbekannte Werte bleiben leer.
+
+INSTALLATION AUF DEM IPHONE:
+1. Vorher die vorhandene Asthma-App öffnen und unter Einstellungen eine vollständige,
+   verschlüsselte Sicherung auf dem iPhone speichern.
+2. DIE UPDATE-DATEI herunterladen und in der Dateien-App entpacken.
+3. Die Dateien aus dem entpackten Ordner GitHub_Update einzeln oder gemeinsam
+   in den Hauptordner deiner GitHub-Asthma-App (Branch main) hochladen.
+   Gleichnamige Dateien ersetzen. Keine Gesundheitsdaten/Importdateien hochladen!
+4. Auf GitHub die Änderungen speichern (Commit).
+5. Die Asthma-App auf dem iPhone öffnen, entsperren und unter Einstellungen
+   „Nach Updates suchen“ ausführen. Version 3.4.0 prüfen.
+6. Im ausklappbaren Menü „SCHLAFLABOR & SCHLAFWERTE“ öffnen;
+   unter „Vitalwerte“ das Gewichtsdiagramm prüfen.
+7. Unter „Statistik & PDF“ einen Monats- oder Jahresbericht berechnen.
+   Schlaflabor als eigenen Bereich auswählen und nur diesen testweise ins PDF aufnehmen.
+
+PRÜFUNGEN MIT SYNTHETISCHEN DATEN:
+- JavaScript-Syntax der gesamten App: bestanden.
+- Alle Service-Worker-Offline-Dateien vorhanden.
+- Seitenleiste und Schlaflabor auf 390/768 Pixel ohne horizontales Überlaufen.
+- Schlaflabor-Werte angelegt, geändert und wieder angezeigt.
+- Gewichtsdatensatz gespeichert/geändert und Diagramm aktualisiert.
+- Monatsbericht: Schlaflaborwerte inklusive AHI, SpO2 und Dateiname in eigener
+  Kategorie enthalten, 20 auswählbare Kategorien inklusive Gewichtsverlauf.
+- Diese simulierten Tests ersetzen keinen Test mit echten iPhone-Gesundheitsdaten.
+
+DATENSCHUTZ:
+Dieses Paket enthält nur App-Quellcode und frei zugängliche App-Bilder,
+keine persönlichen Importdaten oder medizinischen Befunde. Originaldokumente
+und Messwerte bleiben im lokalen AES-GCM-verschlüsselten Tresor.
+Erstellte/gedruckte PDFs sind unverschlüsselt – bitte sicher verwahren.
+
+HINWEIS:
+ChatGPT hat das Update vorbereitet. Es wurde in dieser Sitzung nicht selbst
+auf GitHub hochgeladen. Nutze bitte den oben beschriebenen Installationsweg.

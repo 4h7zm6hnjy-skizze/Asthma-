@@ -16,7 +16,7 @@
  const kinds=[['spo2','Blutsauerstoff – Diagramm'],['bp','Blutdruck – Diagramm'],['pulse','Puls – Diagramm'],
   ['weight','Gewicht – Diagramm'],['pef','Peak-Flow – Diagramm'],['lung','Lungenfunktion – Diagramme'],
   ['lungfull','Lungenfunktion – alle Befundwerte'],['diffusion','Diffusionsmessung – Diagramme'],
-  ['difffull','Diffusion – alle Befundwerte']];
+  ['difffull','Diffusion – alle Befundwerte'], ['sleep','Schlaflabor – Messwerte und Befunde']];
  const allKinds=[...baseKinds,...kinds];
  const num=v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))?Number(v):null;
  const iso=s=>/^\d{4}-\d\d-\d\d$/.test(s||'')?s:'';
@@ -43,7 +43,7 @@
  const notice=node('p','s292-note');notice.id='s292-selection-status';controls.append(notice);
  const toolbar=$('stats25-build').closest('.stats25-controls');toolbar?.insertAdjacentElement('afterend',controls);
  // Interactive Inhaltsverzeichnis, generated from the actual report cards and
- // the same 19 selections used by the PDF/print renderer.
+ // the same current selections used by the PDF/print renderer.
  function updateContents(){
    const report=$('stats25-report'),heading=report?.querySelector(':scope > .stats25-heading');
    report?.querySelector(':scope > #s292-contents')?.remove();
@@ -254,6 +254,65 @@
      }
      fullTests('lungfull','Vollständige Lungenfunktionsbefunde',allLung);
      fullTests('difffull','Vollständige Diffusionsmessungen (Single Breath)',allDiff);
+     // Schlaflabor: identisches, flaches Feldschema wie in schlaflabor340.js.
+     // PSG, Polygraphie und PAP-Gerätewerte nicht künstlich gleichsetzen.
+     const documents=(await SEC.list('documents')).filter(x=>x&&x.kind==='Schlaflaborbericht');
+     const studies=suite.filter(x=>x.type==='sleep340').map(x=>x.value).filter(within);
+     const sleepRows=studies.map(x=>({date:x.date,time:x.time||'12:00',type:x.studyType,
+       ahi:x.studyType==='psg'?num(x.ahi):null,
+       rei:x.studyType==='polygraphy'?num(x.rei):null,
+       odi:num(x.odi),spo2min:num(x.spo2min),efficiency:num(x.efficiency),residualAhi:x.studyType==='pap'?num(x.residualAhi):null}));
+     panel(root,'sleep','Schlaflabor – Messwerte und Untersuchungen',sleepRows,
+       [{title:'AHI – Polysomnographie',unit:'Ereignisse/h',series:[['ahi','AHI','#1b7c90']]},
+        {title:'REI – Polygraphie',unit:'Ereignisse/h',series:[['rei','REI','#aa7040']]},
+        {title:'ODI – Sauerstoffabfallindex',unit:'Abfälle/h',series:[['odi','ODI','#8b5daa']]},
+        {title:'SpO₂ – Tiefstwert im Schlaf',unit:'%',series:[['spo2min','SpO₂ Min','#366fa1']]},
+        {title:'Rest-AHI – PAP-Geräteauswertung',unit:'Ereignisse/h',series:[['residualAhi','Rest-AHI','#258578']]}],
+       [['ahi','AHI (Ereignisse/h)',1],['rei','REI (Ereignisse/h)',1],['odi','ODI (Abfälle/h)',1],
+        ['spo2min','SpO₂ Minimum (%)',1],['efficiency','Schlafeffizienz (%)',1],['residualAhi','Rest-AHI PAP (/h)',1],['type','Untersuchungsart',-2]]);
+     const sleepBox=root.querySelector('[data-s292-kind="sleep"]');
+     const sleepLabels={
+       ahi:'AHI (Ereignisse/h)',rdi:'RDI (Ereignisse/h)',rei:'REI (Ereignisse/h)',odi:'ODI (Abfälle/h)',
+       spo2mean:'SpO₂ Durchschnitt (%)',spo2min:'SpO₂ Minimum (%)',t90:'T90 – Zeit unter 90 % SpO₂ (%)',
+       obstructive:'Obstruktive Apnoen (Anzahl)',central:'Zentrale Apnoen (Anzahl)',mixed:'Gemischte Apnoen (Anzahl)',
+       hypopnea:'Hypopnoen (Anzahl)',cai:'CAI (/h)',oai:'OAI (/h)',tst:'Gesamtschlafzeit (Minuten)',
+       tib:'Zeit im Bett (Minuten)',efficiency:'Schlafeffizienz (%)',sleepLatency:'Einschlaflatenz (Minuten)',
+       remLatency:'REM-Latenz (Minuten)',waso:'Wachzeit nach Einschlafen (Minuten)',
+       n1:'Schlaf N1 (%)',n2:'Schlaf N2 (%)',n3:'Tiefschlaf N3 (%)',rem:'REM-Schlaf (%)',
+       arousal:'Arousal-Index (/h)',plmi:'PLMI (/h)',snoring:'Schnarchanteil (%)',pressure:'PAP-Druck (cmH₂O)',
+       pressureMin:'APAP Mindestdruck (cmH₂O)',pressureMax:'APAP Höchstdruck (cmH₂O)',
+       residualAhi:'Rest-AHI unter PAP (/h)',usage:'PAP-Nutzung (Stunden/Nacht)',leak:'Maskenleckage (l/min)',
+       usePercent:'Nächte mit PAP-Nutzung (%)',ess:'Epworth-Schläfrigkeitsskala (Punkte)',
+       t90min:'Zeit unter 90 % SpO₂ (Minuten)',t88min:'Zeit unter 88 % SpO₂ (Minuten)',
+       hrMean:'Puls im Schlaf Durchschnitt (/min)',hrMin:'Puls im Schlaf Minimum (/min)',
+       hrMax:'Puls im Schlaf Maximum (/min)',co2max:'CO₂ Höchstwert (mmHg)',
+       ahiSupine:'AHI Rückenlage (/h)',ahiOther:'AHI außerhalb Rückenlage (/h)',
+       pressureI:'BiPAP Einatemdruck IPAP (cmH₂O)',pressureE:'BiPAP Ausatemdruck EPAP (cmH₂O)'
+     };
+     if(sleepBox){
+       if(!studies.length)sleepBox.append(node('p','s292-note','Keine Schlaflaborbefunde im ausgewählten Zeitraum.'));
+       for(const rec of [...studies].sort((a,b)=>a.date.localeCompare(b.date))){
+         const types={psg:'Polysomnographie',polygraphy:'Polygraphie',pap:'PAP-Geräteauswertung',other:'Sonstige Schlafuntersuchung'};
+         sleepBox.append(node('h4','',fmt(rec.date)+' · '+(types[rec.studyType]||'Schlafuntersuchung')+' · '+(rec.doctor||'Ort nicht angegeben')));
+         if(rec.papMode)sleepBox.append(node('p','s292-note','PAP-Modus: '+rec.papMode));
+         if(rec.odiRule)sleepBox.append(node('p','s292-note','ODI-Schwelle: '+rec.odiRule+' %'));
+         if(rec.diagnosis)sleepBox.append(node('p','s292-note','Ärztliche Beurteilung: '+rec.diagnosis));
+         if(rec.recommendation)sleepBox.append(node('p','s292-note','Therapieempfehlung: '+rec.recommendation));
+         if(rec.symptoms)sleepBox.append(node('p','s292-note','Beschwerden: '+rec.symptoms));
+         if(rec.device)sleepBox.append(node('p','s292-note','Gerät / Maske: '+rec.device));
+         if(rec.note)sleepBox.append(node('p','s292-note','Notiz: '+rec.note));
+         const tab=node('table','s292-table'),thead=node('thead'),head=node('tr'),body=node('tbody');
+         for(const h of ['Befundwert','Messung'])head.append(node('th','',h));thead.append(head);tab.append(thead);
+         let count=0;
+         for(const [key,label] of Object.entries(sleepLabels)){
+           const value=num(rec[key]);if(value===null)continue;
+           const tr=node('tr');tr.append(node('td','',label),node('td','',format(value,2)));body.append(tr);count++;
+         }
+         if(count){tab.append(body);const wrap=node('div','s292-table-wrap');wrap.append(tab);sleepBox.append(wrap)}
+         const attachments=documents.filter(d=>d.kind==='Schlaflaborbericht'&&d.studyId===rec.id);
+         if(attachments.length)sleepBox.append(node('p','s292-note','Gespeicherte Originale (in der privaten Akte): '+attachments.map(d=>String(d.name||'Dokument').slice(0,160)).join(' · ')));
+       }
+     }
      root.append(node('p','s292-disclaimer','Gemessene Verläufe sind keine Diagnose. Durchgezogene Linien zeigen Messwerte, gestrichelte Linien ausschließlich manuell hinterlegte persönliche Vergleiche. Bei auffälligen Werten ärztliche Beurteilung einholen. Diese gedruckten Gesundheitsdaten sind unverschlüsselt.'));
      report.append(root);lastKey=r.key;applySelection();
    })();loading=job;

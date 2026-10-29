@@ -1,0 +1,76 @@
+/* Asthma 3.3.2 – lesbare Themenbereiche und seitliche Navigation. Kein Einfluss auf Druckberichte. */
+html.n332-ready .app-nav{display:none!important}
+html.n332-ready .topbar{position:sticky;top:0;z-index:115;background:#fff;box-shadow:0 3px 15px #163c5012}
+html.n332-ready .topbar-inner{gap:8px}
+html.n332-ready .top-actions{gap:8px}
+.n332-open-top{font:inherit;display:flex;align-items:center;justify-content:center;gap:8px;min-width:100px;min-height:43px;padding:8px 12px;border:2px solid #146a83;background:#e9f6f8;color:#12485e;border-radius:11px;font-size:15px;font-weight:850;white-space:nowrap}
+.n332-bars{font-size:20px;line-height:1}
+html.n332-ready .bottom-dock{grid-template-columns:repeat(5,minmax(0,1fr))!important;z-index:110}
+html.n332-ready .bottom-dock button{min-width:0;min-height:57px;padding:4px 1px}
+html.n332-ready .bottom-dock button>span:first-child{font-size:24px;line-height:1}
+html.n332-ready .bottom-dock button>span:last-child{font-size:11px;font-weight:800;white-space:nowrap}
+html.n332-ready #n332-open-bottom{color:#165a72;background:#e5f3f7;border:1px solid #badce4}
+#n332-backdrop[hidden]{display:none!important}
+#n332-backdrop{position:fixed;z-index:800;inset:0;width:100%;height:100%;border:0;background:rgba(10,30,45,.59);cursor:pointer}
+#n332-sidebar{position:fixed;z-index:801;left:0;top:0;bottom:0;width:min(370px,92vw);max-width:100vw;display:flex;flex-direction:column;background:#f7fafc;box-shadow:8px 0 40px #102a4340;transform:translateX(-105%);visibility:hidden;transition:transform .23s ease,visibility .23s;overflow:hidden;overscroll-behavior:contain}
+html.n332-menu-open{overflow:hidden}
+html.n332-menu-open #n332-sidebar{visibility:visible;transform:translateX(0)}
+.n332-side-top{background:#123e55;color:#fff;display:flex;gap:10px;align-items:center;justify-content:space-between;padding:19px 17px 18px;padding-top:max(19px,env(safe-area-inset-top));border-bottom:5px solid #49b9c1}
+.n332-side-top strong{display:block;color:white;font-size:21px;letter-spacing:.3px;font-weight:900}
+.n332-side-top small{display:block;font-size:12px;color:#d3edf1;margin-top:4px}
+.n332-close{border:1px solid #91bdc7;border-radius:11px;color:white;background:#285f74;font-size:21px;font-weight:850;min-width:45px;min-height:45px}
+.n332-side-scroll{overflow-y:auto;overflow-x:hidden;flex:1;padding:14px 13px 26px;overscroll-behavior:contain}
+.n332-group{background:white;border:2px solid #d1e1e8;border-radius:13px;margin:0 0 12px;overflow:hidden}
+.n332-group>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;background:#e9f4f7;padding:17px 13px;color:#123f55;font-size:13.5px;letter-spacing:.2px;font-weight:900;line-height:1.35}
+.n332-group>summary::-webkit-details-marker{display:none}
+.n332-group>summary:after{content:'+';font-size:23px;line-height:1;flex:0 0 17px;color:#1e6e84}
+.n332-group[open]>summary:after{content:'−'}
+.n332-group-links{display:grid;gap:3px;padding:8px}
+.n332-link{font:inherit;text-align:left;display:flex;flex-direction:column;gap:3px;min-width:0;background:white;color:#184558;border:1px solid transparent;border-radius:9px;padding:10px 12px;cursor:pointer;white-space:normal}
+.n332-link strong{font-size:15px;font-weight:850;line-height:1.3}
+.n332-link small{font-size:11px;color:#536e7b;line-height:1.3}
+.n332-link.n332-current{background:#dff3f5;border:1px solid #64b2bf;border-left:5px solid #147188;padding-left:8px}
+.n332-link.n332-current strong{color:#0b455b}
+.n332-side-note{padding:12px 18px 14px;margin:0;border-top:1px solid #d1e1e8;background:#fff;font-size:11px;line-height:1.45;color:#607785}
+/* TITEL: eindeutige primäre Seitenüberschriften und klar abgegrenzte Funktionskarten. */
+html.n332-ready #secure-application .panel>.section-heading,
+html.n332-ready #secure-application #start .section-heading{background:#e9f3f7;border-left:7px solid #16677f;border-radius:12px;padding:17px 16px;margin-bottom:20px;box-shadow:0 1px 0 #c4dbe4}
+html.n332-ready #secure-application .panel>.section-heading h2,
+html.n332-ready #secure-application #start .section-heading h2{font-size:clamp(1.4rem,2.5vw,1.95rem);font-weight:900;line-height:1.2;letter-spacing:-.6px;color:#123e52;overflow-wrap:anywhere}
+html.n332-ready #secure-application .panel>.section-heading .section-kicker{font-size:11px;font-weight:900;color:#126177;letter-spacing:.9px}
+html.n332-ready #secure-application .panel>.section-heading p:not(.section-kicker){font-size:13px;line-height:1.5;color:#365e6e}
+html.n332-ready #secure-application .suite-subpanel{background:#fff;border:2px solid #d3e1e7;border-left:5px solid #4f9bad;border-radius:13px;margin-top:21px;box-shadow:0 2px 8px #092a4b09;overflow-wrap:anywhere}
+html.n332-ready #secure-application .suite-subpanel>h3,
+html.n332-ready #secure-application .suite-subpanel>.section-heading h3,
+html.n332-ready #secure-application .scan-panel h3{font-size:clamp(1.1rem,2vw,1.33rem);font-weight:900;color:#164b60;line-height:1.3;margin:0 0 12px;padding-bottom:9px;border-bottom:2px solid #deecf0;overflow-wrap:anywhere}
+html.n332-ready #secure-application .suite-subpanel>h4{font-size:1.08rem;font-weight:850;color:#134c61}
+html.n332-ready #secure-application fieldset{border-radius:10px;max-width:100%}
+html.n332-ready #secure-application legend{font-weight:850;color:#154a60}
+html.n332-ready #secure-application details>summary{font-weight:780}
+html.n332-ready #secure-application #dateien .dh331-panel{border:2px solid #b6d1dd;background:#f6fafc;margin-top:16px}
+html.n332-ready #secure-application #dateien .dh331-panel h3{font-size:1.25rem;font-weight:900;color:#164b60}
+/* Übersicht: Kernwerte vorne, Akte und Labor klar getrennt. */
+html.n332-ready .d26-dashboard .d26-section-title h2{font-weight:900;font-size:clamp(1.12rem,2.6vw,1.5rem);color:#154459}
+html.n332-ready .d26-dashboard .d26-actions{border:2px solid #d0e2e9;border-radius:15px;padding:12px;background:#f5fafb}
+html.n332-ready .d26-dashboard .n332-core-tile{border:1px solid #b8d6e2;text-align:left}
+html.n332-ready .d26-dashboard .n332-core-tile strong{font-weight:900;letter-spacing:.1px}
+.n332-home-admin{margin:14px 0 25px;padding:16px;border:2px solid #95b9c7;border-radius:14px;display:flex;gap:15px;align-items:center;justify-content:space-between;background:#e9f3f7}
+.n332-home-admin strong{font-size:15px;color:#153e54;font-weight:900}
+.n332-home-admin p{margin:5px 0 0;font-size:12px;color:#496b79;max-width:520px}
+.n332-admin-open{border-radius:10px;background:#145c73;color:#fff;border:0;font-weight:850;padding:13px 15px;min-height:46px;flex:0 0 auto}
+@media(max-width:620px){
+ html.n332-ready .topbar-inner{gap:5px}
+ html.n332-ready .top-actions #update-top{padding:7px 9px}
+ html.n332-ready .top-actions{gap:5px}
+ .n332-open-top{min-width:71px;min-height:42px;padding:6px 8px;font-size:13px;gap:4px}
+ html.n332-ready .bottom-dock button>span:last-child{font-size:clamp(.59rem,2.45vw,.73rem)}
+ .n332-home-admin{flex-direction:column;align-items:stretch}
+ .n332-admin-open{width:100%}
+ html.n332-ready #secure-application .panel>.section-heading{padding:15px 13px}
+}
+@media(prefers-reduced-motion:reduce){#n332-sidebar{transition:none!important}}
+@media print{
+ #n332-sidebar,#n332-backdrop,.n332-open-top{display:none!important}
+ html.n332-ready .topbar{position:static}
+ html.n332-ready #secure-application .panel>.section-heading{box-shadow:none}
+}

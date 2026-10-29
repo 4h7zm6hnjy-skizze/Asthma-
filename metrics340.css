@@ -1,0 +1,16 @@
+/* Asthma 3.4.0: große, klar abgetrennte Gesundheitswerte und Gewichtsdiagramm */
+.m340-section,.m340-weight{background:#f2f9fc;border:2px solid #bcd8e4;border-left:6px solid #15758d;border-radius:16px;padding:16px;margin:20px 0;overflow-wrap:anywhere}
+.m340-section h3,.m340-weight h3{font-weight:900;color:#133f53;font-size:clamp(1.1rem,3.6vw,1.5rem);line-height:1.35;letter-spacing:.25px;margin:0 0 10px}
+.m340-explain{font-size:.9rem;color:#526e79;line-height:1.5;margin:10px 0}
+.m340-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(143px,1fr));gap:11px}
+.m340-card{background:white;border:1px solid #b9d0db;border-radius:13px;min-width:0;padding:14px 12px}
+.m340-card-name{font-size:.81rem;font-weight:850;color:#1f5868;display:block;min-height:2em}
+.m340-card-number{font-size:clamp(1.35rem,4vw,2rem);line-height:1.16;color:#12485d;font-weight:900;display:block;margin:12px 0 8px;overflow-wrap:anywhere}
+.m340-card-date,.m340-card-help{font-size:.77rem;font-weight:650;color:#4e6876;display:block;margin:5px 0}
+.m340-weight-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:14px;margin:14px 0}
+.m340-current{font-size:clamp(1.8rem,5vw,2.7rem);font-weight:900;color:#155b72}
+.m340-range{display:grid;gap:6px;max-width:240px;font-weight:750}
+.m340-range select{padding:9px;font-size:16px;color:#164157;background:white;border:1px solid #a3c6d4;border-radius:9px}
+.m340-weight-graph{background:white;border:1px solid #d1e1e8;border-radius:12px;padding:12px;overflow:hidden;min-height:100px;margin:12px 0}
+.m340-weight-graph svg{width:100%;height:auto;max-height:315px;display:block}
+@media(max-width:500px){.m340-section,.m340-weight{padding:12px}.m340-cards{grid-template-columns:repeat(2,minmax(0,1fr))}.m340-card{padding:12px 10px}}
