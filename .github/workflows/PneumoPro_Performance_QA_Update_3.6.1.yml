@@ -1,0 +1,176 @@
+name: PneumoPro 3.6.1 - Performance und QA-Pruefung
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PneumoPro_Performance_QA_3.6.1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pneumopro-performance-361-main
+  cancel-in-progress: false
+
+jobs:
+  pruefen-optimieren:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Aktuelle PneumoPro-Dateien laden
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Performance-Korrekturen mit Versionsschutz anwenden
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYPATCH'
+          from pathlib import Path
+          import json, subprocess, re
+          VERSION='3.6.1'
+          PREVIOUS='3.6.0'
+          EXPECTED={
+              'secure17.js':'744ebe4a9de789ef3ac3a390db809a0862f3e630',
+              'app.js':'53457474f50af22ceb65abd1524ca387a31ef694',
+              'sw.js':'770e83ad9aece0a1f62e8305a63f67b8e2e6deb4',
+              'search360.js':'36718ef3892833553acf33ec716e3c0cbfa29ff1',
+              'ocr360.js':'c239ce93f3cb13bf926309d72dd81da6cdd53685',
+              'version.json':'1b9f4cb5c49ae7b5d13427349221a3ed4cb5af83',
+          }
+          for name, expected in EXPECTED.items():
+              if not Path(name).is_file():raise SystemExit('Sicherheitsabbruch: '+name+' fehlt.')
+              actual=subprocess.check_output(['git','hash-object',name],text=True).strip()
+              if actual!=expected:raise SystemExit('Sicherheitsabbruch: '+name+' hat sich seit der Prüfung geändert. Nicht überschrieben.')
+          
+          def one(src,old,new,why):
+              count=src.count(old)
+              if count!=1:raise SystemExit('Sicherheitsabbruch: '+why+' Anker nicht eindeutig ('+str(count)+')')
+              return src.replace(old,new,1)
+          
+          v=json.loads(Path('version.json').read_text(encoding='utf-8'))
+          if v.get('version')!=PREVIOUS:raise SystemExit('Aktuelle Version nicht 3.6.0; keine Änderungen vorgenommen.')
+          src={name:Path(name).read_text(encoding='utf-8') for name in EXPECTED}
+          
+          # 1. Suchdurchlauf: dieselben verschlüsselten Gruppen nur einmal aus IndexedDB lesen.
+          s=src['secure17.js']
+          insert="""  // Performance: alle angeforderten Gruppen in EINEM Datenbank-Durchlauf laden.
+            // Keine Cloud-Verbindung, keine dauerhafte Klartextkopie; Tresor muss entsperrt sein.
+            async function listGroups(names){
+              requireUnlock();
+              if(!Array.isArray(names)||names.length>30||names.some(n=>typeof n!=='string'||!/^[a-z][a-z0-9_-]{0,39}$/.test(n)))throw Error('Ungültige Suchgruppen');
+              const result=Object.fromEntries([...new Set(names)].map(n=>[n,[]]));
+              const rows=await rawAll();
+              for(const row of rows){
+                const slash=row.id.indexOf('/');if(slash<1)continue;
+                const group=row.id.slice(0,slash);
+                if(!Object.prototype.hasOwnProperty.call(result,group))continue;
+                result[group].push(await decodeRecord(await unseal(row)));
+              }
+              return result;
+            }
+          """
+          s=one(s,'  async function findOne(group,id){',insert+'  async function findOne(group,id){','Gesammelte Lesefunktion')
+          s=one(s,'const API={list:find,get:findOne,','const API={list:find,listGroups,get:findOne,','Neue Gruppenlesefunktion freigeben')
+          # Dynamic classic scripts with async=false are executed in insertion order, while network requests overlap.
+          # This preserves dependencies; no changes to private data or their encryption.
+          old="for(const src of scripts){await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='./'+src+'?v=3.6.0';s.onload=resolve;s.onerror=()=>reject(Error(src+' konnte nicht geladen werden'));document.body.append(s)})}"
+          new="await Promise.all(scripts.map(src=>new Promise((resolve,reject)=>{const s=document.createElement('script');s.async=false;s.src='./'+src+'?v=3.6.1';s.onload=resolve;s.onerror=()=>reject(Error(src+' konnte nicht geladen werden'));document.body.append(s)})))"
+          s=one(s,old,new,'Paralleler Download bei strikt geordneter Ausführung')
+          src['secure17.js']=s
+          
+          s=src['search360.js']
+          s=one(s,"   for(const [group,category,page] of groups){", "   const grouped=await S.listGroups(groups.map(item=>item[0]));\n   for(const [group,category,page] of groups){",'Suchgruppen einmal lesen')
+          s=one(s,"    const rows=await S.list(group);","    const rows=grouped[group]||[];",'Wiederholte Datenbanksuche vermeiden')
+          src['search360.js']=s
+          
+          # 2. OCR Engine on demand. Only DE model is needed for most German reports.
+          s=src['ocr360.js']
+          s=one(s,'<label for="ocr360-select">Gespeicherte Datei</label>',
+          '''<label for="ocr361-lang">Erkennungssprache</label><select id="ocr361-lang"><option value="deu">Deutsch (schneller, weniger Speicher)</option><option value="eng">Englisch</option><option value="both">Deutsch + Englisch</option></select>
+           <label for="ocr360-select">Gespeicherte Datei</label>''','OCR Sprachwahl')
+          s=one(s,"let selected=null,busy=false,currentText='',worker=null,structured=null;", "let selected=null,busy=false,currentText='',worker=null,workerLanguage='',structured=null;",'OCR Workerstatus')
+          s=one(s,"  if(!worker){\n   const base=new URL('./ocr-vendor/',location.href).href;", "  const language=$('ocr361-lang').value;\n  if(worker&&workerLanguage!==language){await worker.terminate();worker=null;workerLanguage='';}\n  if(!worker){\n   const base=new URL('./ocr-vendor/',location.href).href;",'OCR Sprachenwechsel')
+          s=one(s,"window.Tesseract.createWorker(['deu','eng'],1,", "window.Tesseract.createWorker(language==='both'?['deu','eng']:[language],1,",'OCR ausgewählte Sprachdatei')
+          s=one(s,"   });\n  }\n  return worker;", "   });\n   workerLanguage=language;\n  }\n  return worker;",'OCR Worker Sprachzustand')
+          s=one(s,"script.src='./ocr360.js?v=3.6.0';", "script.src='./ocr360.js?v=3.6.1';",'OCR Cache-Fallback')
+          src['ocr360.js']=s
+          
+          # 3. OCR resources total ~60 MB not needed during service worker installation.
+          # They are fetched/cached on first OCR use, so first use must be online.
+          s=src['sw.js']
+          before=s.count("'./ocr-vendor/core/")
+          if before!=12:raise SystemExit('Erwartet 12 OCR-Engine-Dateien, gefunden '+str(before))
+          s=''.join(line for line in s.splitlines(keepends=True) if "'./ocr-vendor/core/" not in line)
+          s=one(s, " './ocr-vendor/lang/deu.traineddata.gz', './ocr-vendor/lang/eng.traineddata.gz',",'', 'Sprachmodelle lazy laden')
+          s=one(s,"const VERSION='3.6.0-suche-layout';", "const VERSION='3.6.1-performance-qa';",'Offline-Cacheversion')
+          if re.search(r"'\./ocr-vendor/(?:core|lang)/",s):raise SystemExit('Große OCR-Dateien noch im Startcache')
+          src['sw.js']=s
+          
+          # 4. Correct old fallback module URLs to reduce duplicate/cache-mixed loads.
+          s=src['app.js']
+          s=one(s,"const VERSION = '3.6.0';", "const VERSION = '3.6.1';",'Versionsnummer')
+          s=one(s,"js.src='./scans352.js?v=3.5.3';", "js.src='./scans352.js?v=3.6.1';",'Scanner-Cache')
+          s=one(s,"script.src='./health354.js?v=3.5.4';", "script.src='./health354.js?v=3.6.1';",'Health-Cache')
+          src['app.js']=s
+          src['version.json']=json.dumps({
+           'version':VERSION,'released':'2026-10-30',
+           'notes':'Performanceoptimierung und QA: OCR-Sprachmodelle/Engines erst bei Nutzung herunterladen (erste Texterkennung online, danach Browsercache soweit verfügbar). Voreinstellung Deutsch statt zwei OCR-Sprachen. Suchindex aus einer einzigen verschlüsselten Datenbanklesung. App-Skripte parallel laden und in ursprünglicher Reihenfolge ausführen. Browser-, Navigation-, Import-, Integritäts- und Offline-Dateiprüfungen. Bestehende Patientendaten unverändert.'
+          },ensure_ascii=False,indent=2)+'\n'
+          for name,content in src.items():Path(name).write_text(content,encoding='utf-8')
+          print('PneumoPro 3.6.1: sechs Dateien optimiert. Keine Nutzerdaten verändert.')
+          PYPATCH
+      - name: Wiederholbare Integrations- und Browserpruefungen hinterlegen
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYTESTS'
+          from pathlib import Path
+          import base64
+          files={
+           'qa/pneumopro361/static_qa.py':'ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCmZyb20gaHRtbC5wYXJzZXIgaW1wb3J0IEhUTUxQYXJzZXIKaW1wb3J0IGFzdCxqc29uLHJlLHN1YnByb2Nlc3MKcm9vdD1QYXRoKCcuJykKY2xhc3MgUGFnZShIVE1MUGFyc2VyKToKIGRlZiBfX2luaXRfXyhzZWxmKTpzdXBlcigpLl9faW5pdF9fKCk7c2VsZi5pZHM9W107c2VsZi5saW5rcz1bXTtzZWxmLmJ1dHRvbnM9W107c2VsZi5nb3RvPVtdCiBkZWYgaGFuZGxlX3N0YXJ0dGFnKHNlbGYsdGFnLGF0dHJzKToKICBhPWRpY3QoYXR0cnMpCiAgaWYgJ2lkJyBpbiBhOnNlbGYuaWRzLmFwcGVuZChhWydpZCddKQogIGZvciBrZXkgaW4gKCdzcmMnLCdocmVmJyk6CiAgIGlmIGtleSBpbiBhOnNlbGYubGlua3MuYXBwZW5kKCh0YWcsa2V5LGFba2V5XSkpCiAgaWYgJ2RhdGEtZ290bycgaW4gYTpzZWxmLmdvdG8uYXBwZW5kKGFbJ2RhdGEtZ290byddKQogIGlmIHRhZz09J2J1dHRvbic6c2VsZi5idXR0b25zLmFwcGVuZChhKQpwPVBhZ2UoKTtwLmZlZWQoKHJvb3QvJ2luZGV4Lmh0bWwnKS5yZWFkX3RleHQoZW5jb2Rpbmc9J3V0Zi04JykpCmZpbGVzPXNvcnRlZChyb290Lmdsb2IoJyouanMnKSkKc3ludGF4PVtdCmZvciBwYXRoIGluIGZpbGVzOgogcmV0PXN1YnByb2Nlc3MucnVuKFsnbm9kZScsJy0tY2hlY2snLHN0cihwYXRoKV0sdGV4dD1UcnVlLGNhcHR1cmVfb3V0cHV0PVRydWUpCiBpZiByZXQucmV0dXJuY29kZTpzeW50YXguYXBwZW5kKChzdHIocGF0aCkscmV0LnN0ZGVyclstNDUwOl0pKQpmb3IgcGF0aCBpbiBbJ29jcjM2MC5qcycsJ3NlYXJjaDM2MC5qcycsJ3NlY3VyZTE3LmpzJywnc3cuanMnLCdhcHAuanMnLCdvY3ItdmVuZG9yL3Rlc3NlcmFjdC5taW4uanMnLCdvY3ItdmVuZG9yL3dvcmtlci5taW4uanMnLCdvY3ItdmVuZG9yL3BkZi5taW4ubWpzJ106CiBhc3NlcnQgKHJvb3QvcGF0aCkuZXhpc3RzKCkscGF0aAogYXNzZXJ0IHN1YnByb2Nlc3MucnVuKFsnbm9kZScsJy0tY2hlY2snLHBhdGhdLGNhcHR1cmVfb3V0cHV0PVRydWUpLnJldHVybmNvZGU9PTAscGF0aAppZiBzeW50YXg6cmFpc2UgQXNzZXJ0aW9uRXJyb3IoJ0phdmFTY3JpcHQgc3ludGF4IGVycm9yczogJytyZXByKHN5bnRheFs6MTBdKSkKcHJpbnQoJ0pTLVN5bnRheDogJytzdHIobGVuKGZpbGVzKSkrJyBsb2thbGUgTW9kdWxlICsgT0NSLU1vZHVsZSBnZXByw7xmdCcpCgpzPShyb290Lydzdy5qcycpLnJlYWRfdGV4dChlbmNvZGluZz0ndXRmLTgnKQphc3NldHM9cy5zcGxpdCgnY29uc3QgQVNTRVRTPVsnLDEpWzFdLnNwbGl0KCddOycsMSlbMF0KaXRlbXM9cmUuZmluZGFsbChyIicoW14nXSspJyIsYXNzZXRzKQptaXNzaW5nPVthIGZvciBhIGluIGl0ZW1zIGlmIGEuc3RhcnRzd2l0aCgnLi8nKSBhbmQgbm90IFBhdGgoYSkuZXhpc3RzKCldCmlmIG1pc3Npbmc6cmFpc2UgQXNzZXJ0aW9uRXJyb3IoJ09mZmxpbmUtQ2FjaGUgdmVyd2Vpc3QgYXVmIGZlaGxlbmRlIERhdGVpZW46ICcrc3RyKG1pc3NpbmdbOjIwXSkpCmFzc2VydCBub3QgYW55KCcvb2NyLXZlbmRvci9jb3JlLycgaW4geCBvciAnL29jci12ZW5kb3IvbGFuZy8nIGluIHggZm9yIHggaW4gaXRlbXMpLCdPQ1ItU3ByYWNobW9kZWxsZSBub2NoIGltIFN0YXJ0Y2FjaGUnCnByaW50KCdPZmZsaW5lLUNhY2hlOiAnK3N0cihsZW4oaXRlbXMpKSsnIGxva2FsZSBFaW50csOkZ2U7IGFsbGUgZXhpc3RpZXJlbjsgZ3Jvw59lIE9DUi1Nb2RlbGxlIG51ciBiZWkgQmVkYXJmJykKbGlua3M9Wyh0YWcsa2V5LHYpIGZvciB0YWcsa2V5LHYgaW4gcC5saW5rcyBpZiBub3Qgdi5zdGFydHN3aXRoKCgnIycsJ2h0dHBzOi8vJywnaHR0cDovLycsJ21haWx0bzonLCd0ZWw6JywnZGF0YTonKSldCmJhZGxpbmtzPVt2IGZvciBfLF8sdiBpbiBsaW5rcyBpZiBub3QgUGF0aCh2LnNwbGl0KCc/JywxKVswXS5zcGxpdCgnIycsMSlbMF0pLmV4aXN0cygpXQppZiBiYWRsaW5rczpwcmludCgnV0FSTlVORzogJytzdHIobGVuKGJhZGxpbmtzKSkrJyBsb2thbGUgSFRNTC1SZXNzb3VyY2VuIGZlaGxlbjogJytzdHIoYmFkbGlua3NbOjE1XSkpCmlkcz17aSBmb3IgaSBpbiBwLmlkc307ZHVwZXM9c29ydGVkKHtpIGZvciBpIGluIHAuaWRzIGlmIHAuaWRzLmNvdW50KGkpPjF9KQppZiBkdXBlczpwcmludCgnV0FSTlVORzogTWVocmZhY2ggdmVyZ2ViZW5lIElEcyBpbiBIVE1MOiAnK3N0cihkdXBlc1s6MTVdKSkKIyBQcsO8ZnVuZyBkZXIgZWluZGV1dGlnZW4gYmVrYW5udGVuIE5hdmlnYXRpb25zLSB1bmQgVXBsb2FkLUFua2VyLgpmb3IgYW5jaG9yIGluICgnc2VjdXJlLWZvcm0nLCdzZWN1cmUtcGFzc3dvcmQnLCdzZWN1cmUtc3VibWl0Jywnc2VjdXJlLWFwcGxpY2F0aW9uJywnc3RhcnQnLCduYXYzMTctc2VhcmNoLXBhbmVsJywncHJpdmF0ZS1zZWFyY2gyMCcsJ3ZlcnNpb24tY2hpcCcsJ2Zvb3Rlci12ZXJzaW9uJyk6CiBpZiBhbmNob3Igbm90IGluIGlkcyBhbmQgYW5jaG9yIG5vdCBpbiAoJ25hdjMxNy1zZWFyY2gtcGFuZWwnLCk6CiAgcmFpc2UgQXNzZXJ0aW9uRXJyb3IoJ1dpY2h0aWdlciBIVE1MLUFua2VyIGZlaGx0OiAnK2FuY2hvcikKZm9yIG5hbWUgaW4gKCdQTkVVTU9QUk9fU0VBUkNIMzYwJywnbGlzdEdyb3VwcycsJ29jcjM2MS1sYW5nJywnUE5FVU1PUFJPX09DUjM2MCcpOgogY29udGVudD0ocm9vdC8oJ29jcjM2MC5qcycgaWYgbmFtZSBpbiAoJ29jcjM2MS1sYW5nJywnUE5FVU1PUFJPX09DUjM2MCcpIGVsc2UgJ3NlYXJjaDM2MC5qcycgaWYgbmFtZT09J1BORVVNT1BST19TRUFSQ0gzNjAnIGVsc2UgJ3NlY3VyZTE3LmpzJykpLnJlYWRfdGV4dCgpCiBhc3NlcnQgbmFtZSBpbiBjb250ZW50LCAnSW50ZWdyYXRpb24gZmVobHQ6ICcrbmFtZQphc3NlcnQganNvbi5sb2Fkcygocm9vdC8ndmVyc2lvbi5qc29uJykucmVhZF90ZXh0KCkpWyd2ZXJzaW9uJ109PSczLjYuMScKYXNzZXJ0ICdzLmFzeW5jPWZhbHNlJyBpbiAocm9vdC8nc2VjdXJlMTcuanMnKS5yZWFkX3RleHQoKQphc3NlcnQgInMuc3JjPScuLycrc3JjKyc/dj0zLjYuMSciIGluIChyb290LydzZWN1cmUxNy5qcycpLnJlYWRfdGV4dCgpCnByaW50KCdIVE1MOiAnK3N0cihsZW4ocC5idXR0b25zKSkrJyBkaXJla3QgZGVmaW5pZXJ0ZSBCdXR0b25zLCAnK3N0cihsZW4ocC5nb3RvKSkrJyBOYXZpZ2F0aW9uc2VsZW1lbnRlLCAnK3N0cihsZW4obGlua3MpKSsnIGludGVybmUgUmVzc291cmNlbnppZWxlOyAnK3N0cihsZW4oZHVwZXMpKSsnIGRvcHBlbHRlIElEcycpCnByaW50KCdJbnRlcm5lIFJlc3NvdXJjZW46ICcrc3RyKGxlbihsaW5rcyktbGVuKGJhZGxpbmtzKSkrJyB2b3JoYW5kZW47ICcrc3RyKGxlbihiYWRsaW5rcykpKycgbmljaHQgdm9yaGFuZGVuJykKcHJpbnQoJ1ZlcnNpb24sIERhdGVuYmFuay1TdWNoZSwgT0NSLVNwcmFjaHdhaGwsIFNjcmlwdC1SZWloZW5mb2xnZSB1bmQgVmVyc2NobMO8c3NlbHVuZ3NzY2huaXR0c3RlbGxlOiBnZXByw7xmdCcpCg==',
+           'qa/pneumopro361/browser_qa.cjs':'J3VzZSBzdHJpY3QnOwovKiBUZXN0IHVzZXMgb25seSBhbiBpc29sYXRlZCB0aHJvd2F3YXkgYnJvd3NlciBwcm9maWxlOyBuZXZlciByZWFsIG1lZGljYWwgcmVjb3Jkcy4gKi8KY29uc3QgZnM9cmVxdWlyZSgnZnMnKSwgcGF0aD1yZXF1aXJlKCdwYXRoJyksaHR0cD1yZXF1aXJlKCdodHRwJyk7CmNvbnN0IHtjaHJvbWl1bX09cmVxdWlyZSgncGxheXdyaWdodC1jb3JlJyk7CmNvbnN0IGJhc2U9cHJvY2Vzcy5jd2QoKSxxYT0nUUEtVEVTVC1FSU5UUkFHLTlmMzQ2Mic7CmNvbnN0IG1pbWU9eycuaHRtbCc6J3RleHQvaHRtbDsgY2hhcnNldD11dGYtOCcsJy5qcyc6J2FwcGxpY2F0aW9uL2phdmFzY3JpcHQnLCcubWpzJzonYXBwbGljYXRpb24vamF2YXNjcmlwdCcsJy5jc3MnOid0ZXh0L2NzcycsJy5qc29uJzonYXBwbGljYXRpb24vanNvbicsJy5wbmcnOidpbWFnZS9wbmcnLCcuanBnJzonaW1hZ2UvanBlZycsJy5zdmcnOidpbWFnZS9zdmcreG1sJywnLndlYm1hbmlmZXN0JzonYXBwbGljYXRpb24vbWFuaWZlc3QranNvbicsJy53YXNtJzonYXBwbGljYXRpb24vd2FzbScsJy5neic6J2FwcGxpY2F0aW9uL2d6aXAnfTsKZnVuY3Rpb24gc2VydmUocmVxLHJlcyl7CiB0cnl7CiAgY29uc3QgdT1uZXcgVVJMKHJlcS51cmwsJ2h0dHA6Ly9sb2NhbGhvc3QnKTtsZXQgbmFtZT1kZWNvZGVVUklDb21wb25lbnQodS5wYXRobmFtZSk7CiAgaWYobmFtZT09PScvJ3x8bmFtZT09PScnKW5hbWU9Jy9pbmRleC5odG1sJzsKICBjb25zdCBmdWxsPXBhdGgucmVzb2x2ZShiYXNlLCcuJytuYW1lKTsKICBpZighZnVsbC5zdGFydHNXaXRoKGJhc2UrcGF0aC5zZXApKXtyZXMud3JpdGVIZWFkKDQwMyk7cmVzLmVuZCgpO3JldHVybn0KICBjb25zdCBzdGF0PWZzLnN0YXRTeW5jKGZ1bGwpO2lmKCFzdGF0LmlzRmlsZSgpKXtyZXMud3JpdGVIZWFkKDQwNCk7cmVzLmVuZCgpO3JldHVybn0KICByZXMuc2V0SGVhZGVyKCdDb250ZW50LVR5cGUnLG1pbWVbcGF0aC5leHRuYW1lKGZ1bGwpXXx8J2FwcGxpY2F0aW9uL29jdGV0LXN0cmVhbScpOwogIHJlcy5zZXRIZWFkZXIoJ0NvbnRlbnQtTGVuZ3RoJyxzdGF0LnNpemUpO2ZzLmNyZWF0ZVJlYWRTdHJlYW0oZnVsbCkucGlwZShyZXMpOwogfWNhdGNoKGUpe3Jlcy53cml0ZUhlYWQoNDA0KTtyZXMuZW5kKCdOb3QgZm91bmQnKTt9Cn0KYXN5bmMgZnVuY3Rpb24gbWFpbigpewogY29uc3Qgc2VydmVyPWh0dHAuY3JlYXRlU2VydmVyKHNlcnZlKTsKIGF3YWl0IG5ldyBQcm9taXNlKHI9PnNlcnZlci5saXN0ZW4oMCwnMTI3LjAuMC4xJyxyKSk7CiBjb25zdCB1cmw9J2h0dHA6Ly8xMjcuMC4wLjE6JytzZXJ2ZXIuYWRkcmVzcygpLnBvcnQrJy8nOwogY29uc3QgZXhlY3V0YWJsZT1wcm9jZXNzLmVudi5DSFJPTUVfUEFUSDsKIGxldCBicm93c2VyOwogY29uc3QgcmVzdWx0cz1bXSwgZXJyb3JzPVtdLHdhcm5pbmdzPVtdOwogY29uc3QgYXNzZXJ0PShjb25kaXRpb24sbGFiZWwpPT57cmVzdWx0cy5wdXNoKHtsYWJlbCxvazohIWNvbmRpdGlvbn0pO2lmKCFjb25kaXRpb24pdGhyb3cgRXJyb3IoJ1NNT0tFIEZBSUxFRDogJytsYWJlbCl9OwogdHJ5ewogIGJyb3dzZXI9YXdhaXQgY2hyb21pdW0ubGF1bmNoKHtoZWFkbGVzczp0cnVlLGV4ZWN1dGFibGVQYXRoOmV4ZWN1dGFibGUsYXJnczpbJy0tbm8tc2FuZGJveCcsJy0tZGlzYWJsZS1kZXYtc2htLXVzYWdlJ119KTsKICBjb25zdCBjb250ZXh0PWF3YWl0IGJyb3dzZXIubmV3Q29udGV4dCh7dmlld3BvcnQ6e3dpZHRoOjM5MCxoZWlnaHQ6ODQ0fSxkZXZpY2VTY2FsZUZhY3RvcjozLGlzTW9iaWxlOnRydWUsaGFzVG91Y2g6dHJ1ZSxzZXJ2aWNlV29ya2VyczonYmxvY2snfSk7CiAgY29uc3QgcGFnZT1hd2FpdCBjb250ZXh0Lm5ld1BhZ2UoKTtwYWdlLm9uKCdkaWFsb2cnLGQ9PmQuYWNjZXB0KCkpOwogIHBhZ2Uub24oJ3BhZ2VlcnJvcicsZT0+ZXJyb3JzLnB1c2goU3RyaW5nKGUuc3RhY2t8fGUubWVzc2FnZSkuc2xpY2UoMCw2MDApKSk7CiAgcGFnZS5vbigncmVzcG9uc2UnLHI9PntpZihyLnN0YXR1cygpPj00MDAmJm5ldyBVUkwoci51cmwoKSkuaG9zdG5hbWU9PT0nMTI3LjAuMC4xJyl3YXJuaW5ncy5wdXNoKHIuc3RhdHVzKCkrJyAnK3IudXJsKCkpfSk7CiAgYXdhaXQgcGFnZS5nb3RvKHVybCx7d2FpdFVudGlsOidkb21jb250ZW50bG9hZGVkJyx0aW1lb3V0OjMwMDAwfSk7CiAgYXdhaXQgcGFnZS5sb2NhdG9yKCcjc2VjdXJlLWNyZWF0ZS1jaG9pY2UnKS53YWl0Rm9yKHtzdGF0ZTondmlzaWJsZScsdGltZW91dDoyNTAwMH0pOwogIGF3YWl0IHBhZ2UubG9jYXRvcignI3NlY3VyZS1jcmVhdGUtY2hvaWNlJykuY2xpY2soKTsKICBhd2FpdCBwYWdlLmxvY2F0b3IoJyNzZWN1cmUtcGFzc3dvcmQnKS5maWxsKCdRYXRlc3RPbmx5LUNoYW5nZU1lLTM2MScpOwogIGF3YWl0IHBhZ2UubG9jYXRvcignI3NlY3VyZS1yZXBlYXQnKS5maWxsKCdRYXRlc3RPbmx5LUNoYW5nZU1lLTM2MScpOwogIGF3YWl0IHBhZ2UubG9jYXRvcignI3NlY3VyZS1zdWJtaXQnKS5jbGljaygpOwogIGF3YWl0IHBhZ2Uud2FpdEZvckZ1bmN0aW9uKCgpPT4hZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI3NlY3VyZS1hcHBsaWNhdGlvbicpPy5oaWRkZW4mJndpbmRvdy5BU1RITUFfTkFWPy5nbyx7dGltZW91dDo2MDAwMH0pOwogIGF3YWl0IHBhZ2Uud2FpdEZvckZ1bmN0aW9uKCgpPT53aW5kb3cuUE5FVU1PUFJPX1NFQVJDSDM2MCYmZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI2ozNTgtb3BlbicpJiZkb2N1bWVudC5xdWVyeVNlbGVjdG9yKCcjcHMzNTItb3BlbicpLHt0aW1lb3V0OjM1MDAwfSk7CiAgYXNzZXJ0KGF3YWl0IHBhZ2UubG9jYXRvcignI3ZlcnNpb24tY2hpcCcpLnRleHRDb250ZW50KCkudGhlbihzPT5zLmluY2x1ZGVzKCczLjYuMScpKSwnVmVyc2lvbiAzLjYuMSBhbmdlemVpZ3QnKTsKICBjb25zdCBncm91cHM9YXdhaXQgcGFnZS5ldmFsdWF0ZShhc3luYyBxPT57CiAgIGNvbnN0IHM9d2luZG93LkFTVEhNQV9TRUNVUklUWTsKICAgYXdhaXQgcy5wdXQoJ2xhYnMnLHtpZDoncWEtbGFiLTM2MScsbWFya2VyOidDUlAnLGRhdGU6JzIwMjYtMTAtMzAnLHZhbHVlOjEyLG5vdGVzOnF9LCdxYS1sYWItMzYxJyk7CiAgIGNvbnN0IGRhdGE9YXdhaXQgcy5saXN0R3JvdXBzKFsnbGFicycsJ2RvY3VtZW50cyddKTsKICAgY29uc3QgZ2V0PWF3YWl0IHMuZ2V0KCdsYWJzJywncWEtbGFiLTM2MScpOwogICByZXR1cm4ge2dyb3VwczpPYmplY3Qua2V5cyhkYXRhKSx2YWx1ZTpnZXQ/LnZhbHVlLG5vdGVzOmdldD8ubm90ZXMsbGFiQ291bnQ6ZGF0YS5sYWJzLmxlbmd0aH07CiAgfSxxYSk7CiAgYXNzZXJ0KGdyb3Vwcy5ncm91cHMuaW5jbHVkZXMoJ2xhYnMnKSYmZ3JvdXBzLmdyb3Vwcy5pbmNsdWRlcygnZG9jdW1lbnRzJykmJmdyb3Vwcy5ub3Rlcz09PXFhLCdWZXJzY2hsw7xzc2VsdGUgU3BlaWNoZXJ1bmcgdW5kIEdydXBwZW5sZXNlbicpOwogIGF3YWl0IHBhZ2UubG9jYXRvcignI25hdjMxNy1zZWFyY2gtYWN0aW9uJykuY2xpY2soKTsKICBhd2FpdCBwYWdlLmxvY2F0b3IoJyNwcml2YXRlLXNlYXJjaDIwJykuZmlsbChxYSk7CiAgYXdhaXQgcGFnZS53YWl0Rm9yRnVuY3Rpb24ocT0+ZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI3ByaXZhdGUtc2VhcmNoLXJlc3VsdHMyMCcpPy50ZXh0Q29udGVudD8uaW5jbHVkZXMoJ0NSUCcpLHFhLHt0aW1lb3V0OjIyMDAwfSk7CiAgYXNzZXJ0KChhd2FpdCBwYWdlLmxvY2F0b3IoJyNwcml2YXRlLXNlYXJjaC1yZXN1bHRzMjAnKS50ZXh0Q29udGVudCgpKS5pbmNsdWRlcygnQ1JQJyksJ0xva2FsZSBWb2xsdGV4dHN1Y2hlIGZpbmRldCB2ZXJzY2hsw7xzc2VsdGVuIFRlc3R3ZXJ0Jyk7CiAgZm9yKGNvbnN0IHdpZHRoIG9mIFszOTAsMzIwLDQzMF0pewogICBhd2FpdCBwYWdlLnNldFZpZXdwb3J0U2l6ZSh7d2lkdGgsaGVpZ2h0Ojg0NH0pOwogICBhd2FpdCBwYWdlLndhaXRGb3JUaW1lb3V0KDE1MCk7CiAgIGNvbnN0IGdlb209YXdhaXQgcGFnZS5ldmFsdWF0ZSgoKT0+ewogICAgY29uc3QgbG9nbz1kb2N1bWVudC5xdWVyeVNlbGVjdG9yKCcucG5ldW1vLWhlYWRlci13b3JkbWFyaycpLmdldEJvdW5kaW5nQ2xpZW50UmVjdCgpLHBhbmVsPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCduYXYzMTctc2VhcmNoLXBhbmVsJykuZ2V0Qm91bmRpbmdDbGllbnRSZWN0KCksdnc9ZG9jdW1lbnQuZG9jdW1lbnRFbGVtZW50LmNsaWVudFdpZHRoOwogICAgcmV0dXJuIHt2dyxsb2dvTGVmdDpsb2dvLmxlZnQsbG9nb1JpZ2h0OmxvZ28ucmlnaHQsc2VhcmNoTGVmdDpwYW5lbC5sZWZ0LHNlYXJjaFJpZ2h0OnBhbmVsLnJpZ2h0fTsKICAgfSk7CiAgIGFzc2VydChnZW9tLmxvZ29MZWZ0Pj0tMSYmZ2VvbS5sb2dvUmlnaHQ8PWdlb20udncrMSYmZ2VvbS5zZWFyY2hMZWZ0Pj0tMSYmZ2VvbS5zZWFyY2hSaWdodDw9Z2VvbS52dysxLCdMb2dvL1N1Y2hlIHZvbGxzdMOkbmRpZyBiZWkgJyt3aWR0aCsncHgnKTsKICB9CiAgYXdhaXQgcGFnZS5zZXRWaWV3cG9ydFNpemUoe3dpZHRoOjM5MCxoZWlnaHQ6ODQ0fSk7CiAgYXdhaXQgcGFnZS5sb2NhdG9yKCcjbmF2MzE3LXNlYXJjaC1jbG9zZScpLmNsaWNrKCk7CiAgYXdhaXQgcGFnZS5sb2NhdG9yKCcjajM1OC1vcGVuJykuY2xpY2soKTsKICBhc3NlcnQoYXdhaXQgcGFnZS5sb2NhdG9yKCcjajM1OC1kaWFsb2cnKS5ldmFsdWF0ZShlPT5lLm9wZW4pLCdKU09OLUltcG9ydGRpYWxvZyDDtmZmbmV0Jyk7CiAgYXdhaXQgcGFnZS5sb2NhdG9yKCcjajM1OC1jbG9zZScpLmNsaWNrKCk7CiAgYXdhaXQgcGFnZS5sb2NhdG9yKCcjbjMzMi1vcGVuLXRvcCcpLmNsaWNrKCk7CiAgYXNzZXJ0KGF3YWl0IHBhZ2UubG9jYXRvcignaHRtbCcpLmV2YWx1YXRlKGU9PmUuY2xhc3NMaXN0LmNvbnRhaW5zKCduMzMyLW1lbnUtb3BlbicpKSwnU2VpdGVubWVuw7wgw7ZmZm5ldCcpOwogIGF3YWl0IHBhZ2UubG9jYXRvcignLm4zMzItY2xvc2UnKS5jbGljaygpOwogIGNvbnN0IHVpSW52ZW50b3J5PWF3YWl0IHBhZ2UuZXZhbHVhdGUoKCk9Pntjb25zdCBjb250cm9scz1bLi4uZG9jdW1lbnQucXVlcnlTZWxlY3RvckFsbCgnYnV0dG9uLGFbaHJlZl0saW5wdXRbdHlwZT1idXR0b25dLGlucHV0W3R5cGU9c3VibWl0XScpXTtjb25zdCBtaXNzaW5nPWNvbnRyb2xzLmZpbHRlcihlbD0+IWVsLnRleHRDb250ZW50Py50cmltKCkmJiFlbC5nZXRBdHRyaWJ1dGUoJ2FyaWEtbGFiZWwnKSYmIWVsLmdldEF0dHJpYnV0ZSgndGl0bGUnKSYmIWVsLnF1ZXJ5U2VsZWN0b3IoJ2ltZ1thbHRdJykpLnNsaWNlKDAsMTUpLm1hcChlbD0+ZWwuaWR8fGVsLm91dGVySFRNTC5zbGljZSgwLDEwMCkpO3JldHVybiB7Y29udHJvbHM6Y29udHJvbHMubGVuZ3RoLHVubGFiZWxlZDptaXNzaW5nfX0pOwogIGNvbnNvbGUubG9nKCdVSS1JTlZFTlRBUjogJyt1aUludmVudG9yeS5jb250cm9scysnIFNjaGFsdGZsw6RjaGVuL0xpbmtzLCBmZWhsZW5kZSBCZXNjaHJpZnR1bmcgKFN0aWNocHJvYmUpOiAnK0pTT04uc3RyaW5naWZ5KHVpSW52ZW50b3J5LnVubGFiZWxlZCkpOwogIGNvbnN0IG5hdj1hd2FpdCBwYWdlLmV2YWx1YXRlKCgpPT57CiAgIGNvbnN0IGlkcz1bJ3N0YXJ0JywncHJvZmlsJywnbHVuZ2Vud2VydGUnLCd2aXRhbHdlcnRlJywncGVha2Zsb3cnLCdrYWxlbmRlcicsJ2xhYm9yJywnYWxsZXJnaWVuJywnc3RhdGlzdGlrJywnZWluc3RlbGx1bmdlbicsJ2RhdGVpZW4nLCd2ZXJzaWNoZXJ1bmcnLCdiZXdlcnR1bmcnLCdzY2hsYWZsYWJvcicsJ2dlaHR0ZXN0J107CiAgIGNvbnN0IHByZXNlbnQ9W10saXNzdWVzPVtdLG1pc3Npbmc9W107CiAgIGZvcihjb25zdCBpZCBvZiBpZHMpe2xldCBlbD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZChpZCk7aWYoIWVsKXttaXNzaW5nLnB1c2goaWQpO2NvbnRpbnVlfXRyeXt3aW5kb3cuQVNUSE1BX05BVi5nbyhpZCk7cHJlc2VudC5wdXNoKGlkKX1jYXRjaChlKXtpc3N1ZXMucHVzaChpZCsnOiAnK2UubWVzc2FnZSl9fQogICB3aW5kb3cuQVNUSE1BX05BVi5nbygnc3RhcnQnKTtyZXR1cm4ge3ByZXNlbnQsaXNzdWVzLG1pc3Npbmd9OwogIH0pOwogIGFzc2VydChuYXYucHJlc2VudC5sZW5ndGg+PTEwJiZuYXYuaXNzdWVzLmxlbmd0aD09PTAsJ05hdmlnYXRpb246ICcrbmF2LnByZXNlbnQubGVuZ3RoKycgU2VpdGVuIG9obmUgSmF2YVNjcmlwdC1GZWhsZXInKTsKICBjb25zdCBtZW51TGlua3M9YXdhaXQgcGFnZS5ldmFsdWF0ZSgoKT0+e2NvbnN0IGxpbmtzPVsuLi5kb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCcjbjMzMi1zaWRlYmFyIFtkYXRhLW4zMzItcGFnZV0nKV07Y29uc3QgaXNzdWVzPVtdO2Zvcihjb25zdCBiIG9mIGxpbmtzKXt0cnl7Yi5jbGljaygpfWNhdGNoKGUpe2lzc3Vlcy5wdXNoKGIuZGF0YXNldC5uMzMyUGFnZSsnOiAnK2UubWVzc2FnZSl9fXdpbmRvdy5BU1RITUFfTkFWLmdvKCdzdGFydCcpO3JldHVybiB7Y291bnQ6bGlua3MubGVuZ3RoLGlzc3Vlc319KTsKICBhc3NlcnQobWVudUxpbmtzLmNvdW50Pj0xNSYmbWVudUxpbmtzLmlzc3Vlcy5sZW5ndGg9PT0wLCdNZW7DvC1WZXJrbsO8cGZ1bmdlbjogJyttZW51TGlua3MuY291bnQrJyBLbGljay1IYW5kbGVyIGdldGVzdGV0Jyk7CiAgYXdhaXQgcGFnZS5sb2NhdG9yKCcjcHMzNTItb3BlbicpLmNsaWNrKCk7CiAgYXNzZXJ0KGF3YWl0IHBhZ2UubG9jYXRvcignI3BzMzUyLWRpYWxvZycpLmV2YWx1YXRlKGU9PmUub3BlbiksJ1plbnRyYWxlciBTY2FubmVyIMO2ZmZuZXQnKTsKICBhd2FpdCBwYWdlLmxvY2F0b3IoJyNvY3IzNjAtcGFuZWwnKS53YWl0Rm9yKHtzdGF0ZTondmlzaWJsZScsdGltZW91dDoyNzAwMH0pOwogIGFzc2VydChhd2FpdCBwYWdlLmxvY2F0b3IoJyNvY3IzNjEtbGFuZyBvcHRpb24nKS5jb3VudCgpPT09MywnT0NSLVNwcmFjaHdhaGwgbWl0IGRyZWkgRWluc3RlbGx1bmdlbicpOwogIGFzc2VydChhd2FpdCBwYWdlLmxvY2F0b3IoJyNvY3IzNjEtbGFuZycpLmlucHV0VmFsdWUoKT09PSdkZXUnLCdEZXV0c2NoZXMgT0NSLU1vZGVsbCBhbHMgcmVzc291cmNlbnNjaG9uZW5kZSBWb3JnYWJlJyk7CiAgYXdhaXQgcGFnZS5sb2NhdG9yKCcjcHMzNTItY2xvc2UnKS5jbGljaygpOwogIGNvbnN0IGNoYW5nZWQ9YXdhaXQgcGFnZS5ldmFsdWF0ZShhc3luYygpPT57Y29uc3Qgcz13aW5kb3cuQVNUSE1BX1NFQ1VSSVRZO3JldHVybiAoYXdhaXQgcy5nZXQoJ2xhYnMnLCdxYS1sYWItMzYxJykpLm5vdGVzfSk7CiAgYXNzZXJ0KGNoYW5nZWQ9PT1xYSwnR2VzcGVpY2hlcnRlciBUZXN0ZWludHJhZyBuYWNoIE5hdmlnYXRpb24gZXJoYWx0ZW4nKTsKICBpZih3YXJuaW5ncy5sZW5ndGgpY29uc29sZS5sb2coJ1dBUk5VTkcgSFRUUC1GZWhsZXI6Jyx3YXJuaW5ncy5zbGljZSgwLDI1KSk7CiAgaWYoZXJyb3JzLmxlbmd0aCljb25zb2xlLmxvZygnV0FSTlVORyBTZWl0ZW5mZWhsZXI6JyxlcnJvcnMuc2xpY2UoMCwyNSkpOwogIGNvbnN0IGNyaXRpY2FsRXJyb3JzPWVycm9ycy5maWx0ZXIocz0+L3NlY3VyZTE3XC5qc3xzZWFyY2gzNjBcLmpzfG9jcjM2MFwuanN8anNvbmNlbnRlcjM1OFwuanMvaS50ZXN0KHMpKTsKICBhc3NlcnQoY3JpdGljYWxFcnJvcnMubGVuZ3RoPT09MCwnS2VpbmUgdW5iZWhhbmRlbHRlbiBGZWhsZXIgaW4gZGVuIGFrdHVhbGlzaWVydGVuIEtlcm5tb2R1bGVuJyk7CiAgY29uc29sZS5sb2coJ0JST1dTRVItVEVTVFM6ICcrcmVzdWx0cy5maWx0ZXIoeD0+eC5vaykubGVuZ3RoKycgYmVzdGFuZGVuLiBOYXZpZ2F0aW9uOiAnK25hdi5wcmVzZW50LmpvaW4oJywgJykpO2lmKG5hdi5taXNzaW5nLmxlbmd0aCljb25zb2xlLmxvZygnTmljaHQgdm9yaGFuZGVuZSBvcHRpb25hbGUgU2VpdGVuOicsbmF2Lm1pc3Npbmcuam9pbignLCAnKSk7CiAgY29uc29sZS5sb2coJ0hpbndlaXNlOiAnK3dhcm5pbmdzLmxlbmd0aCsnIEhUVFAtUHJvYmxlbWUsICcrZXJyb3JzLmxlbmd0aCsnIEphdmFTY3JpcHQtU2VpdGVuZmVobGVyIChzaWVoZSBMb2cpLicpOwogIGF3YWl0IGNvbnRleHQuY2xvc2UoKTsKIH1maW5hbGx5e2lmKGJyb3dzZXIpYXdhaXQgYnJvd3Nlci5jbG9zZSgpO2F3YWl0IG5ldyBQcm9taXNlKHI9PnNlcnZlci5jbG9zZShyKSl9Cn0KbWFpbigpLmNhdGNoKGU9Pntjb25zb2xlLmVycm9yKGUuc3RhY2t8fGUpO3Byb2Nlc3MuZXhpdENvZGU9MX0pOwo=',
+          }
+          for name,data in files.items():
+           p=Path(name)
+           if p.exists():raise SystemExit('Sicherheitsabbruch: '+name+' existiert bereits.')
+           p.parent.mkdir(parents=True,exist_ok=True)
+           p.write_bytes(base64.b64decode(data))
+           print(name+': Testdatei erstellt')
+          PYTESTS
+      - name: JavaScript, HTML, Verweise und Offline-Dateien kontrollieren
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 qa/pneumopro361/static_qa.py
+          python3 -m json.tool version.json >/dev/null
+          git diff --check
+      - name: App in isoliertem Mobilbrowser funktional testen
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME" ]; then
+            echo 'ERROR: Chrome/Chromium ist nicht vorhanden – kein Browser-Test möglich.' >&2
+            exit 1
+          fi
+          TEST_NODE="$RUNNER_TEMP/pneumopro-361-qa"
+          mkdir -p "$TEST_NODE"
+          npm --prefix "$TEST_NODE" install --no-save --ignore-scripts --no-audit --no-fund playwright-core@1.55.0
+          CHROME_PATH="$CHROME" NODE_PATH="$TEST_NODE/node_modules" node qa/pneumopro361/browser_qa.cjs
+      - name: Verifizierte Programmkorrekturen und Tests veroeffentlichen
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add secure17.js app.js sw.js search360.js ocr360.js version.json qa/pneumopro361/
+          if git diff --cached --quiet; then
+            echo 'Keine Änderungen notwendig.'
+          else
+            git commit -m 'PneumoPro 3.6.1: Ladezeit, Suchdatenbank, OCR-Speicher, automatisierte QA'
+            git push origin HEAD:main
+          fi
