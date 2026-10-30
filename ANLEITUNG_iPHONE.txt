@@ -1,26 +1,27 @@
-PNEUMOPRO 3.5.3 - REPARATUR DES FEHLENDEN SCANS-BUTTONS
-=======================================================
+PneumoPro 3.5.4 · Apple Health per Kurzbefehle
 
-1. Zuerst in PneumoPro unter Einstellungen eine verschluesselte Datensicherung erstellen.
-2. Diese ZIP auf dem iPhone in der Dateien-App entpacken.
-3. Den Ordner GitHub_Update oeffnen und die 5 Dateien darin nach GitHub hochladen.
-4. GitHub: Repository 4h7zm6hnjy-skizze/Asthma- (Branch main), Add file > Upload files.
-5. Die 5 vorhandenen Dateien ersetzen, dann Commit changes bestaetigen.
-6. PneumoPro aufrufen, Einstellungen > Nach Updates suchen > Update installieren.
-7. Version 3.5.3 pruefen. Die Kopfzeile hat auf dem iPhone zwei Reihen; in der unteren Leiste ist SCANS.
-8. Auf SCANS tippen und testweise die Dateiauswahl oeffnen.
+INSTALLATION AUF DEM IPHONE
+1. Vorher in PneumoPro eine verschlüsselte Datensicherung erstellen.
+2. Diese ZIP entpacken.
+3. NUR die sechs Dateien aus GitHub_Update in die Wurzel des GitHub-Repositories Asthma- hochladen und gleichnamige Dateien ersetzen.
+4. Auf den ERFOLGREICHEN GitHub-Pages-Build achten (Actions -> pages build and deployment).
+5. PneumoPro online öffnen, Einstellungen -> Nach Updates suchen -> Version 3.5.4 installieren. Danach Vitalwerte & Gewicht -> Apple Health -> PneumoPro.
 
-Warum das Update?
-Der Scans-Code war auf GitHub, aber auf dem iPhone erschien der Knopf nicht.
-Ein unabhaengiger Startweg ueber app.js sorgt nun dafuer, dass die Scans-Funktion
-nach dem Entsperren nachgeladen wird, auch wenn das bisherige Hilfsmodul ausfaellt.
-Die zweireihige Kopfzeile verhindert, dass die Schaltflaeche am iPhone-Rand verschwindet.
+WIE DER KURZBEFEHL FUNKTIONIERT
+Einmalig iPhone Kurzbefehle öffnen, neue Aktion „Gesundheitsdaten suchen“ (Find Health Samples) für „Blutsauerstoff“ hinzufügen, nach Startdatum sortieren und Limit 20 setzen.
+Mit jedem Ergebnis wiederholen. Über „Details von Gesundheitsdaten abrufen“ den Messwert und das Startdatum aus dem Wiederholungselement auslesen. Das Datum mit „Datum formatieren“ auf yyyy-MM-dd HH:mm einstellen.
+In der Wiederholung den Text „spo2;[Datumsvariable];[Wertvariable];%“ erzeugen. Die Variablen über den Kurzbefehle-Editor einfügen, nicht wörtlich mit eckigen Klammern schreiben.
+Nach der Wiederholung „Text kombinieren“ (Wiederholungsergebnisse, Trennzeichen Neue Zeilen) und „In Zwischenablage kopieren“ ausführen.
+In PneumoPro Vitalwerte -> Apple Health -> Aus Zwischenablage einfügen -> Messwerte prüfen -> Geprüfte Werte übernehmen.
 
-WICHTIG: Nur die 5 App-Dateien hochladen. Keine privaten Fotos, Befunde oder Backups
-ins oeffentliche GitHub-Repository hochladen.
-Die bereits gespeicherten Gesundheitsdaten bleiben lokal verschluesselt.
-Die Monats-/Jahresstatistik und Arztvorbereitung bleiben unveraendert.
-Ein isolierter Browser-Test war erfolgreich, aber der echte iPhone-Test steht aus.
+Weitere Kürzel: pulse (/min), resp (/min), weight (kg), sys (mmHg), dia (mmHg). Blutdruckpaar braucht identisches Datum und Uhrzeit.
 
-App: https://4h7zm6hnjy-skizze.github.io/Asthma-/
-GitHub: https://github.com/4h7zm6hnjy-skizze/Asthma-
+EINGABEFORMAT (Beispiele, nur fiktive Werte):
+spo2;2026-10-30 14:30;97;%
+pulse;2026-10-30 14:30;78;/min
+resp;2026-10-30 14:30;16;/min
+weight;2026-10-30 14:30;75,0;kg
+
+DATENSCHUTZ: Nur die lokal kopierten Werte werden importiert. Kein Internet/Server-Upload aus dem Modul, keine Daten an GitHub, keine Hintergrundabfrage. Safari-Webseiten können nicht direkt die Apple HealthKit-Freigabe in den iOS-Einstellungen erhalten. Die Zwischenablage enthält kurzfristig Gesundheitsdaten und sollte nicht öffentlich geteilt werden.
+
+HINWEISE: Die deutschen/englischen Aktionsnamen unterscheiden sich je nach iOS-Version. Es wird keine fertige signierte Apple-Kurzbefehle-Datei behauptet. Die Einrichtung muss einmal auf dem iPhone erfolgen. Der echte Import auf dem persönlichen iPhone ist zusätzlich zu prüfen.

@@ -9,9 +9,9 @@
   if(!SEC?.state?.().unlocked || !$('vitalwerte') || $('v29-root')) return;
   const PERIODS=[['1','Tag'],['7','Woche'],['30','Monat'],['365','Jahr'],['3652','10 Jahre']];
   const TYPES={
-    spo2:{title:'Blutsauerstoff (SpO₂)',unit:'%',series:[['value','SpO₂','#0e8594']],min:40,max:100,decimals:1,sources:['Apple Watch','Finger-Pulsoximeter','Ohr-Pulsoximeter','Anderes Gerät']},
-    bp:{title:'Blutdruck',unit:'mmHg',series:[['value','Systolisch','#af5268'],['diastolic','Diastolisch','#5372b7']],min:40,max:300,decimals:0,sources:['Oberarm','Handgelenk','Arztpraxis','Anderes Gerät']},
-    pulse:{title:'Puls',unit:'Schläge/min',series:[['value','Puls','#a666a6']],min:20,max:250,decimals:0,sources:['Apple Watch','Finger-Pulsoximeter','Ohr-Pulsoximeter','Blutdruckgerät','Manuell']}
+    spo2:{title:'Blutsauerstoff (SpO₂)',unit:'%',series:[['value','SpO₂','#0e8594']],min:40,max:100,decimals:1,sources:['Apple Watch','Apple Health (Kurzbefehle)','Finger-Pulsoximeter','Ohr-Pulsoximeter','Anderes Gerät']},
+    bp:{title:'Blutdruck',unit:'mmHg',series:[['value','Systolisch','#af5268'],['diastolic','Diastolisch','#5372b7']],min:40,max:300,decimals:0,sources:['Apple Health (Kurzbefehle)','Oberarm','Handgelenk','Arztpraxis','Anderes Gerät']},
+    pulse:{title:'Puls',unit:'Schläge/min',series:[['value','Puls','#a666a6']],min:20,max:250,decimals:0,sources:['Apple Watch','Apple Health (Kurzbefehle)','Finger-Pulsoximeter','Ohr-Pulsoximeter','Blutdruckgerät','Manuell']}
   };
   const REF=[
     ['spo2','SpO₂: ärztlich bestätigte Untergrenze (%)',40,100],
@@ -104,7 +104,6 @@
     for(const row of entries.slice(0,100)){const item=make('article','v29-record'),text=make('div'),heading=kind==='bp'?row.value+'/'+row.diastolic+' mmHg':row.value+' '+TYPES[kind].unit;
       text.append(make('strong','',fmtDate(row.date)+' · '+row.time+' · '+heading),make('small','',row.source+(row.note?' · '+row.note:'')));
       if(kind==='bp'){const st=bpStatus(row);if(st){item.classList.add('bp344-record');item.style.setProperty('--bp-tone',st.color);text.append(make('span','bp344-status',st.label));text.querySelector('.bp344-status').style.setProperty('--bp-tone',st.color);}}
-      else {const st=window.PNEUMOPRO_AMPEL347?.classify(kind,row.value);if(st){item.classList.add('pp347-record');item.style.setProperty('--pp347-tone',st.color);const tag=make('span','pp347-status',st.label);tag.style.setProperty('--pp347-tone',st.color);text.append(tag);}}
       const buttons=make('div','v29-actions'),edit=make('button','btn btn-outline','Bearbeiten'),del=make('button','btn btn-text','Löschen');edit.type=del.type='button';edit.addEventListener('click',()=>editMeasurement(kind,row));del.addEventListener('click',()=>deleteMeasurement(kind,row));buttons.append(edit,del);item.append(text,buttons);box.append(item);
     }
     if(entries.length>100)box.append(make('p','input-note','Neueste 100 Einträge angezeigt. Die übrigen Messungen bleiben verschlüsselt gespeichert.'));
@@ -122,10 +121,9 @@
     for(let i=0;i<=4;i++){const yy=T+i*(H-T-B)/4;add('line',{x1:L,x2:W-R,y1:yy,y2:yy,stroke:'#dae7ea'});add('text',{x:3,y:yy+4,fill:'#56717d','font-size':13},(hi-(hi-lo)*i/4).toFixed(cfg.decimals));}
     reference.forEach((r,i)=>{if(r===null)return;const yy=y(r);add('line',{x1:L,x2:W-R,y1:yy,y2:yy,stroke:cfg.series[i][2],'stroke-width':2,'stroke-dasharray':'7 6'});add('text',{x:W-R-2,y:Math.max(13,yy-5),fill:cfg.series[i][2],'font-size':13,'text-anchor':'end'},'Ziel '+r);});
     for(const [field,title,color] of cfg.series){const valid=points.filter(row=>number(row[field])!==null);if(valid.length>1)add('polyline',{points:valid.map(row=>x(row)+','+y(row[field])).join(' '),fill:'none',stroke:color,'stroke-width':3,'stroke-linecap':'round','stroke-linejoin':'round'});
-      valid.forEach(row=>{const c=add('circle',{cx:x(row),cy:y(row[field]),r:points.length>100?3:5,fill:kind==='bp'?window.ASTHMA_BPA344?.classifyPart(row[field],field==='value'?'systolic':'diastolic').color||color:window.PNEUMOPRO_AMPEL347?.classify(kind,row[field])?.color||color,stroke:'#fff','stroke-width':1});const tip=document.createElementNS(ns,'title');tip.textContent=fmtDate(row.date)+' '+row.time+' · '+title+': '+row[field]+' '+cfg.unit+' · '+row.source+(kind==='bp'?' · '+(window.ASTHMA_BPA344?.classifyPart(row[field],field==='value'?'systolic':'diastolic').label||''):'');c.append(tip);});}
+      valid.forEach(row=>{const c=add('circle',{cx:x(row),cy:y(row[field]),r:points.length>100?3:5,fill:kind==='bp'?window.ASTHMA_BPA344?.classifyPart(row[field],field==='value'?'systolic':'diastolic').color||color:color,stroke:'#fff','stroke-width':1});const tip=document.createElementNS(ns,'title');tip.textContent=fmtDate(row.date)+' '+row.time+' · '+title+': '+row[field]+' '+cfg.unit+' · '+row.source+(kind==='bp'?' · '+(window.ASTHMA_BPA344?.classifyPart(row[field],field==='value'?'systolic':'diastolic').label||''):'');c.append(tip);});}
     [0,Math.floor((points.length-1)/2),points.length-1].filter((v,i,a)=>a.indexOf(v)===i).forEach(i=>add('text',{x:x(points[i]),y:H-8,'text-anchor':i===0?'start':i===points.length-1?'end':'middle',fill:'#56717d','font-size':13},fmtDate(points[i].date)));
     if(kind==='bp'){host.append(bpLegend());const info=make('p','bp344-note','Die Farben zeigen nur grobe Orientierung für Erwachsene bei Ruhewerten, keine Diagnose oder individuellen Zielbereich. Zu Hause wird Hypertonie häufig ab einem Mittelwert von 135/85 mmHg beurteilt; Einzelmessungen können abweichen. Sehr hohe Werte erneut in Ruhe messen. Bei Beschwerden wie Brustschmerz, starker Luftnot, Lähmung oder Sprachstörung: 112.');host.append(info);}
-    if(kind!=='bp'){host.append(make('p','pp347-note',kind==='spo2'?'SpO₂-Ampel: nur Orientierung, übliche Werte bei gesunden Erwachsenen häufig 95–100 %. Bei Lungenerkrankungen ärztliches Ziel und Messmethode beachten.': 'Puls-Ampel: Richtwerte gelten nur für Ruhe; unter Belastung, bei Fieber oder Medikamenten gelten sie nicht.'));}
     $('v29-explanation-'+kind).textContent=series.length+' Messungen · durchgezogene Linien: gemessene Werte; '+(reference.some(x=>x!==null)?'gestrichelte Linien: manuell hinterlegte persönliche Vergleichswerte.':'noch keine ärztlich abgestimmten Vergleichswerte hinterlegt.')+(points.length!==series.length?' Darstellung auf '+points.length+' Punkte reduziert, Daten unverändert.':'');
   }
   async function saveReferences(event){event.preventDefault();const updated={};

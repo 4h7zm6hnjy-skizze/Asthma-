@@ -1,5 +1,5 @@
 {
-  "version": "3.5.3",
+  "version": "3.5.4",
   "released": "2026-10-30",
-  "notes": "Scans-Button iPhone-Fix: unabhaengiger Modulstart nach Entsperren, gut sichtbare zweizeilige Kopfzeile fuer schmale Displays; Scans, Kamera und verschluesseltes Originalarchiv bleiben erhalten. Alle anderen Gesundheitsbereiche und Monats-/Jahresstatistik bleiben unveraendert."
+  "notes": "Apple Health via Kurzbefehle: lokale, kontrollierte Übernahme von Blutsauerstoff, Puls, Atemfrequenz, Gewicht und Blutdruck. Import aus iPhone-Zwischenablage oder Textdatei; Vorschau, Prüfung, Dublettenschutz, verschlüsselte Speicherung. Kein direkter HealthKit-Zugriff, keine Datenübertragung. PneumoPro 3.5.3 und bestehende Berichte bleiben erhalten."
 }

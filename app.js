@@ -1,6 +1,6 @@
 'use strict';
 (() => {
-  const VERSION = '3.5.3';
+  const VERSION = '3.5.4';
   window.ASTHMA_APP_VERSION = VERSION;
   const STORAGE = 'asthma-v1-preferences';
   const sources = window.ASTHMA_SOURCES || {};
@@ -210,6 +210,13 @@
       document.body.append(js);
       setTimeout(()=>{if(!document.getElementById('ps352-open'))js.remove()},750);
     },300);
+  })();
+  // 3.5.4: Apple-Health-Import über Kurzbefehle, ohne Netzwerk oder HealthKit in Safari.
+  (function loadHealth354(){
+    if(document.getElementById('h354-loader'))return;
+    const script=document.createElement('script');script.id='h354-loader';script.src='./health354.js?v=3.5.4';
+    script.onerror=()=>{const v=document.getElementById('vitalwerte');if(v&&!document.getElementById('h354-load-error')){const p=document.createElement('p');p.id='h354-load-error';p.textContent='Apple-Health-Import konnte nicht geladen werden. Bitte online die Offline-Dateien aktualisieren.';p.style.color='#8a2020';v.prepend(p)}};
+    document.body.append(script);
   })();
   // Für prüfbare Funktionstests ohne Zugriff auf private Profildaten.
   Object.defineProperty(window,'__asthmaAppTest',{value:Object.freeze({compareVersions,articleCount:articles.length,getEligibility}),enumerable:false});
