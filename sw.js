@@ -1,5 +1,5 @@
 /* Asthma 3.3.0: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
-const VERSION='3.5.2-scans-schnellupload';
+const VERSION='3.5.3-scans-toolbar-repair';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
  './scans352.js', './arztvor351.js','./laborpro349.js','./bewertung348.js','./bewertung348.css',

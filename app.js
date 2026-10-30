@@ -1,6 +1,6 @@
 'use strict';
 (() => {
-  const VERSION = '3.5.2';
+  const VERSION = '3.5.3';
   window.ASTHMA_APP_VERSION = VERSION;
   const STORAGE = 'asthma-v1-preferences';
   const sources = window.ASTHMA_SOURCES || {};
@@ -196,6 +196,21 @@
   }),enumerable:false});
   $('version-chip').textContent='v'+VERSION;$('footer-version').textContent=VERSION;
   bindEvents();installSourceList();render();updateConnection();setupOffline();
+  // 3.5.3: Unabhaengiger Scans-Start. Keine Abhaengigkeit von Labor-/Erklaerungsmodulen.
+  // Die App laedt die Funktion erst nach dem Entsperren und der Hauptnavigation.
+  (function ensureScans353(){
+    let tries=0;
+    const ticker=setInterval(()=>{
+      if(document.getElementById('ps352-open')){clearInterval(ticker);return;}
+      if(++tries>100){clearInterval(ticker);return;}
+      if(!window.ASTHMA_SECURITY?.state?.().unlocked||!window.ASTHMA_NAV||!document.querySelector('.top-actions'))return;
+      if(document.getElementById('ps353-loader'))return;
+      const js=document.createElement('script');js.id='ps353-loader';js.src='./scans352.js?v=3.5.3';
+      js.onerror=()=>{js.remove();};
+      document.body.append(js);
+      setTimeout(()=>{if(!document.getElementById('ps352-open'))js.remove()},750);
+    },300);
+  })();
   // Für prüfbare Funktionstests ohne Zugriff auf private Profildaten.
   Object.defineProperty(window,'__asthmaAppTest',{value:Object.freeze({compareVersions,articleCount:articles.length,getEligibility}),enumerable:false});
 })();

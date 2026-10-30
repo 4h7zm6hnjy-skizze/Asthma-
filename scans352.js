@@ -1,5 +1,5 @@
 'use strict';
-/* PneumoPro 3.5.2 – leicht erreichbarer Scanner-/Datei-Upload.
+/* PneumoPro 3.5.3 – leicht erreichbarer Scanner-/Datei-Upload.
  * Originale verbleiben im lokalen verschluesselten Tresor, kein HTTP-Upload.
  * Werte werden NICHT unkontrolliert aus Bildern/PDFs als Messreihen uebernommen.
  */
@@ -78,7 +78,18 @@
  #ps352-dialog .ps352-viewer button{min-height:40px;padding:8px 14px;border:1px solid #8ab7c5;border-radius:8px;background:#e7f4f7;color:#15465a;font-weight:800}
  #ps352-dialog .ps352-hidden{display:none!important}
  @media(max-width:640px){#ps352-dialog .ps352-areas{grid-template-columns:repeat(2,minmax(0,1fr))}#ps352-dialog .ps352-head{padding:12px 14px}#ps352-dialog .ps352-head h2{font-size:20px}}
- @media(max-width:430px){#ps352-open{font-size:12px;padding:6px 8px;min-height:40px;gap:3px}#ps352-open .ps352-icon{font-size:17px}header.topbar .a281-brand-wordmark{width:112px}header.topbar .topbar-inner{gap:3px;padding-left:9px;padding-right:9px}header.topbar .top-actions{gap:2px}#nav317-search-action{padding:0 6px!important;font-size:12px!important}#nav317-search-action svg{width:15px!important}#n332-open-top{min-width:58px!important;padding:5px 5px!important;gap:3px!important;font-size:12px!important}#n332-open-top .n332-bars{font-size:16px}header.topbar #update-top{padding:5px 5px!important;min-width:25px!important}#ps352-dialog .ps352-body{padding:12px}#ps352-dialog .ps352-areas{gap:8px}#ps352-dialog .ps352-area{padding:10px;min-height:73px}#ps352-dialog .ps352-area strong{font-size:13px}#ps352-dialog .ps352-grid{grid-template-columns:1fr}}
+   /* iPhone: Knopf nicht in der schmalen Kopfzeile abschneiden. */
+  @media(max-width:560px){
+    #secure-application header.topbar{height:auto!important;min-height:112px!important}
+    #secure-application header.topbar .topbar-inner{height:auto!important;min-height:112px!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:center!important;gap:5px!important;padding-top:7px!important;padding-bottom:8px!important}
+    #secure-application header.topbar .brand.a281-brand{align-self:flex-start!important;max-width:100%!important}
+    #secure-application header.topbar .top-actions{width:100%!important;min-width:0!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:4px!important}
+    #secure-application #ps352-open{display:inline-flex!important;visibility:visible!important;opacity:1!important;flex:1 1 auto!important;min-width:66px!important;min-height:43px!important;font-size:13px!important;padding:7px 9px!important}
+    #secure-application #nav317-holder{min-width:0!important}
+    #secure-application #n332-open-top{flex-shrink:0!important}
+    #secure-application header.topbar #update-top{flex-shrink:0!important}
+  }
+@media(max-width:430px){#ps352-open{font-size:12px;padding:6px 8px;min-height:40px;gap:3px}#ps352-open .ps352-icon{font-size:17px}header.topbar .a281-brand-wordmark{width:112px}header.topbar .topbar-inner{gap:3px;padding-left:9px;padding-right:9px}header.topbar .top-actions{gap:2px}#nav317-search-action{padding:0 6px!important;font-size:12px!important}#nav317-search-action svg{width:15px!important}#n332-open-top{min-width:58px!important;padding:5px 5px!important;gap:3px!important;font-size:12px!important}#n332-open-top .n332-bars{font-size:16px}header.topbar #update-top{padding:5px 5px!important;min-width:25px!important}#ps352-dialog .ps352-body{padding:12px}#ps352-dialog .ps352-areas{gap:8px}#ps352-dialog .ps352-area{padding:10px;min-height:73px}#ps352-dialog .ps352-area strong{font-size:13px}#ps352-dialog .ps352-grid{grid-template-columns:1fr}}
  @media(max-width:375px){header.topbar .a281-brand-wordmark{width:101px}header.topbar .topbar-inner{gap:2px;padding-left:6px;padding-right:6px}#nav317-search-action span{display:none!important}#nav317-search-action{min-width:39px!important;padding:5px!important}}
  @media(max-width:355px){#ps352-open{font-size:11px;padding:5px}#ps352-dialog .ps352-areas{grid-template-columns:1fr}}
  @media print{#ps352-open,#ps352-dialog{display:none!important}}
@@ -143,5 +154,5 @@
  $('ps352-viewer-close').addEventListener('click',closePreview);
  $('ps352-go').addEventListener('click',()=>{const dest=typeMap.get(current)?.[3]||'dateien';close();NAV.go(dest)});
  $('ps352-archive').addEventListener('click',()=>{close();NAV.go('akte');document.querySelector('.my-tab[data-my-tab="documents"]')?.click()});
- preview();window.__PNEUMOPRO_SCANS352=Object.freeze({version:'3.5.2',areas:TYPES.map(t=>t[0]),maxFiles:8});
+ preview();window.__PNEUMOPRO_SCANS352=Object.freeze({version:'3.5.3',areas:TYPES.map(t=>t[0]),maxFiles:8});
 })();

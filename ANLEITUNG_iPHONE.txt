@@ -1,15 +1,26 @@
-ASTHMA-AMPEL: PDF-REPARATUR FUER iPHONE
+PNEUMOPRO 3.5.3 - REPARATUR DES FEHLENDEN SCANS-BUTTONS
+=======================================================
 
-WICHTIG: Bestehende App NICHT loeschen. Vorher in Einstellungen eine verschluesselte Sicherung erstellen.
+1. Zuerst in PneumoPro unter Einstellungen eine verschluesselte Datensicherung erstellen.
+2. Diese ZIP auf dem iPhone in der Dateien-App entpacken.
+3. Den Ordner GitHub_Update oeffnen und die 5 Dateien darin nach GitHub hochladen.
+4. GitHub: Repository 4h7zm6hnjy-skizze/Asthma- (Branch main), Add file > Upload files.
+5. Die 5 vorhandenen Dateien ersetzen, dann Commit changes bestaetigen.
+6. PneumoPro aufrufen, Einstellungen > Nach Updates suchen > Update installieren.
+7. Version 3.5.3 pruefen. Die Kopfzeile hat auf dem iPhone zwei Reihen; in der unteren Leiste ist SCANS.
+8. Auf SCANS tippen und testweise die Dateiauswahl oeffnen.
 
-1. ZIP auf iPhone herunterladen und in der Dateien-App antippen (entpacken).
-2. Safari: https://github.com/4h7zm6hnjy-skizze/Asthma-
-3. Im Hauptverzeichnis: Add file > Upload files (ggf. ueber Safari Desktop-Website anfordern).
-4. NUR DIE DATEI ampel320.js aus diesem Ordner hochladen (keine ZIP). Bei vorhandener Datei Ueberschreiben bestaetigen, Commit changes.
-5. Die existierende Asthma-Webapp schliessen und bei Internetverbindung neu oeffnen. Version bleibt 3.2.0.
-6. Statistik > Ampel > Zeitraum waehlen > Ampel-PDF erstellen > PDF teilen / Drucken > In Dateien sichern oder Drucken.
-   Falls Teilen nicht funktioniert: PDF herunterladen oder PDF ansehen.
+Warum das Update?
+Der Scans-Code war auf GitHub, aber auf dem iPhone erschien der Knopf nicht.
+Ein unabhaengiger Startweg ueber app.js sorgt nun dafuer, dass die Scans-Funktion
+nach dem Entsperren nachgeladen wird, auch wenn das bisherige Hilfsmodul ausfaellt.
+Die zweireihige Kopfzeile verhindert, dass die Schaltflaeche am iPhone-Rand verschwindet.
 
-DATENSCHUTZ: PDF liegt ausserhalb der App unverschluesselt vor. Keine persoenlichen Messwerte werden auf GitHub hochgeladen.
+WICHTIG: Nur die 5 App-Dateien hochladen. Keine privaten Fotos, Befunde oder Backups
+ins oeffentliche GitHub-Repository hochladen.
+Die bereits gespeicherten Gesundheitsdaten bleiben lokal verschluesselt.
+Die Monats-/Jahresstatistik und Arztvorbereitung bleiben unveraendert.
+Ein isolierter Browser-Test war erfolgreich, aber der echte iPhone-Test steht aus.
 
-Technik: Ersetzt window.print() durch einen lokalen PDF-Generator, der Messwerte und Notizen aus dem entsperrten Browser-Tresor in der Anzeige nutzt. Kein Server, kein externes PDF-Angebot.
+App: https://4h7zm6hnjy-skizze.github.io/Asthma-/
+GitHub: https://github.com/4h7zm6hnjy-skizze/Asthma-
