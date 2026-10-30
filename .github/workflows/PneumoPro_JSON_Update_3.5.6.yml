@@ -1,0 +1,118 @@
+name: PneumoPro 3.5.6 - Allergiewerte JSON Export Import
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PneumoPro_JSON_Update_3.5.6.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pneumopro-json-356-main
+  cancel-in-progress: false
+
+jobs:
+  json-allergien:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aktuellen Quellcode laden
+        uses: actions/checkout@v4
+      - name: JSON-Austausch installieren
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYUPDATE'
+          from pathlib import Path
+          import base64,zlib,hashlib,json,subprocess
+          
+          VERSION='3.5.6'
+          EXPECTED={
+           "secure17.js": "83b83ffe8225b469c48a1eec6ce1a8498cbcbbd7",
+           "sw.js": "e9a60282fc9391934a76aebf6ad3355bbd83ba0f",
+           "app.js": "95fa1f34fb7ef80d849413ae410d66074774a3d4",
+           "version.json": "b9b70ee46fc085f0c7c4954c797f521040e6d7a2"
+          }
+          B64_PAYLOAD='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'
+          EXPECTED_ADDON_SHA256='635e450f45ab40cea1c6360b0c83fab98ce3d0a57d3137510005a1cb03d0191e'
+          
+          
+          def once(text,old,new,label):
+              count=text.count(old)
+              if count!=1: raise SystemExit('Sicherheitsabbruch: '+label+' nicht eindeutig ('+str(count)+').')
+              return text.replace(old,new,1)
+          
+          release=json.loads(Path('version.json').read_text(encoding='utf-8'))
+          if release.get('version')==VERSION and Path('allergienjson356.js').exists():
+              print('Version 3.5.6 bereits vorhanden – keine Änderung.')
+              raise SystemExit(0)
+          if release.get('version')!='3.5.5':
+              raise SystemExit('Sicherheitsabbruch: Erwartet Version 3.5.5, tatsächlich '+str(release.get('version'))+'.')
+          if Path('allergienjson356.js').exists():
+              raise SystemExit('Sicherheitsabbruch: JSON-Modul existiert bereits. Keine Datei überschrieben.')
+          if not Path('allergien355.js').is_file():
+              raise SystemExit('Sicherheitsabbruch: Allergiemodul aus 3.5.5 fehlt.')
+          
+          source={name:Path(name).read_text(encoding='utf-8') for name in EXPECTED}
+          for path,expected in EXPECTED.items():
+              actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
+              if actual!=expected:
+                  raise SystemExit('Sicherheitsabbruch: '+path+' wurde seit der Vorbereitung verändert. Nichts überschrieben.')
+          
+          changes={}
+          s=source['secure17.js']
+          s=once(s,"'allergien355.js','bewertung348.js'","'allergien355.js','allergienjson356.js','bewertung348.js'",'JSON-Modullader')
+          s=once(s,"s.src='./'+src+'?v=3.5.5'","s.src='./'+src+'?v=3.5.6'",'JavaScript-Cache-Version')
+          changes['secure17.js']=s
+          s=source['sw.js']
+          s=once(s,"const VERSION='3.5.5-allergien';","const VERSION='3.5.6-allergien-json';",'Offline-Cache-Version')
+          s=once(s,"const ASSETS=[\n './allergien355.js'","const ASSETS=[\n './allergienjson356.js', './allergien355.js'",'Offline-Precache')
+          s=once(s,"const important=['/allergien355.js'","const important=['/allergienjson356.js','/allergien355.js'",'Offline-Netzwerkstrategie')
+          changes['sw.js']=s
+          changes['app.js']=once(source['app.js'],"const VERSION = '3.5.5';","const VERSION = '3.5.6';",'App-Version')
+          release['version']=VERSION
+          release['released']='2026-10-30'
+          release['notes']='Allergiebefunde als unverschlüsselte JSON-Datei für die manuelle Weitergabe (z. B. an ChatGPT) exportieren; kompatible JSON-Dateien nach Vorschau und Bestätigung verschlüsselt importieren. Dublettenabgleich und optionales Aktualisieren. Fotos und PDFs werden nicht exportiert. Bestehende Daten und Berichte bleiben erhalten.'
+          changes['version.json']=json.dumps(release,ensure_ascii=False,indent=2)+'\n'
+          addon=zlib.decompress(base64.b64decode(B64_PAYLOAD)).decode('utf-8')
+          if hashlib.sha256(addon.encode('utf-8')).hexdigest()!=EXPECTED_ADDON_SHA256:
+              raise SystemExit('Sicherheitsabbruch: JSON-Modul-Prüfsumme ungültig.')
+          if 'PNEUMOPRO_ALLERGIEN_JSON356' not in addon or "SEC.put('suite'" not in addon:
+              raise SystemExit('Sicherheitsabbruch: JSON-Modul unvollständig.')
+          changes['allergienjson356.js']=addon
+          for name,data in changes.items():Path(name).write_text(data,encoding='utf-8')
+          print('PneumoPro 3.5.6: Neue JSON-Funktion eingebaut. Bestehende Daten unangetastet.')
+          PYUPDATE
+      - name: JavaScript, Versionsdatei und Modulverkabelung pruefen
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in allergien355.js allergienjson356.js secure17.js sw.js app.js suite15.js statsplus292.js; do node --check "$f"; done
+          python3 -m json.tool version.json >/dev/null
+          git diff --check
+          python3 - <<'PYVERIFY'
+          from pathlib import Path
+          import json
+          assert json.loads(Path('version.json').read_text())['version']=='3.5.6'
+          assert "'allergien355.js','allergienjson356.js'" in Path('secure17.js').read_text()
+          assert "'./allergienjson356.js'" in Path('sw.js').read_text()
+          assert 'PNEUMOPRO_ALLERGIEN_JSON356' in Path('allergienjson356.js').read_text()
+          assert 'PneumoPro-Allergien-JSON' in Path('allergienjson356.js').read_text()
+          print('Technische Pruefung erfolgreich')
+          PYVERIFY
+      - name: Version 3.5.6 veroeffentlichen
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add allergienjson356.js secure17.js sw.js app.js version.json
+          if git diff --cached --quiet; then
+            echo "Keine Aenderungen erforderlich"
+          else
+            git commit -m "PneumoPro 3.5.6: Allergiewerte JSON importieren exportieren"
+            git push origin HEAD:main
+          fi
