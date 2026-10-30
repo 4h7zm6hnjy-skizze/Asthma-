@@ -16,7 +16,7 @@
  const kinds=[['spo2','Blutsauerstoff – Diagramm'],['bp','Blutdruck – Diagramm'],['pulse','Puls – Diagramm'],
   ['weight','Gewicht – Diagramm'],['pef','Peak-Flow – Diagramm'],['lung','Lungenfunktion – Diagramme'],
   ['lungfull','Lungenfunktion – alle Befundwerte'],['diffusion','Diffusionsmessung – Diagramme'],
-  ['difffull','Diffusion – alle Befundwerte'], ['sleep','Schlaflabor – Messwerte und Befunde'], ['sleepimages','Schlaflabor – Originaldiagramme und Befundseiten'], ['walk','Gehtest – Messwerte und Verlauf'], ['walkimages','Gehtest – Originalbefund'], ['imaging','Röntgen & CT – Diagnoseprotokolle'], ['imagingimages','Röntgen & CT – Bildvorschauen'], ['lungdiseases','Lungenerkrankungen – Diagnose- und Testprotokoll'], ['lungrights','Reha, Hilfsmittel & Rechte – Anträge'], ['providers','Ärzte & Krankenhäuser – Termine und Dokumente'], ['stairs','Treppenbelastung – Stufen und Gründe']];
+  ['difffull','Diffusion – alle Befundwerte'], ['sleep','Schlaflabor – Messwerte und Befunde'], ['sleepimages','Schlaflabor – Originaldiagramme und Befundseiten'], ['walk','Gehtest – Messwerte und Verlauf'], ['walkimages','Gehtest – Originalbefund'], ['imaging','Röntgen & CT – Diagnoseprotokolle'], ['imagingimages','Röntgen & CT – Bildvorschauen'], ['lungdiseases','Lungenerkrankungen – Diagnose- und Testprotokoll'], ['lungrights','Reha, Hilfsmittel & Rechte – Anträge'], ['providers','Ärzte & Krankenhäuser – Termine und Dokumente'], ['allergies','Allergien – Untersuchungsergebnisse'], ['stairs','Treppenbelastung – Stufen und Gründe']];
  const allKinds=[...baseKinds,...kinds];
  const num=v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))?Number(v):null;
  const iso=s=>/^\d{4}-\d\d-\d\d$/.test(s||'')?s:'';
@@ -232,6 +232,27 @@
      const lRows=lung.map(x=>({...x,fev1:num(x.fev1),fvc:num(x.fvc),fev1Liters:num(x.fev1Liters),fvcLiters:num(x.fvcLiters)}));
      panel(root,'lung','Ärztliche Lungenfunktion',lRows,[{title:'FEV₁ / FVC in % vom Soll',unit:'%',series:[['fev1','FEV₁ % Soll','#217f9b'],['fvc','FVC % Soll','#a662a1']]},{title:'FEV₁ / FVC in Litern',unit:'l',series:[['fev1Liters','FEV₁ l','#247e76'],['fvcLiters','FVC l','#d48748']]}],[['fev1','FEV₁ (% Soll)',1],['fvc','FVC (% Soll)',1],['fev1Liters','FEV₁ (l)',2],['fvcLiters','FVC (l)',2],['phase','Messphase',-2]],refs);
 
+
+     // PneumoPro 3.5.5: Allergieakte – nur Befunde im gewählten Berichtzeitraum.
+     const allergyRows=suite.filter(x=>x.type==='allergies355').map(x=>x.value).filter(within).sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+     const allergySection=node('section','s292-category');allergySection.dataset.s292Kind='allergies';allergySection.dataset.printEnabled=selected.allergies?'true':'false';
+     allergySection.append(node('h3','','Allergien und Allergietests'));
+     allergySection.append(node('p','s292-note','Erfasst: '+allergyRows.length+' Tests/Reaktionen. Befunde werden nur dokumentiert; ein positiver Prick-/IgE-Test ist allein keine klinische Allergiediagnose.'));
+     if(!allergyRows.length)allergySection.append(node('p','s292-empty','Keine Allergiebefunde in diesem Zeitraum.'));
+     else{
+       const t=node('table','s292-table'),thead=node('thead'),tr=node('tr');
+       for(const title of ['Datum','Auslöser','Test','Ergebnis','Ärztliche Einordnung','Ampel','Messwert','Praxis / Bemerkung'])tr.append(node('th','',title));thead.append(tr);t.append(thead);
+       const tbody=node('tbody');
+       const resultLabels={negativ:'negativ',positiv:'positiv',grenzwertig:'grenzwertig',reaktion:'Reaktion',ausstehend:'ausstehend',unbekannt:'unbekannt',unklar:'unklar'};
+       const medicalLabels={bestaetigt:'ärztlich bestätigt',ausgeschlossen:'ärztlich ausgeschlossen',verdacht:'Verdacht',ungewiss:'unklar',offen:'offen'};
+       for(const a of allergyRows){
+         const row=node('tr');const rating=window.PNEUMOPRO_ALLERGIEN355?.score(a);
+         const cols=[fmt(a.date),a.allergen||'–',window.PNEUMOPRO_ALLERGIEN355?.methods?.find(m=>m[0]===a.method)?.[1]||a.method||'–',resultLabels[a.result]||a.result||'–',medicalLabels[a.confirmation]||a.confirmation||'–',rating?.label||'nicht bewertet',a.value===null||a.value===undefined?'–':String(a.value)+' '+(a.unit||''),[a.provider,a.symptoms,a.advice,a.notes].filter(Boolean).join(' · ')||'–'];
+         for(const value of cols)row.append(node('td','',value));tbody.append(row);
+       }
+       t.append(tbody);const wrap=node('div','s292-table-wrap');wrap.append(t);allergySection.append(wrap);
+     }
+     root.append(allergySection);
      const allLung=lung.filter(x=>Array.isArray(x.testRows));
      const allDiff=suite.filter(x=>x.type==='diffusion').map(x=>x.value).filter(within);
      const metricCodes=[['DLCO_SB','DLCO'],['KCO_SB','KCO'],['VA_SB','VA']];

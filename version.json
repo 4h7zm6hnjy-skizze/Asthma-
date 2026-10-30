@@ -1,5 +1,5 @@
 {
-  "version": "3.5.4",
+  "version": "3.5.5",
   "released": "2026-10-30",
-  "notes": "Apple Health via Kurzbefehle: lokale, kontrollierte Übernahme von Blutsauerstoff, Puls, Atemfrequenz, Gewicht und Blutdruck. Import aus iPhone-Zwischenablage oder Textdatei; Vorschau, Prüfung, Dublettenschutz, verschlüsselte Speicherung. Kein direkter HealthKit-Zugriff, keine Datenübertragung. PneumoPro 3.5.3 und bestehende Berichte bleiben erhalten."
+  "notes": "Neu: Allergien und Allergietests mit Prick-, Epikutan-, IgE-, Medikamenten-, Lebensmittel- und Lungenprovokationstests; dokumentierte Ergebnisse und vorsichtige Ampelbewertung, Originalbefunde, Statistik-Export. Keine automatische Diagnose; Daten lokal verschlüsselt. Vorhandene Daten bleiben erhalten."
 }

@@ -26,6 +26,7 @@
       ['bildgebung','RÖNTGEN & CT · BILDGEBUNG','Bilder, CT-Serien und Diagnoseprotokolle'],
       ['dateien','Dateien & Scannen','Alle Unterlagen hochladen'],
       ['labor','Labor & Blutwerte','Laborbefunde und Messreihen'],
+      ['allergien','ALLERGIEN & ALLERGIETESTS','Pollen, Medikamente, Essen, Haut- und Provokationstests'],
       ['befunde','Befundscanner','Fototext und Werte prüfen'],
       ['akte','Meine Akte','Dokumente, Anträge und Tagebuch'],
       ['bericht','Arztbericht','Zusammenfassung erstellen'],

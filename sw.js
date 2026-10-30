@@ -1,8 +1,8 @@
 /* Asthma 3.3.0: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
-const VERSION='3.5.4-health-kurzbefehle';
+const VERSION='3.5.5-allergien';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
- './health354.js',
+ './allergien355.js', './health354.js',
  './scans352.js', './arztvor351.js','./laborpro349.js','./bewertung348.js','./bewertung348.css',
  './ampel347.js','./ampel347.css',
  './bpampel344.js','./bpampel344.css','./lungenkrankheiten344.js','./lungenkrankheiten344.css',
@@ -32,7 +32,7 @@ self.addEventListener('fetch',event=>{
  if(path.endsWith('/version.json')||path.endsWith('/rechtsmonitor-feed.json')){
   event.respondWith(fetch(event.request,{cache:'no-store'}).catch(()=>caches.match(event.request,{ignoreSearch:true})));return;
  }
- const important=['/health354.js','/scans352.js','/arztvor351.js','/laborpro349.js','/bewertung348.js','/bewertung348.css','/ampel347.js','/ampel347.css','/professional27.js','/bpampel344.js','/bpampel344.css','/lungenkrankheiten344.js','/lungenkrankheiten344.css','/vital29.js','/metrics340.js','/statsplus292.js','/dicom343.js','/bildgebung343.js','/bildgebung343.css','/behandler343.js','/behandler343.css','/gehttest342.js','/gehttest342.css','/schlaflabor340.js','/schlaflabor340.css','/schlafimport341.js','/schlafimport341.css','/wertehilfe342.js','/metrics340.js','/metrics340.css','/navigation332.js','/navigation332.css','/dateien331.js','/dateien331.css','/insurance325.js','/insurance325.css','/diffusion324.js','/diffusion324.css','/dlco326.js','/dlco326.css','/stairs-shortcuts.js','/stairs-shortcuts.css','/secure17.js','/vital29.js','/vital-rescue291.js','/app.js','/design26.js',
+ const important=['/allergien355.js','/health354.js','/scans352.js','/arztvor351.js','/laborpro349.js','/bewertung348.js','/bewertung348.css','/ampel347.js','/ampel347.css','/professional27.js','/bpampel344.js','/bpampel344.css','/lungenkrankheiten344.js','/lungenkrankheiten344.css','/vital29.js','/metrics340.js','/statsplus292.js','/dicom343.js','/bildgebung343.js','/bildgebung343.css','/behandler343.js','/behandler343.css','/gehttest342.js','/gehttest342.css','/schlaflabor340.js','/schlaflabor340.css','/schlafimport341.js','/schlafimport341.css','/wertehilfe342.js','/metrics340.js','/metrics340.css','/navigation332.js','/navigation332.css','/dateien331.js','/dateien331.css','/insurance325.js','/insurance325.css','/diffusion324.js','/diffusion324.css','/dlco326.js','/dlco326.css','/stairs-shortcuts.js','/stairs-shortcuts.css','/secure17.js','/vital29.js','/vital-rescue291.js','/app.js','/design26.js',
   '/quality28.js','/quality28.css','/suite15.js','/calendar17.js','/styles.css','/stats25.js','/statsprint296.js',
   '/statsplus292.js','/labor18.js','/lufu23.js','/laborvergleich303.js','/offline303.js','/befundscan.js','/befund18-parser.js'];
  if(important.some(s=>path.endsWith(s))){
