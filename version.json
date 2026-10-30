@@ -1,5 +1,5 @@
 {
-  "version": "3.4.8",
-  "released": "2026-10-29",
-  "notes": "PneumoPro: neuer separater Bereich Bewertung der Daten mit ausführlicher Ampel-Einordnung, 10 letzten Messungen je Art, Vergleich mit 10 vorherigen, getrennten Lungenfunktionsphasen/Messquellen, Laborreferenzen, Gewicht/BMI und jederzeitiger Neubewertung. Vorversion 3.4.7 vollständig enthalten."
+  "version": "3.5.0",
+  "released": "2026-10-30",
+  "notes": "PneumoPro Labor & Proben: Sputum/Schleimtests, Kultur, PCR, Antibiogramm, Pilze/Mykobakterien, BAL/Zytologie und erweiterter Probenkatalog; lokale verschlüsselte Befunde, Originalbilder, Verlauf und einzeln auswählbarer Laborproben-Bericht. Bewährte Bereiche und Daten unverändert."
 }

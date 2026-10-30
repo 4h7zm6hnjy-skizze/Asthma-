@@ -1,30 +1,27 @@
-ASTHMA 3.2.7 – iPHONE-UPDATE: SPEICHERN VON LUNGENFUNKTION UND DIFFUSION
+PNEUMOPRO 3.5.0 – LABOR & PROBEN / SCHLEIMTESTS
+===============================================
+Dies ist ein ergänzendes Update für bestehende PneumoPro-Version 3.4.8.
 
-WICHTIG: In diesen GitHub-Dateien stehen KEINE privaten Patientendaten oder Befundfotos.
-BITTE VOR DEM UPDATE: In der Asthma-App eine vollständige verschlüsselte Sicherung (.asthma17) erstellen, sicher ablegen und das bisherige App-Passwort behalten.
+1. Zuerst eine VOLLSTÄNDIGE, VERSCHLÜSSELTE Sicherung in PneumoPro erstellen.
+2. ZIP am iPhone entpacken.
+3. Aus dem Ordner GitHub_Update die Dateien in den ROOT des öffentlichen GitHub-Repositories Asthma- hochladen.
+   Vorhandene Dateien mit gleichem Namen ersetzen, neue Datei laborpro349.js hinzufügen.
+4. App ONLINE öffnen und unter Einstellungen / Nach Updates suchen auf 3.5.0 aktualisieren.
+5. Im Bereich LABOR den neuen Block LABOR & PROBEN öffnen.
+6. Unter Einstellungen Offline-Bereitschaft prüfen; erst danach Flugmodus ausprobieren.
 
-A) UPDATE (wenn die Version 3.2.6 bereits vollständig installiert ist)
-  Aus dem Ordner GitHub_Update nur diese 5 Dateien in den Stammordner des GitHub-Repositories ersetzen:
-  diffusion324.js, diffusion324.css, secure17.js, index.html, sw.js, version.json
-  (Es sind 6 Dateien.)
-  Danach Asthma-App öffnen und unter Einstellungen > Nach Updates suchen aktualisieren.
-  Im Profil / Einstellungen Version 3.2.7 prüfen.
-  App nicht deinstallieren. Keine Website-Daten löschen. Bestehenden Tresor entsperren.
+Geänderte Dateien: version.json, app.js, wertehilfe342.js, offline303.js, sw.js.
+Neu: laborpro349.js. Keine persönlichen Gesundheitsdaten in der ZIP.
 
-B) LIEBER VOLLSTÄNDIGER CODE? Die ZIP Vollversion enthält alle 81 GitHub-Dateien.
-  Deren Inhalt aus GitHub_Update in den bestehenden Repository-Hauptordner hochladen und vorhandene Dateien ersetzen.
-  Niemals den privaten Import (JSON) oder andere personenbezogene Daten ins öffentliche GitHub-Repository hochladen.
+Was neu ist: erweiterter Proben-Katalog und freie Tests, Sputum/BAL/Abstrich/Blut/Urin/Stuhl/Erguss,
+Kultur, Erreger, PCR, Pilze, Mykobakterien, Zytologie, Antibiogramm S/I/R,
+Originalfotos/PDFs (lokal verschlüsselt), Bearbeiten, Suche, Messwertdiagramme,
+Berichtsabschnitt für Monats-/Jahresstatistik mit wählbarer Druck-Ausgabe.
 
-C) PRIVATE DATEN IMPORTIEREN
-  In der App unter Lungenfunktion -> Befunde: Lungenfunktion und Diffusionsmessung:
-  "Private Importdatei auswählen" -> private JSON aus Dateien-App auswählen.
-  Die Version 3.2.7 speichert automatisch; kein weiterer Speichern-Klick nötig.
-  Prüfen, dass die Rückmeldung "Erfolgreich und verschlüsselt gespeichert" angezeigt wird.
-  Bei Problemen "Speicherfunktion prüfen" verwenden. Alternativ JSON-Text direkt ins Importtextfeld einfügen.
-  Das Diagramm unter Diffusionsmessung: Zeitverlauf bietet Tag, Woche, Monat, Jahr, 10 Jahre.
-  Mit nur einem Befund wird ein Punkt angezeigt; kein künstlicher Trend.
-
-Die private Datei Asthma_28-10-2026_Lunge_und_Diffusion_OHNE_FOTOS.json bleibt außerhalb von GitHub.
-Daten werden lokal im verschlüsselten Tresor gespeichert. Der App-Updatecode allein trägt keine privaten Werte ein.
-
-TESTGRENZE: Desktop-Tests können die Speichersituation auf dem iPhone nicht garantieren. Keine iPhone-Installation aus der Ferne möglich.
+WICHTIGE GRENZEN:
+- Bild- und PDF-Inhalte werden nicht automatisch mit sicherer Genauigkeit als Laborwerte extrahiert.
+  Originalwerte manuell übertragen und gegen den Befund prüfen.
+- S/I/R und PCR dürfen nicht ohne ärztlichen Kontext als Antibiotikaempfehlung interpretiert werden.
+- Die Datei ergänzt bestehende Einträge ohne bestehende Daten umzuschreiben.
+- Beim Löschen von Messwerten bleiben Originaldokumente in der privaten Akte erhalten.
+- Funktion und Offline-Modus müssen auf dem tatsächlichen iPhone nach Installation geprüft werden.

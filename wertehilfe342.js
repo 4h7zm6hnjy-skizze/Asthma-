@@ -52,4 +52,10 @@
  let delay;window.addEventListener('asthma:secure-change',e=>{if(['suite','labs','epef'].includes(e.detail?.group)){clearTimeout(delay);delay=setTimeout(()=>refresh().catch(()=>{}),180)}});
  refresh().catch(()=>{});
  window.__ASTHMA_WERTEHILFE342_TEST=Object.freeze({version:'3.4.2',areas:Object.keys(catalogs)});
+ // PneumoPro 3.5.0: private, modular lab extension. Keep existing 3.4.8 features intact.
+ if(!document.getElementById('lp349-loader')){
+  const extension=document.createElement('script');extension.id='lp349-loader';extension.src='./laborpro349.js?v=3.5.0';
+  extension.onerror=()=>{const note=document.createElement('p');note.style.cssText='color:#a52737;font-weight:bold;padding:12px';note.textContent='Labor-Probenmodul konnte nicht geladen werden. Bitte online aktualisieren und die Offline-Bereitschaft prüfen.';document.getElementById('labor')?.prepend(note);};
+  document.body.append(extension);
+ }
 })();
