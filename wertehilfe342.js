@@ -64,4 +64,10 @@
   sheet.onerror=()=>{const warning=document.createElement('p');warning.style.cssText='color:#b12233;font-weight:bold;padding:12px';warning.textContent='Arztvorbereitung konnte nicht geladen werden. Bitte Aktualisierung und Offline-Cache prüfen.';document.getElementById('bericht')?.prepend(warning)};
   document.body.append(sheet);
  }
+ // PneumoPro 3.5.2: accessible top-bar Scans and private upload dialog.
+ if(!document.getElementById('ps352-loader')){
+  const scan=document.createElement('script');scan.id='ps352-loader';scan.src='./scans352.js?v=3.5.2';
+  scan.onerror=()=>console.error('Scans 3.5.2 konnten nicht geladen werden. Offline-Cache prüfen.');
+  document.body.append(scan);
+ }
 })();

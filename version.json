@@ -1,5 +1,5 @@
 {
-  "version": "3.5.1",
+  "version": "3.5.2",
   "released": "2026-10-30",
-  "notes": "PneumoPro Arztvorbereitung: eigener Menüpunkt mit Monatsdiagrammen (nur Min/Max/Durchschnitt), neuesten Laborwerten je Untersuchung, Medikamentenplan, persönlichen Daten, Arzt- und Krankenhausunterlagen aus dem lokalen Tresor sowie sachlichen Hinweisen zur ärztlichen Abklärung. Separat druckbar und als PDF speicherbar; Monats-/Jahresberichte unverändert."
+  "notes": "PneumoPro Scans: gut sichtbarer Schnell-Upload oben im Kopfbereich; 20 übersichtliche Bereiche für Fotos, PDF, DICOM und weitere Originalunterlagen. Verschlüsseltes lokales Archiv, Kamera, Mehrfachupload, Zuordnung zu Klinik/Praxis, Originaldateien anzeigen und speichern. Arztvorbereitung, Labor, Monats- und Jahresberichte bleiben erhalten."
 }
