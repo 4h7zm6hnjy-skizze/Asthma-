@@ -1,5 +1,5 @@
 {
-  "version": "3.5.7",
+  "version": "3.5.8",
   "released": "2026-10-30",
-  "notes": "Allergiebefunde im oberen Scanner und in Dateien & Scannen auswaehlen; verschluesselte Fotos/PDFs erscheinen im Allergiebereich und koennen manuell einzelnen Tests zugeordnet werden. JSON-Dateien werden aus dem zentralen Scanner nur zur Pruefung an den Allergie-Import weitergeleitet. Keine automatische Diagnose, vorhandene Daten bleiben erhalten."
+  "notes": "JSON-Import jetzt sofort oben neben Scans und auf der Startseite sichtbar. Datei lokal prüfen, passende Messwertimporte für Lungenfunktion, Diffusion, Allergien, Labor und Gehtest direkt erreichen; nach Bestätigung erscheinen gültige Daten in den vorhandenen Verläufen, Diagrammen und Berichten. Nicht unterstützte JSON-Dateien nur als verschlüsseltes Original speichern. Keine automatische Diagnose."
 }
