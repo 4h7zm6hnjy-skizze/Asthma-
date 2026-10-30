@@ -1,0 +1,197 @@
+name: PneumoPro 3.5.7 - Allergie-Scans und Dokumente (Korrektur)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PneumoPro_Allergien_Scan_Fix_3.5.7.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pneumopro-allergien-scan357-fix-main
+  cancel-in-progress: false
+
+jobs:
+  allergie-scanner:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aktuelle App laden
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Allergiebefunde an den zentralen Scanner anbinden
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYUPDATE'
+          from pathlib import Path
+          import json, subprocess
+          
+          VERSION='3.5.7'
+          EXPECTED={
+           'scans352.js':'843f8423c424de9f240195a5e6f637faaa34b786',
+           'dateien331.js':'440f4cbb595a82373631262a0e68c8fa91607572',
+           'allergien355.js':'d7efa031c6c814a673f938b1f4a304935418a5c8',
+           'allergienjson356.js':'c109239911f333babdc1dd8483ee1986331a11f3',
+           'secure17.js':'86eae839ec8db99b50d4d6361392bae446f7847d',
+           'app.js':'61a762a4dab14dda992781f0037da7017fecb5e7',
+           'sw.js':'08f63893de003b9017f0f8620ff92c255d2a9d82',
+           'version.json':'73b4d87117f1c77d74848015b0d75d56f21d2a07',
+          }
+          if json.loads(Path('version.json').read_text(encoding='utf-8')).get('version')==VERSION:
+           print('PneumoPro 3.5.7 bereits vorhanden, keine Aenderungen.')
+           raise SystemExit(0)
+          if json.loads(Path('version.json').read_text(encoding='utf-8')).get('version')!='3.5.6':
+           raise SystemExit('Sicherheitsabbruch: Keine kompatible Version 3.5.6 vorhanden.')
+          for filename,sha in EXPECTED.items():
+           current=subprocess.check_output(['git','hash-object',filename],text=True).strip()
+           if current!=sha:
+            raise SystemExit('Sicherheitsabbruch: '+filename+' wurde seit der Vorbereitung geaendert. Keine Dateien angepasst.')
+          
+          def replace_once(src,before,after,label):
+           count=src.count(before)
+           if count!=1:
+            raise SystemExit('Sicherheitsabbruch: Stelle '+label+' '+str(count)+' Mal gefunden, erwartet 1.')
+           return src.replace(before,after,1)
+          
+          s=Path('scans352.js').read_text(encoding='utf-8')
+          s=replace_once(s,
+           "  ['lab','Labor / Blutwerte','Bluttest','labor','Blutuntersuchungen und Spezialwerte'],",
+           "  ['lab','Labor / Blutwerte','Bluttest','labor','Blutuntersuchungen und Spezialwerte'],\n  ['allergy','Allergien & Allergietests','Allergiebefund','allergien','Pricktest, Bluttest, Provokation und Ausloeser'],",
+           'Scanner Allergie-Kategorie')
+          s=replace_once(s,'multiple accept=".pdf,','multiple accept=".json,.pdf,','Scanner Dateiauswahl JSON')
+          s=replace_once(s,"const allowed=/\\.(?:pdf|jpe?g|png|webp|heic|heif|tiff?|dcm|dicom|ima|zip|docx?|txt)$/i;",
+           "const allowed=/\\.(?:json|pdf|jpe?g|png|webp|heic|heif|tiff?|dcm|dicom|ima|zip|docx?|txt)$/i;",'Scanner Dateiformate')
+          s=replace_once(s,"function maxSize(f){return /\\.(dcm|dicom|ima|zip)$/i.test(f.name)?32*1048576:12*1048576}",
+           "function maxSize(f){return /\\.json$/i.test(f.name)?4*1048576:/\\.(dcm|dicom|ima|zip)$/i.test(f.name)?32*1048576:12*1048576}", 'Scanner JSON Limit')
+          s=replace_once(s,
+           "for(const f of newFiles){if(!allowed.test(f.name))",
+           "for(const f of newFiles){if(/\\.json$/i.test(f.name)&&current!=='allergy'){errors.push(f.name+': JSON nur bei Allergien, sonst bitte den passenden Importbereich verwenden');continue}if(!allowed.test(f.name))",'Scanner JSON nur Allergie')
+          json_handler="""if(queue.some(f=>/\\.json$/i.test(f.name))){
+            if(current!=='allergy'||queue.length!==1){say('JSON bitte allein im Bereich Allergien auswählen. Fotos und PDFs getrennt speichern.',true);return}
+            try{
+             const f=queue[0];if(f.size>4*1048576)throw Error('JSON zu gross (max. 4 MB)');
+             const parsed=JSON.parse(await f.text());
+             if(parsed?.format!=='PneumoPro-Allergien-JSON'||parsed?.schemaVersion!==1||!Array.isArray(parsed.records))throw Error('Nur PneumoPro-Allergien-JSON wird hier eingelesen.');
+             const target=$('a356-file');if(!target)throw Error('Allergie-JSON-Import nicht verfuegbar.');
+             const transfer=new DataTransfer();transfer.items.add(f);target.files=transfer.files;target.dispatchEvent(new Event('change',{bubbles:true}));
+             queue=[];preview();close();NAV.go('allergien');$('a356-preview')?.click();
+            }catch(error){say('JSON konnte nicht zur Vorschau uebergeben werden: '+(error.message||error),true)}
+            return;
+           }"""
+          s=replace_once(s,"busy=true;const btn=$('ps352-save');",json_handler+"busy=true;const btn=$('ps352-save');",'Scanner JSON Weiterleitung')
+          s=replace_once(s,"version:'3.5.3',areas:TYPES", "version:'3.5.7',areas:TYPES",'Scanner Metadaten')
+          Path('scans352.js').write_text(s,encoding='utf-8')
+          
+          s=Path('dateien331.js').read_text(encoding='utf-8')
+          s=replace_once(s,
+           "    labor:{title:'Labor',docKind:'Bluttest',hint:'Labor-JSON wird in der bestehenden Laborakte zur Kontrolle geöffnet. Fotos und PDFs werden als Originalbefund gespeichert.'},",
+           "    labor:{title:'Labor',docKind:'Bluttest',hint:'Labor-JSON wird in der bestehenden Laborakte zur Kontrolle geöffnet. Fotos und PDFs werden als Originalbefund gespeichert.'},\n    allergie:{title:'Allergien & Allergietests',docKind:'Allergiebefund',hint:'Fotos und PDFs werden verschluesselt als Allergiebefund gespeichert. Eine Allergie-JSON wird nach Vorschau dem Allergiebereich uebergeben.'},",
+           'Dateien Allergie-Typ')
+          s=replace_once(s,
+           '        <button type="button" data-dh-kind="labor" aria-pressed="false"><span aria-hidden="true">◈</span>Labor</button>',
+           '        <button type="button" data-dh-kind="labor" aria-pressed="false"><span aria-hidden="true">◈</span>Labor</button>\n        <button type="button" data-dh-kind="allergie" aria-pressed="false"><span aria-hidden="true">◈</span>Allergien & Allergietests</button>',
+           'Dateien Allergie-Button')
+          allergy_json="""  async function allergyJson(file){
+              if(file.size>4*1048576)throw Error('Allergie-JSON zu gross (max. 4 MB).');
+              const parsed=JSON.parse(await file.text());
+              if(parsed?.format!=='PneumoPro-Allergien-JSON'||parsed?.schemaVersion!==1||!Array.isArray(parsed.records))throw Error('Keine kompatible PneumoPro-Allergie-JSON.');
+              forwardFile(file,'a356-file');
+              setStatus('Allergie-JSON zur Vorschau weitergegeben. Werte werden erst nach deiner ausdruecklichen Bestaetigung gespeichert.');
+              followButton('Allergie-JSON jetzt pruefen',()=>{NAV.go('allergien');$('a356-preview')?.click()});
+            }
+          """
+          s=replace_once(s,"  async function original(file,category,day){",allergy_json+"  async function original(file,category,day){",'Dateien Allergie JSON')
+          s=replace_once(s,
+           "    followButton('Gespeicherte Dokumente öffnen',()=>{NAV.go('akte');",
+           "    if(category==='allergie')followButton('Allergietests und Originale oeffnen',()=>NAV.go('allergien'));\n    followButton('Gespeicherte Dokumente öffnen',()=>{NAV.go('akte');",
+           'Dateien Allergie Link')
+          s=replace_once(s,
+           "if((category==='lunge'||category==='labor'||category==='gehtest')&&/\\.json$/i.test(file.name||'')){",
+           "if((category==='lunge'||category==='labor'||category==='gehtest'||category==='allergie')&&/\\.json$/i.test(file.name||'')){",
+           'Dateien JSON Kategorie')
+          s=replace_once(s,"else await walkJson(file);","else if(category==='gehtest')await walkJson(file);else await allergyJson(file);",'Dateien JSON Router')
+          Path('dateien331.js').write_text(s,encoding='utf-8')
+          
+          s=Path('allergien355.js').read_text(encoding='utf-8')
+          s=replace_once(s,
+           "['id','date','type','allergen','method'",
+           "['id','date','scanDocumentId','type','allergen','method'",'Allergie Formular Bearbeitung')
+          s=replace_once(s,
+           "const record={id,date,createdAt:",
+           "const record={id,date,scanDocumentId:field('scanDocumentId')?.value||'',createdAt:",'Allergie Datenfeld')
+          s=replace_once(s,
+           "      await SEC.put('suite',{key:'allergies355/'+id,type:'allergies355',value:record},'allergies355/'+id);",
+           "      if(record.scanDocumentId){const linked=await SEC.get('documents',record.scanDocumentId);if(linked?.kind!=='Allergiebefund')throw Error('Ausgewaehlter Scan ist nicht mehr vorhanden. Bitte anderen Scan waehlen.')}\n      await SEC.put('suite',{key:'allergies355/'+id,type:'allergies355',value:record},'allergies355/'+id);",
+           'Allergie Dokumentpruefung')
+          s=replace_once(s,
+           "      const acts=el('div','a355-actions');",
+           "      const acts=el('div','a355-actions');\n      if(r.scanDocumentId){const linked=await SEC.get('documents',r.scanDocumentId);if(linked?.kind==='Allergiebefund'&&linked.blob instanceof Blob)acts.append(makeButton('Verknuepften Scan oeffnen',()=>{const url=URL.createObjectURL(linked.blob);const a=document.createElement('a');a.href=url;a.download=linked.name||'Allergiebefund';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000)}));}",
+           'Allergie Scan aus Befund oeffnen')
+          Path('allergien355.js').write_text(s,encoding='utf-8')
+          
+          s=Path('allergienjson356.js').read_text(encoding='utf-8')
+          s=replace_once(s,"attachmentName:old.attachmentName||r.attachmentName", "attachmentName:old.attachmentName||r.attachmentName,scanDocumentId:old.scanDocumentId||''",'JSON bestehende Scanverknuepfung')
+          Path('allergienjson356.js').write_text(s,encoding='utf-8')
+          
+          s=Path('secure17.js').read_text(encoding='utf-8')
+          s=replace_once(s,"'allergien355.js','allergienjson356.js','bewertung348.js'", "'allergien355.js','allergienjson356.js','allergienscan357.js','bewertung348.js'",'Modul Laden')
+          s=replace_once(s,"s.src='./'+src+'?v=3.5.6'", "s.src='./'+src+'?v=3.5.7'", 'Cache sichere Script URLs')
+          Path('secure17.js').write_text(s,encoding='utf-8')
+          
+          s=Path('sw.js').read_text(encoding='utf-8')
+          s=replace_once(s,"const VERSION='3.5.6-allergien-json';", "const VERSION='3.5.7-allergien-scan';",'ServiceWorker Version')
+          s=replace_once(s,"const ASSETS=[\n './allergienjson356.js'", "const ASSETS=[\n './allergienscan357.js', './allergienjson356.js'",'ServiceWorker Assets')
+          s=replace_once(s,"const important=['/allergienjson356.js'", "const important=['/allergienscan357.js','/allergienjson356.js'",'ServiceWorker Online-Aktualisierung')
+          Path('sw.js').write_text(s,encoding='utf-8')
+          
+          s=Path('app.js').read_text(encoding='utf-8')
+          s=replace_once(s,"const VERSION = '3.5.6';", "const VERSION = '3.5.7';", 'App-Version')
+          Path('app.js').write_text(s,encoding='utf-8')
+          
+          Path('allergienscan357.js').write_text('\'use strict\';\n/* PneumoPro 3.5.7 – zentrale Scanablage und Allergieakte verbinden.\n * Keine Bilderkennung und keine automatische medizinische Interpretation.\n * Gespeicherte Originale verbleiben im bestehenden verschlüsselten Tresor.\n */\n(()=>{\n const S=window.ASTHMA_SECURITY,NAV=window.ASTHMA_NAV;\n const page=document.getElementById(\'allergien\'),form=document.getElementById(\'a355-form\');\n if(!S||!NAV||!page||!form||document.getElementById(\'a357-documents\'))return;\n const $=id=>document.getElementById(id);\n const el=(tag,cl,txt)=>{const x=document.createElement(tag);if(cl)x.className=cl;if(txt!==undefined)x.textContent=String(txt);return x};\n const format=d=>/^\\d{4}-\\d\\d-\\d\\d$/.test(d||\'\')?d.slice(8)+\'.\'+d.slice(5,7)+\'.\'+d.slice(0,4):\'Ohne Datum\';\n const section=el(\'section\',\'suite-subpanel\');section.id=\'a357-documents\';\n section.innerHTML=\'<h3>Allergie-Originalbefunde aus „Scans“</h3><p class="a355-note">Bilder und PDFs aus dem oberen Scanner werden hier angezeigt, sobald du dort „Allergien & Allergietests“ auswählst. Ein Scan ergibt noch keine überprüften Messwerte. Bitte die Zahlen manuell anhand des Originals eintragen.</p><div class="a355-actions"><button type="button" class="btn btn-primary" id="a357-open-scan">Scans oben öffnen</button><button type="button" class="btn btn-outline" id="a357-open-files">Dateien & Scannen</button></div><p id="a357-status" class="a355-note" role="status"></p><div id="a357-list" class="a355-list"></div>\';\n const old=form.closest(\'.suite-subpanel\');if(old)old.insertAdjacentElement(\'beforebegin\',section);else page.prepend(section);\n const label=el(\'label\',\'a355-wide\');label.textContent=\'Bereits gescannten Allergiebefund mit diesem Test verknüpfen\';\n const sel=el(\'select\');sel.id=\'a357-link\';sel.name=\'scanDocumentId\';sel.append(new Option(\'Kein Scan zugeordnet\',\'\'));label.append(sel);\n const original=form.querySelector(\'[name="attachment"]\')?.closest(\'label\');\n if(original)original.insertAdjacentElement(\'beforebegin\',label);\n const status=t=>{$(\'a357-status\').textContent=t};\n function openOriginal(r){\n  if(!(r.blob instanceof Blob)){status(\'Original ist nicht mehr lesbar.\');return}\n  const u=URL.createObjectURL(r.blob),a=document.createElement(\'a\');a.href=u;a.download=r.name||\'Allergiebefund\';\n  document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),30000);\n }\n function chooseDoc(r){\n  sel.value=r.id;\n  if(!form.elements.namedItem(\'date\').value&&r.documentDate)form.elements.namedItem(\'date\').value=r.documentDate;\n  if(!form.elements.namedItem(\'provider\').value){form.elements.namedItem(\'provider\').value=(r.clinic||r.providerName||r.doctor||\'\').slice(0,160)}\n  NAV.go(\'allergien\');form.scrollIntoView({block:\'start\',behavior:\'smooth\'});\n  status(\'Original zugeordnet. Die Testwerte bitte überprüfen und anschließend das Allergieformular speichern.\');\n }\n async function refresh(){\n  if(!S.state().unlocked)return;\n  const docs=(await S.list(\'documents\')).filter(d=>d&&d.kind===\'Allergiebefund\'&&d.id)\n    .sort((a,b)=>String(b.documentDate||b.createdAt||\'\').localeCompare(String(a.documentDate||a.createdAt||\'\')));\n  const keep=sel.value;sel.replaceChildren(new Option(\'Kein Scan zugeordnet\',\'\'));\n  for(const r of docs)sel.append(new Option((r.name||\'Allergiebefund\').slice(0,90)+\' · \'+format(r.documentDate),r.id));\n  if(docs.some(r=>r.id===keep))sel.value=keep;\n  const list=$(\'a357-list\');list.replaceChildren();\n  if(!docs.length){list.append(el(\'p\',\'a355-note\',\'Noch keine Allergiebefunde im zentralen Scanner gespeichert. Oben „Scans“ → „Allergien & Allergietests“ auswählen.\'));return}\n  list.append(el(\'p\',\'a355-note\',docs.length+\' gespeicherte Allergie-Originaldatei(en), lokal verschlüsselt.\'));\n  for(const r of docs){\n   const card=el(\'article\',\'a355-item\');card.append(el(\'strong\',\'\',r.name||\'Allergiebefund\'),el(\'p\',\'a355-note\',format(r.documentDate)+\' · \'+(r.clinic||r.providerName||r.doctor||\'Ohne Praxisangabe\')));\n   const buttons=el(\'div\',\'a355-actions\');\n   const open=el(\'button\',\'btn btn-outline\',\'Original öffnen\'),choose=el(\'button\',\'btn btn-outline\',\'Zum Allergietest zuordnen\');\n   open.type=choose.type=\'button\';open.addEventListener(\'click\',()=>openOriginal(r));choose.addEventListener(\'click\',()=>chooseDoc(r));buttons.append(open,choose);card.append(buttons);list.append(card);\n  }\n }\n $(\'a357-open-scan\').addEventListener(\'click\',()=>{\n  const scanner=$(\'ps352-open\');if(scanner){scanner.click();const allergy=document.querySelector(\'[data-ps352-area="allergy"]\');if(allergy)allergy.click();else status(\'Im Scanner fehlt die Allergie-Auswahl. Bitte veröffentlichte Version 3.5.7 kontrollieren.\');}\n  else{NAV.go(\'dateien\');document.querySelector(\'[data-dh-kind="allergie"]\')?.click();status(\'Zentraler Scanner nicht geladen; stattdessen „Dateien & Scannen“ geöffnet.\');}\n });\n $(\'a357-open-files\').addEventListener(\'click\',()=>{NAV.go(\'dateien\');document.querySelector(\'[data-dh-kind="allergie"]\')?.click()});\n window.addEventListener(\'asthma:secure-change\',e=>{if(e.detail?.group===\'documents\'&&S.state().unlocked)refresh().catch(error=>status(\'Dokumente konnten nicht gelesen werden: \'+error.message))});\n window.addEventListener(\'pneumopro:scan-saved\',e=>{if(e.detail?.area===\'allergy\')refresh().catch(()=>{})});\n refresh().catch(error=>status(\'Allergie-Dokumente konnten nicht geladen werden: \'+error.message));\n window.PNEUMOPRO_ALLERGIEN_SCAN357=Object.freeze({version:\'3.5.7\',documentKind:\'Allergiebefund\'});\n})();\n',encoding='utf-8')
+          meta={'version':VERSION,'released':'2026-10-30','notes':'Allergiebefunde im oberen Scanner und in Dateien & Scannen auswaehlen; verschluesselte Fotos/PDFs erscheinen im Allergiebereich und koennen manuell einzelnen Tests zugeordnet werden. JSON-Dateien werden aus dem zentralen Scanner nur zur Pruefung an den Allergie-Import weitergeleitet. Keine automatische Diagnose, vorhandene Daten bleiben erhalten.'}
+          Path('version.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print('PneumoPro 3.5.7: Scanner, Allergieakte, JSON, lokale Speicherung aktualisiert.')
+          PYUPDATE
+      - name: JavaScript und App-Dateien pruefen
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check scans352.js
+          node --check dateien331.js
+          node --check allergien355.js
+          node --check allergienjson356.js
+          node --check allergienscan357.js
+          node --check secure17.js
+          node --check app.js
+          node --check sw.js
+          python3 -m json.tool version.json >/dev/null
+          git diff --check
+          python3 - <<'PYVERIFY'
+          from pathlib import Path
+          import json
+          assert json.loads(Path('version.json').read_text())['version']=='3.5.7'
+          assert "['allergy','Allergien & Allergietests'" in Path('scans352.js').read_text()
+          assert "scanDocumentId:" in Path('allergien355.js').read_text()
+          assert "allergienscan357.js" in Path('secure17.js').read_text()
+          assert "'./allergienscan357.js'" in Path('sw.js').read_text()
+          print('PneumoPro 3.5.7 - statische Pruefung bestanden')
+          PYVERIFY
+      - name: Update veroeffentlichen
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scans352.js dateien331.js allergien355.js allergienjson356.js allergienscan357.js secure17.js app.js sw.js version.json
+          if git diff --cached --quiet; then
+            echo 'Keine neuen Aenderungen'
+          else
+            git commit -m 'PneumoPro 3.5.7: Allergietests mit Scans und JSON verbinden'
+            git push origin HEAD:main
+          fi
