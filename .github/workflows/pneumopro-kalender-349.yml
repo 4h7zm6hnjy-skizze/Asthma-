@@ -1,0 +1,140 @@
+name: PneumoPro 3.4.9 - Kalender-Symbole und grosse Nucala-Spritze
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pneumopro-kalender-349.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pneumopro-calendar349-main
+  cancel-in-progress: false
+
+jobs:
+  kalender-symbole:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aktuelle PneumoPro-Version laden
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Version 3.4.9 sicher einspielen
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYUPDATE'
+          from pathlib import Path
+          import subprocess, json
+          
+          VERSION='3.4.9'
+          FILES={
+           'calendar17.js':'d533f2b5650aea9261be61f21b2a6c7af64b5c2a',
+           'styles.css':'86d777846598c41b8b445a55087a078dc7de7a24',
+           'index.html':'2dea5eacf374510d69c2b88c7ac863612155b082',
+           'app.js':'aab289f3ceb775d05c652a0ade416d287d0c1a2c',
+           'sw.js':'1410ccff3dd4d3910f61411de8cb45f788f59af3',
+           'version.json':'28322b9a395b1768472940ab41ff813f9218fc90',
+          }
+          source={name:Path(name).read_text(encoding='utf-8') for name in FILES}
+          release=json.loads(source['version.json'])
+          if release.get('version')==VERSION:
+           print('PneumoPro 3.4.9 ist bereits installiert; keine Änderungen nötig.')
+           raise SystemExit(0)
+          if release.get('version')!='3.4.8':
+           raise SystemExit('Sicherheitsabbruch: erwartete Version 3.4.8, vorhanden '+str(release.get('version')))
+          for name,sha in FILES.items():
+           current=subprocess.check_output(['git','hash-object',name],text=True).strip()
+           if current!=sha:raise SystemExit('Sicherheitsabbruch: '+name+' wurde zwischenzeitlich geändert; kein Überschreiben.')
+          
+          def once(text,before,after,where):
+           n=text.count(before)
+           if n!=1:raise SystemExit('Sicherheitsabbruch: Änderung '+where+' nicht eindeutig ('+str(n)+').')
+           return text.replace(before,after,1)
+          
+          c=source['calendar17.js']
+          c=once(c,"const typeLabel={krankenhaus:'Krankenhausaufenthalt',lungenarzt:'", "const typeLabel={krankenhaus:'Krankenhausaufenthalt',hausarzt:'Hausarzt',lungenarzt:'",'Hausarzt-Kategorie')
+          c=once(c,"const colors={krankenhaus:'#914569',lungenarzt:'#2566a8',", "const colors={krankenhaus:'#c42137',hausarzt:'#21874b',lungenarzt:'#21874b',",'Kalenderfarben')
+          medical_kind='''  // Vorhandene Termine bleiben unverändert; die Symbole dienen nur zur Anzeige.
+            const medicalKind=e=>{
+              const type=String(e?.type||'');
+              if(['krankenhaus','hausarzt','lungenarzt','nucala'].includes(type))return type;
+              if(type==='termin'){
+                const title=String(e.title||'');
+                if(/hausarzt|hausärzt|allgemeinmedizin/i.test(title))return 'hausarzt';
+                if(/lungenarzt|lungenärzt|pneumolog/i.test(title))return 'lungenarzt';
+              }
+              return '';
+            };
+          '''
+          c=once(c,'  const uid=()=>',medical_kind+'  const uid=()=>','Symbole für bestehende Arzttermine')
+          old="const variants=[...new Set(events.map(x=>x.type))].slice(0,4);variants.forEach(type=>{const dot=node('i','cal-dot cal-'+type);dot.style.backgroundColor=colors[type]||colors.sonstiges;dots.append(dot)});cell.append(dots);if(events.some(x=>x.type==='nucala'))cell.append(node('span','cal-nucala-syringe','💉'));"
+          new='''const medical=[...new Set(events.map(medicalKind).filter(Boolean))];const variants=[...new Set(events.filter(x=>!medicalKind(x)).map(x=>x.type))].slice(0,4);variants.forEach(type=>{const dot=node('i','cal-dot cal-'+type);dot.style.backgroundColor=colors[type]||colors.sonstiges;dots.append(dot)});if(variants.length)cell.append(dots);if(medical.length){const icons=node('span','cal-med-symbols');const glyphs={krankenhaus:'✚',hausarzt:'🏠',lungenarzt:'🫁',nucala:'💉'};const names={krankenhaus:'Krankenhaus',hausarzt:'Hausarzt',lungenarzt:'Lungenarzt',nucala:'Nucala-Injektion'};for(const type of ['krankenhaus','hausarzt','lungenarzt','nucala']){if(!medical.includes(type))continue;const ico=node('span','cal-med-icon cal-med-'+type+(type==='nucala'?' cal-nucala-syringe':''),glyphs[type]);ico.setAttribute('title',names[type]);ico.setAttribute('aria-hidden','true');icons.append(ico)}cell.append(icons)}'''
+          c=once(c,old,new,'Kalendersymbole und vergrößerte Spritze')
+          source['calendar17.js']=c
+          
+          html=source['index.html']
+          html=once(html,'<option value="termin">Arzt-/Therapietermin</option><option value="krankenhaus">','<option value="termin">Arzt-/Therapietermin</option><option value="hausarzt">Hausarzt</option><option value="krankenhaus">','Hausarzt auswählbar')
+          html=once(html,'id="version-chip">v3.4.7','id="version-chip">v3.4.9','Versionsanzeige Einstellungen')
+          html=once(html,'id="footer-version">3.4.7','id="footer-version">3.4.9','Versionsanzeige Fußzeile')
+          html=once(html,'id="update-status" role="status">Installierte Version: 3.4.7','id="update-status" role="status">Installierte Version: 3.4.9','Versionsanzeige Update-Status')
+          source['index.html']=html
+          
+          css=r'''
+          /* PneumoPro 3.4.9 – große, unterscheidbare Symbole ohne Änderung der Termine. */
+          #kalender .cal-day.cal-hospital,html[data-design26] #kalender .cal-day.cal-hospital{background:#fff!important;color:#183044!important;border:2px solid #c42137!important}
+          #kalender .cal-day.cal-hospital.cal-selected,html[data-design26] #kalender .cal-day.cal-hospital.cal-selected{background:#fff!important;color:#183044!important;outline:3px solid #176679!important;outline-offset:1px!important}
+          #kalender .cal-day.cal-hospital .cal-dot{border-color:#b0c2c9!important}
+          #kalender .cal-day .cal-med-symbols{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:1px 3px;max-width:100%;min-height:27px;margin:1px 0}
+          #kalender .cal-day .cal-med-icon{display:inline-flex;position:relative;align-items:center;justify-content:center;min-width:23px;min-height:25px;line-height:1!important;font-size:23px;text-shadow:none;flex:none}
+          #kalender .cal-day .cal-med-krankenhaus{font-size:27px;color:#c42137;font-weight:900}
+          #kalender .cal-day .cal-med-hausarzt::after,#kalender .cal-day .cal-med-lungenarzt::after{content:'✚';position:absolute;right:-2px;bottom:-3px;font-size:12px;font-weight:900;line-height:14px;width:15px;height:15px;text-align:center;color:#148140;background:#fff;border-radius:4px;text-shadow:none}
+          #kalender .cal-day .cal-med-lungenarzt{font-size:24px}
+          #kalender .cal-day .cal-med-nucala.cal-nucala-syringe{position:static!important;inset:auto!important;display:inline-flex!important;font-size:29px!important;line-height:1!important;min-height:29px!important;transform:none!important;vertical-align:middle}
+          #kalender .cal25-swatch{flex-shrink:0}
+          @media(max-width:430px){#kalender .cal-day{min-height:70px}#kalender .cal-day .cal-med-symbols{gap:1px 2px}#kalender .cal-day .cal-med-icon{min-width:20px;font-size:21px}#kalender .cal-day .cal-med-krankenhaus{font-size:25px}#kalender .cal-day .cal-med-nucala.cal-nucala-syringe{font-size:27px!important;min-height:27px!important}}
+          '''
+          source['styles.css']+='\n'+css
+          source['app.js']=once(source['app.js'],"const VERSION = '3.4.8';","const VERSION = '3.4.9';",'App-Version')
+          source['sw.js']=once(source['sw.js'],"const VERSION='3.4.8-pneumopro-datenbewertung';","const VERSION='3.4.9-pneumopro-kalendersymbole';",'neuer Offline-Cache')
+          release.update(version=VERSION,released='2026-10-30',notes='Kalender: Krankenhaus mit rotem Kreuz auf weißem Hintergrund, Hausarzt mit Haus und grünem Kreuz, Lungenarzt mit Lunge und grünem Kreuz, Nucala-Spritze deutlich größer. Bestehende Termine, Nucala-Terminplan und lokale verschlüsselte Daten bleiben unverändert.')
+          source['version.json']=json.dumps(release,ensure_ascii=False,indent=2)+'\n'
+          
+          # Zusätzliche fachliche Konsistenzkontrollen vor jeglichem Speichern.
+          assert "hausarzt:'Hausarzt'" in c and "medicalKind" in c
+          assert "'cal-nucala-syringe','💉'" not in c  # altes kleines Symbol entfernt
+          assert "cal-med-nucala" in source['styles.css']
+          assert 'value="hausarzt"' in html
+          assert source['sw.js'].count("'./calendar17.js'") == 1
+          for name,data in source.items():Path(name).write_text(data,encoding='utf-8')
+          print('PneumoPro 3.4.9: Kalender-Symbole aktualisiert, alte Einträge unverändert.')
+          PYUPDATE
+      - name: Syntax und Funktionen kontrollieren
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check calendar17.js
+          node --check app.js
+          node --check sw.js
+          python3 -m json.tool version.json >/dev/null
+          grep -Fq 'cal-med-hausarzt' calendar17.js
+          grep -Fq 'cal-med-lungenarzt' calendar17.js
+          grep -Fq 'cal-med-nucala' styles.css
+          grep -Fq 'value="hausarzt"' index.html
+      - name: PneumoPro-Update in GitHub speichern
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "PneumoPro Update"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add calendar17.js styles.css index.html app.js sw.js version.json
+          if git diff --cached --quiet; then
+            echo "Keine Änderung nötig; Version bereits vorhanden."
+          else
+            git commit -m "PneumoPro 3.4.9: klare Arzt- und Krankenhaus-Symbole, groessere Nucala-Spritze"
+            git push origin HEAD:main
+          fi
