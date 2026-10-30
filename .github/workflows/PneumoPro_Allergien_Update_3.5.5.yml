@@ -1,0 +1,170 @@
+name: PneumoPro 3.5.5 - Allergien und Allergietests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pneumopro-allergien-355.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pneumopro-allergien-355-main
+  cancel-in-progress: false
+
+jobs:
+  allergie-modul:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aktuelle PneumoPro-Dateien laden
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Allergiemodul sicher einspielen
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYUPDATE'
+          from pathlib import Path
+          import base64, zlib, json, subprocess, sys
+          
+          VERSION='3.5.5'
+          FILES={
+           'secure17.js':'b98e20c719582a63b8e8df3d7dfefa45cfe8614c',
+           'suite15.js':'d7daac5d5f8135aa40ce1980346011e0a2767057',
+           'navigation332.js':'fa86adc8c1a68536e4e8416bf571de4dd96ec1e7',
+           'statsplus292.js':'09c8dcea77eb4c6b76e3782930ffc4a6bb95b460',
+           'app.js':'1155501c33ac8e676d86809069ae23c1f74e4809',
+           'sw.js':'8bd609898a21a0ef772be98093d1357af5857e24',
+           'version.json':'a5535f4ad96736fda380778b6dada8a844d5bff5'
+          }
+          
+          # PAYLOAD inserted at packaging stage.
+          B64_PAYLOAD='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'
+          
+          def once(text,old,new,label):
+              count=text.count(old)
+              if count!=1:raise SystemExit('Sicherheitsabbruch: '+label+' nicht eindeutig ('+str(count)+').')
+              return text.replace(old,new,1)
+          
+          source={name:Path(name).read_text(encoding='utf-8') for name in FILES}
+          release=json.loads(source['version.json'])
+          if release.get('version')==VERSION and Path('allergien355.js').exists():
+              print('Version 3.5.5 bereits vorhanden – keine Änderung.')
+              raise SystemExit(0)
+          if Path('allergien355.js').exists():
+              raise SystemExit('Sicherheitsabbruch: Allergiemodul existiert bereits in einer anderen Version. Bitte nicht überschreiben.')
+          if release.get('version')!='3.5.4':
+              raise SystemExit('Sicherheitsabbruch: Erwartet 3.5.4, gefunden '+str(release.get('version'))+'. Bitte kein älteres Update über neuere Daten schreiben.')
+          for path,expected in FILES.items():
+              actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
+              if actual!=expected:raise SystemExit('Sicherheitsabbruch: '+path+' wurde seit der Erstellung des Updates geändert. Keine Datei überschrieben.')
+          
+          changes={}
+          
+          js=source['secure17.js']
+          js=once(js,"'navigation332.js','bewertung348.js'","'navigation332.js','allergien355.js','bewertung348.js'",'Sicherer Modullader')
+          js=once(js,"s.src='./'+src+'?v=3.4.8'","s.src='./'+src+'?v=3.5.5'",'Cache-Version des Modulladers')
+          changes['secure17.js']=js
+          
+          js=source['suite15.js']
+          js=once(js,"'befunde','labor','therapie'","'befunde','labor','allergien','therapie'",'Seitenfreigabe')
+          changes['suite15.js']=js
+          
+          js=source['navigation332.js']
+          js=once(js,"['labor','Labor & Blutwerte','Laborbefunde und Messreihen'],","['labor','Labor & Blutwerte','Laborbefunde und Messreihen'],\n      ['allergien','ALLERGIEN & ALLERGIETESTS','Pollen, Medikamente, Essen, Haut- und Provokationstests'],",'Menüeintrag')
+          changes['navigation332.js']=js
+          
+          js=source['statsplus292.js']
+          js=once(js,"['providers','Ärzte & Krankenhäuser – Termine und Dokumente'], ['stairs'","['providers','Ärzte & Krankenhäuser – Termine und Dokumente'], ['allergies','Allergien – Untersuchungsergebnisse'], ['stairs'",'Bericht-Auswahl')
+          report_code='''
+               // PneumoPro 3.5.5: Allergieakte – nur Befunde im gewählten Berichtzeitraum.
+               const allergyRows=suite.filter(x=>x.type==='allergies355').map(x=>x.value).filter(within).sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+               const allergySection=node('section','s292-category');allergySection.dataset.s292Kind='allergies';allergySection.dataset.printEnabled=selected.allergies?'true':'false';
+               allergySection.append(node('h3','','Allergien und Allergietests'));
+               allergySection.append(node('p','s292-note','Erfasst: '+allergyRows.length+' Tests/Reaktionen. Befunde werden nur dokumentiert; ein positiver Prick-/IgE-Test ist allein keine klinische Allergiediagnose.'));
+               if(!allergyRows.length)allergySection.append(node('p','s292-empty','Keine Allergiebefunde in diesem Zeitraum.'));
+               else{
+                 const t=node('table','s292-table'),thead=node('thead'),tr=node('tr');
+                 for(const title of ['Datum','Auslöser','Test','Ergebnis','Ärztliche Einordnung','Ampel','Messwert','Praxis / Bemerkung'])tr.append(node('th','',title));thead.append(tr);t.append(thead);
+                 const tbody=node('tbody');
+                 const resultLabels={negativ:'negativ',positiv:'positiv',grenzwertig:'grenzwertig',reaktion:'Reaktion',ausstehend:'ausstehend',unbekannt:'unbekannt',unklar:'unklar'};
+                 const medicalLabels={bestaetigt:'ärztlich bestätigt',ausgeschlossen:'ärztlich ausgeschlossen',verdacht:'Verdacht',ungewiss:'unklar',offen:'offen'};
+                 for(const a of allergyRows){
+                   const row=node('tr');const rating=window.PNEUMOPRO_ALLERGIEN355?.score(a);
+                   const cols=[fmt(a.date),a.allergen||'–',window.PNEUMOPRO_ALLERGIEN355?.methods?.find(m=>m[0]===a.method)?.[1]||a.method||'–',resultLabels[a.result]||a.result||'–',medicalLabels[a.confirmation]||a.confirmation||'–',rating?.label||'nicht bewertet',a.value===null||a.value===undefined?'–':String(a.value)+' '+(a.unit||''),[a.provider,a.symptoms,a.advice,a.notes].filter(Boolean).join(' · ')||'–'];
+                   for(const value of cols)row.append(node('td','',value));tbody.append(row);
+                 }
+                 t.append(tbody);const wrap=node('div','s292-table-wrap');wrap.append(t);allergySection.append(wrap);
+               }
+               root.append(allergySection);
+          '''
+          js=once(js,"     const allLung=lung.filter(x=>Array.isArray(x.testRows));",report_code+"     const allLung=lung.filter(x=>Array.isArray(x.testRows));",'Allergie-Berichtsabschnitt')
+          changes['statsplus292.js']=js
+          
+          js=source['app.js']
+          js=once(js,"const VERSION = '3.5.4';","const VERSION = '3.5.5';",'App-Version')
+          changes['app.js']=js
+          
+          js=source['sw.js']
+          js=once(js,"const VERSION='3.5.4-health-kurzbefehle';","const VERSION='3.5.5-allergien';",'Offline-Version')
+          js=once(js,"const ASSETS=[\n './health354.js',","const ASSETS=[\n './allergien355.js', './health354.js',",'Offline-Precache')
+          js=once(js,"const important=['/health354.js'","const important=['/allergien355.js','/health354.js'",'Offline-Netzwerkstrategie')
+          changes['sw.js']=js
+          
+          release['version']=VERSION
+          release['released']='2026-10-30'
+          release['notes']='Neu: Allergien und Allergietests mit Prick-, Epikutan-, IgE-, Medikamenten-, Lebensmittel- und Lungenprovokationstests; dokumentierte Ergebnisse und vorsichtige Ampelbewertung, Originalbefunde, Statistik-Export. Keine automatische Diagnose; Daten lokal verschlüsselt. Vorhandene Daten bleiben erhalten.'
+          changes['version.json']=json.dumps(release,ensure_ascii=False,indent=2)+'\n'
+          
+          # Assert invariants before writing any file.
+          addon=zlib.decompress(base64.b64decode(B64_PAYLOAD)).decode('utf-8')
+          assert "PNEUMOPRO_ALLERGIEN355" in addon and "SEC.put('suite'" in addon
+          assert "'allergien'" in changes['suite15.js']
+          assert "allergien355.js" in changes['secure17.js'] and "allergien355.js" in changes['sw.js']
+          assert "section.dataset.navPage='allergien'" in addon
+          assert "dataset.s292Kind='allergies'" in changes['statsplus292.js']
+          assert len(set(changes))==7
+          changes['allergien355.js']=addon
+          for name,data in changes.items():Path(name).write_text(data,encoding='utf-8')
+          print('PneumoPro 3.5.5: '+', '.join(changes)+' aktualisiert.')
+          PYUPDATE
+      - name: Syntax und Datenintegritaet pruefen
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check allergien355.js
+          node --check secure17.js
+          node --check suite15.js
+          node --check navigation332.js
+          node --check statsplus292.js
+          node --check app.js
+          node --check sw.js
+          python3 -m json.tool version.json >/dev/null
+          git diff --check
+          python3 - <<'PYVERIFY'
+          from pathlib import Path
+          import json
+          assert json.loads(Path('version.json').read_text())['version']=='3.5.5'
+          assert "'allergien','ALLERGIEN & ALLERGIETESTS'" in Path('navigation332.js').read_text()
+          assert "'allergies','Allergien" in Path('statsplus292.js').read_text()
+          assert "'allergien355.js'" in Path('secure17.js').read_text()
+          assert "'./allergien355.js'" in Path('sw.js').read_text()
+          print('PneumoPro 3.5.5 Integritaetskontrolle bestanden')
+          PYVERIFY
+      - name: Version 3.5.5 veroeffentlichen
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add allergien355.js secure17.js suite15.js navigation332.js statsplus292.js app.js sw.js version.json
+          if git diff --cached --quiet; then
+            echo "Keine Aenderungen erforderlich"
+          else
+            git commit -m "PneumoPro 3.5.5: Allergien, Tests, Ampel, Berichte"
+            git push origin HEAD:main
+          fi
