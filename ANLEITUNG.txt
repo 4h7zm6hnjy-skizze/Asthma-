@@ -1,27 +1,28 @@
-PNEUMOPRO 3.5.0 – LABOR & PROBEN / SCHLEIMTESTS
-===============================================
-Dies ist ein ergänzendes Update für bestehende PneumoPro-Version 3.4.8.
+PNEUMOPRO 3.5.1 – ARZTVORBEREITUNG (iPHONE)
 
-1. Zuerst eine VOLLSTÄNDIGE, VERSCHLÜSSELTE Sicherung in PneumoPro erstellen.
-2. ZIP am iPhone entpacken.
-3. Aus dem Ordner GitHub_Update die Dateien in den ROOT des öffentlichen GitHub-Repositories Asthma- hochladen.
-   Vorhandene Dateien mit gleichem Namen ersetzen, neue Datei laborpro349.js hinzufügen.
-4. App ONLINE öffnen und unter Einstellungen / Nach Updates suchen auf 3.5.0 aktualisieren.
-5. Im Bereich LABOR den neuen Block LABOR & PROBEN öffnen.
-6. Unter Einstellungen Offline-Bereitschaft prüfen; erst danach Flugmodus ausprobieren.
+WICHTIG: ZUERST vollständige, verschlüsselte Datensicherung in PneumoPro erstellen.
 
-Geänderte Dateien: version.json, app.js, wertehilfe342.js, offline303.js, sw.js.
-Neu: laborpro349.js. Keine persönlichen Gesundheitsdaten in der ZIP.
+1. Diese ZIP-Datei auf dem iPhone entpacken.
+2. Den Ordner GitHub_Update öffnen.
+3. ALLE SECHS DATEIEN daraus direkt in das öffentliche App-Code-Repository hochladen und gleichnamige Dateien ersetzen.
+4. Keine medizinischen Befunde oder Tresor-Backups auf GitHub hochladen!
+5. PneumoPro online öffnen und Einstellungen > Nach Updates suchen > Update installieren.
+6. Menü > Arztvorbereitung. Monat wählen und Arztübersicht neu erstellen.
+7. Drucken oder PDF erstellen / speichern. Bei iOS im Teilen-Menü In Dateien sichern wählen.
+8. Einstellungen > Offline-Bereitschaft prüfen; im Flugmodus erneut testen.
 
-Was neu ist: erweiterter Proben-Katalog und freie Tests, Sputum/BAL/Abstrich/Blut/Urin/Stuhl/Erguss,
-Kultur, Erreger, PCR, Pilze, Mykobakterien, Zytologie, Antibiogramm S/I/R,
-Originalfotos/PDFs (lokal verschlüsselt), Bearbeiten, Suche, Messwertdiagramme,
-Berichtsabschnitt für Monats-/Jahresstatistik mit wählbarer Druck-Ausgabe.
+INHALT:
+- Eigener Menüpunkt Arztvorbereitung als kompakte eigene Ansicht.
+- Monatsdiagramme: NUR Min/Max/Durchschnitt, keine Messwerttabellen.
+- Nur jeweils neuester Laborwert je Untersuchung, inklusive Probenlabor.
+- Persönliche Angaben und aktueller Medikamentenplan.
+- 12 Monate Arzt- und Klinikbesuche / Unterlagen aus der lokalen verschlüsselten App-Akte.
+- Ärztlich zu klärende Werte/Empfehlungen werden als Hinweise markiert; keine automatische Diagnose.
+- Eigenständige PDF-Erzeugung ohne Server, daneben iOS-Druckfunktion.
+- Monats- und Jahresstatistik sowie alle bestehenden Speicherstrukturen bleiben UNVERÄNDERT.
 
-WICHTIGE GRENZEN:
-- Bild- und PDF-Inhalte werden nicht automatisch mit sicherer Genauigkeit als Laborwerte extrahiert.
-  Originalwerte manuell übertragen und gegen den Befund prüfen.
-- S/I/R und PCR dürfen nicht ohne ärztlichen Kontext als Antibiotikaempfehlung interpretiert werden.
-- Die Datei ergänzt bestehende Einträge ohne bestehende Daten umzuschreiben.
-- Beim Löschen von Messwerten bleiben Originaldokumente in der privaten Akte erhalten.
-- Funktion und Offline-Modus müssen auf dem tatsächlichen iPhone nach Installation geprüft werden.
+EINSCHRÄNKUNGEN:
+- Ärztliche Dokumente werden ausschließlich aus bereits lokal importierten und eindeutig zugeordneten Daten abgerufen. Keine direkte Anbindung an Krankenhaussysteme/Praxen.
+- Originalbefunde werden nur referenziert. Ausdruck/PDF sind nicht verschlüsselt.
+- Keine medizinische Diagnose oder Dosisempfehlung. Einzelne Messmethoden müssen ärztlich eingeordnet werden.
+- Bei sehr vielen dokumentierten Einzelwerten kann der Bericht mehr Seiten umfassen.

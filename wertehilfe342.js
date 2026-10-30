@@ -58,4 +58,10 @@
   extension.onerror=()=>{const note=document.createElement('p');note.style.cssText='color:#a52737;font-weight:bold;padding:12px';note.textContent='Labor-Probenmodul konnte nicht geladen werden. Bitte online aktualisieren und die Offline-Bereitschaft prüfen.';document.getElementById('labor')?.prepend(note);};
   document.body.append(extension);
  }
+ // Arztvorbereitung loads after the existing pages, keeping all historical reports intact.
+ if(!document.getElementById('av351-loader')){
+  const sheet=document.createElement('script');sheet.id='av351-loader';sheet.src='./arztvor351.js?v=3.5.1';
+  sheet.onerror=()=>{const warning=document.createElement('p');warning.style.cssText='color:#b12233;font-weight:bold;padding:12px';warning.textContent='Arztvorbereitung konnte nicht geladen werden. Bitte Aktualisierung und Offline-Cache prüfen.';document.getElementById('bericht')?.prepend(warning)};
+  document.body.append(sheet);
+ }
 })();

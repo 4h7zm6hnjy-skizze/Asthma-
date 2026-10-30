@@ -1,5 +1,5 @@
 {
-  "version": "3.5.0",
+  "version": "3.5.1",
   "released": "2026-10-30",
-  "notes": "PneumoPro Labor & Proben: Sputum/Schleimtests, Kultur, PCR, Antibiogramm, Pilze/Mykobakterien, BAL/Zytologie und erweiterter Probenkatalog; lokale verschlüsselte Befunde, Originalbilder, Verlauf und einzeln auswählbarer Laborproben-Bericht. Bewährte Bereiche und Daten unverändert."
+  "notes": "PneumoPro Arztvorbereitung: eigener Menüpunkt mit Monatsdiagrammen (nur Min/Max/Durchschnitt), neuesten Laborwerten je Untersuchung, Medikamentenplan, persönlichen Daten, Arzt- und Krankenhausunterlagen aus dem lokalen Tresor sowie sachlichen Hinweisen zur ärztlichen Abklärung. Separat druckbar und als PDF speicherbar; Monats-/Jahresberichte unverändert."
 }
