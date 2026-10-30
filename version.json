@@ -1,5 +1,5 @@
 {
-  "version": "3.5.5",
+  "version": "3.5.6",
   "released": "2026-10-30",
-  "notes": "Neu: Allergien und Allergietests mit Prick-, Epikutan-, IgE-, Medikamenten-, Lebensmittel- und Lungenprovokationstests; dokumentierte Ergebnisse und vorsichtige Ampelbewertung, Originalbefunde, Statistik-Export. Keine automatische Diagnose; Daten lokal verschlüsselt. Vorhandene Daten bleiben erhalten."
+  "notes": "Allergiebefunde als unverschlüsselte JSON-Datei für die manuelle Weitergabe (z. B. an ChatGPT) exportieren; kompatible JSON-Dateien nach Vorschau und Bestätigung verschlüsselt importieren. Dublettenabgleich und optionales Aktualisieren. Fotos und PDFs werden nicht exportiert. Bestehende Daten und Berichte bleiben erhalten."
 }
