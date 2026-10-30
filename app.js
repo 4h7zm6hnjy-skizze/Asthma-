@@ -1,6 +1,6 @@
 'use strict';
 (() => {
-  const VERSION = '3.5.8';
+  const VERSION = '3.5.9';
   window.ASTHMA_APP_VERSION = VERSION;
   const STORAGE = 'asthma-v1-preferences';
   const sources = window.ASTHMA_SOURCES || {};
@@ -211,6 +211,35 @@
       setTimeout(()=>{if(!document.getElementById('ps352-open'))js.remove()},750);
     },300);
   })();
+  // 3.5.9: Sichtbarer JSON-Schnellzugriff direkt im bereits aktiven Hauptprogramm.
+  // Verhindert, dass ein verzoegert/alt geladenes separates Modul den Zugang versteckt.
+  (function ensureVisibleJSON359(){
+    const top=document.querySelector('#secure-application .top-actions'),start=document.getElementById('start');
+    if(!top||!start)return;
+    const style=document.createElement('style');style.id='j359-style';
+    style.textContent='#j359-entry,#j358-open{display:inline-flex!important;visibility:visible!important;opacity:1!important;align-items:center;justify-content:center;min-height:43px;min-width:82px;border:2px solid #14748b;border-radius:11px;background:#096980;color:white;font:inherit;font-size:13px;font-weight:850;padding:8px 11px;white-space:nowrap;cursor:pointer;flex:1 1 92px}#j359-home{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:#e3f5f9;border:2px solid #15829a;border-radius:14px;padding:13px;margin:12px 16px;color:#143e52}#j359-home strong{font-size:1rem}#j359-home button{border:0;border-radius:10px;background:#086783;color:white;font:inherit;font-weight:850;padding:12px 16px;min-height:46px;cursor:pointer}@media(max-width:720px){#secure-application header.topbar,#secure-application header.topbar .topbar-inner{height:auto!important;min-height:112px!important}#secure-application header.topbar .top-actions{display:flex!important;flex-wrap:wrap!important;row-gap:6px!important;width:100%!important}#j359-home{margin:12px 8px}}';
+    document.head.append(style);
+    const entry=document.createElement('button');entry.type='button';entry.id='j359-entry';entry.textContent='JSON-Import';entry.setAttribute('aria-label','JSON-Datei direkt importieren');
+    const search=document.getElementById('nav317-holder'),menu=document.getElementById('n332-open-top');
+    top.insertBefore(entry,(search?.parentNode===top?search:null)||(menu?.parentNode===top?menu:null)||top.firstChild);
+    function showImport(){
+      const dlg=document.getElementById('j358-dialog');
+      if(dlg){if(!dlg.open)dlg.showModal();return}
+      if(document.getElementById('j359-loader'))return;
+      const script=document.createElement('script');script.id='j359-loader';script.src='./jsoncenter358.js?v=3.5.9';
+      script.onload=()=>{script.removeAttribute('id');const loaded=document.getElementById('j358-dialog');if(loaded){if(!loaded.open)loaded.showModal()}else alert('Der JSON-Import konnte nicht gestartet werden. Bitte die aktualisierte App online erneut oeffnen.');};
+      script.onerror=()=>{script.remove();alert('JSON-Modul nicht geladen. Internet und App-Version 3.5.9 pruefen.');};
+      document.body.append(script);
+    }
+    entry.addEventListener('click',showImport);
+    if(!document.getElementById('j359-home')){
+      const panel=document.createElement('div');panel.id='j359-home';
+      const label=document.createElement('strong');label.textContent='JSON-Datei direkt importieren – ohne Suchen';
+      const action=document.createElement('button');action.type='button';action.textContent='JSON-Datei auswaehlen';action.addEventListener('click',showImport);
+      panel.append(label,action);start.insertBefore(panel,start.firstChild);
+    }
+  })();
+
   // 3.5.4: Apple-Health-Import über Kurzbefehle, ohne Netzwerk oder HealthKit in Safari.
   (function loadHealth354(){
     if(document.getElementById('h354-loader'))return;

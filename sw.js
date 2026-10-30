@@ -1,5 +1,5 @@
 /* Asthma 3.3.0: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
-const VERSION='3.5.8-json-direkt';
+const VERSION='3.5.9-json-sichtbar';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
  './jsoncenter358.js','./allergienscan357.js', './allergienjson356.js', './allergien355.js', './health354.js',

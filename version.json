@@ -1,5 +1,5 @@
 {
-  "version": "3.5.8",
+  "version": "3.5.9",
   "released": "2026-10-30",
-  "notes": "JSON-Import jetzt sofort oben neben Scans und auf der Startseite sichtbar. Datei lokal prüfen, passende Messwertimporte für Lungenfunktion, Diffusion, Allergien, Labor und Gehtest direkt erreichen; nach Bestätigung erscheinen gültige Daten in den vorhandenen Verläufen, Diagrammen und Berichten. Nicht unterstützte JSON-Dateien nur als verschlüsseltes Original speichern. Keine automatische Diagnose."
+  "notes": "JSON-Import jetzt garantiert als direkte sichtbare Schaltflaeche oben und auf der Startseite. Bestehende Fachimporte fuer Allergien, Lungenfunktion, Diffusion, Labor und Gehtest inklusive Diagrammen/Statistiken bleiben unveraendert. Korrigierter Startseitenanker und Lade-Fallback; keine Aenderung an lokalen Gesundheitsdaten."
 }

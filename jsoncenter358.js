@@ -52,8 +52,8 @@
  @media(max-width:620px){#secure-application header.topbar .top-actions{flex-wrap:wrap!important;row-gap:5px!important}#j358-open{flex:1 1 72px;min-width:72px}#j358-dialog .j358-body{padding:13px}}
  @media print{#j358-open,#j358-dialog,#j358-scan-cta,#j358-home{display:none!important}}`;
  document.head.append(style);
- const button=create('button','', 'JSON-Import');button.id='j358-open';button.type='button';button.setAttribute('aria-label','JSON-Datei sofort importieren');
- const scanner=$('ps352-open'),search=$('nav317-holder'),menu=$('n332-open-top');top.insertBefore(button,scanner?.nextSibling||search||menu||top.firstChild);
+ const button=$('j359-entry')||create('button','', 'JSON-Import');button.id='j358-open';button.type='button';button.textContent='JSON-Import';button.setAttribute('aria-label','JSON-Datei sofort importieren');
+ const scanner=$('ps352-open'),search=$('nav317-holder'),menu=$('n332-open-top');if(button.parentNode!==top)top.insertBefore(button,(scanner?.parentNode===top?scanner.nextSibling:null)||(search?.parentNode===top?search:null)||(menu?.parentNode===top?menu:null)||top.firstChild);
  const dialog=create('dialog');dialog.id='j358-dialog';dialog.setAttribute('aria-label','JSON-Datei schnell importieren');
  dialog.innerHTML=`<div class="j358-head"><strong>JSON-Datei importieren</strong><button class="j358-action secondary" id="j358-close" type="button" aria-label="Fenster schließen">Schließen</button></div>
  <div class="j358-body"><p>Direkt eine JSON-Datei auswählen. Erkannte Fachimporte übernehmen nach Bestätigung die validierten Werte auch in die verfügbaren Diagramme und Berichte. Ohne passenden Import bleibt die Datei ein Originaldokument.</p>
@@ -145,7 +145,7 @@
   finally{archive.disabled=false;}
  });
  // Eine sichtbare Direktwahl auf der Startseite, ohne zuerst den Scanner zu öffnen.
- const home=$('uebersicht');if(home){const panel=create('div');panel.id='j358-home';panel.append(create('strong','', 'JSON-Datei direkt einlesen – ohne Suchen'));const hButton=create('button','', 'JSON importieren');hButton.type='button';hButton.addEventListener('click',show);panel.append(hButton);home.insertAdjacentElement('afterbegin',panel);}
+ const home=$('start');if(home&&!$('j359-home')){const panel=create('div');panel.id='j358-home';panel.append(create('strong','', 'JSON-Datei direkt einlesen – ohne Suchen'));const hButton=create('button','', 'JSON importieren');hButton.type='button';hButton.addEventListener('click',show);panel.append(hButton);home.insertAdjacentElement('afterbegin',panel);}
  // Die Direktwahl zusätzlich ganz oben im bisherigen Scanner anzeigen.
  let tries=0;const attach=()=>{
   const scanBody=$('ps352-dialog')?.querySelector('.ps352-body');
