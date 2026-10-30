@@ -10,6 +10,7 @@
   const kinds={
     lunge:{title:'Lungenfunktion',docKind:'Lungenfunktionstest',hint:'JSON-Dateien mit Messwerten werden in die bestehende Lungenfunktion übernommen. Fotos und PDFs bleiben als Originalbefund erhalten.'},
     labor:{title:'Labor',docKind:'Bluttest',hint:'Labor-JSON wird in der bestehenden Laborakte zur Kontrolle geöffnet. Fotos und PDFs werden als Originalbefund gespeichert.'},
+    allergie:{title:'Allergien & Allergietests',docKind:'Allergiebefund',hint:'Fotos und PDFs werden verschluesselt als Allergiebefund gespeichert. Eine Allergie-JSON wird nach Vorschau dem Allergiebereich uebergeben.'},
     gehtest:{title:'Gehtest / Belastungstest',docKind:'Gehtestbericht',hint:'Private Gehtest-JSON über die Gehtest-Importfunktion auswählen; Originalbilder und PDF hier verschlüsselt ablegen.'},
     arzt:{title:'Arztbriefe',docKind:'Arztbrief',hint:'Arztbrief fotografieren oder PDF auswählen. Der Originalbericht wird verschlüsselt gespeichert.'},
     entlassung:{title:'Entlassungsberichte',docKind:'Entlassungsbericht',hint:'Entlassungsbericht fotografieren oder PDF auswählen. Das Original wird verschlüsselt gespeichert.'},
@@ -24,6 +25,7 @@
       <div class="dh331-categories" role="group" aria-label="Art des Dokuments">
         <button type="button" data-dh-kind="lunge" aria-pressed="true"><span aria-hidden="true">◷</span>Lungenfunktion</button>
         <button type="button" data-dh-kind="labor" aria-pressed="false"><span aria-hidden="true">◈</span>Labor</button>
+        <button type="button" data-dh-kind="allergie" aria-pressed="false"><span aria-hidden="true">◈</span>Allergien & Allergietests</button>
         <button type="button" data-dh-kind="gehtest" aria-pressed="false"><span aria-hidden="true">↗</span>Gehtest / Belastung</button>
         <button type="button" data-dh-kind="arzt" aria-pressed="false"><span aria-hidden="true">▤</span>Arztbriefe</button>
         <button type="button" data-dh-kind="entlassung" aria-pressed="false"><span aria-hidden="true">▣</span>Entlassungsberichte</button>
@@ -112,6 +114,14 @@
     setStatus('Labor-Datei zur Prüfung geöffnet. Bitte die Werte im Laborbereich kontrollieren und die Übernahme bestätigen.');
     followButton('Labor-Import kontrollieren',()=>NAV.go('labor'));
   }
+  async function allergyJson(file){
+    if(file.size>4*1048576)throw Error('Allergie-JSON zu gross (max. 4 MB).');
+    const parsed=JSON.parse(await file.text());
+    if(parsed?.format!=='PneumoPro-Allergien-JSON'||parsed?.schemaVersion!==1||!Array.isArray(parsed.records))throw Error('Keine kompatible PneumoPro-Allergie-JSON.');
+    forwardFile(file,'a356-file');
+    setStatus('Allergie-JSON zur Vorschau weitergegeben. Werte werden erst nach deiner ausdruecklichen Bestaetigung gespeichert.');
+    followButton('Allergie-JSON jetzt pruefen',()=>{NAV.go('allergien');$('a356-preview')?.click()});
+  }
   async function original(file,category,day){
     if(!/\.(pdf|jpe?g|png|webp|heic|heif)$/i.test(file.name||'')||!file.size||file.size>12*1024*1024)
       throw Error('Als Original sind Fotos und PDF-Dateien bis 12 MB erlaubt.');
@@ -134,6 +144,7 @@
       if(category==='lunge')followButton('Messwerte im Befundscanner prüfen',()=>{try{forwardFile(file,'scan-gallery');NAV.go('befunde')}catch(e){setStatus(e.message,true)}});
       if(category==='labor')followButton('Laborbild zur Werteerfassung öffnen',()=>{try{forwardFile(file,'lab-file');NAV.go('labor')}catch(e){setStatus(e.message,true)}});
     }
+    if(category==='allergie')followButton('Allergietests und Originale oeffnen',()=>NAV.go('allergien'));
     followButton('Gespeicherte Dokumente öffnen',()=>{NAV.go('akte');document.querySelector('.my-tab[data-my-tab="documents"]')?.click()});
   }
   async function handle(file,field){
@@ -143,8 +154,8 @@
       if(!SEC.state().unlocked)throw Error('Bitte zuerst die Gesundheitsakte entsperren.');
       setStatus('Prüfe Datei '+file.name+' …');
       const category=chosen,day=$('dh331-date').value;
-      if((category==='lunge'||category==='labor'||category==='gehtest')&&/\.json$/i.test(file.name||'')){
-        if(category==='lunge')await lungJson(file);else if(category==='labor')await laborJson(file);else await walkJson(file);
+      if((category==='lunge'||category==='labor'||category==='gehtest'||category==='allergie')&&/\.json$/i.test(file.name||'')){
+        if(category==='lunge')await lungJson(file);else if(category==='labor')await laborJson(file);else if(category==='gehtest')await walkJson(file);else await allergyJson(file);
       }else await original(file,category,day);
     }catch(err){setStatus('Datei nicht übernommen: '+(err?.message||String(err)),true);}
     finally{field.value='';busy=false;}

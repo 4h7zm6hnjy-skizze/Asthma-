@@ -114,7 +114,7 @@
       const old=byId.get(r.id);
       if(old){
         if(fingerprint(r)===fingerprint(old)){duplicates++;continue;}
-        if(allowUpdates)updates.push({...r,id:old.id,createdAt:old.createdAt||r.createdAt,attachment:old.attachment||null,attachmentName:old.attachmentName||r.attachmentName});
+        if(allowUpdates)updates.push({...r,id:old.id,createdAt:old.createdAt||r.createdAt,attachment:old.attachment||null,attachmentName:old.attachmentName||r.attachmentName,scanDocumentId:old.scanDocumentId||''});
         else conflicts++;
       }else if(byContent.has(fingerprint(r))){duplicates++;}
       else{additions.push({...r,attachment:null});byContent.add(fingerprint(r));}
