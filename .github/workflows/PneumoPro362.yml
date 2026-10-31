@@ -1,0 +1,152 @@
+name: PneumoPro 3.6.2 Originaldiagramme und Befundwerte
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PneumoPro362.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pneumopro-362-originale
+  cancel-in-progress: false
+
+jobs:
+  upgrade:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository laden
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Originaldiagramme im Test sichtbar machen
+        shell: bash
+        run: |
+          python3 - <<'PY_ORIGINAL'
+          from pathlib import Path
+          import json, hashlib, sys
+
+          def replace_once(s,a,b,label):
+              n=s.count(a)
+              if n!=1: raise RuntimeError(f'{label}: erwartete Stelle nicht genau einmal gefunden ({n}). Keine Veröffentlichung.')
+              return s.replace(a,b,1)
+
+          def edit(path,transform):
+              p=Path(path)
+              if not p.is_file(): raise RuntimeError(f'{path}: fehlende Datei. Abbruch.')
+              initial=p.read_text(encoding='utf-8')
+              final=transform(initial)
+              if final==initial: raise RuntimeError(f'{path}: Ausgangscode nicht geändert. Abbruch.')
+              p.write_text(final,encoding='utf-8')
+              print(path+': aktualisiert')
+
+          vpath=Path('version.json')
+          v=json.loads(vpath.read_text(encoding='utf-8')).get('version')
+          if v=='3.6.2':
+              print('3.6.2 ist bereits installiert. Keine Änderung.')
+              sys.exit(0)
+          if v=='3.6.0':
+              # Die vorhandene 3.6.1-Gewichtsänderung zuerst anwenden, damit nichts verloren geht.
+              old=Path('.github/workflows/PneumoPro_3.6.1_Gewicht_EinDatei.yml')
+              if not old.is_file(): raise RuntimeError('3.6.1-Update-Datei fehlt. Bitte vorher Version 3.6.1 installieren.')
+              blob=old.read_bytes()
+              expected='f3b71269882c296ce098bdb046eb557686a676648e0de114df7854ba94d0e76b'
+              if hashlib.sha256(blob).hexdigest()!=expected:
+                  raise RuntimeError('Vorhandene 3.6.1-Datei entspricht nicht der geprüften Vorlage.')
+              lines=blob.decode('utf-8').splitlines()
+              start="          python3 - <<'PY_UPDATE'"
+              end='          PY_UPDATE'
+              if lines.count(start)!=1 or lines.count(end)!=1: raise RuntimeError('Vorheriger Update-Code nicht eindeutig gefunden.')
+              lo=lines.index(start)+1; hi=lines.index(end,lo)
+              weight_code='\n'.join(line[10:] if line.startswith('          ') else line for line in lines[lo:hi])+'\n'
+              compile(weight_code,'gewicht-361.py','exec')
+              exec(compile(weight_code,'gewicht-361.py','exec'),{'__name__':'__main__'})
+              v=json.loads(vpath.read_text(encoding='utf-8')).get('version')
+          if v!='3.6.1': raise RuntimeError(f'Version {v} nicht unterstützt. Erwartet 3.6.0/3.6.1.')
+
+          old_original="if(v.attachment){const photo=el('details');photo.append(el('summary','Originalbefund anzeigen'));photo.addEventListener('toggle',()=>{if(photo.open&&!photo.querySelector('img')){const img=el('img');img.src=v.attachment.data;img.alt='Originalbefund '+v.date;photo.append(img);}});n.append(photo);}"
+          new_original="""if(v.attachment){const photo=el('figure');photo.className='dl324-raw-original';photo.append(el('figcaption','Unveränderter Originalbefund mit den echten Klinikdiagrammen · '+v.date));const img=el('img');img.src=v.attachment.data;img.alt='Originalaufnahme der Untersuchung vom '+v.date+' mit den echten aufgezeichneten Testkurven';img.loading='lazy';photo.append(img);const zoom=btn('Original vergrößern',()=>{const expanded=photo.classList.toggle('dl324-raw-zoom');zoom.textContent=expanded?'Ansicht verkleinern':'Original vergrößern';});photo.append(zoom,el('p','Zoom ändert nur die Bildschirmdarstellung. Die Originaldatei und die gemessenen Kurven bleiben unverändert.'));n.append(photo);}"""
+          old_duplicate="""const duplicate=all.some(x=>x.type===r.type&&x.value?.date===r.value.date&&x.value?.time===r.value.time&&Array.isArray(x.value?.testRows)&&JSON.stringify(x.value.testRows)===JSON.stringify(r.value.testRows));
+              if(duplicate){skipped++;continue;}"""
+          new_duplicate="""const duplicate=all.find(x=>x.type===r.type&&x.value?.date===r.value.date&&x.value?.time===r.value.time&&Array.isArray(x.value?.testRows)&&JSON.stringify(x.value.testRows)===JSON.stringify(r.value.testRows));
+              if(duplicate){if(r.value.attachment&&!duplicate.value?.attachment){const existingKey=r.type+'/'+duplicate.value.id;await S.put('suite',{key:existingKey,type:r.type,value:{...duplicate.value,attachment:r.value.attachment}},existingKey);const check=await S.get('suite',existingKey);if(!check?.value?.attachment)throw Error('Originalbild konnte nicht mit bestehendem Test verknüpft werden.');saved++;}else skipped++;continue;}"""
+
+          def render_originals(s):
+              s=replace_once(s,"const glossary=el('details');glossary.append","const glossary=el('details');glossary.open=true;glossary.append",'Erklärungen sofort sichtbar')
+              s=replace_once(s,old_original,new_original,'Originalaufnahme direkt im Test')
+              s=replace_once(s,old_duplicate,new_duplicate,'Original zu bestehendem Test')
+              return s
+          edit('diffusion324.js',render_originals)
+
+          css_note="""
+          /* 3.6.2: Vergrößert nur die Darstellung der unveränderten Originaldatei. */
+          #dl324 .dl324-raw-original{margin:14px 0;padding:12px;border:1px solid #bcd4dd;background:#fff;border-radius:10px;overflow-x:auto;max-width:100%}
+          #dl324 .dl324-raw-original figcaption{font-weight:800;color:#163e56;margin-bottom:10px}
+          #dl324 .dl324-raw-original img{display:block;width:100%;max-width:100%;height:auto;object-fit:contain}
+          #dl324 .dl324-raw-original.dl324-raw-zoom img{width:1100px;max-width:none;height:auto}
+          #dl324 .dl324-raw-original button{min-height:44px}
+          #dl324 .dl324-raw-original p{font-size:.85rem;line-height:1.45;color:#465f6b}
+          """
+          edit('diffusion324.css',lambda s:s+css_note)
+          old_report="body.append(row);}table.append(body);const wrap=node('div','s292-table-wrap');wrap.append(table);box.append(wrap);"
+          new_report="""body.append(row);}table.append(body);const wrap=node('div','s292-table-wrap');wrap.append(table);box.append(wrap);
+                 if(rec.attachment?.data&&/^data:image\/(jpeg|png);base64,/.test(rec.attachment.data)){const raw=node('figure','s292-original-figure');raw.append(node('figcaption','Unveränderter Klinik-Originalbefund mit den echten Messkurven ('+fmt(rec.date)+')'));const photo=node('img','s292-original-test');photo.src=rec.attachment.data;photo.alt='Originalgrafiken der Untersuchung vom '+fmt(rec.date);raw.append(photo);box.append(raw);}"""
+          edit('statsplus292.js',lambda s:replace_once(s,old_report,new_report,'Originale im druckbaren Vollbefund'))
+
+          css_report="""
+          /* Originalbefundfotos in vollständig ausgewählten Berichten. */
+          .s292-original-figure{margin:14px 0 24px;page-break-inside:avoid;break-inside:avoid;border:1px solid #d0e0e8;padding:10px}
+          .s292-original-figure figcaption{font-weight:800;margin-bottom:8px}
+          .s292-original-test{display:block;max-width:100%;width:auto;height:auto;max-height:950px;margin:0 auto;object-fit:contain}
+          @media print{.s292-original-figure{page-break-inside:avoid;break-inside:avoid}.s292-original-test{max-height:235mm;max-width:100%;object-fit:contain}}
+          """
+          edit('statsplus292.css',lambda s:s+css_report)
+          edit('secure17.js',lambda s:replace_once(s,"s.src='./'+src+'?v=3.6.1'","s.src='./'+src+'?v=3.6.2'",'Modulversion'))
+          edit('app.js',lambda s:replace_once(s,"const VERSION = '3.6.1';","const VERSION = '3.6.2';",'Appversion'))
+          edit('sw.js',lambda s:replace_once(s,"const VERSION='3.6.1-gewicht-detail';","const VERSION='3.6.2-echte-originale';",'Offline-Cache'))
+
+          def index(s):
+              if '3.6.1' not in s: raise RuntimeError('index.html: 3.6.1 fehlt')
+              return s.replace('3.6.1','3.6.2')
+          edit('index.html',index)
+
+          def manifest(s):
+              obj=json.loads(s)
+              if obj.get('version')!='3.6.1': raise RuntimeError('version.json: falsche Ausgangsversion')
+              obj.update(version='3.6.2',released='2026-10-31',notes='Unveränderte Originaldiagramme direkt beim Lungenfunktionstest und Diffusionsbefund. Alle Messwerte und Erklärungen im jeweiligen Test; unveränderte Originale auch im ausgewählten vollständigen Befundbericht. Bereits identisch vorhandene Befunde erhalten fehlende Originalfotos ohne Duplikat. Private Fotos nur lokal verschlüsselt. Die Gewichtsdiagramm-Änderung 3.6.1 bleibt erhalten.')
+              return json.dumps(obj,ensure_ascii=False,indent=2)+'\n'
+          edit('version.json',manifest)
+          print('3.6.2 vorbereitet. Keine medizinischen Originalbilder im öffentlichen GitHub-Repository gespeichert.')
+          PY_ORIGINAL
+      - name: Code und Datenformat prüfen
+        shell: bash
+        run: |
+          set -e
+          node --check diffusion324.js
+          node --check statsplus292.js
+          node --check metrics340.js
+          node --check secure17.js
+          node --check app.js
+          node --check sw.js
+          python3 -m json.tool version.json > /dev/null
+          grep -q 'dl324-raw-original' diffusion324.js
+          grep -q 's292-original-test' statsplus292.js
+          grep -q 'm340-weight-scale' metrics340.js
+          grep -q '3.6.2' version.json
+      - name: Aktualisierung veröffentlichen
+        shell: bash
+        run: |
+          set -e
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add diffusion324.js diffusion324.css statsplus292.js statsplus292.css metrics340.js secure17.js app.js sw.js index.html version.json
+          if git diff --cached --quiet; then
+            echo 'Bereits aktuell.'
+          else
+            git commit -m 'PneumoPro 3.6.2: echte Originaldiagramme und vollständige Befunde'
+            git push origin HEAD:main
+          fi
