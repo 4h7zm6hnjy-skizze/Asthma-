@@ -1,0 +1,183 @@
+name: PneumoPro 3.6.1 Gewichtsdiagramm
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/pneumopro-gewicht-361.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pneumopro-gewicht-361
+  cancel-in-progress: false
+
+jobs:
+  update-weight-chart:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository holen
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Gewichtsdiagramme aktualisieren
+        shell: bash
+        run: |
+          python3 - <<'PY_UPDATE'
+          from pathlib import Path
+          import json
+          
+          # Bei erneutem Start nach erfolgreichem Update keine weiteren Änderungen ausführen.
+          version_path = Path("version.json")
+          if version_path.is_file() and json.loads(version_path.read_text(encoding="utf-8")).get("version") == "3.6.1":
+              print("PneumoPro 3.6.1 ist bereits eingerichtet.")
+              raise SystemExit(0)
+          
+          
+          def edit(path, action):
+              file = Path(path)
+              if not file.is_file():
+                  raise RuntimeError(f'{path}: Datei nicht gefunden; Abbruch ohne Commit.')
+              original = file.read_text(encoding='utf-8')
+              if path == 'version.json' and json.loads(original).get('version') == '3.6.1':
+                  print('Version 3.6.1 bereits vorhanden; kein Update erforderlich.')
+                  return
+              revised = action(original)
+              if revised == original:
+                  raise RuntimeError(f'{path}: Keine Änderungen; Abbruch zur Sicherheit.')
+              file.write_text(revised, encoding='utf-8')
+              print(f'{path}: angepasst')
+          
+          
+          def once(text, before, after, label):
+              count = text.count(before)
+              if count != 1:
+                  raise RuntimeError(f'{label}: erwartete Ausgangsstelle nicht genau einmal gefunden ({count}). Abbruch ohne Commit.')
+              return text.replace(before, after, 1)
+          
+          
+          def span(text, start, stop, replacement, label):
+              a = text.find(start)
+              b = text.find(stop, a + len(start)) if a != -1 else -1
+              if a < 0 or b <= a:
+                  raise RuntimeError(f'{label}: Ursprungsabschnitt verändert oder fehlt. Abbruch ohne Commit.')
+              return text[:a] + replacement + text[b:]
+          
+          
+          def metrics(s):
+              s = once(s, '</select></label><div class="m340-weight-graph"',
+                       '</select></label><label class="m340-range">Darstellung<select id="m340-weight-scale"><option value="detail" selected>Unterschiede vergrößern</option><option value="full">Gesamtansicht mit BMI-Bereich</option></select></label><div class="m340-weight-graph"', 'Ansicht-Auswahl')
+              s = span(s,
+                  '  const W=660,H=300,L=64,R=28,T=34,B=62,values=selected.map(x=>x.kg);',
+                  "  const svg=shape(graph,'svg'",
+                  '''  const W=660,H=300,L=64,R=28,T=34,B=62,values=selected.map(x=>x.kg);
+            const detail=$('m340-weight-scale').value!=='full';
+            if(ref&&!detail)values.push(ref.weightMin,ref.weightMax);
+            const lo=Math.min(...values),hi=Math.max(...values),spread=hi-lo;
+            const pad=detail?Math.max(0.35,spread*.2):Math.max(1.5,spread*.18);
+            let min=Math.max(0,lo-pad),max=hi+pad;const span=Math.max(.1,max-min);
+          ''', 'Gewicht-Achse')
+              s = span(s,
+                  '  if(ref){const top=T+(max-ref.weightMax)/span*(H-T-B)',
+                  '  for(let j=0;j<5;j++)',
+                  '''  if(ref&&ref.weightMax>=min&&ref.weightMin<=max){
+              const top=T+(max-ref.weightMax)/span*(H-T-B),bottom=T+(max-ref.weightMin)/span*(H-T-B);
+              const clippedTop=Math.max(T,top),clippedBottom=Math.min(H-B,bottom);
+              if(clippedBottom>clippedTop)shape(svg,'rect',{x:L,y:clippedTop,width:W-L-R,height:clippedBottom-clippedTop,fill:'#d9f3e5',opacity:.9});
+              for(const yy of [top,bottom])if(yy>=T&&yy<=H-B)shape(svg,'line',{x1:L,x2:W-R,y1:yy,y2:yy,stroke:'#237949','stroke-dasharray':'6 5'});
+              const t=shape(svg,'text',{x:W-R-3,y:Math.max(T+14,Math.min(H-B-8,clippedTop+16)),'text-anchor':'end','font-size':13,fill:'#166a42'},'BMI 18,5–<25');
+              shape(t,'title',{},'BMI-Orientierungsbereich für Erwachsene. Kein persönliches ärztliches Zielgewicht.');
+            }
+          ''', 'BMI-Markierung')
+              s = once(s,
+                  "shape(svg,'text',{x:L,y:18,'font-size':15,fill:'#365e6e'},'kg');",
+                  "shape(svg,'text',{x:L,y:18,'font-size':15,fill:'#365e6e'},detail?'kg · vergrößerte Skala (nicht bei 0)':'kg · Gesamtansicht');", 'Achsenbeschriftung')
+              s = span(s,
+                  "  desc.textContent=selected.length+' Messungen · '+nice(first.date)",
+                  " }\n $('m340-weight-range').addEventListener('change',drawWeight);",
+                  '''  const previousMeasurement=selected.at(-2),recent=end.kg-previousMeasurement.kg,range=Math.max(...selected.map(x=>x.kg))-Math.min(...selected.map(x=>x.kg));
+            desc.textContent=selected.length+' Messungen · '+nice(first.date)+' '+fmt(first.kg)+' kg → '+nice(end.date)+' '+fmt(end.kg)+' kg · Insgesamt '+(delta>0?'+':'')+fmt(delta)+' kg · Letzte Änderung '+(recent>0?'+':'')+fmt(recent)+' kg · Spannweite '+fmt(range)+' kg.'+(detail?' Die y-Achse ist zur Erkennung kleiner Unterschiede vergrößert und beginnt nicht bei 0.':' Gesamtansicht mit BMI-Bereich.')+(ref?' BMI 18,5 bis unter 25 ist nur ein allgemeiner Orientierungsbereich, kein persönliches Zielgewicht.':' Körpergröße im Profil ergänzen, um den BMI-Orientierungsbereich zu sehen.');
+          ''', 'Gewichtsstatistik')
+              s = once(s, "$('m340-weight-range').addEventListener('change',drawWeight);",
+                       "$('m340-weight-range').addEventListener('change',drawWeight);\n $('m340-weight-scale').addEventListener('change',drawWeight);", 'Wechsel-Steuerung')
+              s = once(s, "version:'3.4.7'", "version:'3.6.1'", 'Testkennung')
+              return s
+          
+          
+          def report(s):
+              s = once(s,
+                  'const refVals=series.map(([k])=>num(refs[k])).filter(v=>v!==null).concat(band?[band.weightMin,band.weightMax]:[]);',
+                  "const refVals=series.map(([k])=>num(refs[k])).filter(v=>v!==null).concat(unit!=='kg'&&band?[band.weightMin,band.weightMax]:[]);", 'Bericht-Achsenwerte')
+              s = once(s,
+                  'let min=Math.min(...nums,...refVals),max=Math.max(...nums,...refVals),pad=max===min?Math.max(1,max*.06):(max-min)*.13;',
+                  "let min=Math.min(...nums,...refVals),max=Math.max(...nums,...refVals),pad=unit==='kg'?Math.max(.35,(max-min)*.2):(max===min?Math.max(1,max*.06):(max-min)*.13);", 'Bericht-Padding')
+              s = once(s,
+                  "if(band){const highY=y(band.weightMax),lowY=y(band.weightMin);shape('rect',{x:L,y:highY,width:W-L-R,height:Math.max(1,lowY-highY),fill:'#d9f3e5',opacity:.9});shape('line',{x1:L,x2:W-R,y1:highY,y2:highY,stroke:'#277847','stroke-dasharray':'6 4'});shape('line',{x1:L,x2:W-R,y1:lowY,y2:lowY,stroke:'#277847','stroke-dasharray':'6 4'});shape('text',{x:W-R-5,y:Math.max(T+13,highY-5),'font-size':12,'text-anchor':'end',fill:'#186f48'},'BMI 18,5–<25');}",
+                  "if(band&&band.weightMax>=min&&band.weightMin<=max){const highY=y(band.weightMax),lowY=y(band.weightMin),clippedHigh=Math.max(T,highY),clippedLow=Math.min(H-B,lowY);if(clippedLow>clippedHigh)shape('rect',{x:L,y:clippedHigh,width:W-L-R,height:clippedLow-clippedHigh,fill:'#d9f3e5',opacity:.9});for(const yy of [highY,lowY])if(yy>=T&&yy<=H-B)shape('line',{x1:L,x2:W-R,y1:yy,y2:yy,stroke:'#277847','stroke-dasharray':'6 4'});shape('text',{x:W-R-5,y:Math.max(T+13,Math.min(H-B-8,clippedHigh+14)),'font-size':12,'text-anchor':'end',fill:'#186f48'},'BMI 18,5–<25');}", 'Bericht-BMI-Markierung')
+              s = once(s, 'c.append(chartSummary);',
+                  "c.append(chartSummary);\n   if(unit==='kg')c.append(node('p','s292-note','Für kleine Gewichtsunterschiede ist die Skala vergrößert und beginnt nicht bei 0 kg. Der BMI-Orientierungsbereich wird nur eingeblendet, wenn er in diesem Ausschnitt liegt; die Zielwerte stehen im Begleittext.'));", 'Bericht-Erklärung')
+              return s
+          
+          
+          def simple(old, new, label):
+              return lambda s: once(s, old, new, label)
+          
+          edit('metrics340.js', metrics)
+          edit('statsplus292.js', report)
+          edit('secure17.js', simple("s.src='./'+src+'?v=3.6.0'", "s.src='./'+src+'?v=3.6.1'", 'Module laden'))
+          edit('app.js', simple("const VERSION = '3.6.0';", "const VERSION = '3.6.1';", 'App-Version'))
+          edit('sw.js', simple("const VERSION='3.6.0-suche-layout';", "const VERSION='3.6.1-gewicht-detail';", 'Offline-Cache'))
+          
+          def index(s):
+              if '3.4.7' not in s:
+                  raise RuntimeError('index.html: erwartete Versionsmarkierungen fehlen; Abbruch.')
+              return s.replace('3.4.7','3.6.1').replace('3.4.8','3.6.1')
+          
+          edit('index.html', index)
+          
+          def manifest(s):
+              data = json.loads(s)
+              if data.get('version') != '3.6.0':
+                  raise RuntimeError('version.json: nur von 3.6.0 auf 3.6.1 aktualisieren. Abbruch.')
+              data.update(version='3.6.1',released='2026-10-31',notes='Gewichtsdiagramm mit vergrößerter Gewichtsskala für kleine Unterschiede; auswählbare Gesamtansicht mit BMI-Orientierungsbereich. Letzte Gewichtsänderung und Spannweite sichtbar; verbesserte Skala auch in Monats- und Jahresberichten. Alle gespeicherten Gesundheitsdaten bleiben unverändert.')
+              return json.dumps(data,ensure_ascii=False,indent=2)+'\n'
+          
+          edit('version.json', manifest)
+          
+          # Plausibilitätsprüfungen für typische kleine und größere Gewichtsunterschiede.
+          for values in ([129.2, 129.8, 130.1], [130], [129.9, 130.0], [129, 134]):
+              lo,hi=min(values),max(values)
+              pad=max(.35,(hi-lo)*.2)
+              minimum,maximum=max(0,lo-pad),hi+pad
+              assert minimum<=lo<=hi<=maximum and maximum>minimum
+          print('Alle Prüfungen der Gewichtsskala bestanden.')
+          PY_UPDATE
+      - name: JavaScript und JSON pruefen
+        shell: bash
+        run: |
+          set -e
+          node --check metrics340.js
+          node --check statsplus292.js
+          node --check secure17.js
+          node --check app.js
+          node --check sw.js
+          python3 -m json.tool version.json > /dev/null
+          grep -q 'm340-weight-scale' metrics340.js
+          grep -q '3.6.1' version.json
+      - name: Aktualisierung veroeffentlichen
+        shell: bash
+        run: |
+          set -e
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add metrics340.js statsplus292.js secure17.js app.js sw.js index.html version.json
+          if git diff --cached --quiet; then
+            echo 'Es sind keine weiteren Aenderungen erforderlich.'
+          else
+            git commit -m 'PneumoPro 3.6.1: Gewichtsdiagramm Unterschiede vergroessern'
+            git push origin HEAD:main
+          fi
