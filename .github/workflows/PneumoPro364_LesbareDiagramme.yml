@@ -1,0 +1,93 @@
+name: PneumoPro 3.6.4 – Klinikdiagramme besser lesbar
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PneumoPro364_LesbareDiagramme.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pneumopro-364-diagramme
+  cancel-in-progress: false
+
+jobs:
+  upgrade:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository laden
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Diagramme schonend vergroessern und kontrastieren
+        shell: bash
+        run: |
+          python3 - <<'PY_PATCH'
+          from pathlib import Path
+          import json, subprocess
+
+          def once(src,old,new,label):
+              n=src.count(old)
+              if n!=1: raise RuntimeError(f'{label}: erwarteter Originalabschnitt {n}x statt genau einmal. Keine Veroeffentlichung.')
+              return src.replace(old,new,1)
+
+          vpath=Path('version.json')
+          if not vpath.is_file(): raise RuntimeError('version.json fehlt.')
+          version=json.loads(vpath.read_text(encoding='utf-8')).get('version')
+          if version=='3.6.4':
+              print('Version 3.6.4 ist bereits vorhanden – keine Aenderung notwendig.')
+          else:
+              if version!='3.6.3': raise RuntimeError('Update erwartet Version 3.6.3; gefunden: '+str(version))
+              result={}
+              result['rawcharts363.js']=once(Path('rawcharts363.js').read_text(encoding='utf-8'),"  const data=ctx.getImageData(0,0,w,h);const pixels=data.data;\n  // Nur Tonwerte; keine Verformung, kein Erzeugen/Entfernen von Linien.\n  // Ein heller Papierhintergrund wird nahezu weiß; die Originalkurven bleiben an derselben Position.\n  for(let i=0;i<pixels.length;i+=4){const gray=.299*pixels[i]+.587*pixels[i+1]+.114*pixels[i+2];const p=Math.max(0,Math.min(255,(gray-150)*1.45+190));pixels[i]=p;pixels[i+1]=p;pixels[i+2]=p;}\n  ctx.putImageData(data,0,0);return canvas.toDataURL('image/png');","  const data=ctx.getImageData(0,0,w,h),pixels=data.data;\n  // Nur Tonwertkorrektur pro Originalpixel, nie Linien nachzeichnen oder Messwerte erfinden.\n  // Der dokumenteigene helle Grauwert wird als Hintergrund ermittelt, damit auch\n  // feine, auf den Klinikfotos helle Linien nicht wie bisher weiß abgeschnitten werden.\n  const histogram=new Uint32Array(256),count=pixels.length/4;\n  for(let i=0;i<pixels.length;i+=4){const g=Math.round(.299*pixels[i]+.587*pixels[i+1]+.114*pixels[i+2]);histogram[g]++;}\n  let cumulative=0,background=230;\n  for(let g=0;g<256;g++){cumulative+=histogram[g];if(cumulative>=count*.90){background=g;break;}}\n  for(let i=0;i<pixels.length;i+=4){\n   const gray=.299*pixels[i]+.587*pixels[i+1]+.114*pixels[i+2];\n   const shade=Math.max(0,Math.min(253,Math.round(253-Math.max(0,background-gray)*3.1)));\n   pixels[i]=shade;pixels[i+1]=shade;pixels[i+2]=shade;\n  }\n  ctx.putImageData(data,0,0);return canvas.toDataURL('image/png');",'Klinikdiagramm-Kontrast')
+              css=Path('rawcharts363.css').read_text(encoding='utf-8')
+              if '3.6.4: groessere Einzelkarten' in css: raise RuntimeError('Diagramm-CSS bereits bearbeitet')
+              result['rawcharts363.css']=css+'\n/* 3.6.4: groessere Einzelkarten auf iPhone; echte Originalpixel, keine Kurvenrekonstruktion. */\n#raw363 .raw363-grid{grid-template-columns:1fr;gap:15px;margin-top:14px}\n#raw363 .raw363-card{padding:12px;border-radius:14px;gap:11px;box-shadow:0 3px 12px #0b364017}\n#raw363 .raw363-card span{font-size:.94rem;line-height:1.35}\n#raw363 .raw363-thumb{height:clamp(230px,68vw,305px);width:100%;object-fit:contain;image-rendering:auto}\n#raw363 .raw363-note{font-size:.9rem;line-height:1.5}\n.raw363-dialog{width:min(98vw,1000px);max-width:98vw;height:min(94dvh,1040px);max-height:94dvh}\n.raw363-viewport img{max-width:99%;max-height:99%}\n@media(min-width:720px){#raw363 .raw363-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#raw363 .raw363-thumb{height:270px}}\n@media(min-width:1100px){#raw363 .raw363-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}\n'
+              result['app.js']=once(Path('app.js').read_text(encoding='utf-8'),"const VERSION = '3.6.3';","const VERSION = '3.6.4';",'App-Version')
+              result['secure17.js']=once(Path('secure17.js').read_text(encoding='utf-8'),"s.src='./'+src+'?v=3.6.3'","s.src='./'+src+'?v=3.6.4'",'Modul-Cachekennung')
+              result['sw.js']=once(Path('sw.js').read_text(encoding='utf-8'),"const VERSION='3.6.3-alle-scan-kopien';","const VERSION='3.6.4-lesbare-diagramme';",'Offline-Cache')
+              html=Path('index.html').read_text(encoding='utf-8')
+              if '3.6.3' not in html: raise RuntimeError('HTML-Versionsnummer 3.6.3 nicht vorhanden')
+              result['index.html']=html.replace('3.6.3','3.6.4')
+              meta=json.loads(vpath.read_text(encoding='utf-8'))
+              meta.update(version='3.6.4',released='2026-10-31',notes='Groessere Klinikdiagramm-Vorschauen auf iPhone. Schonende kontrastverstaerkte Scanansicht bewahrt auch feine hellgraue Kurven und Beschriftungen; Zoom bleibt erhalten. Originalfotos und medizinische Messdaten unveraendert und nur lokal verschluesselt.')
+              result['version.json']=json.dumps(meta,ensure_ascii=False,indent=2)+'\n'
+              for p in ('rawcharts363.js','app.js','secure17.js','sw.js'):
+                  with Path('/tmp/'+p).open('w',encoding='utf-8') as file:file.write(result[p])
+                  subprocess.run(['node','--check','/tmp/'+p],check=True)
+              json.loads(result['version.json'])
+              assert 'grid-template-columns:1fr' in result['rawcharts363.css']
+              assert 'histogram[g]++' in result['rawcharts363.js']
+              assert '253-Math.max(0,background-gray)*3.1' in result['rawcharts363.js']
+              for p,content in result.items():Path(p).write_text(content,encoding='utf-8')
+              print('7 Dateien erfolgreich validiert und aktualisiert.')
+          PY_PATCH
+      - name: Installationskontrolle
+        shell: bash
+        run: |
+          set -e
+          node --check rawcharts363.js
+          node --check app.js
+          node --check secure17.js
+          node --check sw.js
+          python3 -m json.tool version.json >/dev/null
+          grep -q 'histogram\[g\]++' rawcharts363.js
+          grep -q 'groessere Einzelkarten' rawcharts363.css
+          grep -q '3.6.4' version.json
+      - name: Aktualisierung veroeffentlichen
+        shell: bash
+        run: |
+          set -e
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add rawcharts363.js rawcharts363.css app.js secure17.js sw.js index.html version.json
+          if git diff --cached --quiet; then
+            echo 'Keine weitere Aenderung erforderlich.'
+          else
+            git commit -m 'PneumoPro 3.6.4: Klinikdiagramme vergroessern und Linien lesbarer darstellen'
+            git push origin HEAD:main
+          fi
