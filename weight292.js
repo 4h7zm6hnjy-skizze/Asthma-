@@ -5,7 +5,7 @@
  const $=id=>document.getElementById(id),SEC=window.ASTHMA_SECURITY;
  if(!SEC?.state?.().unlocked||!$('vitalwerte')||$('s292-weight'))return;
  const root=document.createElement('section');root.id='s292-weight';root.className='s292-weight';
- root.innerHTML='<h3>Gewichtsverlauf</h3><p class="input-note">Neue Gewichtsmessungen mit Datum dokumentieren. Alte Profilangaben werden nicht verändert. Die Einträge erscheinen im Statistik-Anhang und in der Sicherung.</p><form id="s292-weight-form"><label>Datum<input type="date" name="date" required></label><label>Gewicht (kg)<input type="number" name="kg" required min="15" max="500" step="0.1" inputmode="decimal"></label><label>Notiz (optional)<input type="text" name="note" maxlength="160"></label><input type="hidden" name="entry"><div class="s292-actions"><button class="btn btn-primary" type="submit">Gewicht speichern</button><button class="btn btn-outline" id="s292-weight-cancel" type="button" hidden>Abbrechen</button></div></form><p id="s292-weight-status" role="status"></p><div id="s292-weight-list"></div>';
+ root.innerHTML='<h3>Gewichtsverlauf</h3><p class="input-note">Neue Gewichtsmessungen mit Datum dokumentieren. Das neueste gespeicherte Gewicht aktualisiert automatisch das Patientenprofil, den BMI und die Körperoberfläche. Die Einträge erscheinen im Statistik-Anhang und in der Sicherung.</p><form id="s292-weight-form"><label>Datum<input type="date" name="date" required></label><label>Gewicht (kg)<input type="number" name="kg" required min="15" max="500" step="0.1" inputmode="decimal"></label><label>Notiz (optional)<input type="text" name="note" maxlength="160"></label><input type="hidden" name="entry"><div class="s292-actions"><button class="btn btn-primary" type="submit">Gewicht speichern</button><button class="btn btn-outline" id="s292-weight-cancel" type="button" hidden>Abbrechen</button></div></form><p id="s292-weight-status" role="status"></p><div id="s292-weight-list"></div>';
  $('vitalwerte').append(root);
  const form=$('s292-weight-form'),status=$('s292-weight-status'),list=$('s292-weight-list');
  const dateStr=()=>{const x=new Date();return [x.getFullYear(),String(x.getMonth()+1).padStart(2,'0'),String(x.getDate()).padStart(2,'0')].join('-')};
@@ -30,7 +30,7 @@
    const editId=form.elements.entry.value;
    if(!editId&&entries.some(x=>x.date===date&&Number(x.kg)===kg)){status.textContent='Identischer Wert am selben Tag bereits vorhanden.';return;}
    const id=editId||crypto.randomUUID?.()||'w'+Date.now()+'-'+Math.random().toString(36).slice(2);
-   const value={id,date,kg,note:note.slice(0,160)};
+   const value={id,date,kg,note:note.slice(0,160),createdAt:entries.find(x=>x.id===id)?.createdAt||new Date().toISOString()};
    try{await SEC.put('suite',{key:'weight292/'+id,type:'weight292',value},'weight292/'+id);reset();status.textContent='Gewicht verschlüsselt gespeichert.';await refresh();}catch(err){status.textContent='Speichern fehlgeschlagen: '+err.message;}
  });
  $('s292-weight-cancel').addEventListener('click',reset);

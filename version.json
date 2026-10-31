@@ -1,5 +1,5 @@
 {
-  "version": "3.7.4",
+  "version": "3.7.5",
   "released": "2026-10-31",
-  "notes": "Getrennte Pruefansichten fuer Spirometrie, Bodyplethysmographie und Diffusionsmessung bei einem zentralen Original-Upload. Zusaetzliche Messparameter fuer Hausarzt-Befunde, unveraenderte lokale Verschluesselung und vorhandene Diagramme. Spirometrie und Body in einem Messwertdatensatz, Diffusion separat; unlesbare Werte bleiben leer und werden geprueft."
+  "notes": "Aktuellste Gewichtsmessung automatisch im Patientenprofil mit BMI und Koerperoberflaeche; Messwertlisten in bestehenden Bereichen aufklappbar (Sauerstoff, Puls, Blutdruck, Gewicht, Peak-Flow, Lungenfunktion). Bestehende Diagramme, Speicher und Daten unveraendert."
 }

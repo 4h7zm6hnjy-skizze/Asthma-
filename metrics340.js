@@ -56,7 +56,7 @@
  $('m340-weight-range').addEventListener('change',drawWeight);
  $('m340-weight-scale').addEventListener('change',drawWeight);
  async function refresh(){const call=++epoch,items=await S.list('suite');if(call!==epoch)return;
-  weights=items.filter(x=>x.type==='weight292'&&/^\d{4}-\d\d-\d\d$/.test(x.value?.date||'')&&n(x.value.kg)!==null).map(x=>({date:x.value.date,kg:n(x.value.kg)})).sort((a,b)=>a.date.localeCompare(b.date));
+  weights=items.filter(x=>x.type==='weight292'&&/^\d{4}-\d\d-\d\d$/.test(x.value?.date||'')&&n(x.value.kg)!==null).map(x=>({date:x.value.date,kg:n(x.value.kg),createdAt:String(x.value.createdAt||''),id:String(x.value.id||x.key||'')})).sort((a,b)=>a.date.localeCompare(b.date)||a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id));
   const vitals=items.filter(x=>x.type==='vital29'&&x.value?.date).map(x=>x.value).sort((a,b)=>(b.date+' '+(b.time||'')).localeCompare(a.date+' '+(a.time||'')));
   const find=kind=>vitals.find(x=>x.kind===kind),spo=find('spo2'),bp=find('bp'),pulse=find('pulse'),wg=weights.at(-1);
   const v=$('m340-vital-cards');v.replaceChildren();addCard(v,'BLUTSAUERSTOFF · SpO₂',n(spo?.value),'%',spo?.date,'Messmethode beachten',1,'spo2');addCard(v,'BLUTDRUCK · SYSTOLISCH',n(bp?.value),'mmHg',bp?.date,'Oberer Blutdruckwert',0);addCard(v,'BLUTDRUCK · DIASTOLISCH',n(bp?.diastolic),'mmHg',bp?.date,'Unterer Blutdruckwert',0);addCard(v,'PULS',n(pulse?.value),'/min',pulse?.date,'Schläge pro Minute (in Ruhe bewertbar)',0,'pulse');addCard(v,'GEWICHT',n(wg?.kg),'kg',wg?.date,'Diagramm und Eingabe weiter unten',1,'weight');
