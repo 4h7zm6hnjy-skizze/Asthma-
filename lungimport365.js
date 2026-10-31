@@ -73,14 +73,14 @@
  const $=id=>document.getElementById(id), warn=$('li365-warnings'),status=$('li365-status');
  const setStatus=(msg,error=false)=>{status.textContent=msg;status.dataset.error=error?'yes':'no';};
  function warnings(messages){let a=[...new Set(messages.filter(Boolean))];warn.hidden=!a.length;warn.replaceChildren();if(a.length){warn.append(el('strong','','Automatische Übernahme nicht vollständig möglich.'));for(let v of a)warn.append(el('p','',v));warn.append(el('p','','Bei unleserlichen oder uneindeutigen Befunden kannst du das Original selbst in ChatGPT hochladen und die Daten dort auswerten lassen. Prüfe auch dann alle Ergebnisse am Original. Es wird nichts automatisch an ChatGPT übertragen.'));}}
- let currentDoc=null,parsed=null,image=null,canvasBase=null,selection=null,drag=null,crops=[],busy=false,activeRequest=0,worker=null,ocrHints=[],ocrRows366='';
+ let currentDoc=null,parsed=null,image=null,canvasBase=null,selection=null,drag=null,crops=[],busy=false,activeRequest=0,worker=null,ocrHints=[],ocrRows366='',ocrPosition367='';
  const format=n=>n===null||n===undefined?'':String(n).replace('.',',');
  const validDate=s=>/^\d{4}-\d\d-\d\d$/.test(s)&&Number.isFinite(Date.parse(s+'T12:00:00Z'))&&new Date(s+'T12:00:00Z').toISOString().slice(0,10)===s;
  const eligible=d=>d?.blob instanceof Blob&&(/^(?:Lungenfunktionstest|Diffusionsmessung)$/i.test(d.kind||'')||['lufu','diff'].includes(d.scanArea))&&/\.(?:jpe?g|png|webp|heic|heif|pdf)$/i.test(d.name||'');
  const checkMime=file=>/\.(?:jpe?g|png|webp|heic|heif|pdf)$/i.test(file?.name||'')&&file.size>0&&file.size<=12*1048576;
  async function refreshDocs(selectId){let ds=(await S.list('documents')).filter(eligible).sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));const select=$('li365-doc');select.replaceChildren(new Option('Gespeicherten Befund auswählen',''));for(let d of ds)select.append(new Option(String(d.name||'Befund').slice(0,100)+' · '+(d.documentDate||'Datum prüfen'),d.id));if(selectId&&ds.some(d=>d.id===selectId))select.value=selectId;return ds;}
  async function recognizeImage(blob){
-  ocrRows366='';
+  ocrRows366='';ocrPosition367='';
   const bitmap=await createImageBitmap(blob);
   try{
    const fac=Math.min(1.65,2900/Math.max(bitmap.width,bitmap.height),Math.sqrt(5200000/(bitmap.width*bitmap.height)));
@@ -93,7 +93,8 @@
      const text=String(data?.text||'').slice(0,60000),tsv=String(data?.tsv||''),rowsText=engine?.tsvText(tsv)||'';
      const normal=engine?.parse(text),byRows=engine?.parse(rowsText);
      const best=byRows?.rows?.length>normal?.rows?.length?byRows:normal;
-     return {text,tsv,rowsText,score:best?.rows?.length||0};
+     const spatial=window.PNEUMOPRO_PARSER367?.parseTSV(tsv,text);
+     return {text,tsv,rowsText,score:Math.max(best?.rows?.length||0,spatial?.rows?.length||0)};
    }
    let best=resultOf(first.data);
    // Nur wenn die erste Erkennung scheitert: eine zweite lokale Layoutstrategie.
@@ -106,7 +107,7 @@
      }catch(e){ /* Originalerkennung bleibt erhalten; keine Daten erfinden. */ }
      finally{try{await w.setParameters({tessedit_pageseg_mode:'3'});}catch(e){ /* Bei erneutem Scan wird neuer Versuch gestartet. */ }}
    }
-   ocrRows366=best.rowsText;
+   ocrRows366=best.rowsText;ocrPosition367=best.tsv;
    ocrHints=tsvHints(best.tsv,bitmap.width/c.width,bitmap.height/c.height);
    c.width=c.height=1;
    return best.text;
@@ -120,15 +121,20 @@
  for(const [code,label,unit] of defs[kind]){let tr=el('tr');tr.dataset.code=code;tr.append(el('th','',label+' ('+unit+')'));let cand=parsed?.rows?.find(x=>x.code===code);for(const key of ['predicted','actual','percent','z']){let td=el('td');let input=el('input');input.type='text';input.inputMode='decimal';input.autocomplete='off';input.dataset.field=key;input.value=format(cand?.[key]);input.setAttribute('aria-label',label+' '+key);td.append(input);tr.append(td);}t.append(tr);}host.append(t);}
  async function setCurrentDoc(d){currentDoc=d;parsed=null;crops=[];image=null;selection=null;ocrHints=[];$('li365-review').hidden=true;$('li365-chartlist').replaceChildren();$('li365-canvas').width=$('li365-canvas').height=0;setStatus('Ausgewählt: '+d.name+'. Analyse starten.');warnings([]);}
  async function analyze(d){if(busy||!d)return;busy=true;let request=++activeRequest;warnings([]);setStatus('Lese '+d.name+' lokal ein. Es werden keine Daten an einen Server geschickt.');$('li365-analyze').disabled=true;
- try{if(!S.state().unlocked)throw Error('Gesundheitsakte gesperrt.');let isPdf=/\.pdf$/i.test(d.name);ocrHints=[];if(isPdf)ocrRows366='';let text=isPdf?await recognizePdf(d.blob):await recognizeImage(d.blob);if(request!==activeRequest)return;currentDoc=d;
+ try{if(!S.state().unlocked)throw Error('Gesundheitsakte gesperrt.');let isPdf=/\.pdf$/i.test(d.name);ocrHints=[];if(isPdf){ocrRows366='';ocrPosition367='';}let text=isPdf?await recognizePdf(d.blob):await recognizeImage(d.blob);if(request!==activeRequest)return;currentDoc=d;
   const scanner366=window.PNEUMOPRO_PARSER366;
   const fromText=scanner366?.parse(text)||parse(text);
   const fromLines=ocrRows366&&scanner366?scanner366.parse(ocrRows366):null;
   const useLines=fromLines&&fromLines.rows.length>fromText.rows.length;
   parsed=useLines?{...fromLines,date:fromLines.date||fromText.date,warnings:[...new Set([...fromLines.warnings,...fromText.warnings])]}:fromText;
+  const geo=!isPdf&&ocrPosition367?window.PNEUMOPRO_PARSER367?.parseTSV(ocrPosition367,text):null;
+  const useGeo=geo&&geo.rows.length>parsed.rows.length;
+  if(useGeo)parsed={...geo,date:geo.date||parsed.date||fromText.date,warnings:geo.warnings};
+  else if(geo?.diagnostics?.recognized&&!parsed.rows.length)parsed.warnings=[...new Set([...parsed.warnings,...geo.warnings])];
   if(useLines)text+='\n\n[Zusätzliche Tabellenzeilen aus OCR-Positionsdaten]\n'+ocrRows366;
   let notices=[...parsed.warnings];
-  if(useLines)notices.push('Tabellenzeilen anhand ihrer Bildposition rekonstruiert. Bitte Zuordnung der Zahlen am Original besonders sorgfältig prüfen.');if(isPdf&&text.includes('WARNUNG: PDF hat'))notices.push('Mehrseitiges PDF nicht vollständig ausgelesen. Bitte Original prüfen.');
+  if(useLines&&!useGeo)notices.push('Tabellenzeilen anhand ihrer Bildposition rekonstruiert. Bitte Zuordnung der Zahlen am Original besonders sorgfältig prüfen.');
+  if(useGeo)notices.push('Soll/Ist/% anhand wiederkehrender echter Spaltenpositionen als UNBESTAETIGTE Vorschlaege erkannt. Jede Zahl, Einheit und Messphase am Original pruefen.');if(isPdf&&text.includes('WARNUNG: PDF hat'))notices.push('Mehrseitiges PDF nicht vollständig ausgelesen. Bitte Original prüfen.');
  $('li365-type').value=parsed.kind||(['diff','lufu'].includes(d.scanArea)?(d.scanArea==='diff'?'diffusion':'measurements'):'');$('li365-date').value=parsed.date||d.documentDate||'';$('li365-time').value='';$('li365-clinic').value=d.clinic||d.providerName||'';$('li365-phase').value='unbekannt';$('li365-text').textContent=text;$('li365-verified').checked=false;drawRows();$('li365-review').hidden=false;
  const missing=defs[$('li365-type').value]?.length-(parsed.rows.filter(x=>defs[$('li365-type').value].some(v=>v[0]===x.code)).length)||0;
  if(missing>0)notices.push(missing+' von '+defs[$('li365-type').value].length+' Parameterpositionen sind nicht sicher ausgelesen. Fehlende Werte bleiben leer.');

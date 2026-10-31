@@ -1,5 +1,5 @@
 {
-  "version": "3.6.6",
+  "version": "3.6.7",
   "released": "2026-10-31",
-  "notes": "Verbesserte Erkennung von Soll/Ist/%-Tabellen mit zusaetzlichen Klinikspalten, Referenzwerten und Z-Scores. Zweiter lokaler OCR-Versuch bei erfolglosem Foto. Messwerte nur als Vorschlaege, manuelle Kontrolle zwingend, Warnung bei Unsicherheit und Option ChatGPT. Mobilformulare sauber untereinander, Originaldaten bleiben verschluesselt."
+  "notes": "OCR-Tabellen anhand echter Spaltenpositionen mit rechnerischer Plausibilitaetspruefung. Nur wiederholt eindeutig passende Soll/Ist/%-Spalten als unbestaetigte Vorschlaege; unklare Werte bleiben leer und erzeugen Warnungen. Originale und Tresor unveraendert, kein Upload medizinischer Daten. Auch mit dieser Version ist eine 100-prozentige Erkennung nicht garantiert."
 }
