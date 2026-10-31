@@ -1,6 +1,6 @@
 'use strict';
 (() => {
-  const VERSION = '3.7.3';
+  const VERSION = '3.7.4';
   window.ASTHMA_APP_VERSION = VERSION;
   const STORAGE = 'asthma-v1-preferences';
   const sources = window.ASTHMA_SOURCES || {};

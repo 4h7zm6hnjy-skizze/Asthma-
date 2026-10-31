@@ -1,5 +1,5 @@
 {
-  "version": "3.7.3",
+  "version": "3.7.4",
   "released": "2026-10-31",
-  "notes": "Neue lokale Originalbild-Nachpruefansicht fuer teilweise oder nicht erkannte Lungenfunktionswerte: Bildzoom, zeilenweise Eingabe, bewusste Originalkontrolle, Plausibilitaetspruefung und Kennzeichnung manuell abgeglichener Werte. Vorhandene OCR bleibt konservativ; keine geschaetzten Messwerte oder Bearbeitung gespeicherter Fotos. Endgueltige Speicherung erst nach bestehender Bestaetigung."
+  "notes": "Getrennte Pruefansichten fuer Spirometrie, Bodyplethysmographie und Diffusionsmessung bei einem zentralen Original-Upload. Zusaetzliche Messparameter fuer Hausarzt-Befunde, unveraenderte lokale Verschluesselung und vorhandene Diagramme. Spirometrie und Body in einem Messwertdatensatz, Diffusion separat; unlesbare Werte bleiben leer und werden geprueft."
 }
