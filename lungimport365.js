@@ -73,13 +73,45 @@
  const $=id=>document.getElementById(id), warn=$('li365-warnings'),status=$('li365-status');
  const setStatus=(msg,error=false)=>{status.textContent=msg;status.dataset.error=error?'yes':'no';};
  function warnings(messages){let a=[...new Set(messages.filter(Boolean))];warn.hidden=!a.length;warn.replaceChildren();if(a.length){warn.append(el('strong','','Automatische Übernahme nicht vollständig möglich.'));for(let v of a)warn.append(el('p','',v));warn.append(el('p','','Bei unleserlichen oder uneindeutigen Befunden kannst du das Original selbst in ChatGPT hochladen und die Daten dort auswerten lassen. Prüfe auch dann alle Ergebnisse am Original. Es wird nichts automatisch an ChatGPT übertragen.'));}}
- let currentDoc=null,parsed=null,image=null,canvasBase=null,selection=null,drag=null,crops=[],busy=false,activeRequest=0,worker=null,ocrHints=[];
+ let currentDoc=null,parsed=null,image=null,canvasBase=null,selection=null,drag=null,crops=[],busy=false,activeRequest=0,worker=null,ocrHints=[],ocrRows366='';
  const format=n=>n===null||n===undefined?'':String(n).replace('.',',');
  const validDate=s=>/^\d{4}-\d\d-\d\d$/.test(s)&&Number.isFinite(Date.parse(s+'T12:00:00Z'))&&new Date(s+'T12:00:00Z').toISOString().slice(0,10)===s;
  const eligible=d=>d?.blob instanceof Blob&&(/^(?:Lungenfunktionstest|Diffusionsmessung)$/i.test(d.kind||'')||['lufu','diff'].includes(d.scanArea))&&/\.(?:jpe?g|png|webp|heic|heif|pdf)$/i.test(d.name||'');
  const checkMime=file=>/\.(?:jpe?g|png|webp|heic|heif|pdf)$/i.test(file?.name||'')&&file.size>0&&file.size<=12*1048576;
  async function refreshDocs(selectId){let ds=(await S.list('documents')).filter(eligible).sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));const select=$('li365-doc');select.replaceChildren(new Option('Gespeicherten Befund auswählen',''));for(let d of ds)select.append(new Option(String(d.name||'Befund').slice(0,100)+' · '+(d.documentDate||'Datum prüfen'),d.id));if(selectId&&ds.some(d=>d.id===selectId))select.value=selectId;return ds;}
- async function recognizeImage(blob){const url=URL.createObjectURL(blob);try{const bitmap=await createImageBitmap(blob);try{const fac=Math.min(1,2300/Math.max(bitmap.width,bitmap.height),Math.sqrt(4000000/(bitmap.width*bitmap.height)));const c=document.createElement('canvas');c.width=Math.max(1,Math.round(bitmap.width*fac));c.height=Math.max(1,Math.round(bitmap.height*fac));c.getContext('2d').drawImage(bitmap,0,0,c.width,c.height);const w=await ocrWorker();let data=await w.recognize(c,{}, {tsv:true});ocrHints=tsvHints(String(data.data?.tsv||''),bitmap.width/c.width,bitmap.height/c.height);c.width=c.height=1;return String(data.data?.text||'').slice(0,60000);}finally{bitmap.close();}}finally{URL.revokeObjectURL(url);}}
+ async function recognizeImage(blob){
+  ocrRows366='';
+  const bitmap=await createImageBitmap(blob);
+  try{
+   const fac=Math.min(1.65,2900/Math.max(bitmap.width,bitmap.height),Math.sqrt(5200000/(bitmap.width*bitmap.height)));
+   const c=document.createElement('canvas');c.width=Math.max(1,Math.round(bitmap.width*fac));c.height=Math.max(1,Math.round(bitmap.height*fac));
+   const ctx=c.getContext('2d',{willReadFrequently:true});if(!ctx)throw Error('Bildverarbeitung nicht verfügbar.');
+   ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(bitmap,0,0,c.width,c.height);
+   const w=await ocrWorker(),engine=window.PNEUMOPRO_PARSER366;
+   const first=await w.recognize(c,{}, {tsv:true});
+   function resultOf(data){
+     const text=String(data?.text||'').slice(0,60000),tsv=String(data?.tsv||''),rowsText=engine?.tsvText(tsv)||'';
+     const normal=engine?.parse(text),byRows=engine?.parse(rowsText);
+     const best=byRows?.rows?.length>normal?.rows?.length?byRows:normal;
+     return {text,tsv,rowsText,score:best?.rows?.length||0};
+   }
+   let best=resultOf(first.data);
+   // Nur wenn die erste Erkennung scheitert: eine zweite lokale Layoutstrategie.
+   if(best.score<2){
+     try{
+       setStatus('Wenig Tabellenwerte erkannt. Zweiter lokaler Leseversuch ...');
+       await w.setParameters({tessedit_pageseg_mode:'6'});
+       const second=resultOf((await w.recognize(c,{}, {tsv:true})).data);
+       if(second.score>best.score)best=second;
+     }catch(e){ /* Originalerkennung bleibt erhalten; keine Daten erfinden. */ }
+     finally{try{await w.setParameters({tessedit_pageseg_mode:'3'});}catch(e){ /* Bei erneutem Scan wird neuer Versuch gestartet. */ }}
+   }
+   ocrRows366=best.rowsText;
+   ocrHints=tsvHints(best.tsv,bitmap.width/c.width,bitmap.height/c.height);
+   c.width=c.height=1;
+   return best.text;
+  }finally{bitmap.close();}
+ }
  async function ocrWorker(){if(!window.Tesseract){await new Promise((resolve,reject)=>{let s=document.createElement('script');s.src='./ocr-vendor/tesseract.min.js';s.onload=resolve;s.onerror=()=>reject(Error('Lokales OCR-Modul nicht verfügbar.'));document.head.append(s);});}if(!window.Tesseract?.createWorker)throw Error('OCR-Modul nicht verfügbar.');if(!worker){const base=new URL('./ocr-vendor/',location.href).href;worker=await window.Tesseract.createWorker(['deu','eng'],1,{workerPath:base+'worker.min.js',corePath:base+'core',langPath:base+'lang',workerBlobURL:false});}return worker;}
  function tsvHints(tsv,fx,fy){const matches=[];const groups=new Map();for(const line of tsv.split(/\r?\n/).slice(1)){const f=line.split('\t');if(f.length<12||f[0]!=='5')continue;let word=f.slice(11).join(' ').trim();if(!word)continue;const key=f.slice(1,5).join('-');let list=groups.get(key)||[];list.push({word,x:Number(f[6]),y:Number(f[7]),w:Number(f[8]),h:Number(f[9])});groups.set(key,list);}for(const words of groups.values()){let title=words.map(x=>x.word).join(' ');if(!/(?:fluss.{0,8}volumen|flow.{0,8}volume|volumen.{0,8}zeit|volume.{0,8}time|ch\s*4.{0,8}co|atemwegswiderstand|bodypleth|diffusionskurve)/i.test(title))continue;let x=Math.min(...words.map(w=>w.x)),y=Math.min(...words.map(w=>w.y));let label=/ch\s*4|diffusion/i.test(title)?'Diffusion (CO/CH4)':/widerstand|pleth/i.test(title)?'Atemwegswiderstand':/zeit|time/i.test(title)?'Volumen-Zeit':'Fluss-Volumen';matches.push({label,x:Math.round(x*fx),y:Math.round(y*fy),title:title.slice(0,90)});}return matches.slice(0,8);}
  async function recognizePdf(blob){const pdfjs=await import('./ocr-vendor/pdf.min.mjs');pdfjs.GlobalWorkerOptions.workerSrc=new URL('./ocr-vendor/pdf.worker.min.mjs',location.href).href;const job=pdfjs.getDocument({data:new Uint8Array(await blob.arrayBuffer()),useSystemFonts:true}),pdf=await job.promise;let pages=[],count=Math.min(pdf.numPages,5);try{for(let pageNum=1;pageNum<=count;pageNum++){setStatus('PDF-Seite '+pageNum+' von '+count+' wird lokal gelesen.');let p=await pdf.getPage(pageNum),data=await p.getTextContent();let items=(data.items||[]).filter(i=>i.str&&i.transform);let out='';if(items.length){const lines=[];for(let item of items){const y=item.transform[5];let group=lines.find(l=>Math.abs(l.y-y)<3);if(!group){group={y,items:[]};lines.push(group);}group.items.push(item);}out=lines.sort((a,b)=>b.y-a.y).map(l=>l.items.sort((a,b)=>a.transform[4]-b.transform[4]).map(x=>x.str).join(' ')).join('\n');}
@@ -88,7 +120,15 @@
  for(const [code,label,unit] of defs[kind]){let tr=el('tr');tr.dataset.code=code;tr.append(el('th','',label+' ('+unit+')'));let cand=parsed?.rows?.find(x=>x.code===code);for(const key of ['predicted','actual','percent','z']){let td=el('td');let input=el('input');input.type='text';input.inputMode='decimal';input.autocomplete='off';input.dataset.field=key;input.value=format(cand?.[key]);input.setAttribute('aria-label',label+' '+key);td.append(input);tr.append(td);}t.append(tr);}host.append(t);}
  async function setCurrentDoc(d){currentDoc=d;parsed=null;crops=[];image=null;selection=null;ocrHints=[];$('li365-review').hidden=true;$('li365-chartlist').replaceChildren();$('li365-canvas').width=$('li365-canvas').height=0;setStatus('Ausgewählt: '+d.name+'. Analyse starten.');warnings([]);}
  async function analyze(d){if(busy||!d)return;busy=true;let request=++activeRequest;warnings([]);setStatus('Lese '+d.name+' lokal ein. Es werden keine Daten an einen Server geschickt.');$('li365-analyze').disabled=true;
- try{if(!S.state().unlocked)throw Error('Gesundheitsakte gesperrt.');let isPdf=/\.pdf$/i.test(d.name);ocrHints=[];let text=isPdf?await recognizePdf(d.blob):await recognizeImage(d.blob);if(request!==activeRequest)return;currentDoc=d;parsed=parse(text);let notices=[...parsed.warnings];if(isPdf&&text.includes('WARNUNG: PDF hat'))notices.push('Mehrseitiges PDF nicht vollständig ausgelesen. Bitte Original prüfen.');
+ try{if(!S.state().unlocked)throw Error('Gesundheitsakte gesperrt.');let isPdf=/\.pdf$/i.test(d.name);ocrHints=[];if(isPdf)ocrRows366='';let text=isPdf?await recognizePdf(d.blob):await recognizeImage(d.blob);if(request!==activeRequest)return;currentDoc=d;
+  const scanner366=window.PNEUMOPRO_PARSER366;
+  const fromText=scanner366?.parse(text)||parse(text);
+  const fromLines=ocrRows366&&scanner366?scanner366.parse(ocrRows366):null;
+  const useLines=fromLines&&fromLines.rows.length>fromText.rows.length;
+  parsed=useLines?{...fromLines,date:fromLines.date||fromText.date,warnings:[...new Set([...fromLines.warnings,...fromText.warnings])]}:fromText;
+  if(useLines)text+='\n\n[Zusätzliche Tabellenzeilen aus OCR-Positionsdaten]\n'+ocrRows366;
+  let notices=[...parsed.warnings];
+  if(useLines)notices.push('Tabellenzeilen anhand ihrer Bildposition rekonstruiert. Bitte Zuordnung der Zahlen am Original besonders sorgfältig prüfen.');if(isPdf&&text.includes('WARNUNG: PDF hat'))notices.push('Mehrseitiges PDF nicht vollständig ausgelesen. Bitte Original prüfen.');
  $('li365-type').value=parsed.kind||(['diff','lufu'].includes(d.scanArea)?(d.scanArea==='diff'?'diffusion':'measurements'):'');$('li365-date').value=parsed.date||d.documentDate||'';$('li365-time').value='';$('li365-clinic').value=d.clinic||d.providerName||'';$('li365-phase').value='unbekannt';$('li365-text').textContent=text;$('li365-verified').checked=false;drawRows();$('li365-review').hidden=false;
  const missing=defs[$('li365-type').value]?.length-(parsed.rows.filter(x=>defs[$('li365-type').value].some(v=>v[0]===x.code)).length)||0;
  if(missing>0)notices.push(missing+' von '+defs[$('li365-type').value].length+' Parameterpositionen sind nicht sicher ausgelesen. Fehlende Werte bleiben leer.');

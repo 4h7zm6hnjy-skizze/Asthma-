@@ -29,3 +29,10 @@
 #li365-home .li365-preview figure{background:#fff;border:1px solid #d5e5ec;border-radius:9px;margin:0;padding:6px}
 #li365-home .li365-preview img{width:100%;max-height:220px;object-fit:contain;cursor:zoom-in}
 #li365-home .li365-preview figcaption{font-size:.75rem;color:#406274}
+
+/* 3.6.6: iPhone - saubere einzelne Formularfelder ohne Ueberlappung. */
+@media(max-width:680px){
+ #li365 .li365-fields{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:7px!important}
+ #li365 .li365-fields>label{display:block;min-width:0!important;max-width:100%!important;width:100%;margin:5px 0!important}
+ #li365 .li365-fields input,#li365 .li365-fields select{width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+}
