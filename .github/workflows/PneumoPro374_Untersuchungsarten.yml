@@ -1,0 +1,83 @@
+name: PneumoPro 3.7.4 - Untersuchungsarten getrennt
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PneumoPro374_Untersuchungsarten.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pneumopro-374-untersuchungsarten
+  cancel-in-progress: false
+
+jobs:
+  upgrade:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aktuellen App-Stand laden
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Getrennte Untersuchungsansichten installieren
+        shell: bash
+        run: |
+          python3 - <<'PY_374'
+          from pathlib import Path
+          import base64,json,subprocess
+          
+          vfile=Path('version.json')
+          meta=json.loads(vfile.read_text(encoding='utf-8'))
+          if meta.get('version')=='3.7.4':
+           print('Version 3.7.4 ist bereits vorhanden, keine doppelten Aenderungen.')
+          elif meta.get('version')!='3.7.3':
+           raise SystemExit('Ausgangsversion 3.7.3 erwartet; aus Sicherheitsgruenden nichts aendern.')
+          else:
+           def one(filename,old,new):
+            f=Path(filename);source=f.read_text(encoding='utf-8')
+            if source.count(old)!=1:raise RuntimeError(f'{filename}: Marker nicht eindeutig ({source.count(old)} Treffer).')
+            f.write_text(source.replace(old,new,1),encoding='utf-8')
+           def allv(filename):
+            f=Path(filename);source=f.read_text(encoding='utf-8')
+            if '3.7.3' not in source:raise RuntimeError(f'{filename}: Version 3.7.3 fehlt.')
+            f.write_text(source.replace('3.7.3','3.7.4'),encoding='utf-8')
+           if Path('lungsplit374.js').exists():raise RuntimeError('Modul bereits vorhanden bei falscher Version.')
+           Path('lungsplit374.js').write_bytes(base64.b64decode('J3VzZSBzdHJpY3QnOwovKiBQbmV1bW9Qcm8gMy43LjQ6IFNlcGFyYXRlIEFuc2ljaHQgZnVlciBTcGlyb21ldHJpZSwgQm9keXBsZXRoeXNtb2dyYXBoaWUgdW5kIERpZmZ1c2lvbi4KICAgRWluIE9yaWdpbmFsLVVwbG9hZCwga2VpbmUgc2VydmVyc2VpdGlnZSBWZXJhcmJlaXR1bmcsIGtlaW5lIFVlYmVydHJhZ3VuZyBwZXJzb25lbmJlem9nZW5lciBEYXRlbi4KICAgQmVzdGVoZW5kZSBTcGVpY2hlcnVuZyBpbiBzdWl0ZS9tZWFzdXJlbWVudHMgYmV6aWVodW5nc3dlaXNlIHN1aXRlL2RpZmZ1c2lvbiBibGVpYnQgZXJoYWx0ZW4uICovCigoKT0+ewogIGNvbnN0ICQ9aWQ9PmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKGlkKTsKICBjb25zdCByZXZpZXc9JCgnbGkzNjUtcmV2aWV3JyksdGFibGU9JCgnbGkzNjUtdGFibGUnKSxzZWxlY3Q9JCgnbGkzNjUtdHlwZScpOwogIGlmKCFyZXZpZXd8fCF0YWJsZXx8IXNlbGVjdHx8JCgnbHMzNzQnKSlyZXR1cm47CiAgY29uc3QgYnlHcm91cD17CiAgICBzcGlybzpuZXcgU2V0KFsnVkMnLCdWQ19JTicsJ0ZWQ2luJywnRlZDRXgnLCdGVkMnLCdGRVYxJywnRkVWMV9WQycsJ0ZFVjFfRlZDJywnUEVGJywnUElGJywnTUVGMjUnLCdNRUY1MCcsJ01FRjc1JywnTU1FRjc1XzI1JywnRkVGNzUnXSksCiAgICBib2R5Om5ldyBTZXQoWydSYXd0b3QnLCdzUmF3dG90JywnUmF3aW4nLCdSYXdleCcsJ1JfZWZmJywnc1JfZWZmJywnRlJDcGxldGgnLCdUR1YnLCdUTEMnLCdSVicsJ1JWX1RMQyddKSwKICAgIGRpZmZ1c2lvbjpudWxsCiAgfTsKICBjb25zdCBuYW1lcz17c3Bpcm86J1NwaXJvbWV0cmllJyxib2R5OidCb2R5cGxldGh5c21vZ3JhcGhpZScsZGlmZnVzaW9uOidEaWZmdXNpb25zbWVzc3VuZyd9OwogIGNvbnN0IGtpbmRPZj1ncm91cD0+Z3JvdXA9PT0nZGlmZnVzaW9uJz8nZGlmZnVzaW9uJzonbWVhc3VyZW1lbnRzJzsKICBjb25zdCBkcmFmdHM9bmV3IE1hcCgpOwogIGxldCBncm91cD0nc3Bpcm8nLG9wZW5lZD1mYWxzZSxyZW5kZXJlZEtpbmQ9c2VsZWN0LnZhbHVlOwogIGNvbnN0IGhvc3Q9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnc2VjdGlvbicpO2hvc3QuaWQ9J2xzMzc0JzsKICBjb25zdCB0aXRsZT1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCdoNCcpO3RpdGxlLnRleHRDb250ZW50PSdNZXNzd2VydGUgbmFjaCBVbnRlcnN1Y2h1bmdzYXJ0IGdldHJlbm50Jztob3N0LmFwcGVuZCh0aXRsZSk7CiAgY29uc3QgaW50cm89ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgncCcpO2ludHJvLnRleHRDb250ZW50PSdFaW5tYWwgaG9jaGxhZGVuLCBkaWUgV2VydGUgamUgVmVyZmFocmVuIGtvbnRyb2xsaWVyZW4uIFNwaXJvbWV0cmllIHVuZCBCb2R5cGxldGh5c21vZ3JhcGhpZSBnZWhvZXJlbiB6dW0gc2VsYmVuIEx1bmdlbmZ1bmt0aW9uc3Rlc3Q7IERpZmZ1c2lvbnN3ZXJ0ZSB3ZXJkZW4gc2VwYXJhdCBnZXNwZWljaGVydC4nO2hvc3QuYXBwZW5kKGludHJvKTsKICBjb25zdCBiYXI9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnZGl2Jyk7YmFyLnNldEF0dHJpYnV0ZSgncm9sZScsJ2dyb3VwJyk7YmFyLnNldEF0dHJpYnV0ZSgnYXJpYS1sYWJlbCcsJ1VudGVyc3VjaHVuZ3NhcnQgd2FlaGxlbicpO2Jhci5jbGFzc05hbWU9J2xzMzc0LXRhYnMnOwogIGNvbnN0IGJ1dHRvbnM9e307CiAgZm9yKGNvbnN0IGlkIG9mIFsnc3Bpcm8nLCdib2R5JywnZGlmZnVzaW9uJ10pewogICAgY29uc3QgYj1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCdidXR0b24nKTtiLnR5cGU9J2J1dHRvbic7Yi50ZXh0Q29udGVudD1uYW1lc1tpZF07Yi5kYXRhc2V0Lmdyb3VwPWlkO2Jhci5hcHBlbmQoYik7YnV0dG9uc1tpZF09YjsKICB9CiAgaG9zdC5hcHBlbmQoYmFyKTsKICBjb25zdCBleHBsYW5hdGlvbj1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCdwJyk7ZXhwbGFuYXRpb24uaWQ9J2xzMzc0LWhpbnQnO2V4cGxhbmF0aW9uLnNldEF0dHJpYnV0ZSgncm9sZScsJ3N0YXR1cycpO2hvc3QuYXBwZW5kKGV4cGxhbmF0aW9uKTsKICB0YWJsZS5iZWZvcmUoaG9zdCk7CiAgY29uc3QgY3NzPWRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ3N0eWxlJyk7Y3NzLnRleHRDb250ZW50PWAjbHMzNzR7cGFkZGluZzoxMnB4O21hcmdpbjoxMnB4IDA7Ym9yZGVyOjFweCBzb2xpZCAjYWFjYmQ1O2JvcmRlci1yYWRpdXM6MTJweDtiYWNrZ3JvdW5kOiNmMmY5ZmI7Y29sb3I6IzEyM2I1Mn0jbHMzNzQgLmxzMzc0LXRhYnN7ZGlzcGxheTpmbGV4O2ZsZXgtd3JhcDp3cmFwO2dhcDo4cHg7bWFyZ2luOjEwcHggMH0jbHMzNzQgLmxzMzc0LXRhYnMgYnV0dG9ue2ZsZXg6MSAxIDEzNXB4O21pbi1oZWlnaHQ6NDZweDtiYWNrZ3JvdW5kOndoaXRlO2NvbG9yOiMxMjNiNTI7Ym9yZGVyOjFweCBzb2xpZCAjN2M5ZGE5O2JvcmRlci1yYWRpdXM6OXB4O2ZvbnQtd2VpZ2h0OjYwMH0jbHMzNzQgLmxzMzc0LXRhYnMgYnV0dG9uW2FyaWEtcHJlc3NlZD0idHJ1ZSJde2JhY2tncm91bmQ6IzEyM2I1Mjtjb2xvcjp3aGl0ZTtib3JkZXItY29sb3I6IzEyM2I1Mn0jbHMzNzQtaGludHttYXJnaW46N3B4IDA7bGluZS1oZWlnaHQ6MS41O2ZvbnQtc2l6ZTouOXJlbX1gO2RvY3VtZW50LmhlYWQuYXBwZW5kKGNzcyk7CiAgZnVuY3Rpb24gc2F2ZURyYWZ0KCl7CiAgICBjb25zdCBrPXJlbmRlcmVkS2luZDtpZighWydtZWFzdXJlbWVudHMnLCdkaWZmdXNpb24nXS5pbmNsdWRlcyhrKSlyZXR1cm47CiAgICBjb25zdCBob2xkZXI9ZHJhZnRzLmdldChrKXx8e307CiAgICBmb3IoY29uc3QgdHIgb2YgdGFibGUucXVlcnlTZWxlY3RvckFsbCgndHJbZGF0YS1jb2RlXScpKXsKICAgICAgY29uc3QgY2VsbHM9e307Zm9yKGNvbnN0IGlucHV0IG9mIHRyLnF1ZXJ5U2VsZWN0b3JBbGwoJ2lucHV0W2RhdGEtZmllbGRdJykpY2VsbHNbaW5wdXQuZGF0YXNldC5maWVsZF09aW5wdXQudmFsdWU7CiAgICAgIGhvbGRlclt0ci5kYXRhc2V0LmNvZGVdPXtjZWxscyxzdGF0dXM6dHIuZGF0YXNldC5zdGF0dXN9OwogICAgfQogICAgZHJhZnRzLnNldChrLGhvbGRlcik7CiAgfQogIGZ1bmN0aW9uIHJlc3RvcmVEcmFmdCgpewogICAgY29uc3QgaG9sZGVyPWRyYWZ0cy5nZXQoc2VsZWN0LnZhbHVlKTtpZighaG9sZGVyKXJldHVybjsKICAgIGZvcihjb25zdCB0ciBvZiB0YWJsZS5xdWVyeVNlbGVjdG9yQWxsKCd0cltkYXRhLWNvZGVdJykpewogICAgICBjb25zdCBkPWhvbGRlclt0ci5kYXRhc2V0LmNvZGVdO2lmKCFkKWNvbnRpbnVlOwogICAgICBmb3IoY29uc3QgaW5wdXQgb2YgdHIucXVlcnlTZWxlY3RvckFsbCgnaW5wdXRbZGF0YS1maWVsZF0nKSlpZihPYmplY3QuaGFzT3duKGQuY2VsbHMsaW5wdXQuZGF0YXNldC5maWVsZCkpaW5wdXQudmFsdWU9ZC5jZWxsc1tpbnB1dC5kYXRhc2V0LmZpZWxkXTsKICAgICAgaWYoZC5zdGF0dXM9PT0nbWFudWFsJyl0ci5kYXRhc2V0LnN0YXR1cz0nbWFudWFsJzsKICAgIH0KICB9CiAgZnVuY3Rpb24gc2hvdygpewogICAgY29uc3Qgaz1raW5kT2YoZ3JvdXApLHZpc2libGU9az09PXNlbGVjdC52YWx1ZTsKICAgIGxldCBjb3VudD0wOwogICAgZm9yKGNvbnN0IHRyIG9mIHRhYmxlLnF1ZXJ5U2VsZWN0b3JBbGwoJ3RyW2RhdGEtY29kZV0nKSl7CiAgICAgIGNvbnN0IHNob3dSb3c9dmlzaWJsZSYmKGdyb3VwPT09J2RpZmZ1c2lvbid8fGJ5R3JvdXBbZ3JvdXBdLmhhcyh0ci5kYXRhc2V0LmNvZGUpKTsKICAgICAgdHIuaGlkZGVuPSFzaG93Um93O3RyLnN0eWxlLmRpc3BsYXk9c2hvd1Jvdz8nJzonbm9uZSc7aWYoc2hvd1Jvdyljb3VudCsrOwogICAgfQogICAgZm9yKGNvbnN0IGlkIG9mIE9iamVjdC5rZXlzKGJ1dHRvbnMpKWJ1dHRvbnNbaWRdLnNldEF0dHJpYnV0ZSgnYXJpYS1wcmVzc2VkJyxTdHJpbmcoaWQ9PT1ncm91cCkpOwogICAgY29uc3Qgbm90ZT1rPT09J2RpZmZ1c2lvbic/J0RpZmZ1c2lvbnN3ZXJ0ZSB3ZXJkZW4gYWxzIGVpZ2VuZXIgQmVmdW5kIGdlc3BlaWNoZXJ0LiBXZW5uIGRpZXNlcyBPcmlnaW5hbCBtZWhyZXJlIFVudGVyc3VjaHVuZ2VuIGVudGhhZWx0LCBuYWNoIGRlbSBTcGVpY2hlcm4genVyIGFuZGVyZW4gVGVzdGFydCB3ZWNoc2Vsbi4nOgogICAgICBncm91cD09PSdzcGlybyc/J1NwaXJvbWV0cmllOiBGRVYxLCBWQy9GVkMsIEZsdXNzd2VydGUuIFp1bSBTcGVpY2hlcm4gZ2Vob2VyZW4gYXVjaCBkaWUgZWluZ2VnZWJlbmVuIEJvZHktV2VydGUgZGVyc2VsYmVuIFVudGVyc3VjaHVuZy4nOgogICAgICAnQm9keXBsZXRoeXNtb2dyYXBoaWU6IFRMQywgUlYsIFRHViB1bmQgV2lkZXJzdGFlbmRlLiBadW0gU3BlaWNoZXJuIGdlaG9lcmVuIGF1Y2ggZGllIGVpbmdlZ2ViZW5lbiBTcGlyb21ldHJpZS1XZXJ0ZSBkZXJzZWxiZW4gVW50ZXJzdWNodW5nLic7CiAgICBleHBsYW5hdGlvbi50ZXh0Q29udGVudD1ub3RlKyhjb3VudD8nJzonIEtlaW5lIFplaWxlbiBzaWNodGJhcjogVGVzdGFydCBpbiBkZW4gTWVzc3dlcnRmZWxkZXJuIGtvbnRyb2xsaWVyZW4uJyk7CiAgICBjb25zdCBoPXRhYmxlLnF1ZXJ5U2VsZWN0b3IoJ3RhYmxlJyk7aWYoaCloLnNldEF0dHJpYnV0ZSgnYXJpYS1sYWJlbCcsbmFtZXNbZ3JvdXBdKycg4oCTIE1lc3N3ZXJ0dGFiZWxsZScpOwogIH0KICBmdW5jdGlvbiBjaG9vc2UobmV4dCl7CiAgICBpZihuZXh0PT09Z3JvdXAmJnNlbGVjdC52YWx1ZT09PWtpbmRPZihuZXh0KSl7c2hvdygpO3JldHVybjt9CiAgICBzYXZlRHJhZnQoKTtncm91cD1uZXh0OwogICAgY29uc3Qga2luZD1raW5kT2YoZ3JvdXApOwogICAgaWYoc2VsZWN0LnZhbHVlIT09a2luZCl7c2VsZWN0LnZhbHVlPWtpbmQ7c2VsZWN0LmRpc3BhdGNoRXZlbnQobmV3IEV2ZW50KCdjaGFuZ2UnLHtidWJibGVzOnRydWV9KSk7fQogICAgcmVzdG9yZURyYWZ0KCk7c2hvdygpOwogICAgY29uc3QgdmVyaWZpZWQ9JCgnbGkzNjUtdmVyaWZpZWQnKTtpZih2ZXJpZmllZCl2ZXJpZmllZC5jaGVja2VkPWZhbHNlOwogIH0KICBmb3IoY29uc3QgW2lkLGJdIG9mIE9iamVjdC5lbnRyaWVzKGJ1dHRvbnMpKWIuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCgpPT5jaG9vc2UoaWQpKTsKICBzZWxlY3QuYWRkRXZlbnRMaXN0ZW5lcignY2hhbmdlJyxzYXZlRHJhZnQsdHJ1ZSk7IC8vIENhcHR1cmUgdm9yIGRlbSBSZWRyYXcgZGVzIGJlc3RlaGVuZGVuIEltcG9ydGVycy4KICBzZWxlY3QuYWRkRXZlbnRMaXN0ZW5lcignY2hhbmdlJywoKT0+ewogICAgZ3JvdXA9c2VsZWN0LnZhbHVlPT09J2RpZmZ1c2lvbic/J2RpZmZ1c2lvbic6Z3JvdXA9PT0nYm9keSc/J2JvZHknOidzcGlybyc7CiAgICByZXN0b3JlRHJhZnQoKTtzaG93KCk7CiAgfSk7CiAgbmV3IE11dGF0aW9uT2JzZXJ2ZXIoKCk9PntyZW5kZXJlZEtpbmQ9c2VsZWN0LnZhbHVlO3Jlc3RvcmVEcmFmdCgpO3Nob3coKTt9KS5vYnNlcnZlKHRhYmxlLHtjaGlsZExpc3Q6dHJ1ZX0pOwogIG5ldyBNdXRhdGlvbk9ic2VydmVyKCgpPT57CiAgICBpZighcmV2aWV3LmhpZGRlbiYmIW9wZW5lZCl7b3BlbmVkPXRydWU7ZHJhZnRzLmNsZWFyKCk7Z3JvdXA9c2VsZWN0LnZhbHVlPT09J2RpZmZ1c2lvbic/J2RpZmZ1c2lvbic6J3NwaXJvJztzaG93KCk7fQogICAgaWYocmV2aWV3LmhpZGRlbilvcGVuZWQ9ZmFsc2U7CiAgfSkub2JzZXJ2ZShyZXZpZXcse2F0dHJpYnV0ZXM6dHJ1ZSxhdHRyaWJ1dGVGaWx0ZXI6WydoaWRkZW4nXX0pOwogIGZvcihjb25zdCBpZCBvZiBbJ2xpMzY1LWZpbGUnLCdsaTM2NS1kb2MnXSkkKGlkKT8uYWRkRXZlbnRMaXN0ZW5lcignY2hhbmdlJywoKT0+e2RyYWZ0cy5jbGVhcigpO29wZW5lZD1mYWxzZTt9LHRydWUpOwogIHNob3coKTsKICB3aW5kb3cuUE5FVU1PUFJPX1NQTElUMzc0PU9iamVjdC5mcmVlemUoe3ZlcnNpb246JzMuNy40Jyxtb2RlczpPYmplY3Qua2V5cyhieUdyb3VwKX0pOwp9KSgpOwo='))
+           one('lungimport365.js',"measurements:[['sR_eff'", "measurements:[['VC','VC','l'],['FVCin','FVC in','l'],['FVCEx','FVC ex','l'],['FEV1_VC','FEV1/VC','%'],['MEF25','MEF25','l/s'],['MEF50','MEF50','l/s'],['MEF75','MEF75','l/s'],['Rawtot','Rawtot','kPa/(l/s)'],['sRawtot','sRawtot','kPa·s'],['Rawin','Rawin','kPa/(l/s)'],['Rawex','Rawex','kPa/(l/s)'],['TGV','TGV','l'],['sR_eff'")
+           one('lungimport365.js'," const patterns=[\n", " const patterns=[\n [/^FVC\\s*(?:in|inspiratorisch)\\b/i,'FVCin'],[/^FVC\\s*(?:ex|exspiratorisch)\\b/i,'FVCEx'],[/^FEV\\s*1\\s*\\/\\s*VC\\b/i,'FEV1_VC'],[/^MEF\\s*25\\b/i,'MEF25'],[/^MEF\\s*50\\b/i,'MEF50'],[/^MEF\\s*75\\b/i,'MEF75'],[/^Rawtot\\b/i,'Rawtot'],[/^sRawtot\\b/i,'sRawtot'],[/^Rawin\\b/i,'Rawin'],[/^Rawex\\b/i,'Rawex'],[/^TGV\\b/i,'TGV'],[/^VC\\b/i,'VC'],\n")
+           one('lungimport365.js',"const at=code=>rows.find(x=>x.code===code);Object.assign(value,{fev1:at('FEV1').percent,fvc:at('FVC').percent,fev1Liters:at('FEV1').actual,fvcLiters:at('FVC').actual,ratio:at('FEV1_FVC').actual});", "const at=code=>rows.find(x=>x.code===code)||{};const fvc=rows.find(x=>['FVC','FVCEx','FVCin'].includes(x.code)&&x.actual!==null)||{};Object.assign(value,{fev1:at('FEV1').percent??null,fvc:fvc.percent??null,fev1Liters:at('FEV1').actual??null,fvcLiters:fvc.actual??null,ratio:at('FEV1_FVC').actual??at('FEV1_VC').actual??null});")
+           one('secure17.js',"'lungreview373.js','lungimport365.js'", "'lungreview373.js','lungimport365.js','lungsplit374.js'")
+           one('sw.js',"const VERSION='3.7.3-ursprungsbild-pruefung';", "const VERSION='3.7.4-untersuchungsarten-getrennt';")
+           one('sw.js'," './lungimport365.js','./lungimport365.css',", " './lungimport365.js','./lungsplit374.js','./lungimport365.css',")
+           one('sw.js',"const important=['/lungreview373.js'", "const important=['/lungsplit374.js','/lungreview373.js'")
+           for filename in ('secure17.js','app.js','index.html'):allv(filename)
+           meta.update(version='3.7.4',released='2026-10-31',notes='Getrennte Pruefansichten fuer Spirometrie, Bodyplethysmographie und Diffusionsmessung bei einem zentralen Original-Upload. Zusaetzliche Messparameter fuer Hausarzt-Befunde, unveraenderte lokale Verschluesselung und vorhandene Diagramme. Spirometrie und Body in einem Messwertdatensatz, Diffusion separat; unlesbare Werte bleiben leer und werden geprueft.')
+           vfile.write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+           for file in ('lungsplit374.js','lungimport365.js','secure17.js','app.js'):
+            subprocess.run(['node','--check',file],check=True)
+           assert 'lungsplit374.js' in Path('sw.js').read_text(encoding='utf-8')
+           assert 'lungsplit374.js' in Path('secure17.js').read_text(encoding='utf-8')
+           assert json.loads(Path('version.json').read_text(encoding='utf-8'))['version']=='3.7.4'
+           print('Syntax- und Versionspruefungen erfolgreich.')
+          PY_374
+      - name: Pruefen und App-Dateien uebernehmen
+        shell: bash
+        run: |
+          node --check lungsplit374.js
+          node --check lungimport365.js
+          node --check secure17.js
+          python3 -c "import json; assert json.load(open('version.json'))['version']=='3.7.4'"
+          git diff --check
+          git add lungsplit374.js lungimport365.js secure17.js sw.js index.html app.js version.json
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "PneumoPro 3.7.4: getrennte Spirometrie-, Body- und Diffusionspruefung"
+            git push origin HEAD:main
+          else
+            echo "PneumoPro 3.7.4 bereits installiert"
+          fi
