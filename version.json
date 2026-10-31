@@ -1,5 +1,5 @@
 {
-  "version": "3.7.6",
+  "version": "3.7.7",
   "released": "2026-10-31",
-  "notes": "Einfache Startseite mit Kacheln fuer die letzten Messwerte auf einen Blick: SpO2, Blutdruck, Puls, Gewicht, FEV1, FVC und Peak-Flow. Mit Ampelprinzip, Datum und direktem Zugriff auf Vitalwerte, Lungenfunktion und Peak-Flow. Bestehende Daten, Diagramme und Speicher bleiben unveraendert."
+  "notes": "Startseite verfeinert: alte Box \"Heute im Blick\" entfernt, die Kacheln mit den letzten Messwerten an den Seitenanfang verschoben, der Zusatz \"ohne Schnickschnack\" entfernt und Copyright © Marcel Hentschel 2026 hinzugefuegt. Bestehende Daten und Diagramme bleiben unveraendert."
 }
