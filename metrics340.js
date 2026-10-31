@@ -11,7 +11,7 @@
  const el=(tag,cl,t)=>{const e=document.createElement(tag);if(cl)e.className=cl;if(t!==undefined)e.textContent=String(t);return e};
  const vital=el('section','m340-section');vital.id='m340-vital';vital.innerHTML='<h3>MEINE MESSWERTE · AUF EINEN BLICK</h3><p class="m340-explain">Die letzten gespeicherten Werte mit Datum. Für den gesamten Verlauf die Diagramme darunter öffnen.</p><div class="m340-cards" id="m340-vital-cards"></div>';
  const lung=el('section','m340-section');lung.id='m340-lung';lung.innerHTML='<h3>LUNGENFUNKTION · LETZTER BEFUND</h3><p class="m340-explain">FEV₁ und FVC: Liter und Prozent des Sollwerts sind unterschiedliche Angaben.</p><div class="m340-cards" id="m340-lung-cards"></div>';
- const weight=el('section','m340-weight');weight.id='m340-weight';weight.innerHTML='<h3>GEWICHT · VERLAUFSDIAGRAMM</h3><div class="m340-weight-head" id="m340-weight-head"></div><label class="m340-range">Zeitraum<select id="m340-weight-range"><option value="1">Tag</option><option value="7">Woche</option><option value="30">Monat</option><option value="365">Jahr</option><option value="3652" selected>10 Jahre</option><option value="all">Alle</option></select></label><div class="m340-weight-graph" id="m340-weight-graph"></div><p class="m340-explain" id="m340-weight-trend"></p>';
+ const weight=el('section','m340-weight');weight.id='m340-weight';weight.innerHTML='<h3>GEWICHT · VERLAUFSDIAGRAMM</h3><div class="m340-weight-head" id="m340-weight-head"></div><label class="m340-range">Zeitraum<select id="m340-weight-range"><option value="1">Tag</option><option value="7">Woche</option><option value="30">Monat</option><option value="365">Jahr</option><option value="3652" selected>10 Jahre</option><option value="all">Alle</option></select></label><label class="m340-range">Darstellung<select id="m340-weight-scale"><option value="detail" selected>Unterschiede vergrößern</option><option value="full">Gesamtansicht mit BMI-Bereich</option></select></label><div class="m340-weight-graph" id="m340-weight-graph"></div><p class="m340-explain" id="m340-weight-trend"></p>';
  const vroot=$('vitalwerte'), lroot=$('lungenwerte');
  const vanchor=vroot.querySelector('.section-heading');if(vanchor)vanchor.after(vital);else vroot.prepend(vital);
  const lanchor=lroot.querySelector('.section-heading');if(lanchor)lanchor.after(lung);else lroot.prepend(lung);
@@ -30,25 +30,31 @@
   if(ref){header.append(el('span','pp347-weight-band','BMI-Zielbereich (Erwachsene): '+fmt(ref.weightMin)+'–'+fmt(ref.weightMax)+' kg · BMI aktuell '+fmt(ref.bmi)));}
   const selected=weights.filter(x=>x.date>=cutoff($('m340-weight-range').value));if(!selected.length){graph.textContent='Keine Werte im gewählten Zeitraum.';desc.textContent='Wähle einen längeren Zeitraum.';return;}
   const W=660,H=300,L=64,R=28,T=34,B=62,values=selected.map(x=>x.kg);
-  if(ref){values.push(ref.weightMin,ref.weightMax);}
-  let min=Math.min(...values),max=Math.max(...values),pad=Math.max(1.5,(max-min)*.18);min=Math.max(0,min-pad);max+=pad;const span=max-min||1;
+  const detail=$('m340-weight-scale').value!=='full';
+  if(ref&&!detail)values.push(ref.weightMin,ref.weightMax);
+  const lo=Math.min(...values),hi=Math.max(...values),spread=hi-lo;
+  const pad=detail?Math.max(0.35,spread*.2):Math.max(1.5,spread*.18);
+  let min=Math.max(0,lo-pad),max=hi+pad;const span=Math.max(.1,max-min);
   const svg=shape(graph,'svg',{viewBox:'0 0 660 300',role:'img','aria-label':'Gewicht in kg, '+selected.length+' Messungen'});
   const pos=(v,i)=>[L+(selected.length===1?(W-L-R)/2:i*(W-L-R)/(selected.length-1)),T+(max-v)/span*(H-T-B)];
-  if(ref){const top=T+(max-ref.weightMax)/span*(H-T-B),bottom=T+(max-ref.weightMin)/span*(H-T-B);
-    shape(svg,'rect',{x:L,y:top,width:W-L-R,height:Math.max(1,bottom-top),fill:'#d9f3e5',opacity:.9});
-    shape(svg,'line',{x1:L,x2:W-R,y1:top,y2:top,stroke:'#237949','stroke-dasharray':'6 5'});
-    shape(svg,'line',{x1:L,x2:W-R,y1:bottom,y2:bottom,stroke:'#237949','stroke-dasharray':'6 5'});
-    const t=shape(svg,'text',{x:W-R-3,y:Math.max(15,top-6),'text-anchor':'end','font-size':13,fill:'#166a42'},'BMI 18,5–<25');
+  if(ref&&ref.weightMax>=min&&ref.weightMin<=max){
+    const top=T+(max-ref.weightMax)/span*(H-T-B),bottom=T+(max-ref.weightMin)/span*(H-T-B);
+    const clippedTop=Math.max(T,top),clippedBottom=Math.min(H-B,bottom);
+    if(clippedBottom>clippedTop)shape(svg,'rect',{x:L,y:clippedTop,width:W-L-R,height:clippedBottom-clippedTop,fill:'#d9f3e5',opacity:.9});
+    for(const yy of [top,bottom])if(yy>=T&&yy<=H-B)shape(svg,'line',{x1:L,x2:W-R,y1:yy,y2:yy,stroke:'#237949','stroke-dasharray':'6 5'});
+    const t=shape(svg,'text',{x:W-R-3,y:Math.max(T+14,Math.min(H-B-8,clippedTop+16)),'text-anchor':'end','font-size':13,fill:'#166a42'},'BMI 18,5–<25');
     shape(t,'title',{},'BMI-Orientierungsbereich für Erwachsene. Kein persönliches ärztliches Zielgewicht.');
   }
   for(let j=0;j<5;j++){const yy=T+j*(H-T-B)/4;shape(svg,'line',{x1:L,y1:yy,x2:W-R,y2:yy,stroke:'#dce7ed'});shape(svg,'text',{x:L-9,y:yy+4,'text-anchor':'end',fill:'#506b77','font-size':15},fmt(max-j*span/4))}
   let prev=null;selected.forEach((v,i)=>{const [x,y]=pos(v.kg,i);if(prev)shape(svg,'line',{x1:prev[0],y1:prev[1],x2:x,y2:y,stroke:'#187b95','stroke-width':3.5});const dot=shape(svg,'circle',{cx:x,cy:y,r:6.2,fill:'#126d85',stroke:'#fff','stroke-width':2});shape(dot,'title',{},nice(v.date)+': '+fmt(v.kg)+' kg');if(selected.length<=5||i===0||i===selected.length-1||i===Math.floor(selected.length/2))shape(svg,'text',{x,y:H-19,'text-anchor':'middle',fill:'#4f6978','font-size':13},v.date.slice(8)+'.'+v.date.slice(5,7)+'.'+v.date.slice(2,4));prev=[x,y]});
-  shape(svg,'text',{x:L,y:18,'font-size':15,fill:'#365e6e'},'kg');
+  shape(svg,'text',{x:L,y:18,'font-size':15,fill:'#365e6e'},detail?'kg · vergrößerte Skala (nicht bei 0)':'kg · Gesamtansicht');
   if(selected.length===1){desc.textContent='Ein Messwert am '+nice(selected[0].date)+'. Für den Verlauf sind weitere Messungen erforderlich.'+(ref?' Grüner Bereich: BMI 18,5 bis unter 25; allgemeine Erwachsenen-Orientierung.':'');return;}
   const first=selected[0],end=selected.at(-1),delta=end.kg-first.kg;
-  desc.textContent=selected.length+' Messungen · '+nice(first.date)+' '+fmt(first.kg)+' kg → '+nice(end.date)+' '+fmt(end.kg)+' kg · Veränderung '+(delta>0?'+':'')+fmt(delta)+' kg.'+(ref?' Grün markiert BMI 18,5 bis unter 25 (Erwachsene). Dies ist kein individuelles Zielgewicht.':' Bitte Größe im Profil eintragen, um den BMI-Zielbereich einzublenden.');
+  const previousMeasurement=selected.at(-2),recent=end.kg-previousMeasurement.kg,range=Math.max(...selected.map(x=>x.kg))-Math.min(...selected.map(x=>x.kg));
+  desc.textContent=selected.length+' Messungen · '+nice(first.date)+' '+fmt(first.kg)+' kg → '+nice(end.date)+' '+fmt(end.kg)+' kg · Insgesamt '+(delta>0?'+':'')+fmt(delta)+' kg · Letzte Änderung '+(recent>0?'+':'')+fmt(recent)+' kg · Spannweite '+fmt(range)+' kg.'+(detail?' Die y-Achse ist zur Erkennung kleiner Unterschiede vergrößert und beginnt nicht bei 0.':' Gesamtansicht mit BMI-Bereich.')+(ref?' BMI 18,5 bis unter 25 ist nur ein allgemeiner Orientierungsbereich, kein persönliches Zielgewicht.':' Körpergröße im Profil ergänzen, um den BMI-Orientierungsbereich zu sehen.');
  }
  $('m340-weight-range').addEventListener('change',drawWeight);
+ $('m340-weight-scale').addEventListener('change',drawWeight);
  async function refresh(){const call=++epoch,items=await S.list('suite');if(call!==epoch)return;
   weights=items.filter(x=>x.type==='weight292'&&/^\d{4}-\d\d-\d\d$/.test(x.value?.date||'')&&n(x.value.kg)!==null).map(x=>({date:x.value.date,kg:n(x.value.kg)})).sort((a,b)=>a.date.localeCompare(b.date));
   const vitals=items.filter(x=>x.type==='vital29'&&x.value?.date).map(x=>x.value).sort((a,b)=>(b.date+' '+(b.time||'')).localeCompare(a.date+' '+(a.time||'')));
@@ -65,5 +71,5 @@
  let timer;window.addEventListener('asthma:secure-change',e=>{if(e.detail?.group==='suite'){clearTimeout(timer);timer=setTimeout(()=>refresh().catch(()=>{}),120)}});window.addEventListener('asthma:lung-study-imported',()=>refresh().catch(()=>{}));
  window.addEventListener('asthma:personal-profile-updated',()=>refresh().catch(()=>{}));
  refresh().catch(e=>{const out=$('m340-vital-cards');if(out)out.textContent='Daten konnten nicht geladen werden: '+e.message});
- window.__ASTHMA_METRICS340_TEST=Object.freeze({version:'3.4.7',cutoff});
+ window.__ASTHMA_METRICS340_TEST=Object.freeze({version:'3.6.1',cutoff});
 })();

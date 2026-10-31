@@ -1,5 +1,5 @@
 /* Asthma 3.3.0: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
-const VERSION='3.6.0-suche-layout';
+const VERSION='3.6.2-echte-originale';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
  './ocr-vendor/core/tesseract-core-lstm.wasm',

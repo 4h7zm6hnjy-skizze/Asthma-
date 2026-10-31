@@ -86,3 +86,9 @@ body.stats25-print .s292-category .s292-table-wrap{overflow:visible!important}
 
 /* Walk report image layout uses the existing local image renderer. */
 [data-s292-kind=walkimages] .s341-report-image{break-inside:avoid-page;page-break-inside:avoid} 
+
+/* Originalbefundfotos in vollständig ausgewählten Berichten. */
+.s292-original-figure{margin:14px 0 24px;page-break-inside:avoid;break-inside:avoid;border:1px solid #d0e0e8;padding:10px}
+.s292-original-figure figcaption{font-weight:800;margin-bottom:8px}
+.s292-original-test{display:block;max-width:100%;width:auto;height:auto;max-height:950px;margin:0 auto;object-fit:contain}
+@media print{.s292-original-figure{page-break-inside:avoid;break-inside:avoid}.s292-original-test{max-height:235mm;max-width:100%;object-fit:contain}}

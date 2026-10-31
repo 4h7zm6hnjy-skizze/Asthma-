@@ -112,15 +112,15 @@
    };
    const nums=values.flatMap(x=>series.map(([k])=>num(x[k])).filter(x=>x!==null));
    const band=unit==='kg'?window.PNEUMOPRO_AMPEL347?.body(SEC.profileGet()?.personal?.heightCm,values.at(-1)?.value):null;
-   const refVals=series.map(([k])=>num(refs[k])).filter(v=>v!==null).concat(band?[band.weightMin,band.weightMax]:[]);
-   let min=Math.min(...nums,...refVals),max=Math.max(...nums,...refVals),pad=max===min?Math.max(1,max*.06):(max-min)*.13;
+   const refVals=series.map(([k])=>num(refs[k])).filter(v=>v!==null).concat(unit!=='kg'&&band?[band.weightMin,band.weightMax]:[]);
+   let min=Math.min(...nums,...refVals),max=Math.max(...nums,...refVals),pad=unit==='kg'?Math.max(.35,(max-min)*.2):(max===min?Math.max(1,max*.06):(max-min)*.13);
    min=Math.max(0,min-pad);max+=pad;if(min===max)max=min+1;
    const y=v=>T+(H-T-B)*(max-v)/(max-min);
    const start=Date.parse(values[0].date+'T'+(values[0].time||'12:00'))||0;
    const finish=Date.parse(values.at(-1).date+'T'+(values.at(-1).time||'12:00'))||start;
    const x=val=>{const ts=Date.parse(val.date+'T'+(val.time||'12:00'))||start;return L+(W-L-R)*(finish===start?0.5:(ts-start)/(finish-start));};
    function shape(kind,attrs,content){const el=document.createElementNS(svgNS,kind);for(const [key,v] of Object.entries(attrs||{}))el.setAttribute(key,String(v));if(content!==undefined)el.textContent=String(content);svg.append(el);return el;}
-   if(band){const highY=y(band.weightMax),lowY=y(band.weightMin);shape('rect',{x:L,y:highY,width:W-L-R,height:Math.max(1,lowY-highY),fill:'#d9f3e5',opacity:.9});shape('line',{x1:L,x2:W-R,y1:highY,y2:highY,stroke:'#277847','stroke-dasharray':'6 4'});shape('line',{x1:L,x2:W-R,y1:lowY,y2:lowY,stroke:'#277847','stroke-dasharray':'6 4'});shape('text',{x:W-R-5,y:Math.max(T+13,highY-5),'font-size':12,'text-anchor':'end',fill:'#186f48'},'BMI 18,5–<25');}
+   if(band&&band.weightMax>=min&&band.weightMin<=max){const highY=y(band.weightMax),lowY=y(band.weightMin),clippedHigh=Math.max(T,highY),clippedLow=Math.min(H-B,lowY);if(clippedLow>clippedHigh)shape('rect',{x:L,y:clippedHigh,width:W-L-R,height:clippedLow-clippedHigh,fill:'#d9f3e5',opacity:.9});for(const yy of [highY,lowY])if(yy>=T&&yy<=H-B)shape('line',{x1:L,x2:W-R,y1:yy,y2:yy,stroke:'#277847','stroke-dasharray':'6 4'});shape('text',{x:W-R-5,y:Math.max(T+13,Math.min(H-B-8,clippedHigh+14)),'font-size':12,'text-anchor':'end',fill:'#186f48'},'BMI 18,5–<25');}
    // Show explicit units, numeric scales and (bounded) real measurement labels.
    shape('text',{x:L,y:20,'font-size':14,'font-weight':'700',fill:'#244d61'},'Messwert ('+(unit||'Einheit')+')');
    for(let i=0;i<6;i++){const value=min+(max-min)*(5-i)/5,yy=T+(H-T-B)*i/5;shape('line',{x1:L,x2:W-R,y1:yy,y2:yy,stroke:'#d5e1e8','stroke-width':1});shape('text',{x:L-9,y:yy+4,'text-anchor':'end','font-size':12,fill:'#405967'},format(value,digits));}
@@ -175,6 +175,7 @@
      chartSummary.append(node('span','',label+': '+measurements.length+' Messungen · Minimum '+format(Math.min(...nn),digits)+' '+unit+' · Maximum '+format(Math.max(...nn),digits)+' '+unit+' · Durchschnitt '+format(nsum(nn),digits)+' '+unit+' · Letzter Wert '+format(last.value,digits)+' '+unit+' am '+fmt(last.date)+change));
    }
    c.append(chartSummary);
+   if(unit==='kg')c.append(node('p','s292-note','Für kleine Gewichtsunterschiede ist die Skala vergrößert und beginnt nicht bei 0 kg. Der BMI-Orientierungsbereich wird nur eingeblendet, wenn er in diesem Ausschnitt liegt; die Zielwerte stehen im Begleittext.'));
    c.append(node('p','s292-note','Zahlen zwischen Punkten zeigen absolute Messwertänderungen; bei Prozentwerten sind dies Prozentpunkte (pp). Das Vorzeichen bedeutet nicht automatisch eine klinische Verbesserung oder Verschlechterung. Bei vielen Messpunkten werden die Änderungszahlen aus Platzgründen nicht eingeblendet.'));
    c.append(node('p','s292-note','Zahlen an der senkrechten Achse: '+(unit||'Messwert')+'. Beschriftete Messpunkte: konkrete Einzelwerte; aus Platzgründen sind nicht alle Punkte direkt beschriftet. Die waagerechte Achse zeigt echte Messdaten. Durchgezogen: dokumentierte Messwerte. Gestrichelt: nur manuell hinterlegte persönliche Vergleichswerte; keine automatisch festgelegten medizinischen Grenzen. Alle Einzelwerte stehen in der Tabelle.'));
    const legend=node('div','s292-legend');for(const [key,label,color] of series){const cell=node('span');cell.append(node('i','s292-dot'));cell.querySelector('i').style.backgroundColor=color;cell.append(node('span','',label+(num(refs[key])!==null?' (gestrichelt: persönlicher Vergleich)':'')));legend.append(cell);}c.append(legend);
@@ -275,6 +276,7 @@
          const body=node('tbody');for(const measure of rec.testRows||[]){const row=node('tr');
            for(const cell of [labels[measure.code]||measure.code,measure.actual,measure.predicted,measure.percent,measure.z])row.append(node('td','',cell===null||cell===undefined?'–':typeof cell==='number'?format(cell,2):String(cell)));
            body.append(row);}table.append(body);const wrap=node('div','s292-table-wrap');wrap.append(table);box.append(wrap);
+       if(rec.attachment?.data&&/^data:image\/(jpeg|png);base64,/.test(rec.attachment.data)){const raw=node('figure','s292-original-figure');raw.append(node('figcaption','Unveränderter Klinik-Originalbefund mit den echten Messkurven ('+fmt(rec.date)+')'));const photo=node('img','s292-original-test');photo.src=rec.attachment.data;photo.alt='Originalgrafiken der Untersuchung vom '+fmt(rec.date);raw.append(photo);box.append(raw);}
        }
        root.append(box);
      }

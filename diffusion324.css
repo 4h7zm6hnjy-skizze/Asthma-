@@ -7,3 +7,11 @@
 #dl324-originals figure{margin:18px 0;padding:10px;background:white;border:1px solid #bcd4dd;border-radius:10px}#dl324-originals figcaption{font-weight:700;margin:0 0 10px}#dl324-originals img{display:block;width:100%;max-width:750px;height:auto;margin:auto}
 
 #dl324 .dl324-tip{font-size:.92rem;color:#375e73;line-height:1.45}#dl324 #dl324-paste textarea{display:block;width:100%;min-height:8rem;padding:10px;font-size:16px;box-sizing:border-box}#dl324 #dl324-status{border-left:4px solid #6a9ba8;padding-left:10px;min-height:22px}
+
+/* 3.6.2: Vergrößert nur die Darstellung der unveränderten Originaldatei. */
+#dl324 .dl324-raw-original{margin:14px 0;padding:12px;border:1px solid #bcd4dd;background:#fff;border-radius:10px;overflow-x:auto;max-width:100%}
+#dl324 .dl324-raw-original figcaption{font-weight:800;color:#163e56;margin-bottom:10px}
+#dl324 .dl324-raw-original img{display:block;width:100%;max-width:100%;height:auto;object-fit:contain}
+#dl324 .dl324-raw-original.dl324-raw-zoom img{width:1100px;max-width:none;height:auto}
+#dl324 .dl324-raw-original button{min-height:44px}
+#dl324 .dl324-raw-original p{font-size:.85rem;line-height:1.45;color:#465f6b}

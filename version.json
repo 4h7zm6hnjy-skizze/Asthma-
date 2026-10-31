@@ -1,5 +1,5 @@
 {
-  "version": "3.6.0",
-  "released": "2026-10-30",
-  "notes": "iPhone-Kopfzeile mit vollständigem PneumoPro-Logo und komplett sichtbarem Suchfenster. Suche in allen lokal gespeicherten Daten inklusive geprüfter OCR-Texte aus Foto/PDF. Offline-Texterkennung mit lokalen deutschen und englischen Sprachmodellen, PDF-Textauslesung und OCR für Scan-PDFs (bis 5 Seiten). Text vor verschlüsselter Speicherung prüfen; keine automatische Diagnose oder Messwertübernahme. Gesundheitsdaten bleiben unangetastet."
+  "version": "3.6.2",
+  "released": "2026-10-31",
+  "notes": "Unveränderte Originaldiagramme direkt beim Lungenfunktionstest und Diffusionsbefund. Alle Messwerte und Erklärungen im jeweiligen Test; unveränderte Originale auch im ausgewählten vollständigen Befundbericht. Bereits identisch vorhandene Befunde erhalten fehlende Originalfotos ohne Duplikat. Private Fotos nur lokal verschlüsselt. Die Gewichtsdiagramm-Änderung 3.6.1 bleibt erhalten."
 }
