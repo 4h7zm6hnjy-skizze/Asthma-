@@ -1,0 +1,147 @@
+name: PneumoPro 3.6.8 - Tabellenbereiche gezielt auslesen
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PneumoPro368_Tabellenfokus.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pneumopro-368-tabellenfokus
+  cancel-in-progress: false
+
+jobs:
+  upgrade:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository laden
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Gezielte OCR-Vergroesserung fuer Tabellen installieren
+        shell: bash
+        run: |
+          if grep -q '"version": "3.6.8"' version.json; then
+            echo "Version 3.6.8 ist bereits installiert."
+          else
+            python3 - <<'PY_PNEUMO368'
+          from pathlib import Path
+          import json, subprocess
+          
+          def replace_one(path, old, new, label):
+              p=Path(path)
+              s=p.read_text(encoding='utf-8')
+              n=s.count(old)
+              if n!=1:
+                  raise RuntimeError(f'{label}: erwartete Programmstelle nicht eindeutig gefunden ({n} Treffer); nichts geschrieben.')
+              p.write_text(s.replace(old,new,1),encoding='utf-8')
+          
+          p='lungimport365.js'
+          replace_one(p, "   ocrRows366=best.rowsText;ocrPosition367=best.tsv;\n   ocrHints=tsvHints(best.tsv,bitmap.width/c.width,bitmap.height/c.height);\n   c.width=c.height=1;\n   return best.text;", '''   // Diagrammhinweise immer aus dem vollstaendigen Original behalten.
+             ocrHints=tsvHints(best.tsv,bitmap.width/c.width,bitmap.height/c.height);
+             const fullPageText=best.text;
+             // Eine ganze fotografierte Klinikseite kann kleine Tabellen in einer
+             // anderen OCR-Lesereihenfolge liefern. Bei weniger als zwei brauchbaren
+             // Messzeilen deshalb begrenzte vergroesserte Bildbereiche lokal pruefen.
+             // Keine feste Klinik, kein fixer Patient und keine ausgedachten Zahlen.
+             let cropName='';
+             if(best.score<2){
+               const regions=[
+                 {name:'linke untere Tabelle',x:.065,y:.435,w:.55,h:.285},
+                 {name:'rechte untere Tabelle',x:.425,y:.435,w:.53,h:.36},
+                 {name:'linke mittlere Tabelle',x:.065,y:.235,w:.56,h:.37},
+                 {name:'untere breite Tabelle',x:.055,y:.595,w:.88,h:.31}
+               ];
+               try{
+                 await w.setParameters({tessedit_pageseg_mode:'6'});
+                 for(const region of regions){
+                   if(best.score>=8)break;
+                   const sx=Math.floor(bitmap.width*region.x),sy=Math.floor(bitmap.height*region.y);
+                   const sw=Math.max(1,Math.floor(bitmap.width*region.w)),sh=Math.max(1,Math.floor(bitmap.height*region.h));
+                   const scale=Math.min(4.7,2450/sw,2700/sh,Math.sqrt(5400000/(sw*sh)));
+                   const tile=document.createElement('canvas');
+                   tile.width=Math.max(1,Math.floor(sw*scale));tile.height=Math.max(1,Math.floor(sh*scale));
+                   try{
+                     const tc=tile.getContext('2d',{willReadFrequently:true});
+                     if(!tc)continue;
+                     tc.fillStyle='#fff';tc.fillRect(0,0,tile.width,tile.height);
+                     tc.imageSmoothingEnabled=true;tc.imageSmoothingQuality='high';
+                     tc.drawImage(bitmap,sx,sy,sw,sh,0,0,tile.width,tile.height);
+                     setStatus('Kleine Messwerttabelle gezielt lesen: '+region.name+' ...');
+                     const candidate=resultOf((await w.recognize(tile,{}, {tsv:true})).data);
+                     if(candidate.score>best.score){best=candidate;cropName=region.name;}
+                   }catch(error){ /* Diesen Teilbereich nicht uebernehmen; anderen pruefen. */ }
+                   finally{tile.width=tile.height=1;}
+                 }
+               }catch(error){ /* Misslingt der Tabellenfokus, bleibt die Vollseiten-OCR erhalten. */ }
+               finally{try{await w.setParameters({tessedit_pageseg_mode:'3'});}catch(error){}}
+             }
+             ocrRows366=best.rowsText;ocrPosition367=best.tsv;
+             c.width=c.height=1;
+             return cropName?fullPageText+'\\n\\n[Vergrößerte Tabellenansicht: '+cropName+']\\n'+best.text:fullPageText;''', 'Separate vergroesserte Tabellen-OCR')
+          
+          # Die Klinik verwendet teilweise alternative Schreibweisen bei FEV1/FVC und RV/TLC.
+          # Diese sind als echte beschriftete Tabellenzeilen, nicht als angenommene Reihenfolge, zu erkennen.
+          p='lungparser367.js'
+          replace_one(p,"[/^RV\\s*\\/\\s*TLC\\b/i,'RV_TLC']", "[/^RV\\s*(?:\\/|%)\\s*TLC\\b/i,'RV_TLC']", 'RV/TLC-Beschriftung')
+          replace_one(p,"[/^FEV\\s*1\\s*\\/\\s*FVC\\b/i,'FEV1_FVC']", "[/^FEV\\s*1\\s*(?:\\/|%)\\s*FVC\\b/i,'FEV1_FVC']", 'FEV1/FVC-Beschriftung')
+          # Zweistellige Jahreszahlen ausschliesslich neben einem expliziten Messdatum akzeptieren.
+          replace_one(p,"  const dates=(root.PNEUMOPRO_PARSER366?.parse(fullText)?.date)||'';", '''  let dates=(root.PNEUMOPRO_PARSER366?.parse(fullText)?.date)||'';
+            if(!dates){
+             const match=String(fullText||'').match(/(?:Messdatum|Untersuchungsdatum|Testdatum)[^\\d]{0,45}(\\d{1,2})[./](\\d{1,2})[./](\\d{2}|20\\d{2})\\b/i);
+             if(match){
+              const year=match[3].length===2?'20'+match[3]:match[3];
+              const proposed=year+'-'+match[2].padStart(2,'0')+'-'+match[1].padStart(2,'0');
+              const dt=new Date(proposed+'T12:00:00Z');
+              if(!Number.isNaN(dt.getTime())&&dt.toISOString().slice(0,10)===proposed)dates=proposed;
+             }
+            }''', 'Untersuchungsdatum sicher lesen')
+          
+          p='lungparser366.js'
+          replace_one(p,"[/^RV\\s*[\\/]\\s*TLC\\b/i,'RV_TLC']", "[/^RV\\s*(?:[\\/]|%)\\s*TLC\\b/i,'RV_TLC']", 'RV-Prozent-TLC im zweiten Parser')
+          replace_one(p,"[/^FEV\\s*1\\s*[\\/]\\s*FVC\\b/i,'FEV1_FVC']", "[/^FEV\\s*1\\s*(?:[\\/]|%)\\s*FVC\\b/i,'FEV1_FVC']", 'FEV1-Prozent-FVC im zweiten Parser')
+          
+          replace_one('app.js', "const VERSION = '3.6.7';", "const VERSION = '3.6.8';", 'App-Version')
+          replace_one('sw.js',"const VERSION='3.6.7-positionsdaten';","const VERSION='3.6.8-gezieltes-tabellen-ocr';",'Offline-Version')
+          for p in ['secure17.js','index.html']:
+              data=Path(p).read_text(encoding='utf-8')
+              if '3.6.7' not in data:raise RuntimeError(f'{p}: Ausgangsversion 3.6.7 fehlt')
+              Path(p).write_text(data.replace('3.6.7','3.6.8'),encoding='utf-8')
+          meta=json.loads(Path('version.json').read_text(encoding='utf-8'))
+          if meta.get('version')!='3.6.7':raise RuntimeError('Die App ist nicht auf Ausgangsversion 3.6.7')
+          meta.update(version='3.6.8',released='2026-10-31',notes=('Bei unlesbarer Vollseiten-OCR werden kleine Tabellenbereiche im Foto separat vergroessert und offline untersucht. '
+              'Wiederkehrende echte Spalten und rechnerisch stimmige Soll/Ist/%-Werte werden ausschliesslich als ungepruefte Vorschlaege angezeigt. '
+              'Alternative Beschriftungen FEV1/FVC und RV/TLC werden erkannt. Keine Ergaenzung fehlender Messwerte, '
+              'kein unbestaetigtes Speichern, unveraenderte verschluesselte Originale.'))
+          Path('version.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          for src in ['lungimport365.js','lungparser366.js','lungparser367.js','secure17.js','app.js']:
+              subprocess.run(['node','--check',src],check=True)
+          assert json.loads(Path('version.json').read_text(encoding='utf-8'))['version']=='3.6.8'
+          assert '3.6.8' in Path('secure17.js').read_text()
+          print('PneumoPro 3.6.8: Code-Syntax und Version erfolgreich geprueft.')
+          PY_PNEUMO368
+          fi
+      - name: Programm pruefen und aktualisieren
+        shell: bash
+        run: |
+          node --check lungparser366.js
+          node --check lungparser367.js
+          node --check lungimport365.js
+          node --check secure17.js
+          node --check app.js
+          python3 -c "import json; assert json.load(open('version.json'))['version']=='3.6.8'"
+          git diff --check
+          git add lungparser366.js lungparser367.js lungimport365.js secure17.js sw.js index.html app.js version.json
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "PneumoPro 3.6.8: vergroesserte Tabellen-OCR mit sicheren Wertvorschlaegen"
+            git push origin HEAD:main
+          else
+            echo "Keine weiteren Aenderungen erforderlich."
+          fi
