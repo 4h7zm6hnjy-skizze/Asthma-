@@ -1,0 +1,125 @@
+name: PneumoPro 3.7.2 - Tabellenkoordinaten reparieren
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PneumoPro372_Tabellenkoordinaten.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pneumopro-372-tabellenkoordinaten
+  cancel-in-progress: false
+
+jobs:
+  upgrade:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bestehende App aus GitHub laden
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Gesicherte OCR-Tabellenkoordinaten installieren
+        shell: bash
+        run: |
+          if grep -q '"version": "3.7.2"' version.json; then
+            echo 'PneumoPro 3.7.2 ist bereits installiert.'
+          else
+            python3 - <<'PY372_INSTALL'
+          from pathlib import Path
+          import base64, json, subprocess
+
+          def replace_one(path, old, new, title):
+              p=Path(path)
+              s=p.read_text(encoding='utf-8')
+              n=s.count(old)
+              if n!=1:
+                  raise RuntimeError(f'{title} in {path}: {n} Fundstellen (erwartet: 1). Keine Aenderung an dieser Datei.')
+              p.write_text(s.replace(old,new,1),encoding='utf-8')
+
+          def replace_version(path):
+              p=Path(path); s=p.read_text(encoding='utf-8')
+              if '3.7.1' not in s:raise RuntimeError(f'{path}: Ausgangsversion 3.7.1 fehlt.')
+              p.write_text(s.replace('3.7.1','3.7.2'),encoding='utf-8')
+
+          ver=json.loads(Path('version.json').read_text(encoding='utf-8'))
+          if ver.get('version')!='3.7.1':raise RuntimeError('PneumoPro 3.7.1 als Ausgangsversion erwartet; bestehende Dateien bleiben unveraendert.')
+          if Path('lungfocus372.js').exists():raise RuntimeError('lungfocus372.js bereits vorhanden. Update-Status pruefen.')
+
+          # Preserve original images and clinical data. Only program files change.
+          Path('lungfocus372.js').write_bytes(base64.b64decode('J3VzZSBzdHJpY3QnOwovKiBQbmV1bW9Qcm8gMy43LjI6IE9DUi1Qb3NpdGlvbnNkYXRlbiB2ZXJncm9lc3NlcnRlciBUYWJlbGxlbmJlcmVpY2hlCiAqIGluIE9yaWdpbmFsYmlsZC1Lb29yZGluYXRlbiB1bXJlY2huZW4gdW5kIGdlemllbHQgZXJuZXV0IGxlc2VuLgogKiBLZWluZSBEb2t1bWVudGRhdGVuIGltIENvZGUsIGtlaW5lIFVlYmVydHJhZ3VuZyBvZGVyIFNjaGFldHp1bmcuCiAqLwooZnVuY3Rpb24ocm9vdCl7CiAgZnVuY3Rpb24gdG9PcmlnaW5hbFRTVih0c3YscmVnaW9uKXsKICAgIGlmKCFyZWdpb258fCFyZWdpb24uY3d8fCFyZWdpb24uY2h8fCFyZWdpb24uc3d8fCFyZWdpb24uc2gpcmV0dXJuICcnOwogICAgY29uc3Qgc3g9cmVnaW9uLnN3L3JlZ2lvbi5jdyxzeT1yZWdpb24uc2gvcmVnaW9uLmNoOwogICAgY29uc3Qgb3V0PVsnbGV2ZWxcdHBhZ2VfbnVtXHRibG9ja19udW1cdHBhcl9udW1cdGxpbmVfbnVtXHR3b3JkX251bVx0bGVmdFx0dG9wXHR3aWR0aFx0aGVpZ2h0XHRjb25mXHR0ZXh0J107CiAgICBmb3IoY29uc3QgbGluZSBvZiBTdHJpbmcodHN2fHwnJykuc3BsaXQoL1xyP1xuLykuc2xpY2UoMSkpewogICAgICBjb25zdCBmPWxpbmUuc3BsaXQoJ1x0Jyk7aWYoZi5sZW5ndGg8MTJ8fGZbMF0hPT0nNScpY29udGludWU7CiAgICAgIGNvbnN0IG51bXM9WzYsNyw4LDldLm1hcChpPT5OdW1iZXIoZltpXSkpOwogICAgICBpZighbnVtcy5ldmVyeShOdW1iZXIuaXNGaW5pdGUpKWNvbnRpbnVlOwogICAgICBmWzZdPVN0cmluZyhNYXRoLnJvdW5kKHJlZ2lvbi54K251bXNbMF0qc3gpKTsKICAgICAgZls3XT1TdHJpbmcoTWF0aC5yb3VuZChyZWdpb24ueStudW1zWzFdKnN5KSk7CiAgICAgIGZbOF09U3RyaW5nKE1hdGgubWF4KDEsTWF0aC5yb3VuZChudW1zWzJdKnN4KSkpOwogICAgICBmWzldPVN0cmluZyhNYXRoLm1heCgxLE1hdGgucm91bmQobnVtc1szXSpzeSkpKTsKICAgICAgb3V0LnB1c2goZi5qb2luKCdcdCcpKTsKICAgIH0KICAgIHJldHVybiBvdXQubGVuZ3RoPjE/b3V0LmpvaW4oJ1xuJyk6Jyc7CiAgfQogIGZ1bmN0aW9uIGNob29zZShyZWdpb25zLHdpZHRoLGhlaWdodCxleGlzdGluZyxmb2N1cyl7CiAgICBjb25zdCB0ZXN0ZWQ9W107CiAgICBpZighZm9jdXM/LnRhcmdldHMpcmV0dXJuIHRlc3RlZDsKICAgIGNvbnN0IGtub3duPW5ldyBTZXQoZXhpc3RpbmcuZmlsdGVyKHg9Pk51bWJlci5pc0Zpbml0ZSh4LmFjdHVhbCkmJk51bWJlci5pc0Zpbml0ZSh4LnBlcmNlbnQpKS5tYXAoeD0+eC5jb2RlKSk7CiAgICBmb3IoY29uc3QgcmVnaW9uIG9mIChyZWdpb25zfHxbXSkuc2xpY2UoMCw1KSl7CiAgICAgIGNvbnN0IHRzdj10b09yaWdpbmFsVFNWKHJlZ2lvbi50c3YscmVnaW9uKTsKICAgICAgaWYoIXRzdiljb250aW51ZTsKICAgICAgY29uc3QgZm91bmQ9Zm9jdXMudGFyZ2V0cyh0c3Ysd2lkdGgsaGVpZ2h0LGV4aXN0aW5nLDEyLDEsMSk7CiAgICAgIGNvbnN0IGNvZGVzPVsuLi5uZXcgU2V0KGZvdW5kLnJvd3MubWFwKHg9PnguY29kZSkuZmlsdGVyKGNvZGU9PiFrbm93bi5oYXMoY29kZSkpKV07CiAgICAgIGlmKCFjb2Rlcy5sZW5ndGgpY29udGludWU7CiAgICAgIHRlc3RlZC5wdXNoKHt0c3YsY29kZXMsc2NvcmU6Y29kZXMubGVuZ3RoLHJlZ2lvbjpyZWdpb24ubmFtZXx8J1RhYmVsbGVuYmVyZWljaCd9KTsKICAgIH0KICAgIHJldHVybiB0ZXN0ZWQuc29ydCgoYSxiKT0+Yi5zY29yZS1hLnNjb3JlKTsKICB9CiAgYXN5bmMgZnVuY3Rpb24gc2NhbihibG9iLHJlZ2lvbnMsZXhpc3RpbmcsZm9jdXMsb2NyV29ya2VyLHN0YXR1cyl7CiAgICBjb25zdCByZXN1bHQ9e3Jvd3M6W10sd2FybmluZ3M6W10sY2FuZGlkYXRlczowLHRhcmdldHM6MCxhdHRlbXB0czowLHJlZ2lvbjonJ307CiAgICBpZighZm9jdXM/LnNjYW58fCFibG9ifHwhcmVnaW9ucz8ubGVuZ3RoKXJldHVybiByZXN1bHQ7CiAgICBjb25zdCBiaXRtYXA9YXdhaXQgY3JlYXRlSW1hZ2VCaXRtYXAoYmxvYik7bGV0IHJhbmtlZDsKICAgIHRyeXtyYW5rZWQ9Y2hvb3NlKHJlZ2lvbnMsYml0bWFwLndpZHRoLGJpdG1hcC5oZWlnaHQsZXhpc3RpbmcsZm9jdXMpO31maW5hbGx5e2JpdG1hcC5jbG9zZSgpO30KICAgIHJlc3VsdC5jYW5kaWRhdGVzPXJhbmtlZC5sZW5ndGg7CiAgICBpZighcmFua2VkLmxlbmd0aCl7cmVzdWx0Lndhcm5pbmdzLnB1c2goJ0tlaW5lIHZlcmxhZXNzbGljaGVuIFplaWxlbmtvb3JkaW5hdGVuIGluIHZlcmdyb2Vzc2VydGVuIFRhYmVsbGVuIGVya2FubnQuIEZlaGxlbmRlIFdlcnRlIGJsZWliZW4gbGVlci4nKTtyZXR1cm4gcmVzdWx0O30KICAgIGNvbnN0IGFsbD1uZXcgTWFwKGV4aXN0aW5nLm1hcChyPT5bci5jb2RlLHJdKSk7CiAgICAvLyBOdXIgZGVyIGFtIGJlc3RlbiBiZXNjaHJpZnRldGUgVGFiZWxsZW5iZXJlaWNoOyBlaW4gendlaXRlciBudXIsCiAgICAvLyB3ZW5uIGRlciBlcnN0ZSBrZWluZSBuZXVlIFphaGwgbGllZmVydC4gVmVyaGluZGVydCBlbmRsb3NlIGlQaG9uZS1PQ1IuCiAgICBmb3IobGV0IGluZGV4PTA7aW5kZXg8TWF0aC5taW4oMixyYW5rZWQubGVuZ3RoKTtpbmRleCsrKXsKICAgICAgY29uc3QgY2hvaWNlPXJhbmtlZFtpbmRleF07CiAgICAgIHN0YXR1cz8uKCdMZXNlIFRhYmVsbGVuemVpbGVuIGF1cyAnK2Nob2ljZS5yZWdpb24rJyAuLi4nKTsKICAgICAgY29uc3QgcnVuPWF3YWl0IGZvY3VzLnNjYW4oYmxvYixjaG9pY2UudHN2LFsuLi5hbGwudmFsdWVzKCldLG9jcldvcmtlcixzdGF0dXMsMSwxKTsKICAgICAgcmVzdWx0LnRhcmdldHMrPXJ1bi50YXJnZXRzfHwwO3Jlc3VsdC5hdHRlbXB0cys9cnVuLmF0dGVtcHRzfHwwOwogICAgICByZXN1bHQud2FybmluZ3MucHVzaCguLi4ocnVuLndhcm5pbmdzfHxbXSkpOwogICAgICBjb25zdCBiZWZvcmU9cmVzdWx0LnJvd3MubGVuZ3RoOwogICAgICBmb3IoY29uc3QgbmV4dCBvZiBydW4ucm93c3x8W10pewogICAgICAgIGNvbnN0IG9sZD1hbGwuZ2V0KG5leHQuY29kZSk7CiAgICAgICAgaWYob2xkKXsKICAgICAgICAgIGlmKE51bWJlci5pc0Zpbml0ZShvbGQucHJlZGljdGVkKSYmTnVtYmVyLmlzRmluaXRlKG5leHQucHJlZGljdGVkKSYmTWF0aC5hYnMob2xkLnByZWRpY3RlZC1uZXh0LnByZWRpY3RlZCk+LjAyNSl7cmVzdWx0Lndhcm5pbmdzLnB1c2gobmV4dC5jb2RlKyc6IFNvbGx3ZXJ0IGF1cyBab29tIHdpZGVyc3ByaWNodCBkZW0gT3JpZ2luYWx2b3JzY2hsYWc7IGJpdHRlIG1hbnVlbGwgcHJ1ZWZlbi4nKTtjb250aW51ZTt9CiAgICAgICAgICBpZihOdW1iZXIuaXNGaW5pdGUob2xkLmFjdHVhbCkmJk51bWJlci5pc0Zpbml0ZShuZXh0LmFjdHVhbCkmJk1hdGguYWJzKG9sZC5hY3R1YWwtbmV4dC5hY3R1YWwpPi4wMjUpe3Jlc3VsdC53YXJuaW5ncy5wdXNoKG5leHQuY29kZSsnOiBJc3R3ZXJ0IGF1cyBab29tIHdpZGVyc3ByaWNodCBkZW0gT3JpZ2luYWx2b3JzY2hsYWc7IGJpdHRlIG1hbnVlbGwgcHJ1ZWZlbi4nKTtjb250aW51ZTt9CiAgICAgICAgICBpZihOdW1iZXIuaXNGaW5pdGUob2xkLnBlcmNlbnQpJiZOdW1iZXIuaXNGaW5pdGUobmV4dC5wZXJjZW50KSYmTWF0aC5hYnMob2xkLnBlcmNlbnQtbmV4dC5wZXJjZW50KT4uMDUpe3Jlc3VsdC53YXJuaW5ncy5wdXNoKG5leHQuY29kZSsnOiBQcm96ZW50d2VydC1XaWRlcnNwcnVjaDsgYmlzaGVyaWdlciBWb3JzY2hsYWcgYmxlaWJ0IGVyaGFsdGVuLicpO2NvbnRpbnVlO30KICAgICAgICAgIGlmKE51bWJlci5pc0Zpbml0ZShvbGQucGVyY2VudCkpY29udGludWU7CiAgICAgICAgICBpZighTnVtYmVyLmlzRmluaXRlKG5leHQucGVyY2VudCkpY29udGludWU7CiAgICAgICAgICBjb25zdCB1cGRhdGVkPXsuLi5vbGQscGVyY2VudDpuZXh0LnBlcmNlbnR9O2FsbC5zZXQobmV4dC5jb2RlLHVwZGF0ZWQpO3Jlc3VsdC5yb3dzLnB1c2godXBkYXRlZCk7CiAgICAgICAgfWVsc2UgaWYoTnVtYmVyLmlzRmluaXRlKG5leHQuYWN0dWFsKSl7CiAgICAgICAgICBhbGwuc2V0KG5leHQuY29kZSxuZXh0KTtyZXN1bHQucm93cy5wdXNoKG5leHQpOwogICAgICAgIH0KICAgICAgfQogICAgICBpZihyZXN1bHQucm93cy5sZW5ndGg+YmVmb3JlKXtyZXN1bHQucmVnaW9uPWNob2ljZS5yZWdpb247YnJlYWs7fQogICAgfQogICAgcmV0dXJuIHJlc3VsdDsKICB9CiAgY29uc3QgYXBpPU9iamVjdC5mcmVlemUoe3RvT3JpZ2luYWxUU1YsY2hvb3NlLHNjYW59KTsKICBpZih0eXBlb2YgbW9kdWxlPT09J29iamVjdCcmJm1vZHVsZS5leHBvcnRzKW1vZHVsZS5leHBvcnRzPWFwaTsKICBlbHNlIHJvb3QuUE5FVU1PUFJPX0ZPQ1VTMzcyPWFwaTsKfSkodHlwZW9mIHdpbmRvdyE9PSd1bmRlZmluZWQnP3dpbmRvdzpnbG9iYWxUaGlzKTsK'))
+
+          p='lungimport365.js'
+          replace_one(p,"ocrRows366='',ocrPosition367='',ocrFullTSV371='',ocrFullScale371={x:1,y:1};","ocrRows366='',ocrPosition367='',ocrFullTSV371='',ocrFullScale371={x:1,y:1},ocrRegions372=[];",'Zustand')
+          replace_one(p,"ocrRows366='';ocrPosition367='';ocrFullTSV371='';ocrFullScale371={x:1,y:1};","ocrRows366='';ocrPosition367='';ocrFullTSV371='';ocrFullScale371={x:1,y:1};ocrRegions372=[];",'Neuer OCR-Durchgang')
+          replace_one(p,"   if(best.score<2){\n     const regions=[","   if(best.score<10){\n     const regions=[",'Fokus auch bei teilweise lesbarer Tabelle')
+          replace_one(p,"         if(best.score>=8)break;","         if(best.score>=10)break;",'Fokusgrenze')
+          replace_one(p,"           const candidate=resultOf((await w.recognize(tile,{}, {tsv:true})).data);\n           if(candidate.score>best.score){best=candidate;cropName=region.name;}",
+          "           const candidate=resultOf((await w.recognize(tile,{}, {tsv:true})).data);\n           if(candidate.tsv&&ocrRegions372.length<5)ocrRegions372.push({name:region.name,tsv:candidate.tsv,x:sx,y:sy,sw,sh,cw:tile.width,ch:tile.height});\n           if(candidate.score>best.score){best=candidate;cropName=region.name;}", 'TSV-Wortkoordinaten jedes Tabellenausschnitts speichern')
+          replace_one(p,"if(isPdf){ocrRows366='';ocrPosition367='';ocrFullTSV371='';}","if(isPdf){ocrRows366='';ocrPosition367='';ocrFullTSV371='';ocrRegions372=[];}",'PDF-Zustand')
+          anchor="  if(useLines)text+='\\n\\n[Zusätzliche Tabellenzeilen aus OCR-Positionsdaten]\\n'+ocrRows366;"
+          new="""  // 3.7.2: Verknuepft echte OCR-Koordinaten vergroesserter Tabellenausschnitte
+            // mit dem Originalbild. Auslese-Vorschlaege erfordern weiterhin Kontrolle.
+            let found372=0,warnings372=[];
+            if(!isPdf&&ocrRegions372.length&&window.PNEUMOPRO_FOCUS372&&window.PNEUMOPRO_FOCUS371){
+              try{
+                const extra=await window.PNEUMOPRO_FOCUS372.scan(d.blob,ocrRegions372,parsed.rows,window.PNEUMOPRO_FOCUS371,ocrWorker,msg=>setStatus(msg));
+                const current=new Map(parsed.rows.map(row=>[row.code,row]));
+                for(const row of extra.rows){
+                  const before=current.get(row.code);
+                  if(before){
+                    if(Number.isFinite(before.predicted)&&Number.isFinite(row.predicted)&&Math.abs(before.predicted-row.predicted)>.025){warnings372.push(row.code+': Unterschied bei Sollwert; keine automatische Aenderung.');continue;}
+                    if(Number.isFinite(before.actual)&&Number.isFinite(row.actual)&&Math.abs(before.actual-row.actual)>.025){warnings372.push(row.code+': Unterschied bei Istwert; keine automatische Aenderung.');continue;}
+                    if(!Number.isFinite(before.percent)&&Number.isFinite(row.percent)){current.set(row.code,{...before,percent:row.percent});found372++;}
+                  }else if(Number.isFinite(row.actual)){current.set(row.code,row);found372++;}
+                }
+                if(found372)parsed={...parsed,rows:[...current.values()]};
+                warnings372.push(...extra.warnings);
+                if(!found372&&extra.targets)warnings372.push('Zeilen-Nachlesen ergab keine eindeutig zusaetzlichen Zahlen; fehlende Felder bleiben leer.');
+              }catch(error){warnings372.push('Erweiterte Tabellenkoordinaten konnten nicht verwendet werden; bisherige Vorschlaege bleiben erhalten.');}
+            }
+          """+anchor
+          replace_one(p,anchor,new,'Gezieltes Lesen aus vergroesserten Tabellenkoordinaten')
+          replace_one(p,"let notices=[...parsed.warnings,...focus371Warnings];","let notices=[...parsed.warnings,...focus371Warnings,...warnings372];",'Warnungen anzeigen')
+          replace_one(p,"if(focus371Found)notices.push(focus371Found+' zusätzliche Angaben aus gezielt vergrößerten Tabellenzeilen als UNBESTÄTIGTE Vorschläge erkannt. Alle Werte am Original prüfen.');",
+          "if(focus371Found)notices.push(focus371Found+' zusätzliche Angaben aus gezielt vergrößerten Tabellenzeilen als UNBESTÄTIGTE Vorschläge erkannt. Alle Werte am Original prüfen.');\n  if(found372)notices.push(found372+' weitere Werte aus zugeordneten Tabellenfoto-Zeilen als UNBESTAETIGTE Vorschlaege: Original pruefen.');",'Transparenz bei Nachleseergebnissen')
+
+          replace_one('secure17.js',"'lungfocus371.js','lungimport365.js'","'lungfocus371.js','lungfocus372.js','lungimport365.js'",'Neuen Scanner laden')
+          replace_version('secure17.js')
+          replace_one('sw.js',"const VERSION='3.7.1-zeilen-und-prozentspalten';","const VERSION='3.7.2-tabelle-bildposition';",'Service-Worker aktualisieren')
+          replace_one('sw.js',"'./lungfocus371.js','./lungfocus371.css',","'./lungfocus371.js','./lungfocus372.js','./lungfocus371.css',",'Offline-Datei vorladen')
+          replace_one('sw.js',"const important=['/lungfocus371.js'","const important=['/lungfocus372.js','/lungfocus371.js'",'Wichtigste Cache-Datei aktualisieren')
+          replace_version('app.js')
+          replace_version('index.html')
+          ver.update(version='3.7.2',released='2026-10-31',notes='Gezielte Zeilenerkennung nutzt neben Ganzseiten-OCR jetzt auch originale Bildpositionen aus vergroesserten Tabellenansichten. Erkennt nur lesbare und rechnerisch plausible Angaben; fehlende oder widerspruechliche Zahlen bleiben leer. Status vollstaendig/teilweise/nicht erkannt; keine Veraenderung gespeicherter Originale, lokale verschluesselte Befunde, manuelle Kontrolle zwingend.')
+          Path('version.json').write_text(json.dumps(ver,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          for file in ['lungfocus372.js','lungimport365.js','secure17.js','app.js']:
+              subprocess.run(['node','--check',file],check=True)
+          assert json.loads(Path('version.json').read_text(encoding='utf-8'))['version']=='3.7.2'
+          assert "'lungfocus371.js','lungfocus372.js','lungimport365.js'" in Path('secure17.js').read_text(encoding='utf-8')
+          assert './lungfocus372.js' in Path('sw.js').read_text(encoding='utf-8')
+          print('PneumoPro 3.7.2: alle lokalen Syntax- und Versionspruefungen bestanden.')
+          PY372_INSTALL
+          fi
+      - name: Syntaxpruefung und sichere Veroeffentlichung
+        shell: bash
+        run: |
+          node --check lungfocus372.js
+          node --check lungimport365.js
+          node --check secure17.js
+          node --check app.js
+          python3 -c "import json; assert json.load(open('version.json',encoding='utf-8'))['version']=='3.7.2'"
+          git diff --check
+          git add lungfocus372.js lungimport365.js secure17.js sw.js index.html app.js version.json
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "PneumoPro 3.7.2: vergrösserte Tabellenpositionen fuer Zeilen-OCR"
+            git push origin HEAD:main
+          else
+            echo "PneumoPro 3.7.2 bereits aktuell."
+          fi
