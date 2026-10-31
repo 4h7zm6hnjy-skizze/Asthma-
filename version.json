@@ -1,5 +1,5 @@
 {
-  "version": "3.7.2",
+  "version": "3.7.3",
   "released": "2026-10-31",
-  "notes": "Gezielte Zeilenerkennung nutzt neben Ganzseiten-OCR jetzt auch originale Bildpositionen aus vergroesserten Tabellenansichten. Erkennt nur lesbare und rechnerisch plausible Angaben; fehlende oder widerspruechliche Zahlen bleiben leer. Status vollstaendig/teilweise/nicht erkannt; keine Veraenderung gespeicherter Originale, lokale verschluesselte Befunde, manuelle Kontrolle zwingend."
+  "notes": "Neue lokale Originalbild-Nachpruefansicht fuer teilweise oder nicht erkannte Lungenfunktionswerte: Bildzoom, zeilenweise Eingabe, bewusste Originalkontrolle, Plausibilitaetspruefung und Kennzeichnung manuell abgeglichener Werte. Vorhandene OCR bleibt konservativ; keine geschaetzten Messwerte oder Bearbeitung gespeicherter Fotos. Endgueltige Speicherung erst nach bestehender Bestaetigung."
 }
