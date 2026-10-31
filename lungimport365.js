@@ -73,14 +73,14 @@
  const $=id=>document.getElementById(id), warn=$('li365-warnings'),status=$('li365-status');
  const setStatus=(msg,error=false)=>{status.textContent=msg;status.dataset.error=error?'yes':'no';};
  function warnings(messages){let a=[...new Set(messages.filter(Boolean))];warn.hidden=!a.length;warn.replaceChildren();if(a.length){warn.append(el('strong','','Automatische Übernahme nicht vollständig möglich.'));for(let v of a)warn.append(el('p','',v));warn.append(el('p','','Bei unleserlichen oder uneindeutigen Befunden kannst du das Original selbst in ChatGPT hochladen und die Daten dort auswerten lassen. Prüfe auch dann alle Ergebnisse am Original. Es wird nichts automatisch an ChatGPT übertragen.'));}}
- let currentDoc=null,parsed=null,image=null,canvasBase=null,selection=null,drag=null,crops=[],busy=false,activeRequest=0,worker=null,ocrHints=[],ocrRows366='',ocrPosition367='',ocrFullTSV371='',ocrFullScale371={x:1,y:1};
+ let currentDoc=null,parsed=null,image=null,canvasBase=null,selection=null,drag=null,crops=[],busy=false,activeRequest=0,worker=null,ocrHints=[],ocrRows366='',ocrPosition367='',ocrFullTSV371='',ocrFullScale371={x:1,y:1},ocrRegions372=[];
  const format=n=>n===null||n===undefined?'':String(n).replace('.',',');
  const validDate=s=>/^\d{4}-\d\d-\d\d$/.test(s)&&Number.isFinite(Date.parse(s+'T12:00:00Z'))&&new Date(s+'T12:00:00Z').toISOString().slice(0,10)===s;
  const eligible=d=>d?.blob instanceof Blob&&(/^(?:Lungenfunktionstest|Diffusionsmessung)$/i.test(d.kind||'')||['lufu','diff'].includes(d.scanArea))&&/\.(?:jpe?g|png|webp|heic|heif|pdf)$/i.test(d.name||'');
  const checkMime=file=>/\.(?:jpe?g|png|webp|heic|heif|pdf)$/i.test(file?.name||'')&&file.size>0&&file.size<=12*1048576;
  async function refreshDocs(selectId){let ds=(await S.list('documents')).filter(eligible).sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));const select=$('li365-doc');select.replaceChildren(new Option('Gespeicherten Befund auswählen',''));for(let d of ds)select.append(new Option(String(d.name||'Befund').slice(0,100)+' · '+(d.documentDate||'Datum prüfen'),d.id));if(selectId&&ds.some(d=>d.id===selectId))select.value=selectId;return ds;}
  async function recognizeImage(blob){
-  ocrRows366='';ocrPosition367='';ocrFullTSV371='';ocrFullScale371={x:1,y:1};
+  ocrRows366='';ocrPosition367='';ocrFullTSV371='';ocrFullScale371={x:1,y:1};ocrRegions372=[];
   const bitmap=await createImageBitmap(blob);
   try{
    const fac=Math.min(1.65,2900/Math.max(bitmap.width,bitmap.height),Math.sqrt(5200000/(bitmap.width*bitmap.height)));
@@ -116,7 +116,7 @@
    // Messzeilen deshalb begrenzte vergroesserte Bildbereiche lokal pruefen.
    // Keine feste Klinik, kein fixer Patient und keine ausgedachten Zahlen.
    let cropName='';
-   if(best.score<2){
+   if(best.score<10){
      const regions=[
        {name:'linke untere Tabelle',x:.065,y:.435,w:.55,h:.285},
        {name:'rechte untere Tabelle',x:.425,y:.435,w:.53,h:.36},
@@ -126,7 +126,7 @@
      try{
        await w.setParameters({tessedit_pageseg_mode:'6'});
        for(const region of regions){
-         if(best.score>=8)break;
+         if(best.score>=10)break;
          const sx=Math.floor(bitmap.width*region.x),sy=Math.floor(bitmap.height*region.y);
          const sw=Math.max(1,Math.floor(bitmap.width*region.w)),sh=Math.max(1,Math.floor(bitmap.height*region.h));
          const scale=Math.min(4.7,2450/sw,2700/sh,Math.sqrt(5400000/(sw*sh)));
@@ -140,6 +140,7 @@
            tc.drawImage(bitmap,sx,sy,sw,sh,0,0,tile.width,tile.height);
            setStatus('Kleine Messwerttabelle gezielt lesen: '+region.name+' ...');
            const candidate=resultOf((await w.recognize(tile,{}, {tsv:true})).data);
+           if(candidate.tsv&&ocrRegions372.length<5)ocrRegions372.push({name:region.name,tsv:candidate.tsv,x:sx,y:sy,sw,sh,cw:tile.width,ch:tile.height});
            if(candidate.score>best.score){best=candidate;cropName=region.name;}
          }catch(error){ /* Diesen Teilbereich nicht uebernehmen; anderen pruefen. */ }
          finally{tile.width=tile.height=1;}
@@ -165,7 +166,7 @@
   tr.append(heading371);for(const key of ['predicted','actual','percent','z']){let td=el('td');let input=el('input');input.type='text';input.inputMode='decimal';input.autocomplete='off';input.dataset.field=key;input.value=format(cand?.[key]);input.setAttribute('aria-label',label+' '+key);td.append(input);tr.append(td);}t.append(tr);}host.append(t);}
  async function setCurrentDoc(d){currentDoc=d;parsed=null;crops=[];image=null;selection=null;ocrHints=[];$('li365-review').hidden=true;$('li365-chartlist').replaceChildren();$('li365-canvas').width=$('li365-canvas').height=0;setStatus('Ausgewählt: '+d.name+'. Analyse starten.');warnings([]);}
  async function analyze(d){if(busy||!d)return;busy=true;let request=++activeRequest;warnings([]);setStatus('Lese '+d.name+' lokal ein. Es werden keine Daten an einen Server geschickt.');$('li365-analyze').disabled=true;
- try{if(!S.state().unlocked)throw Error('Gesundheitsakte gesperrt.');let isPdf=/\.pdf$/i.test(d.name);ocrHints=[];if(isPdf){ocrRows366='';ocrPosition367='';ocrFullTSV371='';}let text=isPdf?await recognizePdf(d.blob):await recognizeImage(d.blob);if(request!==activeRequest)return;currentDoc=d;
+ try{if(!S.state().unlocked)throw Error('Gesundheitsakte gesperrt.');let isPdf=/\.pdf$/i.test(d.name);ocrHints=[];if(isPdf){ocrRows366='';ocrPosition367='';ocrFullTSV371='';ocrRegions372=[];}let text=isPdf?await recognizePdf(d.blob):await recognizeImage(d.blob);if(request!==activeRequest)return;currentDoc=d;
   const scanner366=window.PNEUMOPRO_PARSER366;
   const fromText=scanner366?.parse(text)||parse(text);
   const fromLines=ocrRows366&&scanner366?scanner366.parse(ocrRows366):null;
@@ -220,9 +221,30 @@
       if(!study371.targets)focus371Warnings.push('Fuer fehlende Zeilen wurden keine verlaesslichen Textpositionen erkannt. Diese Angaben bleiben leer.');
     }catch(error){focus371Warnings.push('Einzelzeilen-Nachpruefung technisch nicht moeglich: '+(error?.message||String(error))+'. Bisherige sichere Vorschlaege bleiben erhalten.');}
   }
+  // 3.7.2: Verknuepft echte OCR-Koordinaten vergroesserter Tabellenausschnitte
+  // mit dem Originalbild. Auslese-Vorschlaege erfordern weiterhin Kontrolle.
+  let found372=0,warnings372=[];
+  if(!isPdf&&ocrRegions372.length&&window.PNEUMOPRO_FOCUS372&&window.PNEUMOPRO_FOCUS371){
+    try{
+      const extra=await window.PNEUMOPRO_FOCUS372.scan(d.blob,ocrRegions372,parsed.rows,window.PNEUMOPRO_FOCUS371,ocrWorker,msg=>setStatus(msg));
+      const current=new Map(parsed.rows.map(row=>[row.code,row]));
+      for(const row of extra.rows){
+        const before=current.get(row.code);
+        if(before){
+          if(Number.isFinite(before.predicted)&&Number.isFinite(row.predicted)&&Math.abs(before.predicted-row.predicted)>.025){warnings372.push(row.code+': Unterschied bei Sollwert; keine automatische Aenderung.');continue;}
+          if(Number.isFinite(before.actual)&&Number.isFinite(row.actual)&&Math.abs(before.actual-row.actual)>.025){warnings372.push(row.code+': Unterschied bei Istwert; keine automatische Aenderung.');continue;}
+          if(!Number.isFinite(before.percent)&&Number.isFinite(row.percent)){current.set(row.code,{...before,percent:row.percent});found372++;}
+        }else if(Number.isFinite(row.actual)){current.set(row.code,row);found372++;}
+      }
+      if(found372)parsed={...parsed,rows:[...current.values()]};
+      warnings372.push(...extra.warnings);
+      if(!found372&&extra.targets)warnings372.push('Zeilen-Nachlesen ergab keine eindeutig zusaetzlichen Zahlen; fehlende Felder bleiben leer.');
+    }catch(error){warnings372.push('Erweiterte Tabellenkoordinaten konnten nicht verwendet werden; bisherige Vorschlaege bleiben erhalten.');}
+  }
   if(useLines)text+='\n\n[Zusätzliche Tabellenzeilen aus OCR-Positionsdaten]\n'+ocrRows366;
-  let notices=[...parsed.warnings,...focus371Warnings];
+  let notices=[...parsed.warnings,...focus371Warnings,...warnings372];
   if(focus371Found)notices.push(focus371Found+' zusätzliche Angaben aus gezielt vergrößerten Tabellenzeilen als UNBESTÄTIGTE Vorschläge erkannt. Alle Werte am Original prüfen.');
+  if(found372)notices.push(found372+' weitere Werte aus zugeordneten Tabellenfoto-Zeilen als UNBESTAETIGTE Vorschlaege: Original pruefen.');
   if(supplement370Rows.length)notices.push(supplement370Rows.length+' Parameter mit lesbaren Soll-/Istwerten, aber ohne sichere Prozentangabe. Die Prozentfelder bleiben leer. Alle Vorschlaege am Original kontrollieren.');
   if(supplement370Conflicts.length)notices.push('OCR widerspricht vorhandenen Werten bei: '+supplement370Conflicts.join(', ')+'. Bitte mit dem Original vergleichen; die bestaetigtere vollstaendige Zeile bleibt unveraendert.');
   if(useClean369)notices.push('Weitere Werte aus getrennten OCR-Tabellenteilen als ungepruefte Vorschlaege erkannt. Alle Zahlen und die Messphase am Original kontrollieren.');

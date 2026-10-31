@@ -1,5 +1,5 @@
 {
-  "version": "3.7.1",
+  "version": "3.7.2",
   "released": "2026-10-31",
-  "notes": "Gezielter zweiter OCR-Durchgang nur auf fehlenden Lungenfunktions-Zeilen, danach bei sicherer Koordinate separate Prozentspaltenpruefung. Drei klare Status: vollstaendig, teilweise, nicht erkannt. Kein Erfinden von Werten, unveraenderte verschluesselte Originale, verpflichtende Originalkontrolle."
+  "notes": "Gezielte Zeilenerkennung nutzt neben Ganzseiten-OCR jetzt auch originale Bildpositionen aus vergroesserten Tabellenansichten. Erkennt nur lesbare und rechnerisch plausible Angaben; fehlende oder widerspruechliche Zahlen bleiben leer. Status vollstaendig/teilweise/nicht erkannt; keine Veraenderung gespeicherter Originale, lokale verschluesselte Befunde, manuelle Kontrolle zwingend."
 }
