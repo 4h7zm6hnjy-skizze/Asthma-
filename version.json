@@ -1,5 +1,5 @@
 {
-  "version": "3.6.9",
+  "version": "3.7.0",
   "released": "2026-10-31",
-  "notes": "Verbesserte Zusammenfuehrung von Lungenfunktions-OCR aus gesamtem Klinikbogen und separat vergroesserten Tabellen. Erkennt zweistellige Jahreszahlen im Untersuchungsdatum, prueft ausgeschriebene Soll/Ist/%-Tripel rechnerisch und weist unlesbare oder widerspruechliche Werte ausdruecklich zurueck. Keine erfundenen Dezimalstellen; bestaetigungspflichtige Vorschlaege, Originale unveraendert und lokal verschluesselt."
+  "notes": "Teilerkannte Soll/Ist-Messwerte werden separat als unbestaetigte OCR-Vorschlaege gezeigt. Keine automatische Ergaenzung fehlender Prozentwerte oder verlorener Dezimalzeichen. Vollstaendigkeit nur bei tatsaechlich abgelesenen Soll/Ist/Prozent-Spalten; OCR-Konflikte werden gewarnt und nicht ueberschrieben. Messzeit kann aus eindeutigem Messzeit-Feld vorbelegt werden. Originaldateien bleiben verschluesselt und unveraendert."
 }
