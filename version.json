@@ -1,5 +1,5 @@
 {
-  "version": "3.6.3",
+  "version": "3.6.4",
   "released": "2026-10-31",
-  "notes": "Echte Klinikdiagramme vom 28.10.2026 als saubere, angetippte Ausschnitte direkt in Deine Lungenwerte. Alle bereits gespeicherten und neu angezeigten Dokumentbilder erhalten automatisch eine lokale, optisch optimierte Scan-Kopie mit konservativer Randerkennung. Bei fehlender Erkennung bleibt das Original sichtbar. Originale werden nie ueberschrieben; Umschalter Kopie/Original, Zoom und Offline-Funktion. Keine Patientendaten in GitHub."
+  "notes": "Groessere Klinikdiagramm-Vorschauen auf iPhone. Schonende kontrastverstaerkte Scanansicht bewahrt auch feine hellgraue Kurven und Beschriftungen; Zoom bleibt erhalten. Originalfotos und medizinische Messdaten unveraendert und nur lokal verschluesselt."
 }

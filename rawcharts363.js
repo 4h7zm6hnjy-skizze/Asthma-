@@ -41,10 +41,19 @@
   if(w<20||h<20||x0<0||y0<0||x1>img.naturalWidth||y1>img.naturalHeight)throw Error('Der Diagrammausschnitt passt nicht zum Originalfoto.');
   const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)throw Error('Scanansicht wird von diesem Browser nicht unterstützt.');
   ctx.drawImage(img,x0,y0,w,h,0,0,w,h);
-  const data=ctx.getImageData(0,0,w,h);const pixels=data.data;
-  // Nur Tonwerte; keine Verformung, kein Erzeugen/Entfernen von Linien.
-  // Ein heller Papierhintergrund wird nahezu weiß; die Originalkurven bleiben an derselben Position.
-  for(let i=0;i<pixels.length;i+=4){const gray=.299*pixels[i]+.587*pixels[i+1]+.114*pixels[i+2];const p=Math.max(0,Math.min(255,(gray-150)*1.45+190));pixels[i]=p;pixels[i+1]=p;pixels[i+2]=p;}
+  const data=ctx.getImageData(0,0,w,h),pixels=data.data;
+  // Nur Tonwertkorrektur pro Originalpixel, nie Linien nachzeichnen oder Messwerte erfinden.
+  // Der dokumenteigene helle Grauwert wird als Hintergrund ermittelt, damit auch
+  // feine, auf den Klinikfotos helle Linien nicht wie bisher weiß abgeschnitten werden.
+  const histogram=new Uint32Array(256),count=pixels.length/4;
+  for(let i=0;i<pixels.length;i+=4){const g=Math.round(.299*pixels[i]+.587*pixels[i+1]+.114*pixels[i+2]);histogram[g]++;}
+  let cumulative=0,background=230;
+  for(let g=0;g<256;g++){cumulative+=histogram[g];if(cumulative>=count*.90){background=g;break;}}
+  for(let i=0;i<pixels.length;i+=4){
+   const gray=.299*pixels[i]+.587*pixels[i+1]+.114*pixels[i+2];
+   const shade=Math.max(0,Math.min(253,Math.round(253-Math.max(0,background-gray)*3.1)));
+   pixels[i]=shade;pixels[i+1]=shade;pixels[i+2]=shade;
+  }
   ctx.putImageData(data,0,0);return canvas.toDataURL('image/png');
  }
  function openZoom(src,title){full.src=src;name.textContent=title;zoom(1);if(dialog.showModal)dialog.showModal();else dialog.setAttribute('open','');}

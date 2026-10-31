@@ -1,5 +1,5 @@
 /* Asthma 3.3.0: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
-const VERSION='3.6.3-alle-scan-kopien';
+const VERSION='3.6.4-lesbare-diagramme';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
  './rawcharts363.js','./rawcharts363.css','./doccopy363.js','./doccopy363.css',
