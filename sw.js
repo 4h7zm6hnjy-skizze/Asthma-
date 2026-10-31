@@ -1,5 +1,5 @@
 /* Asthma 3.3.0: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
-const VERSION='3.7.7-start-professional';
+const VERSION='3.7.8-kompakte-startseite';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
  './lungparser366.js','./lungparser367.js','./lungparser369.js','./lungparser370.js','./lungfocus371.js','./lungfocus372.js','./lungfocus371.css',
@@ -33,7 +33,7 @@ const ASSETS=[
  './labor18.js','./laborvergleich303.js','./offline303.js','./hub20.js','./scanner20.js','./pdf20.js','./jszip.min.js','./vital29.js',
  './vital-rescue291.js','./vital29.css','./epef21.js','./lufu23.js','./medplan24.js','./gdb24.js',
  './au25.js','./stats25.js','./statsplus292.js','./statsprint296.js','./statsplus292.css',
- './weight292.js','./tidy375.js','./dashboard376.js','./dashboard377.js','./medpref25.js','./hilfsmittel251.js','./version.json','./manifest.webmanifest',
+ './weight292.js','./tidy375.js','./dashboard376.js','./dashboard377.js','./dashboard378.js','./medpref25.js','./hilfsmittel251.js','./version.json','./manifest.webmanifest',
  './icon.svg','./design26.css','./design26.js','./logo-192.png','./logo-512.png',
  './logo-home-v270.png','./professional27.js','./professional27.css','./quality28.js',
  './quality28.css','./branding281.css','./logo-192-v281.png','./logo-512-v281.png',
