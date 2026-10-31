@@ -1,0 +1,119 @@
+name: PneumoPro 3.7.5 - Gewicht synchronisieren und Messlisten aufklappen
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PneumoPro375_Gewicht_Messlisten.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pneumopro-375-gewicht-messlisten
+  cancel-in-progress: false
+
+jobs:
+  installieren:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: App laden
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Ein-Datei-Update installieren
+        shell: bash
+        run: |
+          python3 - <<'PY_375'
+          from pathlib import Path
+          import base64, json
+          
+          target=Path('version.json')
+          current=json.loads(target.read_text(encoding='utf-8'))
+          if current.get('version') == '3.7.5':
+              print('PneumoPro 3.7.5 ist bereits installiert.')
+          elif current.get('version') != '3.7.4':
+              raise RuntimeError('Erwartete Version 3.7.4 fehlt. Zur Sicherheit keine Aenderungen.')
+          else:
+              def replace_once(filename, before, after):
+                  path=Path(filename)
+                  original=path.read_text(encoding='utf-8')
+                  count=original.count(before)
+                  if count != 1:
+                      raise RuntimeError(f'{filename}: erwarteter Marker nicht eindeutig: {count} Treffer.')
+                  path.write_text(original.replace(before,after,1),encoding='utf-8')
+              def replace_version(filename):
+                  path=Path(filename)
+                  original=path.read_text(encoding='utf-8')
+                  if '3.7.4' not in original:
+                      raise RuntimeError(f'{filename}: Version 3.7.4 fehlt.')
+                  path.write_text(original.replace('3.7.4','3.7.5'),encoding='utf-8')
+              if Path('tidy375.js').exists():
+                  raise RuntimeError('tidy375.js existiert bereits, aber Version passt nicht.')
+              Path('tidy375.js').write_bytes(base64.b64decode('J3VzZSBzdHJpY3QnOwovKiBQbmV1bW9Qcm8gMy43LjU6IEdld2ljaHQgaW0gUGF0aWVudGVucHJvZmlsIHN5bmNocm9uaXNpZXJlbiwgTWVzc2xpc3RlbiBlaW5rbGFwcGVuLgogICBLZWluZSBleHRlcm5lbiBBbmZyYWdlbiwga2VpbmUgQWVuZGVydW5nIG9kZXIgTG9lc2NodW5nIHZvbiBNZXNzZGF0ZW4uICovCigoKSA9PiB7CiAgY29uc3QgUyA9IHdpbmRvdy5BU1RITUFfU0VDVVJJVFk7CiAgaWYgKCFTPy5zdGF0ZT8uKCkudW5sb2NrZWQgfHwgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3BwMzc1LXN0eWxlJykpIHJldHVybjsKICBjb25zdCAkID0gaWQgPT4gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoaWQpOwogIGNvbnN0IHRhcmdldHMgPSBbCiAgICBbJ3YyOS1oaXN0b3J5LXNwbzInLCAnQmx1dHNhdWVyc3RvZmYnLCAnc3BvMiddLAogICAgWyd2MjktaGlzdG9yeS1icCcsICdCbHV0ZHJ1Y2snLCAnYnAnXSwKICAgIFsndjI5LWhpc3RvcnktcHVsc2UnLCAnUHVscycsICdwdWxzZSddLAogICAgWydzMjkyLXdlaWdodC1saXN0JywgJ0dld2ljaHQnLCAnd2VpZ2h0J10sCiAgICBbJ2VwZWYtaGlzdG9yeScsICdQZWFrLUZsb3cnLCAnZXBlZiddLAogICAgWydtZWFzdXJlbWVudC1saXN0JywgJ0x1bmdlbmZ1bmt0aW9uJywgJ21lYXN1cmVtZW50cyddLAogICAgWydsdWZ1MjMtcmVjb3JkLWxpc3QnLCAnTHVuZ2VudW50ZXJzdWNodW5nZW4nLCAnbWVhc3VyZW1lbnRzJ10sCiAgICBbJ3JlcG9ydC1saXN0JywgJ0Flcnp0bGljaGUgQmVmdW5kZScsICdkb20nXQogIF07CiAgY29uc3Qgc3R5bGUgPSBkb2N1bWVudC5jcmVhdGVFbGVtZW50KCdzdHlsZScpOwogIHN0eWxlLmlkID0gJ3BwMzc1LXN0eWxlJzsKICBzdHlsZS50ZXh0Q29udGVudCA9ICcucHAzNzUtZm9sZHttYXJnaW46MTVweCAwO21pbi13aWR0aDowO2JvcmRlcjoxcHggc29saWQgI2I5ZDdkZjtib3JkZXItcmFkaXVzOjEycHg7YmFja2dyb3VuZDojZjdmYmZjO292ZXJmbG93OmhpZGRlbn0ucHAzNzUtZm9sZD5zdW1tYXJ5e2N1cnNvcjpwb2ludGVyO2xpc3Qtc3R5bGU6bm9uZTtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpzcGFjZS1iZXR3ZWVuO2dhcDoxMHB4O3BhZGRpbmc6MTNweCAxNXB4O2ZvbnQtd2VpZ2h0Ojc2MDtmb250LXNpemU6MTVweDtsaW5lLWhlaWdodDoxLjQ1O2NvbG9yOiMxNTU3NmM7bWluLWhlaWdodDo0OHB4O292ZXJmbG93LXdyYXA6YW55d2hlcmV9LnBwMzc1LWZvbGQ+c3VtbWFyeTo6LXdlYmtpdC1kZXRhaWxzLW1hcmtlcntkaXNwbGF5Om5vbmV9LnBwMzc1LWZvbGQ+c3VtbWFyeTpmb2N1cy12aXNpYmxle291dGxpbmU6M3B4IHNvbGlkICMyMzg3OWM7b3V0bGluZS1vZmZzZXQ6LTNweH0ucHAzNzUtZm9sZD5zdW1tYXJ5OjphZnRlcntjb250ZW50OiLilr4iO2ZsZXg6bm9uZTtmb250LXNpemU6MThweDt0cmFuc2l0aW9uOnRyYW5zZm9ybSAuMTVzIGVhc2V9LnBwMzc1LWZvbGRbb3Blbl0+c3VtbWFyeTo6YWZ0ZXJ7dHJhbnNmb3JtOnJvdGF0ZSgxODBkZWcpfS5wcDM3NS1mb2xkW29wZW5dPnN1bW1hcnl7Ym9yZGVyLWJvdHRvbToxcHggc29saWQgI2Q0ZTVlYjtiYWNrZ3JvdW5kOiNlYWY2Zjh9LnBwMzc1LWZvbGQ+LnBwMzc1LWlubmVye3BhZGRpbmc6MTBweCAxMnB4O21pbi13aWR0aDowO292ZXJmbG93LXg6YXV0b30ucHAzNzUtZm9sZCAudjI5LXJlY29yZHttYXgtd2lkdGg6MTAwJX0ucHAzNzUtZm9sZCB0YWJsZXttYXgtd2lkdGg6MTAwJX1AbWVkaWEobWF4LXdpZHRoOjYyMHB4KXsucHAzNzUtZm9sZD5zdW1tYXJ5e2ZvbnQtc2l6ZToxNHB4O3BhZGRpbmc6MTJweH0ucHAzNzUtZm9sZD4ucHAzNzUtaW5uZXJ7cGFkZGluZzo3cHg7b3ZlcmZsb3cteDphdXRvfX1AbWVkaWEgcHJpbnR7LnBwMzc1LWZvbGR7ZGlzcGxheTpibG9jayFpbXBvcnRhbnR9LnBwMzc1LWZvbGQ+LnBwMzc1LWlubmVye2Rpc3BsYXk6YmxvY2shaW1wb3J0YW50fX0nOwogIGRvY3VtZW50LmhlYWQuYXBwZW5kKHN0eWxlKTsKICBjb25zdCBzdGF0ZSA9IG5ldyBNYXAoKTsKICBsZXQgc3VpdGVDb3VudHMgPSBudWxsLCBlcGVmQ291bnQgPSBudWxsOwogIGZ1bmN0aW9uIGNvdW50RE9NKGhvc3QpIHsKICAgIGlmICghaG9zdCkgcmV0dXJuIDA7CiAgICBpZiAoaG9zdC5xdWVyeVNlbGVjdG9yKCd0YWJsZScpKSByZXR1cm4gTWF0aC5tYXgoMCwgaG9zdC5xdWVyeVNlbGVjdG9yQWxsKCd0YWJsZSB0cicpLmxlbmd0aCAtIDEpOwogICAgcmV0dXJuIFsuLi5ob3N0LmNoaWxkcmVuXS5maWx0ZXIoeCA9PiAheC5tYXRjaGVzKCdwLmlucHV0LW5vdGUscC5zdWl0ZS1tc2cscC5lcGVmLW5vdGUnKSkubGVuZ3RoOwogIH0KICBmdW5jdGlvbiBsYWJlbChpZCwgdGl0bGUsIGtpbmQpIHsKICAgIGNvbnN0IGl0ZW0gPSBzdGF0ZS5nZXQoaWQpOwogICAgaWYgKCFpdGVtKSByZXR1cm47CiAgICBsZXQgY291bnQ7CiAgICBpZiAoa2luZCA9PT0gJ3dlaWdodCcpIGNvdW50ID0gc3VpdGVDb3VudHM/LndlaWdodDsKICAgIGVsc2UgaWYgKGtpbmQgPT09ICdtZWFzdXJlbWVudHMnKSBjb3VudCA9IHN1aXRlQ291bnRzPy5tZWFzdXJlbWVudHM7CiAgICBlbHNlIGlmIChbJ3NwbzInLCAnYnAnLCAncHVsc2UnXS5pbmNsdWRlcyhraW5kKSkgY291bnQgPSBzdWl0ZUNvdW50cz8uW2tpbmRdOwogICAgZWxzZSBpZiAoa2luZCA9PT0gJ2VwZWYnKSBjb3VudCA9IGVwZWZDb3VudDsKICAgIGVsc2UgY291bnQgPSBjb3VudERPTShpdGVtLmhvc3QpOwogICAgaXRlbS5zdW1tYXJ5LnRleHRDb250ZW50ID0gdGl0bGUgKyAnIMK3ICcgKyAoY291bnQgPT0gbnVsbCA/ICdFaW56ZWx3ZXJ0ZSBhbnplaWdlbicgOiBjb3VudCArICcgJyArIChjb3VudCA9PT0gMSA/ICdFaW50cmFnJyA6ICdFaW50cmFlZ2UnKSArICcgYW56ZWlnZW4nKTsKICB9CiAgZnVuY3Rpb24gaW5zdGFsbCgpIHsKICAgIGZvciAoY29uc3QgW2lkLCB0aXRsZSwga2luZF0gb2YgdGFyZ2V0cykgewogICAgICBjb25zdCBob3N0ID0gJChpZCk7CiAgICAgIGlmICghaG9zdCB8fCBzdGF0ZS5oYXMoaWQpIHx8IGhvc3QuY2xvc2VzdCgnLnBwMzc1LWZvbGQnKSkgY29udGludWU7CiAgICAgIGNvbnN0IGRldGFpbHMgPSBkb2N1bWVudC5jcmVhdGVFbGVtZW50KCdkZXRhaWxzJyk7CiAgICAgIGRldGFpbHMuY2xhc3NOYW1lID0gJ3BwMzc1LWZvbGQnOwogICAgICBkZXRhaWxzLnNldEF0dHJpYnV0ZSgnYXJpYS1sYWJlbCcsIHRpdGxlICsgJyDigJMgZWluemVsbmUgTWVzc3dlcnRlJyk7CiAgICAgIGNvbnN0IHN1bW1hcnkgPSBkb2N1bWVudC5jcmVhdGVFbGVtZW50KCdzdW1tYXJ5Jyk7CiAgICAgIGNvbnN0IGluc2lkZSA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2RpdicpOwogICAgICBpbnNpZGUuY2xhc3NOYW1lID0gJ3BwMzc1LWlubmVyJzsKICAgICAgaG9zdC5wYXJlbnROb2RlLmluc2VydEJlZm9yZShkZXRhaWxzLCBob3N0KTsKICAgICAgZGV0YWlscy5hcHBlbmQoc3VtbWFyeSwgaW5zaWRlKTsKICAgICAgaW5zaWRlLmFwcGVuZChob3N0KTsKICAgICAgc3RhdGUuc2V0KGlkLCB7aG9zdCwgc3VtbWFyeSwgZGV0YWlscywga2luZCwgdGl0bGV9KTsKICAgICAgbGFiZWwoaWQsIHRpdGxlLCBraW5kKTsKICAgIH0KICB9CiAgY29uc3QgaXNvRGF0ZSA9IHMgPT4gdHlwZW9mIHMgPT09ICdzdHJpbmcnICYmIC9eXGR7NH0tXGR7Mn0tXGR7Mn0kLy50ZXN0KHMpICYmICFOdW1iZXIuaXNOYU4obmV3IERhdGUocyArICdUMTI6MDA6MDAnKS52YWx1ZU9mKCkpOwogIGNvbnN0IGtnID0gdiA9PiB2ICE9PSBudWxsICYmIHYgIT09ICcnICYmIHYgIT09IHVuZGVmaW5lZCAmJiBOdW1iZXIuaXNGaW5pdGUoTnVtYmVyKHYpKSAmJiBOdW1iZXIodikgPj0gMTUgJiYgTnVtYmVyKHYpIDw9IDUwMCA/IE51bWJlcih2KSA6IG51bGw7CiAgY29uc3Qgc2FtZSA9IChhLCBiKSA9PiBhID09PSBiIHx8IChhID09IG51bGwgJiYgYiA9PSBudWxsKTsKICBsZXQgc2VxID0gMDsKICBhc3luYyBmdW5jdGlvbiByZWZyZXNoKCkgewogICAgaWYgKCFTLnN0YXRlKCkudW5sb2NrZWQpIHJldHVybjsKICAgIGNvbnN0IHJ1biA9ICsrc2VxOwogICAgY29uc3QgW3N1aXRlLCBlcGVmXSA9IGF3YWl0IFByb21pc2UuYWxsU2V0dGxlZChbUy5saXN0KCdzdWl0ZScpLCBTLmxpc3QoJ2VwZWYnKV0pOwogICAgaWYgKHJ1biAhPT0gc2VxKSByZXR1cm47CiAgICBpZiAoc3VpdGUuc3RhdHVzID09PSAnZnVsZmlsbGVkJykgewogICAgICBjb25zdCByb3dzID0gc3VpdGUudmFsdWU7CiAgICAgIHN1aXRlQ291bnRzID0ge3dlaWdodDowLCBtZWFzdXJlbWVudHM6MCwgc3BvMjowLCBicDowLCBwdWxzZTowfTsKICAgICAgY29uc3Qgd2VpZ2h0cyA9IFtdOwogICAgICBmb3IgKGNvbnN0IHJvdyBvZiByb3dzKSB7CiAgICAgICAgaWYgKHJvdy50eXBlID09PSAnd2VpZ2h0MjkyJyAmJiBpc29EYXRlKHJvdy52YWx1ZT8uZGF0ZSkgJiYga2cocm93LnZhbHVlPy5rZykgIT09IG51bGwpIHsKICAgICAgICAgIHN1aXRlQ291bnRzLndlaWdodCsrOwogICAgICAgICAgd2VpZ2h0cy5wdXNoKHtkYXRlOnJvdy52YWx1ZS5kYXRlLCBrZzprZyhyb3cudmFsdWUua2cpLCBpZDpTdHJpbmcocm93LnZhbHVlLmlkIHx8IHJvdy5rZXkgfHwgJycpLCBjcmVhdGVkQXQ6U3RyaW5nKHJvdy52YWx1ZS5jcmVhdGVkQXQgfHwgJycpfSk7CiAgICAgICAgfSBlbHNlIGlmIChyb3cudHlwZSA9PT0gJ3ZpdGFsMjknICYmIFsnc3BvMicsJ2JwJywncHVsc2UnXS5pbmNsdWRlcyhyb3cudmFsdWU/LmtpbmQpKSBzdWl0ZUNvdW50c1tyb3cudmFsdWUua2luZF0rKzsKICAgICAgICBlbHNlIGlmIChyb3cudHlwZSA9PT0gJ21lYXN1cmVtZW50cycpIHN1aXRlQ291bnRzLm1lYXN1cmVtZW50cysrOwogICAgICB9CiAgICAgIHdlaWdodHMuc29ydCgoYSwgYikgPT4gYS5kYXRlLmxvY2FsZUNvbXBhcmUoYi5kYXRlKSB8fCBhLmNyZWF0ZWRBdC5sb2NhbGVDb21wYXJlKGIuY3JlYXRlZEF0KSB8fCBhLmlkLmxvY2FsZUNvbXBhcmUoYi5pZCkpOwogICAgICBjb25zdCBsYXRlc3QgPSB3ZWlnaHRzLmxlbmd0aCA/IHdlaWdodHNbd2VpZ2h0cy5sZW5ndGggLSAxXSA6IG51bGw7CiAgICAgIGNvbnN0IHByb2ZpbGUgPSBTLnByb2ZpbGVHZXQoKSB8fCB7fSwgcCA9IHByb2ZpbGUucGVyc29uYWwgfHwge30sIG1ldGEgPSBwLndlaWdodFN5bmMzNzU7CiAgICAgIGlmIChsYXRlc3QpIHsKICAgICAgICBpZiAoIXNhbWUoa2cocC53ZWlnaHRLZyksIGxhdGVzdC5rZykgfHwgcC53ZWlnaHREYXRlICE9PSBsYXRlc3QuZGF0ZSB8fCAhbWV0YSkgewogICAgICAgICAgY29uc3Qgb3JpZ2luYWwgPSBtZXRhICYmIHR5cGVvZiBtZXRhID09PSAnb2JqZWN0JyA/IG1ldGEgOiB7b3JpZ2luYWxLZzpwLndlaWdodEtnID8/IG51bGwsIG9yaWdpbmFsRGF0ZTpwLndlaWdodERhdGUgfHwgJyd9OwogICAgICAgICAgY29uc3QgdXBkYXRlZCA9IHsuLi5wLCB3ZWlnaHRLZzpsYXRlc3Qua2csIHdlaWdodERhdGU6bGF0ZXN0LmRhdGUsIHdlaWdodFN5bmMzNzU6ey4uLm9yaWdpbmFsLCBsYXN0SWQ6bGF0ZXN0LmlkfX07CiAgICAgICAgICBhd2FpdCBTLnVwZGF0ZVByb2ZpbGUoe3BlcnNvbmFsOnVwZGF0ZWR9KTsKICAgICAgICAgIGlmIChydW4gIT09IHNlcSkgcmV0dXJuOwogICAgICAgICAgLy8gU0VDIG1lbGRldCBkaWUgQWVuZGVydW5nLCBiZXZvciBzZWluIGludGVybmVyIFByb2ZpbHdlcnQgYWt0dWFsaXNpZXJ0IHd1cmRlLgogICAgICAgICAgd2luZG93LmRpc3BhdGNoRXZlbnQobmV3IEN1c3RvbUV2ZW50KCdhc3RobWE6c2VjdXJlLWNoYW5nZScsIHtkZXRhaWw6e2dyb3VwOidwcm9maWxlJ319KSk7CiAgICAgICAgICB3aW5kb3cuZGlzcGF0Y2hFdmVudChuZXcgRXZlbnQoJ2FzdGhtYTpwZXJzb25hbC1wcm9maWxlLXVwZGF0ZWQnKSk7CiAgICAgICAgfQogICAgICB9IGVsc2UgaWYgKG1ldGEgJiYgdHlwZW9mIG1ldGEgPT09ICdvYmplY3QnKSB7CiAgICAgICAgY29uc3QgdXBkYXRlZCA9IHsuLi5wLCB3ZWlnaHRLZzptZXRhLm9yaWdpbmFsS2cgPz8gbnVsbCwgd2VpZ2h0RGF0ZTptZXRhLm9yaWdpbmFsRGF0ZSB8fCAnJ307CiAgICAgICAgZGVsZXRlIHVwZGF0ZWQud2VpZ2h0U3luYzM3NTsKICAgICAgICBhd2FpdCBTLnVwZGF0ZVByb2ZpbGUoe3BlcnNvbmFsOnVwZGF0ZWR9KTsKICAgICAgICBpZiAocnVuICE9PSBzZXEpIHJldHVybjsKICAgICAgICB3aW5kb3cuZGlzcGF0Y2hFdmVudChuZXcgQ3VzdG9tRXZlbnQoJ2FzdGhtYTpzZWN1cmUtY2hhbmdlJywge2RldGFpbDp7Z3JvdXA6J3Byb2ZpbGUnfX0pKTsKICAgICAgICB3aW5kb3cuZGlzcGF0Y2hFdmVudChuZXcgRXZlbnQoJ2FzdGhtYTpwZXJzb25hbC1wcm9maWxlLXVwZGF0ZWQnKSk7CiAgICAgIH0KICAgIH0KICAgIGlmIChlcGVmLnN0YXR1cyA9PT0gJ2Z1bGZpbGxlZCcpIGVwZWZDb3VudCA9IGVwZWYudmFsdWUuZmlsdGVyKHggPT4geC5raW5kID09PSAnbWVhc3VyZW1lbnQnKS5sZW5ndGg7CiAgICBpbnN0YWxsKCk7CiAgICBmb3IgKGNvbnN0IFtpZCwgdGl0bGUsIGtpbmRdIG9mIHRhcmdldHMpIGxhYmVsKGlkLCB0aXRsZSwga2luZCk7CiAgfQogIGxldCB0aW1lciA9IDA7CiAgZnVuY3Rpb24gc2NoZWR1bGUoKSB7CiAgICBjbGVhclRpbWVvdXQodGltZXIpOwogICAgdGltZXIgPSBzZXRUaW1lb3V0KCgpID0+IHJlZnJlc2goKS5jYXRjaChlcnIgPT4gY29uc29sZS53YXJuKCdQbmV1bW9Qcm8gMy43LjU6IE1lc3N3ZXJ0ZSBuaWNodCBzeW5jaHJvbmlzaWVydDonLCBlcnIubWVzc2FnZSkpLCAxOTApOwogIH0KICB3aW5kb3cuYWRkRXZlbnRMaXN0ZW5lcignYXN0aG1hOnNlY3VyZS1jaGFuZ2UnLCBlID0+IHsKICAgIGlmIChbJ3N1aXRlJywnZXBlZicsJ3Byb2ZpbGUnXS5pbmNsdWRlcyhlLmRldGFpbD8uZ3JvdXApKSBzY2hlZHVsZSgpOwogIH0pOwogIHdpbmRvdy5hZGRFdmVudExpc3RlbmVyKCdhc3RobWE6cHJvZmlsZS1yZXNldCcsIHNjaGVkdWxlKTsKICB3aW5kb3cuYWRkRXZlbnRMaXN0ZW5lcignYXN0aG1hOnBlcnNvbmFsLXByb2ZpbGUtdXBkYXRlZCcsIHNjaGVkdWxlKTsKICBsZXQgb2JzZXJ2ZXJUaW1lciA9IDA7CiAgY29uc3Qgb2JzZXJ2ZXIgPSBuZXcgTXV0YXRpb25PYnNlcnZlcigoKSA9PiB7CiAgICBjbGVhclRpbWVvdXQob2JzZXJ2ZXJUaW1lcik7CiAgICBvYnNlcnZlclRpbWVyID0gc2V0VGltZW91dChpbnN0YWxsLCAxMDApOwogIH0pOwogIG9ic2VydmVyLm9ic2VydmUoZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3NlY3VyZS1hcHBsaWNhdGlvbicpIHx8IGRvY3VtZW50LmJvZHksIHtjaGlsZExpc3Q6dHJ1ZSwgc3VidHJlZTp0cnVlfSk7CiAgaW5zdGFsbCgpOwogIHNjaGVkdWxlKCk7CiAgd2luZG93LlBORVVNT1BST19USURZMzc1ID0gT2JqZWN0LmZyZWV6ZSh7dmVyc2lvbjonMy43LjUnLCByZWZyZXNoOnNjaGVkdWxlfSk7Cn0pKCk7Cg=='))
+              replace_once('secure17.js',
+                  "'lungsplit374.js'];",
+                  "'lungsplit374.js','tidy375.js'];")
+              replace_version('secure17.js')
+              replace_version('index.html')
+              replace_once('sw.js',
+                  "const VERSION='3.7.4-untersuchungsarten-getrennt';",
+                  "const VERSION='3.7.5-gewicht-messlisten';")
+              replace_once('sw.js',
+                  "'./weight292.js','./medpref25.js'",
+                  "'./weight292.js','./tidy375.js','./medpref25.js'")
+              replace_once('weight292.js',
+                  'Alte Profilangaben werden nicht verändert.',
+                  'Das neueste gespeicherte Gewicht aktualisiert automatisch das Patientenprofil, den BMI und die Körperoberfläche.')
+              replace_once('weight292.js',
+                  'const value={id,date,kg,note:note.slice(0,160)};',
+                  'const value={id,date,kg,note:note.slice(0,160),createdAt:entries.find(x=>x.id===id)?.createdAt||new Date().toISOString()};')
+              replace_once('metrics340.js',
+                  "map(x=>({date:x.value.date,kg:n(x.value.kg)})).sort((a,b)=>a.date.localeCompare(b.date));",
+                  "map(x=>({date:x.value.date,kg:n(x.value.kg),createdAt:String(x.value.createdAt||''),id:String(x.value.id||x.key||'')})).sort((a,b)=>a.date.localeCompare(b.date)||a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id));")
+              current['version']='3.7.5'
+              current['released']='2026-10-31'
+              current['notes']='Aktuellste Gewichtsmessung automatisch im Patientenprofil mit BMI und Koerperoberflaeche; Messwertlisten in bestehenden Bereichen aufklappbar (Sauerstoff, Puls, Blutdruck, Gewicht, Peak-Flow, Lungenfunktion). Bestehende Diagramme, Speicher und Daten unveraendert.'
+              target.write_text(json.dumps(current,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+              print('Update vorbereitet: Version 3.7.5; 1 neues Modul und sieben angepasste Dateien.')
+          PY_375
+      - name: Dateien auf Syntax, Version und Funktionen pruefen
+        shell: bash
+        run: |
+          set -e
+          node --check tidy375.js
+          node --check secure17.js
+          node --check weight292.js
+          node --check metrics340.js
+          node --check sw.js
+          node --check app.js
+          python3 -m json.tool version.json > /dev/null
+          python3 - <<'PY_CHECK'
+          import json
+          from pathlib import Path
+          assert json.loads(Path('version.json').read_text())['version']=='3.7.5'
+          assert "'lungsplit374.js','tidy375.js'" in Path('secure17.js').read_text()
+          assert "'./weight292.js','./tidy375.js'" in Path('sw.js').read_text()
+          t=Path('tidy375.js').read_text()
+          for marker in ['s292-weight-list','v29-history-spo2','v29-history-bp','v29-history-pulse','epef-history','measurement-list','SEC']:
+              if marker=='SEC': continue
+              assert marker in t,marker
+          assert '3.7.5' in Path('index.html').read_text()
+          print('Alle Installations- und Syntaxkontrollen bestanden.')
+          PY_CHECK
+          git diff --check
+      - name: Update automatisch veroeffentlichen
+        shell: bash
+        run: |
+          set -e
+          git add tidy375.js secure17.js sw.js index.html weight292.js metrics340.js version.json
+          if git diff --cached --quiet; then
+            echo 'Update bereits installiert.'
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'PneumoPro 3.7.5: Gewicht im Profil synchron und Einzelwerte aufklappbar'
+            git push origin HEAD:main
+          fi
