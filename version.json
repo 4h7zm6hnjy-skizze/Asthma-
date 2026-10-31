@@ -1,5 +1,5 @@
 {
-  "version": "3.6.8",
+  "version": "3.6.9",
   "released": "2026-10-31",
-  "notes": "Bei unlesbarer Vollseiten-OCR werden kleine Tabellenbereiche im Foto separat vergroessert und offline untersucht. Wiederkehrende echte Spalten und rechnerisch stimmige Soll/Ist/%-Werte werden ausschliesslich als ungepruefte Vorschlaege angezeigt. Alternative Beschriftungen FEV1/FVC und RV/TLC werden erkannt. Keine Ergaenzung fehlender Messwerte, kein unbestaetigtes Speichern, unveraenderte verschluesselte Originale."
+  "notes": "Verbesserte Zusammenfuehrung von Lungenfunktions-OCR aus gesamtem Klinikbogen und separat vergroesserten Tabellen. Erkennt zweistellige Jahreszahlen im Untersuchungsdatum, prueft ausgeschriebene Soll/Ist/%-Tripel rechnerisch und weist unlesbare oder widerspruechliche Werte ausdruecklich zurueck. Keine erfundenen Dezimalstellen; bestaetigungspflichtige Vorschlaege, Originale unveraendert und lokal verschluesselt."
 }

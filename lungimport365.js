@@ -169,8 +169,16 @@
   const useGeo=geo&&geo.rows.length>parsed.rows.length;
   if(useGeo)parsed={...geo,date:geo.date||parsed.date||fromText.date,warnings:geo.warnings};
   else if(geo?.diagnostics?.recognized&&!parsed.rows.length)parsed.warnings=[...new Set([...parsed.warnings,...geo.warnings])];
+  // Ein weiterer Lesepfad verbindet getrennte Vollseiten- und Tabellen-OCR.
+  // Die App fuellt nur arithmetisch konsistente, ohne Punktkorrektur lesbare
+  // Zahlen aus benannten Zeilen vor; niemals fehlende Werte erraten.
+  const clean369=window.PNEUMOPRO_PARSER369?.parse(text);
+  const useClean369=!!clean369&&clean369.rows.length>parsed.rows.length;
+  if(useClean369)parsed={...clean369,date:clean369.date||parsed.date};
+  else if(clean369?.date&&!parsed.date)parsed={...parsed,date:clean369.date};
   if(useLines)text+='\n\n[Zusätzliche Tabellenzeilen aus OCR-Positionsdaten]\n'+ocrRows366;
   let notices=[...parsed.warnings];
+  if(useClean369)notices.push('Weitere Werte aus getrennten OCR-Tabellenteilen als ungepruefte Vorschlaege erkannt. Alle Zahlen und die Messphase am Original kontrollieren.');
   if(useLines&&!useGeo)notices.push('Tabellenzeilen anhand ihrer Bildposition rekonstruiert. Bitte Zuordnung der Zahlen am Original besonders sorgfältig prüfen.');
   if(useGeo)notices.push('Soll/Ist/% anhand wiederkehrender echter Spaltenpositionen als UNBESTAETIGTE Vorschlaege erkannt. Jede Zahl, Einheit und Messphase am Original pruefen.');if(isPdf&&text.includes('WARNUNG: PDF hat'))notices.push('Mehrseitiges PDF nicht vollständig ausgelesen. Bitte Original prüfen.');
  $('li365-type').value=parsed.kind||(['diff','lufu'].includes(d.scanArea)?(d.scanArea==='diff'?'diffusion':'measurements'):'');$('li365-date').value=parsed.date||d.documentDate||'';$('li365-time').value='';$('li365-clinic').value=d.clinic||d.providerName||'';$('li365-phase').value='unbekannt';$('li365-text').textContent=text;$('li365-verified').checked=false;drawRows();$('li365-review').hidden=false;
