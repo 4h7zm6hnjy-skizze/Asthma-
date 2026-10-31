@@ -1,0 +1,106 @@
+name: PneumoPro 3.7.0 - sichere OCR-Teilwerte sichtbar machen
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PneumoPro370_Teilwerte_OCR.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pneumopro-370-ocr-teilerkennung
+  cancel-in-progress: false
+
+jobs:
+  upgrade:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository laden
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Nur OCR-Auswertung und Anzeige aktualisieren
+        shell: bash
+        run: |
+          python3 - <<'PY_370'
+          from pathlib import Path
+          import base64,json
+
+          def one(path,old,new,tag):
+              p=Path(path)
+              source=p.read_text(encoding='utf-8')
+              hits=source.count(old)
+              if hits!=1: raise RuntimeError(f'{tag}: erwartetes Muster einmal, gefunden {hits}. Keine Aenderung uebernehmen.')
+              p.write_text(source.replace(old,new,1),encoding='utf-8')
+
+          def version(path,old='3.6.9',new='3.7.0'):
+              p=Path(path)
+              value=p.read_text(encoding='utf-8')
+              if old not in value: raise RuntimeError(f'{path}: alte Versionsmarke fehlt; kein Update.')
+              p.write_text(value.replace(old,new),encoding='utf-8')
+
+          state=json.loads(Path('version.json').read_text(encoding='utf-8'))
+          if state['version']=='3.7.0':
+              print('3.7.0 ist bereits vorhanden.')
+          elif state['version']!='3.6.9':
+              raise RuntimeError('PneumoPro 3.6.9 wird als Ausgangsversion erwartet.')
+          else:
+              if Path('lungparser370.js').exists(): raise RuntimeError('lungparser370.js ist bereits vorhanden; bitte Versionierung pruefen.')
+              Path('lungparser370.js').write_bytes(base64.b64decode("J3VzZSBzdHJpY3QnOwovKiBQbmV1bW9Qcm8gMy43LjAgLSB2b3JzaWNodGlnZSBUZWlsd2VydHZvcnNjaGxhZWdlIGF1cyBPQ1IuCiAqIE51ciB0YXRzYWVjaGxpY2ggZ2VsZXNlbmUgRGV6aW1hbHphaGxlbiB3ZXJkZW4gdm9yZ2VzY2hsYWdlbi4gRmVobGVuZGUKICogU29sbC0vSXN0LS9Qcm96ZW50d2VydGUgYmxlaWJlbiBsZWVyLiBLZWluZSBtZWRpemluaXNjaGVuIERhdGVuIGltIENvZGUuCiAqLwooZnVuY3Rpb24ocm9vdCl7CiBjb25zdCBuYW1lcz1bCiAgWy9eUlZccypbJS9dXHMqVExDXHMqKD86U0J8c2luZ2xlXHMqYnJlYXRoKVxiL2ksJ1JWX1RMQ19TQiddLAogIFsvXlJWXHMqWyUvXVxzKlRMQ1xiL2ksJ1JWX1RMQyddLAogIFsvXkZFVlxzKlsxSWxdXHMqWyUvXVxzKkZWQ1xiL2ksJ0ZFVjFfRlZDJ10sCiAgWy9eKD86RExDT2NccypTQnxETENPXHMqY29ycmVjdGVkKVxiL2ksJ0RMQ09jU0InXSwKICBbL14oPzpLQ09jXHMqU0J8S0NPXHMqY29ycmVjdGVkKVxiL2ksJ0tDT2NfU0InXSwKICBbL15ETENPXHMqKD86U0IpP1xiL2ksJ0RMQ09fU0InXSxbL15LQ09ccyooPzpTQik/XGIvaSwnS0NPX1NCJ10sCiAgWy9eVkFccyooPzpTQik/XGIvaSwnVkFfU0InXSxbL15UTENccypTQlxiL2ksJ1RMQ19TQiddLAogIFsvXkZSQ1xzKlNCXGIvaSwnRlJDX1NCJ10sWy9eRVJWXHMqU0JcYi9pLCdFUlZfU0InXSwKICBbL15SVlxzKlNCXGIvaSwnUlZfU0InXSxbL15WSU5ccypTQlxiL2ksJ1ZJTl9TQiddLAogIFsvXig/Ok1NRUZ8TUZFRilccyo3NVxzKlst4oCTXVxzKjI1XGIvaSwnTU1FRjc1XzI1J10sCiAgWy9eRkVGXHMqNzVcYi9pLCdGRUY3NSddLAogIFsvXnNSXHMqZWZmXGIvaSwnc1JfZWZmJ10sWy9eUlxzKmVmZlxiL2ksJ1JfZWZmJ10sCiAgWy9eRlJDXHMqcGxldGhcYi9pLCdGUkNwbGV0aCddLFsvXlZDXHMqSU5cYi9pLCdWQ19JTiddLAogIFsvXkZFVlxzKlsxSWxdXGIvaSwnRkVWMSddLFsvXkZWQ1xiL2ksJ0ZWQyddLAogIFsvXlRMQ1xiL2ksJ1RMQyddLFsvXlJWXGIvaSwnUlYnXSxbL15QRUZcYi9pLCdQRUYnXSxbL15QSUZcYi9pLCdQSUYnXSxbL15IYlxiL2ksJ0hiJ10sWy9eVEFcYi9pLCdUQSddCiBdOwogY29uc3Qgdm9sdW1lPW5ldyBTZXQoWydGVkMnLCdGRVYxJywnVExDJywnUlYnLCdGUkNwbGV0aCcsJ1ZDX0lOJywnVExDX1NCJywnUlZfU0InLCdWQV9TQicsJ1ZJTl9TQicsJ0ZSQ19TQicsJ0VSVl9TQicsJ1BFRicsJ1BJRiddKTsKIGNvbnN0IHJhdGlvPW5ldyBTZXQoWydSVl9UTEMnLCdSVl9UTENfU0InLCdGRVYxX0ZWQyddKTsKIGNvbnN0IG5vcm1hbD1zPT5TdHJpbmcoc3x8JycpLnJlcGxhY2UoL1x1MDBhMC9nLCcgJykucmVwbGFjZSgvW+KCgV0vZywnMScpLnJlcGxhY2UoL1viiJLigJDigJFdL2csJy0nKS5yZXBsYWNlKC9fL2csJyAnKS50cmltKCk7CiBjb25zdCBudW1lcmljPXM9Pk51bWJlcihzLnJlcGxhY2UoJywnLCcuJykpOwogY29uc3QgZGVjaW1hbD0vXihbKy1dP1xkezEsM31bLixdXGR7MSw0fSkoPz1cc3wkKS87CiBmdW5jdGlvbiBpZGVudGlmeShsaW5lKXsKICAvLyBGdWVocmVuZGUgT0NSLURla29yYXRpb24gZW50ZmVybmVuLCBrZWluZSBiZWxpZWJpZ2VuIFdvcnRlIHVlYmVyc3ByaW5nZW4uCiAgbGV0IHQ9bm9ybWFsKGxpbmUpLnJlcGxhY2UoL14oPzpbKyp8fjw+XC3igKIuLDs6IV18XGQpXHMrLywnJykucmVwbGFjZSgvXlvigJknImBdK1xzKi8sJycpOwogIGZvcihjb25zdCBbcGF0dGVybixjb2RlXSBvZiBuYW1lcyl7Y29uc3QgbT10Lm1hdGNoKHBhdHRlcm4pO2lmKG0pcmV0dXJuIHtjb2RlLHRhaWw6dC5zbGljZShtWzBdLmxlbmd0aCkudHJpbSgpfTt9CiAgcmV0dXJuIG51bGw7CiB9CiBmdW5jdGlvbiBwYXJzZSh0ZXh0KXsKICBjb25zdCBjYW5kaWRhdGVzPW5ldyBNYXAoKSx3YXJuaW5ncz1bXSxjb21wbGV0ZUNvZGVzPW5ldyBTZXQoKTsKICBjb25zdCBsaW5lcz1ub3JtYWwodGV4dCkuc3BsaXQoL1xyP1xuLykubWFwKHg9PngudHJpbSgpKS5maWx0ZXIoQm9vbGVhbikuc2xpY2UoMCwzMDAwKTsKICBmb3IoY29uc3QgbGluZSBvZiBsaW5lcyl7CiAgIGNvbnN0IHJvdz1pZGVudGlmeShsaW5lKTtpZighcm93KWNvbnRpbnVlOwogICAvLyBCZWlkZSBlcnN0ZW4gU3BhbHRlbiBtdWVzc2VuIGRpcmVrdCBuYWNoIGRlbSBQYXJhbWV0ZXJuYW1lbiBzdGVoZW4uCiAgIGNvbnN0IG0xPXJvdy50YWlsLm1hdGNoKGRlY2ltYWwpO2lmKCFtMSljb250aW51ZTsKICAgY29uc3QgcmVzdD1yb3cudGFpbC5zbGljZShtMVswXS5sZW5ndGgpLnRyaW0oKTtjb25zdCBtMj1yZXN0Lm1hdGNoKGRlY2ltYWwpO2lmKCFtMiljb250aW51ZTsKICAgY29uc3QgcHJlZGljdGVkPW51bWVyaWMobTFbMV0pLGFjdHVhbD1udW1lcmljKG0yWzFdKTsKICAgaWYoIU51bWJlci5pc0Zpbml0ZShwcmVkaWN0ZWQpfHwhTnVtYmVyLmlzRmluaXRlKGFjdHVhbCl8fHByZWRpY3RlZDw9MHx8YWN0dWFsPDApY29udGludWU7CiAgIGNvbnN0IGxpbWl0PXJhdGlvLmhhcyhyb3cuY29kZSk/MTIwOnZvbHVtZS5oYXMocm93LmNvZGUpPzI1OnJvdy5jb2RlPT09J0hiJz8zMDpyb3cuY29kZT09PSdzUl9lZmYnfHxyb3cuY29kZT09PSdSX2VmZid8fHJvdy5jb2RlPT09J0tDT19TQid8fHJvdy5jb2RlPT09J0tDT2NfU0InPzIwOjE1MDsKICAgaWYocHJlZGljdGVkPmxpbWl0fHxhY3R1YWw+bGltaXQpY29udGludWU7CiAgIC8vIE51ciBkYW5uIFRlaWx2b3JzY2hsYWcsIHdlbm4gZGllIFByb3plbnRhbmdhYmUgZmVobHQgb2RlciB1bmxlc2VybGljaCBpc3QuCiAgIGNvbnN0IHRoaXJkPXJlc3Quc2xpY2UobTJbMF0ubGVuZ3RoKS50cmltKCkubWF0Y2goL14oWystXT9cZHsxLDR9KD86Wy4sXVxkezEsNH0pPykoPz1cc3wkKS8pOwogICBjb25zdCBwZXJjZW50YWdlPXRoaXJkP251bWVyaWModGhpcmRbMV0pOm51bGw7CiAgIGNvbnN0IGNvbXBsZXRlPXBlcmNlbnRhZ2UhPT1udWxsJiZwZXJjZW50YWdlPj0wJiZwZXJjZW50YWdlPD00MDAmJk1hdGguYWJzKGFjdHVhbC9wcmVkaWN0ZWQqMTAwLXBlcmNlbnRhZ2UpPD1NYXRoLm1heCgxLjUscGVyY2VudGFnZSouMDIyKTsKICAgaWYoY29tcGxldGUpe2NvbXBsZXRlQ29kZXMuYWRkKHJvdy5jb2RlKTtjb250aW51ZTt9IC8vIFZvbGxzdGFlbmRpZ2UgWmVpbGUgaGF0IFZvcnJhbmcuCiAgIGNvbnN0IGVudHJ5PXtjb2RlOnJvdy5jb2RlLHByZWRpY3RlZCxhY3R1YWwscGVyY2VudDpudWxsLHo6bnVsbCxzb3VyY2U6bGluZS5zbGljZSgwLDE4MCksY29uZmlkZW5jZTonVGVpbHdlcnRlLCBQcm96ZW50IHVua2xhcjsgT3JpZ2luYWwgcHJ1ZWZlbid9OwogICBjb25zdCBrZXk9cHJlZGljdGVkKyd8JythY3R1YWw7CiAgIGNvbnN0IGdyb3VwPWNhbmRpZGF0ZXMuZ2V0KHJvdy5jb2RlKXx8bmV3IE1hcCgpO2dyb3VwLnNldChrZXksZW50cnkpO2NhbmRpZGF0ZXMuc2V0KHJvdy5jb2RlLGdyb3VwKTsKICB9CiAgY29uc3Qgcm93cz1bXTsKICBmb3IoY29uc3QgW2NvZGUsY2hvaWNlc10gb2YgY2FuZGlkYXRlcyl7CiAgIGlmKGNvbXBsZXRlQ29kZXMuaGFzKGNvZGUpKWNvbnRpbnVlOwogICBpZihjaG9pY2VzLnNpemUhPT0xKXt3YXJuaW5ncy5wdXNoKGNvZGUrJzogd2lkZXJzcHJ1ZWNobGljaGUgU29sbC9Jc3QtTGVzdW5nZW4uIEtlaW5lIFZvcmF1c2Z1ZWxsdW5nLicpO2NvbnRpbnVlO30KICAgcm93cy5wdXNoKFsuLi5jaG9pY2VzLnZhbHVlcygpXVswXSk7CiAgfQogIGlmKHJvd3MubGVuZ3RoKXdhcm5pbmdzLnB1c2gocm93cy5sZW5ndGgrJyBNZXNzd2VydHplaWxlKG4pIG51ciB0ZWlsd2Vpc2UgYXVzZ2VsZXNlbjogUHJvemVudHdlcnRlIGZlaGxlbiBvZGVyIHNpbmQgdW56dXZlcmxhZXNzaWcuIEF1c3NjaGxpZXNzbGljaCBsZXNiYXJlIFNvbGwtL0lzdC1aYWhsZW4gd3VyZGVuIGFscyBVTkJFU1RBRVRJR1RFIFZvcnNjaGxhZWdlIGVpbmdlc2V0enQuJyk7CiAgcmV0dXJuIHtyb3dzLHdhcm5pbmdzfTsKIH0KIGNvbnN0IGFwaT1PYmplY3QuZnJlZXplKHtwYXJzZX0pOwogaWYodHlwZW9mIG1vZHVsZT09PSdvYmplY3QnJiZtb2R1bGUuZXhwb3J0cyltb2R1bGUuZXhwb3J0cz1hcGk7CiBlbHNlIHJvb3QuUE5FVU1PUFJPX1BBUlNFUjM3MD1hcGk7Cn0pKHR5cGVvZiB3aW5kb3chPT0ndW5kZWZpbmVkJz93aW5kb3c6Z2xvYmFsVGhpcyk7Cg=="))
+              one('secure17.js',"'lungparser369.js','lungimport365.js'","'lungparser369.js','lungparser370.js','lungimport365.js'",'Ladefolge')
+              one('sw.js',"const VERSION='3.6.9-ocr-zusammenfuehrung';","const VERSION='3.7.0-teilwerte-ocr';",'Cache-Stand')
+              one('sw.js'," './lungparser366.js','./lungparser367.js','./lungparser369.js',"," './lungparser366.js','./lungparser367.js','./lungparser369.js','./lungparser370.js',",'Offline Parser')
+              one('sw.js',"const important=['/lungparser369.js'","const important=['/lungparser370.js','/lungparser369.js'",'Erzwungene Aktualisierung')
+              old="  if(useLines)text+='\\n\\n[Zusätzliche Tabellenzeilen aus OCR-Positionsdaten]\\n'+ocrRows366;"
+              insertion='  // Teilweise lesbare Zahlen getrennt von vollstaendigen Werten behandeln.\n  // Niemals Prozentwerte aus der Rechnung als gemessene Angaben erfinden.\n  const supplement370=window.PNEUMOPRO_PARSER370?.parse(text);\n  const supplement370Rows=[],supplement370Conflicts=[];\n  if(supplement370?.rows){\n    const present=new Map(parsed.rows.map(r=>[r.code,r]));\n    for(const row of supplement370.rows){\n      const existing=present.get(row.code);\n      if(existing){\n        if(Number.isFinite(existing.actual)&&Math.abs(existing.actual-row.actual)>.03) supplement370Conflicts.push(row.code);\n      }else{supplement370Rows.push(row);present.set(row.code,row);}\n    }\n    if(supplement370Rows.length)parsed={...parsed,rows:[...parsed.rows,...supplement370Rows]};\n  }\n'
+              one('lungimport365.js',old,insertion+old,'Teilwert-Vervollstaendigung')
+              old="  let notices=[...parsed.warnings];"
+              new="  let notices=[...parsed.warnings];\n  if(supplement370Rows.length)notices.push(supplement370Rows.length+' Parameter mit lesbaren Soll-/Istwerten, aber ohne sichere Prozentangabe. Die Prozentfelder bleiben leer. Alle Vorschlaege am Original kontrollieren.');\n  if(supplement370Conflicts.length)notices.push('OCR widerspricht vorhandenen Werten bei: '+supplement370Conflicts.join(', ')+'. Bitte mit dem Original vergleichen; die bestaetigtere vollstaendige Zeile bleibt unveraendert.');"
+              one('lungimport365.js',old,new,'Teilwertwarnungen')
+              old=" const missing=defs[$('li365-type').value]?.length-(parsed.rows.filter(x=>defs[$('li365-type').value].some(v=>v[0]===x.code)).length)||0;"
+              new=" const missing=defs[$('li365-type').value]?.filter(v=>!parsed.rows.some(x=>x.code===v[0]&&x.percent!==null&&x.percent!==undefined)).length||0;"
+              one('lungimport365.js',old,new,'Vollstaendigkeitszaehlung')
+              old="$('li365-time').value='';"
+              new="const matchTime370=text.match(/\\b(?:Messzeit|Untersuchungszeit|Uhrzeit)\\s*[:\\-]?\\s*([01]?\\d|2[0-3])[:.]([0-5]\\d)\\b/i);$('li365-time').value=matchTime370?matchTime370[1].padStart(2,'0')+':'+matchTime370[2]:'';"
+              one('lungimport365.js',old,new,'Eindeutig beschriftete Messzeit')
+              old="setStatus(parsed.rows.length+' vorsichtige Wertvorschläge erkannt; bitte alle Angaben vergleichen. Diagramme separat manuell markieren.');"
+              new="setStatus(parsed.rows.filter(x=>x.percent!==null&&x.percent!==undefined).length+' vollstaendige und '+parsed.rows.filter(x=>x.percent===null||x.percent===undefined).length+' teilweise Messwertvorschlaege erkannt; bitte alle Zahlen am Original vergleichen. Diagramme manuell markieren.');"
+              one('lungimport365.js',old,new,'Genaue Anzeige des Pruefstands')
+              for name in ['app.js','index.html','secure17.js']:version(name)
+              state.update(version='3.7.0',released='2026-10-31',notes='Teilerkannte Soll/Ist-Messwerte werden separat als unbestaetigte OCR-Vorschlaege gezeigt. Keine automatische Ergaenzung fehlender Prozentwerte oder verlorener Dezimalzeichen. Vollstaendigkeit nur bei tatsaechlich abgelesenen Soll/Ist/Prozent-Spalten; OCR-Konflikte werden gewarnt und nicht ueberschrieben. Messzeit kann aus eindeutigem Messzeit-Feld vorbelegt werden. Originaldateien bleiben verschluesselt und unveraendert.')
+              Path('version.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+              print('PneumoPro 3.7.0: nur Programmdateien, keine privaten Befunde veraendert.')
+          PY_370
+      - name: Programm und Sicherheitschecks pruefen
+        shell: bash
+        run: |
+          node --check lungparser370.js
+          node --check lungimport365.js
+          node --check secure17.js
+          node --check app.js
+          node - <<'JS_370'
+          const assert=require('node:assert/strict');
+          const {parse}=require('./lungparser370.js');
+          const result=parse('sR eff 1.28 0.78 609\nR eff 0.41 0.31 ?\nFVC 5.50 4.40 80.0');
+          assert.equal(result.rows.length,2);
+          assert.equal(result.rows.find(r=>r.code==='sR_eff').percent,null);
+          assert.equal(parse('FVC 5.50 4.40 80.0').rows.length,0);
+          assert.equal(parse('FVC 550 440 80.0').rows.length,0);
+          assert.equal(parse('FVC 5.50 4.40 800\nFVC 5.50 3.40 800').rows.length,0);
+          console.log('Teilwerte, Widersprueche und fehlende Dezimalzeichen geprueft.');
+          JS_370
+          python3 -c "import json;assert json.load(open('version.json'))['version']=='3.7.0'"
+          git diff --check
+          git add lungparser370.js lungimport365.js secure17.js sw.js index.html app.js version.json
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "PneumoPro 3.7.0: nur sichere OCR-Teilwerte anzeigen"
+            git push origin HEAD:main
+          else
+            echo "PneumoPro 3.7.0 bereits vorhanden."
+          fi
