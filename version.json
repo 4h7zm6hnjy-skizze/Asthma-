@@ -1,5 +1,5 @@
 {
-  "version": "3.7.5",
+  "version": "3.7.6",
   "released": "2026-10-31",
-  "notes": "Aktuellste Gewichtsmessung automatisch im Patientenprofil mit BMI und Koerperoberflaeche; Messwertlisten in bestehenden Bereichen aufklappbar (Sauerstoff, Puls, Blutdruck, Gewicht, Peak-Flow, Lungenfunktion). Bestehende Diagramme, Speicher und Daten unveraendert."
+  "notes": "Einfache Startseite mit Kacheln fuer die letzten Messwerte auf einen Blick: SpO2, Blutdruck, Puls, Gewicht, FEV1, FVC und Peak-Flow. Mit Ampelprinzip, Datum und direktem Zugriff auf Vitalwerte, Lungenfunktion und Peak-Flow. Bestehende Daten, Diagramme und Speicher bleiben unveraendert."
 }
