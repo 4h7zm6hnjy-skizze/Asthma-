@@ -1,0 +1,100 @@
+name: PneumoPro 3.6.7 - Reparatur des Workflows
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PneumoPro367_Reparatur.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pneumopro-367-reparatur
+  cancel-in-progress: false
+
+jobs:
+  upgrade:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository laden
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Parser mit OCR-Spaltenpositionen einbauen
+        shell: bash
+        run: |
+          if grep -q '"version": "3.6.7"' version.json; then
+            echo "Version 3.6.7 ist bereits vorhanden."
+          else
+            python3 - <<'PY_PNEUMO367'
+          from pathlib import Path
+          import base64,json,subprocess
+
+          def one(p,old,new,label):
+           s=Path(p).read_text(encoding='utf-8')
+           if s.count(old)!=1:
+            raise RuntimeError(f'{label}: Stelle nicht eindeutig (Treffer={s.count(old)}). Keine Aenderung gespeichert.')
+           Path(p).write_text(s.replace(old,new,1),encoding='utf-8')
+
+          def allv(p):
+           s=Path(p).read_text(encoding='utf-8')
+           if '3.6.6' not in s: raise RuntimeError(f'{p}: Ausgangsversion 3.6.6 nicht gefunden')
+           Path(p).write_text(s.replace('3.6.6','3.6.7'),encoding='utf-8')
+
+          assert not Path('lungparser367.js').exists(), 'Neues Modul existiert bereits: Update bitte pruefen'
+          Path('lungparser367.js').write_bytes(base64.b64decode('J3VzZSBzdHJpY3QnOwovKiBQbmV1bW9Qcm8gMy42Ljc6IFNwYWx0ZW5iZXpvZ2VuZSwgdm9yc2ljaHRpZ2UgT0NSLVBydWVmdW5nLgogKiBOdXR6dCBlY2h0ZSBXb3J0a29vcmRpbmF0ZW4gZGVyIGxva2FsZW4gVGVzc2VyYWN0LUVya2VubnVuZy4KICogU2NocmVpYnQga2VpbmUgR2VzdW5kaGVpdHNkYXRlbiB1bmQgdWViZXJ0cmFlZ3QgbmljaHRzIGlucyBOZXR6LgogKiBOdXIgZWluZGV1dGlnIG1laHJmYWNoIGJlc3RhZXRpZ3RlIFRhYmVsbGVucG9zaXRpb25lbiB3ZXJkZW4gYWxzIFVOQkVTVEFFVElHVEUgVm9yc2NobGFlZ2UgZ2V6ZWlndC4KICovCihmdW5jdGlvbihyb290KXsKIGNvbnN0IHBhdHRlcm5zPVsKICBbL15SVlxzKlwvXHMqVExDXHMqKD86U0J8c2luZ2xlXHMqYnJlYXRoKVxiL2ksJ1JWX1RMQ19TQiddLAogIFsvXig/OkRMQ09jXHMqU0J8RExDT1xzKmNvcnJlY3RlZClcYi9pLCdETENPY1NCJ10sCiAgWy9eKD86S0NPY1xzKlNCfEtDT1xzKmNvcnJlY3RlZClcYi9pLCdLQ09jX1NCJ10sCiAgWy9eRExDT1xzKig/Ol8/U0IpP1xiL2ksJ0RMQ09fU0InXSxbL15LQ09ccyooPzpfP1NCKT9cYi9pLCdLQ09fU0InXSwKICBbL15WQVxzKig/Ol8/U0IpP1xiL2ksJ1ZBX1NCJ10sWy9eVExDXHMqU0JcYi9pLCdUTENfU0InXSwKICBbL15GUkNccypTQlxiL2ksJ0ZSQ19TQiddLFsvXkVSVlxzKlNCXGIvaSwnRVJWX1NCJ10sCiAgWy9eUlZccypTQlxiL2ksJ1JWX1NCJ10sWy9eVklOXHMqU0JcYi9pLCdWSU5fU0InXSwKICBbL15SVlxzKlwvXHMqVExDXGIvaSwnUlZfVExDJ10sCiAgWy9eRkVWXHMqMVxzKlwvXHMqRlZDXGIvaSwnRkVWMV9GVkMnXSwKICBbL14oPzpNTUVGfE1GRUYpXHMqNzVccypbLeKAk11ccyoyNVxiL2ksJ01NRUY3NV8yNSddLAogIFsvXkZFRlxzKjc1XGIvaSwnRkVGNzUnXSxbL15zUlxzKmVmZlxiL2ksJ3NSX2VmZiddLAogIFsvXlJccyplZmZcYi9pLCdSX2VmZiddLFsvXkZSQ1xzKnBsZXRoXGIvaSwnRlJDcGxldGgnXSwKICBbL15WQ1xzKklOXGIvaSwnVkNfSU4nXSxbL15GRVZccyoxXGIvaSwnRkVWMSddLAogIFsvXkZWQ1xiL2ksJ0ZWQyddLFsvXlRMQ1xiL2ksJ1RMQyddLFsvXlJWXGIvaSwnUlYnXSwKICBbL15QRUZcYi9pLCdQRUYnXSxbL15QSUZcYi9pLCdQSUYnXSxbL15IYlxiL2ksJ0hiJ10sWy9eVEFcYi9pLCdUQSddCiBdOwogY29uc3QgZGlmZnVzaW9uPW5ldyBTZXQoWydETENPX1NCJywnS0NPX1NCJywnVkFfU0InLCdIYicsJ0RMQ09jU0InLCdLQ09jX1NCJywnVEEnLCdWSU5fU0InLCdUTENfU0InLCdGUkNfU0InLCdFUlZfU0InLCdSVl9TQicsJ1JWX1RMQ19TQiddKTsKIGNvbnN0IG5vcm1hbD1zPT5TdHJpbmcoc3x8JycpLnJlcGxhY2UoL1x1MDBhMC9nLCcgJykucmVwbGFjZSgvW+KCgV0vZywnMScpLnJlcGxhY2UoL18vZywnICcpLnJlcGxhY2UoL1viiJLigJDigJFdL2csJy0nKS50cmltKCk7CiBmdW5jdGlvbiBudW1lcmljKHMpe2NvbnN0IHY9U3RyaW5nKHN8fCcnKS50cmltKCkucmVwbGFjZSgnJScsJycpLnJlcGxhY2UoJywnLCcuJyk7cmV0dXJuIC9eWystXT9cZHsxLDR9KD86XC5cZHsxLDR9KT8kLy50ZXN0KHYpJiZOdW1iZXIuaXNGaW5pdGUoTnVtYmVyKHYpKT9OdW1iZXIodik6bnVsbDt9CiBmdW5jdGlvbiBsYWJlbE9mKHMpe2xldCB2YWw9bm9ybWFsKHMpLnJlcGxhY2UoL15bfMK34oCiXHMtXSsvLCcnKTtmb3IoY29uc3QgW3J4LGNvZGVdIG9mIHBhdHRlcm5zKXtjb25zdCBtPXZhbC5tYXRjaChyeCk7aWYobSlyZXR1cm4ge2NvZGUsbGFiZWw6bVswXX07fXJldHVybiBudWxsO30KIGZ1bmN0aW9uIHBsYXVzaWJsZShjb2RlLHByZWQsYWN0LHBlcmNlbnQpe2lmKHByZWQ8PTB8fGFjdDwwfHxwZXJjZW50PDB8fHBlcmNlbnQ+NDAwKXJldHVybiBmYWxzZTsKICBsZXQgbWF4PTE1MDsKICBpZihbJ0ZFVjEnLCdGVkMnLCdWQ19JTicsJ1RMQycsJ1JWJywnRlJDcGxldGgnLCdUTENfU0InLCdGUkNfU0InLCdSVl9TQicsJ1ZJTl9TQicsJ1ZBX1NCJywnRVJWX1NCJywnUEVGJywnUElGJ10uaW5jbHVkZXMoY29kZSkpbWF4PTI1OwogIGlmKFsnSGInXS5pbmNsdWRlcyhjb2RlKSltYXg9MzA7CiAgaWYoWydzUl9lZmYnLCdSX2VmZicsJ0tDT19TQicsJ0tDT2NfU0InXS5pbmNsdWRlcyhjb2RlKSltYXg9MjA7CiAgaWYocHJlZD5tYXh8fGFjdD5tYXgpcmV0dXJuIGZhbHNlOwogIHJldHVybiBNYXRoLmFicygxMDAqYWN0L3ByZWQtcGVyY2VudCk8PU1hdGgubWF4KDIuMSxwZXJjZW50Ki4wMzIpOwogfQogZnVuY3Rpb24gcmVhZFdvcmRzKHRzdil7Y29uc3QgcGFnZXM9bmV3IE1hcCgpO2xldCBjb3VudD0wOwogIGZvcihjb25zdCBsaW5lIG9mIFN0cmluZyh0c3Z8fCcnKS5zcGxpdCgvXHI/XG4vKS5zbGljZSgxKSl7CiAgIGlmKGNvdW50PjEzMDAwKWJyZWFrO2NvbnN0IGY9bGluZS5zcGxpdCgnXHQnKTtpZihmLmxlbmd0aDwxMnx8ZlswXSE9PSc1Jyljb250aW51ZTsKICAgY29uc3Qgd29yZD1ub3JtYWwoZi5zbGljZSgxMSkuam9pbignXHQnKSk7aWYoIXdvcmQpY29udGludWU7CiAgIGNvbnN0IHBhZ2U9K2ZbMV18fDEseD0rZls2XSx5PStmWzddLHc9K2ZbOF0saD0rZls5XTsKICAgaWYoIVt4LHksdyxoXS5ldmVyeShOdW1iZXIuaXNGaW5pdGUpfHx3PD0wfHxoPD0wKWNvbnRpbnVlOwogICBjb25zdCBhcnI9cGFnZXMuZ2V0KHBhZ2UpfHxbXTthcnIucHVzaCh7dGV4dDp3b3JkLHgseSx3LGgsbWlkWTp5K2gvMixyaWdodDp4K3csY29uZjpOdW1iZXIoZlsxMF0pfSk7cGFnZXMuc2V0KHBhZ2UsYXJyKTtjb3VudCsrOwogIH0KICByZXR1cm4gcGFnZXM7CiB9CiBmdW5jdGlvbiB2aXN1YWxMaW5lcyhwYWdlcyl7bGV0IHJlc3VsdD1bXTsKICBmb3IoY29uc3QgW3BhZ2Usd29yZHNdIG9mIHBhZ2VzKXsKICAgY29uc3Qgc29ydGVkPVsuLi53b3Jkc10uc29ydCgoYSxiKT0+YS5taWRZLWIubWlkWXx8YS54LWIueCk7CiAgIGNvbnN0IGhzPXNvcnRlZC5tYXAoeD0+eC5oKS5zb3J0KChhLGIpPT5hLWIpLG1lZGlhbj1oc1tNYXRoLmZsb29yKGhzLmxlbmd0aC8yKV18fDE2OwogICBjb25zdCB0b2xlcmFuY2U9TWF0aC5tYXgoNCxNYXRoLm1pbigxNyxtZWRpYW4qLjU0KSk7CiAgIGNvbnN0IGdyb3Vwcz1bXTsKICAgZm9yKGNvbnN0IHdvcmQgb2Ygc29ydGVkKXtsZXQgcm93PW51bGwsYmVzdD1JbmZpbml0eTsKICAgIGZvcihjb25zdCBnIG9mIGdyb3Vwcyl7Y29uc3QgZGlmZj1NYXRoLmFicyhnLmN5LXdvcmQubWlkWSk7aWYoZGlmZjw9dG9sZXJhbmNlICYmIGRpZmY8YmVzdCl7YmVzdD1kaWZmO3Jvdz1nO319CiAgICBpZighcm93KXtyb3c9e3BhZ2UsY3k6d29yZC5taWRZLHdvcmRzOltdfTtncm91cHMucHVzaChyb3cpO31yb3cud29yZHMucHVzaCh3b3JkKTsKICAgIHJvdy5jeT1yb3cud29yZHMucmVkdWNlKChhLGIpPT5hK2IubWlkWSwwKS9yb3cud29yZHMubGVuZ3RoOwogICB9CiAgIGZvcihjb25zdCByb3cgb2YgZ3JvdXBzKXtyb3cud29yZHMuc29ydCgoYSxiKT0+YS54LWIueCk7cm93LnRleHQ9cm93LndvcmRzLm1hcCh3PT53LnRleHQpLmpvaW4oJyAnKTtyZXN1bHQucHVzaChyb3cpO30KICB9CiAgcmV0dXJuIHJlc3VsdC5zb3J0KChhLGIpPT5hLnBhZ2UtYi5wYWdlfHxhLmN5LWIuY3kpOwogfQogZnVuY3Rpb24gcm93TWV0cmljcyhyb3cpe2NvbnN0IEw9bGFiZWxPZihyb3cudGV4dCk7aWYoIUwpcmV0dXJuIG51bGw7CiAgLy8gRGVyIE5hbWUga2FubiBhdXMgbWVocmVyZW4gT0NSLVdvZXJ0ZXJuIGJlc3RlaGVuLCB6LkIuICJGRVYgMSAvIEZWQyIuCiAgbGV0IHByZWZpeD0nJztsZXQgY3V0PTA7CiAgZm9yKGxldCBrPTA7azxyb3cud29yZHMubGVuZ3RoO2srKyl7CiAgIHByZWZpeCs9KGs/JyAnOicnKStyb3cud29yZHNba10udGV4dDtjdXQ9aysxOwogICBjb25zdCBwPW5vcm1hbChwcmVmaXgpLnJlcGxhY2UoL15bfMK34oCiXHMtXSsvLCcnKTtpZihwLmxlbmd0aD49TC5sYWJlbC5sZW5ndGggJiYgKHAudG9Mb3dlckNhc2UoKT09PUwubGFiZWwudG9Mb3dlckNhc2UoKXx8cC50b0xvd2VyQ2FzZSgpLnN0YXJ0c1dpdGgoTC5sYWJlbC50b0xvd2VyQ2FzZSgpKycgJykpKWJyZWFrOwogIH0KICBjb25zdCBudW1zPVtdOwogIGZvcihjb25zdCB3IG9mIHJvdy53b3Jkcy5zbGljZShjdXQpKXsKICAgY29uc3Qgbj1udW1lcmljKHcudGV4dCk7aWYobiE9PW51bGwpbnVtcy5wdXNoKHtuLHJpZ2h0OncucmlnaHQseDp3Lngsd29yZDp3LnRleHQsY29uZjp3LmNvbmZ9KTsKICB9CiAgY29uc3QgY2FuZGlkYXRlcz1bXTsKICBmb3IobGV0IGE9MDthPG51bXMubGVuZ3RoLTI7YSsrKWZvcihsZXQgYj1hKzE7YjxudW1zLmxlbmd0aC0xO2IrKylmb3IobGV0IGM9YisxO2M8bnVtcy5sZW5ndGg7YysrKXsKICAgaWYoYy1hPjYpY29udGludWU7CiAgIGNvbnN0IHA9bnVtc1thXSx2PW51bXNbYl0scGN0PW51bXNbY107aWYoIXBsYXVzaWJsZShMLmNvZGUscC5uLHYubixwY3QubikpY29udGludWU7CiAgIGNhbmRpZGF0ZXMucHVzaCh7aTphLGo6YixrOmMscHJlZGljdGVkOnAubixhY3R1YWw6di5uLHBlcmNlbnQ6cGN0Lm4sCiAgICB4OltwLnJpZ2h0LHYucmlnaHQscGN0LnJpZ2h0XSxlcnI6TWF0aC5hYnMoMTAwKnYubi9wLm4tcGN0Lm4pLAogICAgdGFpbDpudW1zLnNsaWNlKGMrMSl9KTsKICB9CiAgcmV0dXJuIHtjb2RlOkwuY29kZSxsYWJlbDpMLmxhYmVsLHNvdXJjZTpyb3cudGV4dCxudW1zLGNhbmRpZGF0ZXMscGFnZTpyb3cucGFnZX07CiB9CiBmdW5jdGlvbiBwYXJzZVRTVih0c3YsZnVsbFRleHQ9JycpewogIGNvbnN0IGxpbmVzPXZpc3VhbExpbmVzKHJlYWRXb3Jkcyh0c3YpKTtjb25zdCBmb3VuZD1saW5lcy5tYXAocm93TWV0cmljcykuZmlsdGVyKEJvb2xlYW4pLHdhcm5pbmdzPVtdOwogIGNvbnN0IHBhZ2VzPW5ldyBTZXQoZm91bmQubWFwKHI9PnIucGFnZSkpOwogIGNvbnN0IGNvZGVzPW5ldyBTZXQoZm91bmQubWFwKHI9PnIuY29kZSkpOwogIGNvbnN0IGFsbD1mb3VuZC5mbGF0TWFwKHI9PnIuY2FuZGlkYXRlcy5tYXAoYz0+KHtyb3c6cixjfSkpKTsKICBjb25zdCBzcGFuPXZpc3VhbExpbmVzKHJlYWRXb3Jkcyh0c3YpKS5mbGF0TWFwKHI9PnIud29yZHMpLnJlZHVjZSgoYSx3KT0+TWF0aC5tYXgoYSx3LnJpZ2h0KSwxKTsKICBjb25zdCB0b2w9TWF0aC5tYXgoMTUsTWF0aC5taW4oNTUsc3BhbiouMDIyKSk7CiAgY29uc3QgZD0oYSxiKT0+TWF0aC5tYXgoLi4uYS5tYXAoKHYsaSk9Pk1hdGguYWJzKHYtYltpXSkpKTsKICBjb25zdCBncm91cHM9W107CiAgZm9yKGNvbnN0IHYgb2YgYWxsKXsKICAgbGV0IGdyb3VwPWdyb3Vwcy5maW5kKGc9PmcucGFnZT09PXYucm93LnBhZ2UmJmQodi5jLngsZy54KTw9dG9sKTsKICAgaWYoIWdyb3VwKXtncm91cD17cGFnZTp2LnJvdy5wYWdlLHg6Wy4uLnYuYy54XSxhbGw6W119O2dyb3Vwcy5wdXNoKGdyb3VwKTt9Z3JvdXAuYWxsLnB1c2godik7CiAgfQogIGZvcihjb25zdCBnIG9mIGdyb3Vwcyl7Zy5jb2Rlcz1uZXcgU2V0KGcuYWxsLm1hcCh2PT52LnJvdy5jb2RlKSk7Zy5jb3VudD1nLmNvZGVzLnNpemU7Zy5lcnJvcj1nLmFsbC5yZWR1Y2UoKGEsdik9PmErdi5jLmVyciwwKS9nLmFsbC5sZW5ndGg7fQogIGNvbnN0IHJhbmtlZD1ncm91cHMuc29ydCgoYSxiKT0+Yi5jb3VudC1hLmNvdW50fHxhLmVycm9yLWIuZXJyb3IpOwogIGxldCBiZXN0PXJhbmtlZFswXXx8bnVsbDsKICBpZihiZXN0Py5jb3VudDwyKWJlc3Q9bnVsbDsKICBpZihiZXN0KXsKICAgY29uc3Qgc2ltaWxhcj1yYW5rZWQuZmluZChnPT5nIT09YmVzdCYmZy5wYWdlPT09YmVzdC5wYWdlJiZnLmNvdW50Pj1iZXN0LmNvdW50JiZkKGcueCxiZXN0LngpPnRvbCk7CiAgIGlmKHNpbWlsYXIpYmVzdD1udWxsOwogIH0KICBsZXQgcm93cz1bXTsKICBpZihiZXN0KXtjb25zdCBzZWVuPW5ldyBNYXAoKTsKICAgZm9yKGNvbnN0IHJvdyBvZiBmb3VuZC5maWx0ZXIocj0+ci5wYWdlPT09YmVzdC5wYWdlKSl7CiAgICBjb25zdCBjYW5kaWRhdGVzPXJvdy5jYW5kaWRhdGVzLmZpbHRlcihjPT5kKGMueCxiZXN0LngpPD10b2wpLnNvcnQoKGEsYik9PmQoYS54LGJlc3QueCktZChiLngsYmVzdC54KXx8YS5lcnItYi5lcnIpOwogICAgaWYoIWNhbmRpZGF0ZXMubGVuZ3RoKWNvbnRpbnVlOwogICAgaWYoY2FuZGlkYXRlcy5sZW5ndGg+MSYmZChjYW5kaWRhdGVzWzBdLngsYmVzdC54KSt0b2wqLjI1Pj1kKGNhbmRpZGF0ZXNbMV0ueCxiZXN0LngpKWNvbnRpbnVlOwogICAgaWYoc2Vlbi5oYXMocm93LmNvZGUpKXtzZWVuLnNldChyb3cuY29kZSxudWxsKTtjb250aW51ZTt9CiAgICBjb25zdCBjPWNhbmRpZGF0ZXNbMF07Y29uc3QgYWZ0ZXI9Yy50YWlsOwogICAgY29uc3Qgej1hZnRlci5sZW5ndGg9PT0xJiZhZnRlclswXS5uPj0tOSYmYWZ0ZXJbMF0ubjw9OT9hZnRlclswXS5uOm51bGw7CiAgICBzZWVuLnNldChyb3cuY29kZSx7Y29kZTpyb3cuY29kZSxwcmVkaWN0ZWQ6Yy5wcmVkaWN0ZWQsYWN0dWFsOmMuYWN0dWFsLHBlcmNlbnQ6Yy5wZXJjZW50LHosc291cmNlOnJvdy5zb3VyY2UsY29uZmlkZW5jZToncsOkdW1saWNoIHVuZCByZWNobmVyaXNjaCBnZXByw7xmdCd9KTsKICAgfQogICByb3dzPVsuLi5zZWVuLnZhbHVlcygpXS5maWx0ZXIoQm9vbGVhbik7CiAgfQogIGNvbnN0IGRhdGVzPShyb290LlBORVVNT1BST19QQVJTRVIzNjY/LnBhcnNlKGZ1bGxUZXh0KT8uZGF0ZSl8fCcnOwogIGlmKCFmb3VuZC5sZW5ndGgpd2FybmluZ3MucHVzaCgnS2VpbmUgYmVzY2hyaWZ0ZXRlbiBUYWJlbGxlbnplaWxlbiBpbiBkZW4gQmlsZHBvc2l0aW9uZW4gZXJrYW5udC4nKTsKICBlbHNlIGlmKCFiZXN0KXdhcm5pbmdzLnB1c2goZm91bmQubGVuZ3RoKycgYmVuYW5udGUgVGFiZWxsZW56ZWlsZW4sIGFiZXIga2VpbmUgZWluZGV1dGlnZW4gd2llZGVyaG9sdGVuIFNwYWx0ZW5wb3NpdGlvbmVuLiBaYWhsZW4gd2VyZGVuIG5pY2h0IHZvcmF1c2dlZsO8bGx0LicpOwogIGVsc2UgaWYocm93cy5sZW5ndGg8Y29kZXMuc2l6ZSl3YXJuaW5ncy5wdXNoKChjb2Rlcy5zaXplLXJvd3MubGVuZ3RoKSsnIFRhYmVsbGVud2VydGUgc2luZCByw6R1bWxpY2ggbmljaHQgZWluZGV1dGlnIHVuZCBibGVpYmVuIGxlZXIuJyk7CiAgaWYocm93cy5sZW5ndGgpd2FybmluZ3MucHVzaCgnTWVzc3dlcnRlIGF1cyBlY2h0ZW4gQmlsZHBvc2l0aW9uZW4gYWJnZWxlaXRldC4gQWxsZSBPQ1ItVm9yc2NobMOkZ2UgdW5iZWRpbmd0IG1pdCBkZW0gT3JpZ2luYWwgdmVyZ2xlaWNoZW4uJyk7CiAgY29uc3Qga2luZHM9bmV3IFNldChyb3dzLm1hcChyPT5kaWZmdXNpb24uaGFzKHIuY29kZSk/J2RpZmZ1c2lvbic6J21lYXN1cmVtZW50cycpKTsKICBpZihraW5kcy5zaXplPjEpd2FybmluZ3MucHVzaCgnVW50ZXJzY2hpZWRsaWNoZSBUZXN0YXJ0ZW4gZXJrYW5udDogZWluemVsbiBlcmZhc3Nlbi4nKTsKICByZXR1cm4ge3Jvd3MsZGF0ZTpkYXRlcyxraW5kOmtpbmRzLnNpemU9PT0xP1suLi5raW5kc11bMF06Jycsd2FybmluZ3Msc291cmNlTGluZXM6bGluZXMubGVuZ3RoLGRpYWdub3N0aWNzOntyZWNvZ25pemVkOmZvdW5kLmxlbmd0aCxjYW5kaWRhdGVUcmlwbGVzOmFsbC5sZW5ndGgsbWF0Y2hlZDpyb3dzLmxlbmd0aCxwYWdlczpbLi4ucGFnZXNdLmxlbmd0aH19OwogfQogY29uc3QgYXBpPU9iamVjdC5mcmVlemUoe3BhcnNlVFNWLHJlYWRXb3Jkcyx2aXN1YWxMaW5lc30pOwogaWYodHlwZW9mIG1vZHVsZT09PSdvYmplY3QnJiZtb2R1bGUuZXhwb3J0cyltb2R1bGUuZXhwb3J0cz1hcGk7ZWxzZSByb290LlBORVVNT1BST19QQVJTRVIzNjc9YXBpOwp9KSh0eXBlb2Ygd2luZG93IT09J3VuZGVmaW5lZCc/d2luZG93Omdsb2JhbFRoaXMpOwo='))
+
+          # Nur die Erkennung erweitern; bestaetigte Befunde, Tresor und Speichern unveraendert lassen.
+          one('lungimport365.js',",ocrRows366='';",",ocrRows366='',ocrPosition367='';",'Zustand der OCR-Positionen')
+          one('lungimport365.js',"  ocrRows366='';\n  const bitmap=", "  ocrRows366='';ocrPosition367='';\n  const bitmap=",'OCR-Zustand zuruecksetzen')
+          one('lungimport365.js',"const best=byRows?.rows?.length>normal?.rows?.length?byRows:normal;\n     return {text,tsv,rowsText,score:best?.rows?.length||0};", "const best=byRows?.rows?.length>normal?.rows?.length?byRows:normal;\n     const spatial=window.PNEUMOPRO_PARSER367?.parseTSV(tsv,text);\n     return {text,tsv,rowsText,score:Math.max(best?.rows?.length||0,spatial?.rows?.length||0)};",'Bildspalten in OCR-Bewertung')
+          one('lungimport365.js',"   ocrRows366=best.rowsText;", "   ocrRows366=best.rowsText;ocrPosition367=best.tsv;",'Koordinaten nach OCR merken')
+          one('lungimport365.js',"if(isPdf)ocrRows366='';", "if(isPdf){ocrRows366='';ocrPosition367='';}",'PDF-Zustand zuruecksetzen')
+          one('lungimport365.js',"  parsed=useLines?{...fromLines,date:fromLines.date||fromText.date,warnings:[...new Set([...fromLines.warnings,...fromText.warnings])]}:fromText;\n  if(useLines)", "  parsed=useLines?{...fromLines,date:fromLines.date||fromText.date,warnings:[...new Set([...fromLines.warnings,...fromText.warnings])]}:fromText;\n  const geo=!isPdf&&ocrPosition367?window.PNEUMOPRO_PARSER367?.parseTSV(ocrPosition367,text):null;\n  const useGeo=geo&&geo.rows.length>parsed.rows.length;\n  if(useGeo)parsed={...geo,date:geo.date||parsed.date||fromText.date,warnings:geo.warnings};\n  else if(geo?.diagnostics?.recognized&&!parsed.rows.length)parsed.warnings=[...new Set([...parsed.warnings,...geo.warnings])];\n  if(useLines)",'Raeumliche Spaltenauswertung priorisieren')
+          one('lungimport365.js',"  if(useLines)notices.push('Tabellenzeilen anhand ihrer Bildposition rekonstruiert. Bitte Zuordnung der Zahlen am Original besonders sorgfältig prüfen.');", "  if(useLines&&!useGeo)notices.push('Tabellenzeilen anhand ihrer Bildposition rekonstruiert. Bitte Zuordnung der Zahlen am Original besonders sorgfältig prüfen.');\n  if(useGeo)notices.push('Soll/Ist/% anhand wiederkehrender echter Spaltenpositionen als UNBESTAETIGTE Vorschlaege erkannt. Jede Zahl, Einheit und Messphase am Original pruefen.');",'Warnung zum OCR-Spaltenabgleich')
+
+          one('secure17.js',"'lungparser366.js','lungimport365.js'", "'lungparser366.js','lungparser367.js','lungimport365.js'",'Neuen Parser vor Importmodul laden')
+          allv('secure17.js')
+          one('sw.js',"const VERSION='3.6.6-tabellenerkennung';", "const VERSION='3.6.7-positionsdaten';",'Offline-Cache erneuern')
+          one('sw.js'," './lungparser366.js',", " './lungparser366.js','./lungparser367.js',",'Neuen Parser offline vorladen')
+          one('sw.js',"const important=['/lungparser366.js'", "const important=['/lungparser367.js','/lungparser366.js'",'Neuen Parser frisch laden')
+          allv('index.html');allv('app.js')
+          notes=('OCR-Tabellen anhand echter Spaltenpositionen mit rechnerischer Plausibilitaetspruefung. '
+                 'Nur wiederholt eindeutig passende Soll/Ist/%-Spalten als unbestaetigte Vorschlaege; '
+                 'unklare Werte bleiben leer und erzeugen Warnungen. '
+                 'Originale und Tresor unveraendert, kein Upload medizinischer Daten. '
+                 'Auch mit dieser Version ist eine 100-prozentige Erkennung nicht garantiert.')
+          meta=json.loads(Path('version.json').read_text(encoding='utf-8'))
+          if meta['version']!='3.6.6':raise RuntimeError('Es wird Version 3.6.6 als Ausgangsbasis erwartet.')
+          meta.update(version='3.6.7',released='2026-10-31',notes=notes)
+          Path('version.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          for p in ['lungparser367.js','lungimport365.js','secure17.js','app.js']:
+           subprocess.run(['node','--check',p],check=True)
+          assert 'lungparser367.js' in Path('sw.js').read_text()
+          assert "'lungparser366.js','lungparser367.js','lungimport365.js'" in Path('secure17.js').read_text()
+          assert json.loads(Path('version.json').read_text())['version']=='3.6.7'
+          print('PneumoPro 3.6.7: Quellcode-Pruefungen bestanden.')
+          PY_PNEUMO367
+          fi
+      - name: Quellcode, Versionsdatei und Commit pruefen
+        shell: bash
+        run: |
+          node --check lungparser367.js
+          node --check lungimport365.js
+          node --check secure17.js
+          node --check app.js
+          python3 -c "import json; assert json.load(open('version.json'))['version']=='3.6.7'"
+          git diff --check
+          git add lungparser367.js lungimport365.js secure17.js sw.js index.html app.js version.json
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "PneumoPro 3.6.7: OCR-Spaltenpositionen statt nur Textreihenfolge"
+            git push origin HEAD:main
+          else
+            echo "Keine weiteren Aenderungen erforderlich."
+          fi
