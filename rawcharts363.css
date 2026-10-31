@@ -1,0 +1,21 @@
+/* PneumoPro 3.6.3: Klinikdiagramme als scanartige Ausschnitte */
+#raw363{padding:14px 0 0;margin-top:10px;border-top:1px solid #d8e7eb}
+#raw363 h3{font-weight:800;color:#15495b;font-size:1.05rem;margin:5px 0 8px}
+#raw363 .raw363-note,#raw363 .raw363-empty,#raw363 .raw363-warning{font-size:.84rem;color:#456170;line-height:1.45;margin:6px 0 12px}
+#raw363 .raw363-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:10px}
+#raw363 .raw363-card{background:#fff;border:1px solid #bbd5df;border-radius:11px;display:flex;flex-direction:column;gap:7px;align-items:stretch;min-width:0;padding:8px;cursor:zoom-in;color:#234e60;text-align:center;box-shadow:0 2px 5px #0b364010}
+#raw363 .raw363-card span{font-size:.78rem;font-weight:750;line-height:1.3}
+#raw363 .raw363-thumb{width:100%;height:145px;object-fit:contain;background:white;display:block}
+#raw363 .raw363-card:focus-visible{outline:3px solid #167b95;outline-offset:2px}
+.raw363-dialog{position:fixed;inset:0;margin:auto;box-sizing:border-box;border:0;border-radius:16px;padding:14px;width:min(97vw,850px);max-width:97vw;height:min(90dvh,900px);max-height:90dvh;color:#183e4e;background:#fff;box-shadow:0 16px 70px #001c2d55;overflow:hidden}
+.raw363-dialog::backdrop{background:#00131aaf}
+.raw363-dialog[open]{display:flex;flex-direction:column;gap:12px}
+.raw363-bar,.raw363-actions{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.raw363-bar strong{font-weight:800;font-size:1rem}
+.raw363-dialog button{font:inherit;font-weight:750;color:#15465c;border:1px solid #a6c8d5;border-radius:10px;padding:10px 13px;background:#eff7fa;min-height:44px}
+.raw363-viewport{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:white;border:1px solid #cfdee6;border-radius:10px;overflow:hidden;touch-action:none}
+.raw363-viewport img{max-width:97%;max-height:97%;width:auto;height:auto;object-fit:contain;transform-origin:center center;user-select:none;-webkit-user-select:none;pointer-events:auto}
+.raw363-actions{justify-content:center}
+.raw363-actions button{min-width:62px;font-size:1.1rem}
+.raw363-dialog-note{font-size:.73rem;line-height:1.3;color:#5c7580;margin:0}
+@media(min-width:760px){#raw363 .raw363-grid{grid-template-columns:repeat(3,minmax(0,1fr))}#raw363 .raw363-thumb{height:190px}}

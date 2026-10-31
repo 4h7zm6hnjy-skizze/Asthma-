@@ -1,0 +1,25 @@
+/* PneumoPro 3.6.3 – reversible Dokumentkopien aus alten und neuen Bildern. */
+.dc363-wrap{display:block;max-width:100%;min-width:0;margin:10px 0 14px;overflow:visible}
+.dc363-wrap>img{max-width:100%!important;width:100%;height:auto;object-fit:contain;border:1px solid #d9e5e9;border-radius:8px;background:white}
+.dc363-wrap>img[hidden]{display:none!important}
+.dc363-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:8px 0 2px}
+.dc363-tools small{font-size:12px;line-height:1.3;color:#436474;flex:1 1 100%}
+.dc363-tools button{font:inherit;font-weight:700;font-size:13px;padding:8px 10px;border:1px solid #96bbca;background:#f1f8fb;color:#15495f;border-radius:9px;min-height:40px;cursor:pointer}
+.dc363-dialog{position:fixed;inset:0;margin:auto;width:min(96vw,1000px);max-width:96vw;height:min(91dvh,950px);max-height:91dvh;border:0;border-radius:14px;background:white;color:#183c4e;padding:13px;box-sizing:border-box;overflow:hidden}
+.dc363-dialog::backdrop{background:#0b1d2bd6}
+.dc363-dialog[open]{display:flex;flex-direction:column;gap:10px}
+.dc363-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.dc363-head strong{font-size:14px;line-height:1.3}
+.dc363-dialog button{font:inherit;font-weight:750;border:1px solid #afcad5;background:#eef6fa;color:#15495f;border-radius:9px;padding:9px 13px;min-height:44px}
+.dc363-stage{flex:1;min-height:0;overflow:hidden;background:#fff;border:1px solid #c5dce4;display:flex;align-items:center;justify-content:center;touch-action:none;border-radius:9px}
+.dc363-stage img{max-width:97%;max-height:97%;width:auto;height:auto;object-fit:contain;transform-origin:center center;user-select:none;-webkit-user-select:none}
+.dc363-zoom-controls{display:flex;justify-content:center;align-items:center;gap:12px}.dc363-zoom-controls button{min-width:61px}
+.dc363-caption{color:#637b87;font-size:12px;margin:0;line-height:1.3}
+@media print{.dc363-tools,.dc363-dialog{display:none!important}.dc363-wrap>img.dc363-copy{max-width:100%!important}}
+#dc363-archive{margin:22px 0;padding:14px;border:1px solid #bfdae4;border-radius:14px;background:#f5fbfd}
+#dc363-archive h3{font-size:1.1rem;margin:0 0 8px;color:#174c63}
+#dc363-archive p{font-size:14px;color:#4a6571;line-height:1.45}
+#dc363-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:12px}
+#dc363-gallery .dc363-archive-item{margin:0;padding:8px;background:white;border:1px solid #cbdee4;border-radius:11px;min-width:0}
+#dc363-gallery figcaption{font-weight:750;font-size:12px;line-height:1.35;margin-bottom:8px;overflow-wrap:anywhere}
+#dc363-archive button{margin:5px 8px 5px 0;min-height:42px}
+#dc363-archive [hidden]{display:none!important}
