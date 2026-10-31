@@ -107,10 +107,48 @@
      }catch(e){ /* Originalerkennung bleibt erhalten; keine Daten erfinden. */ }
      finally{try{await w.setParameters({tessedit_pageseg_mode:'3'});}catch(e){ /* Bei erneutem Scan wird neuer Versuch gestartet. */ }}
    }
-   ocrRows366=best.rowsText;ocrPosition367=best.tsv;
+   // Diagrammhinweise immer aus dem vollstaendigen Original behalten.
    ocrHints=tsvHints(best.tsv,bitmap.width/c.width,bitmap.height/c.height);
+   const fullPageText=best.text;
+   // Eine ganze fotografierte Klinikseite kann kleine Tabellen in einer
+   // anderen OCR-Lesereihenfolge liefern. Bei weniger als zwei brauchbaren
+   // Messzeilen deshalb begrenzte vergroesserte Bildbereiche lokal pruefen.
+   // Keine feste Klinik, kein fixer Patient und keine ausgedachten Zahlen.
+   let cropName='';
+   if(best.score<2){
+     const regions=[
+       {name:'linke untere Tabelle',x:.065,y:.435,w:.55,h:.285},
+       {name:'rechte untere Tabelle',x:.425,y:.435,w:.53,h:.36},
+       {name:'linke mittlere Tabelle',x:.065,y:.235,w:.56,h:.37},
+       {name:'untere breite Tabelle',x:.055,y:.595,w:.88,h:.31}
+     ];
+     try{
+       await w.setParameters({tessedit_pageseg_mode:'6'});
+       for(const region of regions){
+         if(best.score>=8)break;
+         const sx=Math.floor(bitmap.width*region.x),sy=Math.floor(bitmap.height*region.y);
+         const sw=Math.max(1,Math.floor(bitmap.width*region.w)),sh=Math.max(1,Math.floor(bitmap.height*region.h));
+         const scale=Math.min(4.7,2450/sw,2700/sh,Math.sqrt(5400000/(sw*sh)));
+         const tile=document.createElement('canvas');
+         tile.width=Math.max(1,Math.floor(sw*scale));tile.height=Math.max(1,Math.floor(sh*scale));
+         try{
+           const tc=tile.getContext('2d',{willReadFrequently:true});
+           if(!tc)continue;
+           tc.fillStyle='#fff';tc.fillRect(0,0,tile.width,tile.height);
+           tc.imageSmoothingEnabled=true;tc.imageSmoothingQuality='high';
+           tc.drawImage(bitmap,sx,sy,sw,sh,0,0,tile.width,tile.height);
+           setStatus('Kleine Messwerttabelle gezielt lesen: '+region.name+' ...');
+           const candidate=resultOf((await w.recognize(tile,{}, {tsv:true})).data);
+           if(candidate.score>best.score){best=candidate;cropName=region.name;}
+         }catch(error){ /* Diesen Teilbereich nicht uebernehmen; anderen pruefen. */ }
+         finally{tile.width=tile.height=1;}
+       }
+     }catch(error){ /* Misslingt der Tabellenfokus, bleibt die Vollseiten-OCR erhalten. */ }
+     finally{try{await w.setParameters({tessedit_pageseg_mode:'3'});}catch(error){}}
+   }
+   ocrRows366=best.rowsText;ocrPosition367=best.tsv;
    c.width=c.height=1;
-   return best.text;
+   return cropName?fullPageText+'\n\n[Vergrößerte Tabellenansicht: '+cropName+']\n'+best.text:fullPageText;
   }finally{bitmap.close();}
  }
  async function ocrWorker(){if(!window.Tesseract){await new Promise((resolve,reject)=>{let s=document.createElement('script');s.src='./ocr-vendor/tesseract.min.js';s.onload=resolve;s.onerror=()=>reject(Error('Lokales OCR-Modul nicht verfügbar.'));document.head.append(s);});}if(!window.Tesseract?.createWorker)throw Error('OCR-Modul nicht verfügbar.');if(!worker){const base=new URL('./ocr-vendor/',location.href).href;worker=await window.Tesseract.createWorker(['deu','eng'],1,{workerPath:base+'worker.min.js',corePath:base+'core',langPath:base+'lang',workerBlobURL:false});}return worker;}

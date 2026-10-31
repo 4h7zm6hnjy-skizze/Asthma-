@@ -1,5 +1,5 @@
 {
-  "version": "3.6.7",
+  "version": "3.6.8",
   "released": "2026-10-31",
-  "notes": "OCR-Tabellen anhand echter Spaltenpositionen mit rechnerischer Plausibilitaetspruefung. Nur wiederholt eindeutig passende Soll/Ist/%-Spalten als unbestaetigte Vorschlaege; unklare Werte bleiben leer und erzeugen Warnungen. Originale und Tresor unveraendert, kein Upload medizinischer Daten. Auch mit dieser Version ist eine 100-prozentige Erkennung nicht garantiert."
+  "notes": "Bei unlesbarer Vollseiten-OCR werden kleine Tabellenbereiche im Foto separat vergroessert und offline untersucht. Wiederkehrende echte Spalten und rechnerisch stimmige Soll/Ist/%-Werte werden ausschliesslich als ungepruefte Vorschlaege angezeigt. Alternative Beschriftungen FEV1/FVC und RV/TLC werden erkannt. Keine Ergaenzung fehlender Messwerte, kein unbestaetigtes Speichern, unveraenderte verschluesselte Originale."
 }

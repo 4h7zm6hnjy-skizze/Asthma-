@@ -1,5 +1,5 @@
 /* Asthma 3.3.0: neuer Offline-Cache bei Navigation-Update, Gesundheitsdaten unangetastet. */
-const VERSION='3.6.7-positionsdaten';
+const VERSION='3.6.8-gezieltes-tabellen-ocr';
 const CACHE=`asthma-static-${VERSION}`;
 const ASSETS=[
  './lungparser366.js','./lungparser367.js',

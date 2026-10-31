@@ -13,8 +13,8 @@
   [/^VA\s*(?:_?SB)?\b/i,'VA_SB'],[/^TLC\s*SB\b/i,'TLC_SB'],
   [/^FRC\s*SB\b/i,'FRC_SB'],[/^ERV\s*SB\b/i,'ERV_SB'],
   [/^RV\s*SB\b/i,'RV_SB'],[/^VIN\s*SB\b/i,'VIN_SB'],
-  [/^RV\s*\/\s*TLC\b/i,'RV_TLC'],
-  [/^FEV\s*1\s*\/\s*FVC\b/i,'FEV1_FVC'],
+  [/^RV\s*(?:\/|%)\s*TLC\b/i,'RV_TLC'],
+  [/^FEV\s*1\s*(?:\/|%)\s*FVC\b/i,'FEV1_FVC'],
   [/^(?:MMEF|MFEF)\s*75\s*[-–]\s*25\b/i,'MMEF75_25'],
   [/^FEF\s*75\b/i,'FEF75'],[/^sR\s*eff\b/i,'sR_eff'],
   [/^R\s*eff\b/i,'R_eff'],[/^FRC\s*pleth\b/i,'FRCpleth'],
@@ -114,7 +114,16 @@
    }
    rows=[...seen.values()].filter(Boolean);
   }
-  const dates=(root.PNEUMOPRO_PARSER366?.parse(fullText)?.date)||'';
+  let dates=(root.PNEUMOPRO_PARSER366?.parse(fullText)?.date)||'';
+  if(!dates){
+   const match=String(fullText||'').match(/(?:Messdatum|Untersuchungsdatum|Testdatum)[^\d]{0,45}(\d{1,2})[./](\d{1,2})[./](\d{2}|20\d{2})\b/i);
+   if(match){
+    const year=match[3].length===2?'20'+match[3]:match[3];
+    const proposed=year+'-'+match[2].padStart(2,'0')+'-'+match[1].padStart(2,'0');
+    const dt=new Date(proposed+'T12:00:00Z');
+    if(!Number.isNaN(dt.getTime())&&dt.toISOString().slice(0,10)===proposed)dates=proposed;
+   }
+  }
   if(!found.length)warnings.push('Keine beschrifteten Tabellenzeilen in den Bildpositionen erkannt.');
   else if(!best)warnings.push(found.length+' benannte Tabellenzeilen, aber keine eindeutigen wiederholten Spaltenpositionen. Zahlen werden nicht vorausgefüllt.');
   else if(rows.length<codes.size)warnings.push((codes.size-rows.length)+' Tabellenwerte sind räumlich nicht eindeutig und bleiben leer.');
