@@ -1,0 +1,103 @@
+name: PneumoPro 3.6.9 - OCR-Befundzeilen sicher verbinden
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PneumoPro369_OCR_Befundfix.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pneumopro-369-ocr-befundfix
+  cancel-in-progress: false
+
+jobs:
+  upgrade:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository laden
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: OCR-Zusammenfuehrung einfuegen
+        shell: bash
+        run: |
+          python3 - <<'PY_369'
+          from pathlib import Path
+          import base64, json
+
+          def replace_once(path, old, new):
+              p=Path(path)
+              s=p.read_text(encoding='utf-8')
+              n=s.count(old)
+              if n!=1:
+                  raise RuntimeError(f'{path}: Erwartete Stelle nicht eindeutig (Treffer: {n}). Keine Aenderungen committen.')
+              p.write_text(s.replace(old,new,1),encoding='utf-8')
+
+          def bump_version(path):
+              p=Path(path)
+              source=p.read_text(encoding='utf-8')
+              if '3.6.8' not in source:
+                  raise RuntimeError(f'{path}: Version 3.6.8 fehlt. Update abgebrochen.')
+              p.write_text(source.replace('3.6.8','3.6.9'),encoding='utf-8')
+
+          state=json.loads(Path('version.json').read_text(encoding='utf-8'))
+          if state.get('version')=='3.6.9':
+              print('Version 3.6.9 bereits installiert; keine erneute Aenderung erforderlich.')
+          elif state.get('version')!='3.6.8':
+              raise RuntimeError('Es wird Version 3.6.8 als Ausgangsbasis erwartet.')
+          else:
+              if Path('lungparser369.js').exists():
+                  raise RuntimeError('lungparser369.js existiert bereits. Unvollstaendige Installation kontrollieren.')
+              # Nur allgemeine Programmregeln, keine privaten Krankenunterlagen im Quellcode.
+              Path('lungparser369.js').write_bytes(base64.b64decode('J3VzZSBzdHJpY3QnOwovKiBQbmV1bW9Qcm8gMy42Ljk6IE9DUiB0ZXh0IGFjcm9zcyBtdWx0aXBsZSBhdHRlbXB0cywgbm8gZmFicmljYXRlZCBtZWFzdXJlbWVudHMuCiAqIE9ubHkgZXhhY3QsIGluZGVwZW5kZW50bHkgcmVhZGFibGUgZGVjaW1hbHMgd2l0aCBpbnRlcm5hbGx5IGNvbnNpc3RlbnQKICogU29sbC9Jc3QvJSBhcmUgcHJlZmlsbHMuIEFsbCByb3dzIHN0YXkgVU5DT05GSVJNRUQgdW50aWwgdXNlciBhcHByb3ZhbC4KICogTmV2ZXIgc2VuZHMgZG9jdW1lbnQgY29udGVudHMgdG8gYW55IHNlcnZpY2UuICovCihmdW5jdGlvbihyb290KXsKICBjb25zdCBEPVsKICAgIFsvXlJWXHMqWyUvXVxzKlRMQ1xzKig/OlNCfHNpbmdsZVxzKmJyZWF0aClcYi9pLCdSVl9UTENfU0InXSwKICAgIFsvXlJWXHMqWyUvXVxzKlRMQ1xiL2ksJ1JWX1RMQyddLAogICAgWy9eRkVWXHMqWzFJbF1ccypbJS9dXHMqRlZDXGIvaSwnRkVWMV9GVkMnXSwKICAgIFsvXig/OkRMQ09jXHMqU0J8RExDT1xzKmNvcnJlY3RlZClcYi9pLCdETENPY1NCJ10sCiAgICBbL14oPzpLQ09jXHMqU0J8S0NPXHMqY29ycmVjdGVkKVxiL2ksJ0tDT2NfU0InXSwKICAgIFsvXkRMQ09ccyooPzpTQik/XGIvaSwnRExDT19TQiddLFsvXktDT1xzKig/OlNCKT9cYi9pLCdLQ09fU0InXSwKICAgIFsvXlZBXHMqKD86U0IpP1xiL2ksJ1ZBX1NCJ10sWy9eVExDXHMqU0JcYi9pLCdUTENfU0InXSwKICAgIFsvXkZSQ1xzKlNCXGIvaSwnRlJDX1NCJ10sWy9eRVJWXHMqU0JcYi9pLCdFUlZfU0InXSwKICAgIFsvXlJWXHMqU0JcYi9pLCdSVl9TQiddLFsvXlZJTlxzKlNCXGIvaSwnVklOX1NCJ10sCiAgICBbL14oPzpNTUVGfE1GRUYpXHMqNzVccypbLeKAk11ccyoyNVxiL2ksJ01NRUY3NV8yNSddLAogICAgWy9eRkVGXHMqNzVcYi9pLCdGRUY3NSddLAogICAgWy9ec1JccyplZmZcYi9pLCdzUl9lZmYnXSxbL15SXHMqZWZmXGIvaSwnUl9lZmYnXSwKICAgIFsvXkZSQ1xzKnBsZXRoXGIvaSwnRlJDcGxldGgnXSxbL15WQ1xzKklOXGIvaSwnVkNfSU4nXSwKICAgIFsvXkZFVlxzKlsxSWxdXGIvaSwnRkVWMSddLFsvXkZWQ1xiL2ksJ0ZWQyddLAogICAgWy9eVExDXGIvaSwnVExDJ10sWy9eUlZcYi9pLCdSViddLAogICAgWy9eUEVGXGIvaSwnUEVGJ10sWy9eUElGXGIvaSwnUElGJ10sWy9eSGJcYi9pLCdIYiddLFsvXlRBXGIvaSwnVEEnXQogIF07CiAgY29uc3QgZGlmZnVzaW9uPW5ldyBTZXQoWydETENPX1NCJywnS0NPX1NCJywnVkFfU0InLCdIYicsJ0RMQ09jU0InLCdLQ09jX1NCJywnVEEnLCdWSU5fU0InLCdUTENfU0InLCdGUkNfU0InLCdFUlZfU0InLCdSVl9TQicsJ1JWX1RMQ19TQiddKTsKICBjb25zdCBkZWM9cz0+e2NvbnN0IG49TnVtYmVyKFN0cmluZyhzKS5yZXBsYWNlKCcsJywnLicpKTtyZXR1cm4gTnVtYmVyLmlzRmluaXRlKG4pP246bnVsbDt9OwogIGNvbnN0IHNpZ25lZE51bWJlcj0vWystXT9cZHsxLDN9KD86Wy4sXVxkezEsNH0pPy9nOwogIGNvbnN0IGlzRGF0ZT1zPT57aWYoIS9eMjBcZFxkLVxkXGQtXGRcZCQvLnRlc3QocykpcmV0dXJuIGZhbHNlO2NvbnN0IHY9bmV3IERhdGUocysnVDEyOjAwOjAwWicpO3JldHVybiAhTnVtYmVyLmlzTmFOKCt2KSYmdi50b0lTT1N0cmluZygpLnNsaWNlKDAsMTApPT09czt9OwogIGZ1bmN0aW9uIGRhdGVzT2YobGluZXMpewogICAgY29uc3QgbWF0Y2hlZD1uZXcgTWFwKCk7CiAgICBmb3IoY29uc3QgbGluZSBvZiBsaW5lcyl7CiAgICAgIGlmKC8oPzpnZWJ1cnR8YmlydGh8YWx0ZXJ8YWdlKS9pLnRlc3QobGluZSkpY29udGludWU7CiAgICAgIGNvbnN0IHNjb3JlPS8oPzptZXNzZGF0dW18dW50ZXJzdWNodW5nc2RhdHVtfHRlc3RkYXR1bXxtZXNzdW5nIGFtfHRlc3QgZGF0ZSkvaS50ZXN0KGxpbmUpPzU6Lyg/OmRhdHVtfGRhdGUpL2kudGVzdChsaW5lKT8yOjE7CiAgICAgIGZvcihjb25zdCBtIG9mIGxpbmUubWF0Y2hBbGwoL1xiKDIwXGRcZClbLlwtL10oXGRcZClbLlwtL10oXGRcZClcYnxcYihcZHsxLDJ9KVsuXC0vXShcZHsxLDJ9KVsuXC0vXShcZHsyfXwyMFxkXGQpXGIvZykpewogICAgICAgIGNvbnN0IHl5PW1bMV0/bVsxXToobVs2XS5sZW5ndGg9PT0yPycyMCcrbVs2XTptWzZdKTsKICAgICAgICBjb25zdCBtb250aD1tWzFdP21bMl06bVs1XS5wYWRTdGFydCgyLCcwJyk7CiAgICAgICAgY29uc3QgZGF5PW1bMV0/bVszXTptWzRdLnBhZFN0YXJ0KDIsJzAnKTsKICAgICAgICBjb25zdCBkYXRlPXl5KyctJyttb250aCsnLScrZGF5OwogICAgICAgIGlmKGlzRGF0ZShkYXRlKSltYXRjaGVkLnNldChkYXRlLE1hdGgubWF4KHNjb3JlLG1hdGNoZWQuZ2V0KGRhdGUpfHwwKSk7CiAgICAgIH0KICAgIH0KICAgIGNvbnN0IHJhbms9Wy4uLm1hdGNoZWQuZW50cmllcygpXS5zb3J0KChhLGIpPT5iWzFdLWFbMV0pOwogICAgcmV0dXJuIHJhbmsubGVuZ3RoJiYoIXJhbmtbMV18fHJhbmtbMF1bMV0+cmFua1sxXVsxXSk/cmFua1swXVswXTonJzsKICB9CiAgZnVuY3Rpb24gc3RyaWN0TnVtZXJpY1Rva2Vucyh0YWlsKXsKICAgIGNvbnN0IHRva2Vucz1bXTsKICAgIGZvcihjb25zdCB0b2tlbiBvZiB0YWlsLnNwbGl0KC9ccysvKS5zbGljZSgwLDE2KSl7CiAgICAgIGNvbnN0IHQ9dG9rZW4ucmVwbGFjZSgvXltcWyh7fF0rfFtcXSl9fDssXSskL2csJycpLnJlcGxhY2UoLyUkLywnJykucmVwbGFjZSgvXC4kLywnJyk7CiAgICAgIGlmKC9eWystXT9cZHsxLDN9KD86Wy4sXVxkezEsNH0pPyQvLnRlc3QodCkpdG9rZW5zLnB1c2goe3ZhbHVlOmRlYyh0KSxyYXc6dH0pOwogICAgICBlbHNlIGlmKHRva2Vucy5sZW5ndGg+PTMpYnJlYWs7IC8vIHVucmVsYXRlZCBncmFwaCB0ZXh0IGFmdGVyIGNvbXBsZXRlIHRyaXBsZXQKICAgIH0KICAgIHJldHVybiB0b2tlbnM7CiAgfQogIGZ1bmN0aW9uIHBsYXVzaWJsZShjb2RlLHAsYSxwY3QpewogICAgaWYocDw9MHx8YTwwfHxwY3Q8MHx8cGN0PjQwMClyZXR1cm4gZmFsc2U7CiAgICBjb25zdCByYXRpbz1bJ0ZFVjFfRlZDJywnUlZfVExDJywnUlZfVExDX1NCJ10uaW5jbHVkZXMoY29kZSk7CiAgICBsZXQgbWF4PXJhdGlvPzEyMDoxNTA7CiAgICBpZihbJ0ZFVjEnLCdGVkMnLCdWQ19JTicsJ1RMQycsJ1JWJywnRlJDcGxldGgnLCdUTENfU0InLCdGUkNfU0InLCdSVl9TQicsJ1ZJTl9TQicsJ1ZBX1NCJywnRVJWX1NCJywnUEVGJywnUElGJ10uaW5jbHVkZXMoY29kZSkpbWF4PTI1OwogICAgaWYoY29kZT09PSdIYicpbWF4PTMwOwogICAgaWYoWydzUl9lZmYnLCdSX2VmZicsJ0tDT19TQicsJ0tDT2NfU0InXS5pbmNsdWRlcyhjb2RlKSltYXg9MjA7CiAgICBpZihwPm1heHx8YT5tYXgpcmV0dXJuIGZhbHNlOwogICAgcmV0dXJuIE1hdGguYWJzKDEwMCphL3AtcGN0KTw9TWF0aC5tYXgoMS41LHBjdCouMDIyKTsKICB9CiAgZnVuY3Rpb24gcGFyc2UocmF3KXsKICAgIGNvbnN0IGxpbmVzPVN0cmluZyhyYXd8fCcnKS5yZXBsYWNlKC9cdTAwYTAvZywnICcpLnJlcGxhY2UoL1vigoFdL2csJzEnKS5yZXBsYWNlKC9b4oiS4oCQ4oCRXS9nLCctJykuc3BsaXQoL1xyP1xuLykubWFwKHM9PnMudHJpbSgpKS5maWx0ZXIoQm9vbGVhbikuc2xpY2UoMCwyNTAwKTsKICAgIGNvbnN0IHdhcm5pbmdzPVtdO2NvbnN0IGRhdGU9ZGF0ZXNPZihsaW5lcyksaGl0cz1uZXcgTWFwKCk7bGV0IHN1c3BpY2lvdXM9MCxyZWNvZ25pemVkPTA7CiAgICBmb3IoY29uc3QgbGluZSBvZiBsaW5lcyl7CiAgICAgIC8vIEF0IG1vc3QgdHdvIGVycmFudCBzaW5nbGUtY2hhcmFjdGVyIGNvbHVtbnMgYmVmb3JlIHRoZSBuYW1lZCBwYXJhbWV0ZXIuCiAgICAgIC8vIERvIG5vdCBtYXRjaCBudW1iZXJzIG9yIHVucmVsYXRlZCB0ZXh0IGFzIG1lYXN1cmVtZW50IG5hbWVzLgogICAgICBjb25zdCBjbGVhbmVkPWxpbmUucmVwbGFjZSgvXig/OlswLTkrKnx+PD5cLeKAoi4sOzohXVxzKil7MCwyfS8sJycpOwogICAgICBsZXQgZm91bmQ9bnVsbDtmb3IoY29uc3QgW3J4LGNvZGVdIG9mIEQpe2NvbnN0IG09Y2xlYW5lZC5tYXRjaChyeCk7aWYobSl7Zm91bmQ9e2NvZGUsdGFpbDpjbGVhbmVkLnNsaWNlKG1bMF0ubGVuZ3RoKS50cmltKCl9O2JyZWFrO319CiAgICAgIGlmKCFmb3VuZCljb250aW51ZTtyZWNvZ25pemVkKys7CiAgICAgIGNvbnN0IG51bXM9c3RyaWN0TnVtZXJpY1Rva2Vucyhmb3VuZC50YWlsKTsKICAgICAgLy8gVGhlIGZpcnN0IHRocmVlIHdlbGwtZm9ybWVkIGNvbHVtbnMgYXJlIFByZWRpY3RlZCwgQWN0dWFsLCBQZXJjZW50LgogICAgICAvLyBBIG1pc3NpbmcgZGVjaW1hbCBwb2ludCBpcyBkZWxpYmVyYXRlbHkgTk9UIHJlcGFpcmVkIG9yIGNvbXB1dGVkLgogICAgICBpZihudW1zLmxlbmd0aDwzfHwhbnVtcy5zbGljZSgwLDIpLmV2ZXJ5KHg9PngucmF3LmluY2x1ZGVzKCcuJyl8fHgucmF3LmluY2x1ZGVzKCcsJykpKXtzdXNwaWNpb3VzKys7Y29udGludWU7fQogICAgICBjb25zdCBbcHJlZCxhY3R1YWwscGVyY2VudCx6XT1udW1zOwogICAgICBpZighcGxhdXNpYmxlKGZvdW5kLmNvZGUscHJlZC52YWx1ZSxhY3R1YWwudmFsdWUscGVyY2VudC52YWx1ZSkpe3N1c3BpY2lvdXMrKztjb250aW51ZTt9CiAgICAgIGNvbnN0IHJvdz17Y29kZTpmb3VuZC5jb2RlLHByZWRpY3RlZDpwcmVkLnZhbHVlLGFjdHVhbDphY3R1YWwudmFsdWUscGVyY2VudDpwZXJjZW50LnZhbHVlLHo6eiYmei52YWx1ZT49LTkmJnoudmFsdWU8PTk/ei52YWx1ZTpudWxsLHNvdXJjZTpsaW5lLnNsaWNlKDAsMTgwKSxjb25maWRlbmNlOidhcml0aG1ldGlzY2ggdW5kIGFuaGFuZCBkZXIgT0NSLVplaWxlIGdlcHLDvGZ0J307CiAgICAgIGNvbnN0IHByZXZpb3VzPWhpdHMuZ2V0KGZvdW5kLmNvZGUpfHxbXTsKICAgICAgaWYoIXByZXZpb3VzLnNvbWUoeD0+eC5wcmVkaWN0ZWQ9PT1yb3cucHJlZGljdGVkJiZ4LmFjdHVhbD09PXJvdy5hY3R1YWwmJngucGVyY2VudD09PXJvdy5wZXJjZW50KSlwcmV2aW91cy5wdXNoKHJvdyk7CiAgICAgIGhpdHMuc2V0KGZvdW5kLmNvZGUscHJldmlvdXMpOwogICAgfQogICAgY29uc3Qgcm93cz1bXTsKICAgIGZvcihjb25zdCBbY29kZSxhbHRlcm5hdGl2ZXNdIG9mIGhpdHMpewogICAgICBpZihhbHRlcm5hdGl2ZXMubGVuZ3RoPT09MSlyb3dzLnB1c2goYWx0ZXJuYXRpdmVzWzBdKTsKICAgICAgZWxzZSB3YXJuaW5ncy5wdXNoKGNvZGUrJzogdW50ZXJzY2hpZWRsaWNoZSBaYWhsZW4gaW4gT0NSLUR1cmNoZ8Okbmdlbjsga2VpbmUgVm9yYXVzZsO8bGx1bmcuJyk7CiAgICB9CiAgICBpZighZGF0ZSl3YXJuaW5ncy5wdXNoKCdVbnRlcnN1Y2h1bmdzZGF0dW0gbmljaHQgZWluZGV1dGlnIGdlbGVzZW4uIEJpdHRlIERhdHVtIGltIE9yaWdpbmFsIHByw7xmZW4uJyk7CiAgICBpZihzdXNwaWNpb3VzKXdhcm5pbmdzLnB1c2goc3VzcGljaW91cysnIE9DUi1UYWJlbGxlbnplaWxlKG4pIHVudm9sbHN0w6RuZGlnLCBtaXQgZmVobGVuZGVuIERlemltYWx6ZWljaGVuIG9kZXIgcmVjaG5lcmlzY2ggd2lkZXJzcHLDvGNobGljaC4gRGllc2UgV2VydGUgYmxlaWJlbiBsZWVyLicpOwogICAgaWYoIXJvd3MubGVuZ3RoKXdhcm5pbmdzLnB1c2goJ0tlaW5lIHZvbGxzdMOkbmRpZyB1bmQgcmVjaG5lcmlzY2ggc2ljaGVyIGxlc2JhcmUgU29sbC9Jc3QvJS1aZWlsZS4gQml0dGUgT3JpZ2luYWwgcHLDvGZlbiBvZGVyIENoYXRHUFQgenVyIG1hbnVlbGxlbiBLb250cm9sbGUgdmVyd2VuZGVuLicpOwogICAgaWYocm93cy5sZW5ndGgpd2FybmluZ3MucHVzaCgnRXJrYW5udGUgWmFobGVuIHNpbmQgVm9yc2NobMOkZ2UsIGtlaW5lIGJlc3TDpHRpZ3RlbiBNZXNzd2VydGUuIEplZGUgU3BhbHRlIHVuZCBFaW5oZWl0IGFuaGFuZCBkZXMgT3JpZ2luYWxmb3RvcyBrb250cm9sbGllcmVuLicpOwogICAgY29uc3Qga2luZHM9bmV3IFNldChyb3dzLm1hcChyPT5kaWZmdXNpb24uaGFzKHIuY29kZSk/J2RpZmZ1c2lvbic6J21lYXN1cmVtZW50cycpKTsKICAgIGlmKGtpbmRzLnNpemU+MSl3YXJuaW5ncy5wdXNoKCdHZW1pc2NodGUgVGVzdGFydGVuOiBMdW5nZW5mdW5rdGlvbiB1bmQgRGlmZnVzaW9uIGdldHJlbm50IGVyZmFzc2VuLicpOwogICAgcmV0dXJuIHtyb3dzLGRhdGUsa2luZDpraW5kcy5zaXplPT09MT9bLi4ua2luZHNdWzBdOicnLHdhcm5pbmdzLHNvdXJjZUxpbmVzOmxpbmVzLmxlbmd0aCxkaWFnbm9zdGljczp7cmVjb2duaXplZCx2YWxpZDpyb3dzLmxlbmd0aCxzdXNwaWNpb3VzfX07CiAgfQogIGNvbnN0IGFwaT1PYmplY3QuZnJlZXplKHtwYXJzZX0pOwogIGlmKHR5cGVvZiBtb2R1bGU9PT0nb2JqZWN0JyYmbW9kdWxlLmV4cG9ydHMpbW9kdWxlLmV4cG9ydHM9YXBpOwogIGVsc2Ugcm9vdC5QTkVVTU9QUk9fUEFSU0VSMzY5PWFwaTsKfSkodHlwZW9mIHdpbmRvdyE9PSd1bmRlZmluZWQnP3dpbmRvdzpnbG9iYWxUaGlzKTsK'))
+              replace_once('secure17.js',"'lungparser367.js','lungimport365.js'", "'lungparser367.js','lungparser369.js','lungimport365.js'")
+              replace_once('sw.js',"const VERSION='3.6.8-gezieltes-tabellen-ocr';", "const VERSION='3.6.9-ocr-zusammenfuehrung';")
+              replace_once('sw.js'," './lungparser366.js','./lungparser367.js',", " './lungparser366.js','./lungparser367.js','./lungparser369.js',")
+              replace_once('sw.js',"const important=['/lungparser367.js'", "const important=['/lungparser369.js','/lungparser367.js'")
+              anchor=r"  if(useLines)text+='\n\n[Zusätzliche Tabellenzeilen aus OCR-Positionsdaten]\n'+ocrRows366;"
+              extension='  // Ein weiterer Lesepfad verbindet getrennte Vollseiten- und Tabellen-OCR.\n  // Die App fuellt nur arithmetisch konsistente, ohne Punktkorrektur lesbare\n  // Zahlen aus benannten Zeilen vor; niemals fehlende Werte erraten.\n  const clean369=window.PNEUMOPRO_PARSER369?.parse(text);\n  const useClean369=!!clean369&&clean369.rows.length>parsed.rows.length;\n  if(useClean369)parsed={...clean369,date:clean369.date||parsed.date};\n  else if(clean369?.date&&!parsed.date)parsed={...parsed,date:clean369.date};\n'
+              replace_once('lungimport365.js',anchor,extension+anchor)
+              replace_once('lungimport365.js',"  let notices=[...parsed.warnings];", "  let notices=[...parsed.warnings];\n  if(useClean369)notices.push('Weitere Werte aus getrennten OCR-Tabellenteilen als ungepruefte Vorschlaege erkannt. Alle Zahlen und die Messphase am Original kontrollieren.');")
+              for name in ['index.html','app.js','secure17.js']:
+                  bump_version(name)
+              state['version']='3.6.9'
+              state['released']='2026-10-31'
+              state['notes']='Verbesserte Zusammenfuehrung von Lungenfunktions-OCR aus gesamtem Klinikbogen und separat vergroesserten Tabellen. Erkennt zweistellige Jahreszahlen im Untersuchungsdatum, prueft ausgeschriebene Soll/Ist/%-Tripel rechnerisch und weist unlesbare oder widerspruechliche Werte ausdruecklich zurueck. Keine erfundenen Dezimalstellen; bestaetigungspflichtige Vorschlaege, Originale unveraendert und lokal verschluesselt.'
+              Path('version.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+              print('3.6.9: Patch ohne medizinische Privatdaten installiert.')
+          PY_369
+      - name: Quellcode und vorsichtige Messwertpruefung testen
+        shell: bash
+        run: |
+          node --check lungparser369.js
+          node --check lungimport365.js
+          node --check secure17.js
+          node --check app.js
+          node - <<'JS_TEST'
+          const assert=require('node:assert/strict');
+          const {parse}=require('./lungparser369.js');
+          const good=parse('Messdatum 03.04.26\nTLC 7.00 5.60 80.0\nFVC 5.00 3.75 75.0');
+          assert.equal(good.date,'2026-04-03');
+          assert.equal(good.rows.length,2);
+          assert.equal(good.rows.find(r=>r.code==='FVC').actual,3.75);
+          assert.equal(parse('FVC 5.00 3.75 95.0').rows.length,0);
+          assert.equal(parse('FVC 500 375 75.0').rows.length,0);
+          assert.equal(parse('FVC 5.00 3.75 75.0\nFVC 5.00 4.00 80.0').rows.length,0);
+          console.log('OCR 3.6.9: plausible, fehlende und widerspruechliche Werte getestet.');
+          JS_TEST
+          python3 -c "import json; assert json.load(open('version.json'))['version']=='3.6.9'"
+          git diff --check
+          git add lungparser369.js lungimport365.js secure17.js sw.js index.html app.js version.json
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "PneumoPro 3.6.9: OCR aus mehreren Tabellenbereichen zusammenfuehren"
+            git push origin HEAD:main
+          else
+            echo "Version bereits aktuell."
+          fi
