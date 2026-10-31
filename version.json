@@ -1,5 +1,5 @@
 {
-  "version": "3.7.0",
+  "version": "3.7.1",
   "released": "2026-10-31",
-  "notes": "Teilerkannte Soll/Ist-Messwerte werden separat als unbestaetigte OCR-Vorschlaege gezeigt. Keine automatische Ergaenzung fehlender Prozentwerte oder verlorener Dezimalzeichen. Vollstaendigkeit nur bei tatsaechlich abgelesenen Soll/Ist/Prozent-Spalten; OCR-Konflikte werden gewarnt und nicht ueberschrieben. Messzeit kann aus eindeutigem Messzeit-Feld vorbelegt werden. Originaldateien bleiben verschluesselt und unveraendert."
+  "notes": "Gezielter zweiter OCR-Durchgang nur auf fehlenden Lungenfunktions-Zeilen, danach bei sicherer Koordinate separate Prozentspaltenpruefung. Drei klare Status: vollstaendig, teilweise, nicht erkannt. Kein Erfinden von Werten, unveraenderte verschluesselte Originale, verpflichtende Originalkontrolle."
 }

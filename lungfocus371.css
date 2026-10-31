@@ -1,0 +1,8 @@
+/* PneumoPro 3.7.1 - eindeutige Erkennungszustände auf iPhone */
+#li365 tr[data-status="complete"] > th:first-child{border-left:4px solid #237c5a}
+#li365 tr[data-status="partial"] > th:first-child{border-left:4px solid #b97d25}
+#li365 tr[data-status="missing"] > th:first-child{border-left:4px solid #a9b8c1}
+#li365 .li371-status{display:block;font-size:11px;font-weight:600;line-height:1.3;margin-top:3px;white-space:normal}
+#li365 tr[data-status="complete"] .li371-status{color:#207153}
+#li365 tr[data-status="partial"] .li371-status{color:#855c20}
+#li365 tr[data-status="missing"] .li371-status{color:#606f78}
