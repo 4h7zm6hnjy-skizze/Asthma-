@@ -1,0 +1,31 @@
+/* PneumoPro 3.6.5 – direktes lokales Befundlesen und sichere Prüfung */
+#li365{margin:20px 0;padding:16px;border:2px solid #b5d7e0;border-radius:16px;background:#f4fafd;min-width:0;overflow-wrap:anywhere}
+#li365 h3{font-size:1.25rem;line-height:1.3;color:#164c62;margin:0 0 10px}#li365 h4{color:#1c566b;margin:18px 0 8px}
+#li365 p{font-size:.91rem;line-height:1.5}#li365 label{display:block;font-weight:730;color:#254c5e;margin:10px 0}
+#li365 input:not([type=checkbox]),#li365 select{display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box;font-size:16px;padding:9px;border:1px solid #afcbd5;border-radius:8px;background:#fff;color:#173f54;margin:5px 0}
+#li365 button{background:#eff9fc;color:#175369;border:1px solid #8dbbcc;font:inherit;font-weight:750;border-radius:9px;min-height:44px;padding:9px 12px;cursor:pointer;white-space:normal}
+#li365 .li365-buttons{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}#li365 .li365-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px}
+#li365-status{border-left:4px solid #1982a0;background:white;padding:11px;border-radius:8px;white-space:pre-wrap}#li365-status[data-error=yes]{border-color:#b43131}
+#li365-warnings{border:2px solid #c44d3c;background:#fff4ee;border-radius:12px;padding:13px;margin:14px 0;color:#6c261b}
+#li365-warnings p{margin:5px 0 7px}#li365 .li365-table{max-width:100%;overflow-x:auto;border:1px solid #bbd3da;border-radius:9px}
+#li365 table{width:100%;border-collapse:collapse;background:white;font-size:.8rem;min-width:545px}#li365 table th,#li365 table td{padding:6px;border-bottom:1px solid #d5e4e8;text-align:left}#li365 table input{min-width:74px!important;width:80px!important;font-size:15px!important;padding:5px!important}
+#li365 pre{max-height:250px;overflow:auto;white-space:pre-wrap;font-size:.78rem;background:#fff;border-radius:10px;padding:10px}
+#li365-canvasarea{overflow:auto;max-width:100%;max-height:70vh;background:#fff;border:1px solid #c5dade;border-radius:8px}#li365-canvas{display:block;max-width:100%;height:auto;margin:auto;touch-action:none}
+#li365-suggestions{margin:8px 0}#li365-suggestions button{margin:4px}#li365 .li365-muted{font-size:.84rem;color:#637789}
+#li365 .li365-cropitem{display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid #ccdfe5;flex-wrap:wrap}#li365 .li365-cropitem img{max-width:130px;max-height:95px;object-fit:contain}
+#li365 label.li365-check{display:flex;align-items:flex-start;gap:10px;background:white;border:1px solid #b8d6df;padding:12px;border-radius:10px}#li365 label.li365-check input{width:20px;height:20px;flex-shrink:0}
+#li365-save{background:#126e83!important;color:#fff!important;display:block;width:100%;margin-top:14px}
+#li365 .li365-preview{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}#li365 .li365-preview img{width:100%;height:auto;max-height:260px;object-fit:contain;cursor:zoom-in}
+#li365 .li365-preview figure{margin:0;border:1px solid #c5dbe4;border-radius:10px;padding:7px;background:white}
+#li365 .li365-preview figcaption{font-size:.8rem}#li365 .li365-study{background:white;border:1px solid #bbd5dd;border-radius:10px;margin:12px 0;padding:10px}
+.li365-lightbox{position:fixed;inset:0;margin:auto;max-width:98vw;max-height:92dvh;overflow:auto;border:0;border-radius:12px;background:white;padding:12px}.li365-lightbox::backdrop{background:#061921dd}.li365-lightbox img{display:block;max-width:none;max-height:none;width:auto;height:auto}.li365-lightbox button{position:sticky;top:0;z-index:2;background:#fff;padding:9px 16px}
+@media(max-width:500px){#li365{padding:12px}#li365 h3{font-size:1.1rem}}
+@media print{#li365{display:none!important}}
+#li365-home{border-top:1px solid #cbdfe7;margin:15px 0 0;padding:14px 0 0}
+#li365-home h4{font-size:1rem;margin:0 0 10px;color:#14536b}
+#li365-home .li365-study{margin:8px 0;background:#fff;border:1px solid #c4d9e2;padding:9px;border-radius:9px}
+#li365-home .li365-study summary{cursor:pointer;font-size:.83rem;font-weight:700}
+#li365-home .li365-preview{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:9px}
+#li365-home .li365-preview figure{background:#fff;border:1px solid #d5e5ec;border-radius:9px;margin:0;padding:6px}
+#li365-home .li365-preview img{width:100%;max-height:220px;object-fit:contain;cursor:zoom-in}
+#li365-home .li365-preview figcaption{font-size:.75rem;color:#406274}

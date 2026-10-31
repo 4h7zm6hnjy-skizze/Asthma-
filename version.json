@@ -1,5 +1,5 @@
 {
-  "version": "3.6.4",
+  "version": "3.6.5",
   "released": "2026-10-31",
-  "notes": "Groessere Klinikdiagramm-Vorschauen auf iPhone. Schonende kontrastverstaerkte Scanansicht bewahrt auch feine hellgraue Kurven und Beschriftungen; Zoom bleibt erhalten. Originalfotos und medizinische Messdaten unveraendert und nur lokal verschluesselt."
+  "notes": "Neuer Lungenfunktionstest als Foto, HEIC, PNG oder PDF direkt in PneumoPro prüfen. Lokale Texterkennung und vorsichtige Soll-Ist-Prozent-Prüfung; nur überprüfte Messwerte werden nach ausdrücklicher Bestätigung gespeichert. Erkennungsvorschläge und manuelle Originaldiagramm-Ausschnitte werden pro Test mit verschlüsseltem Original verknüpft. Bei fehlender oder unklarer Zuordnung erscheint eine ausdrückliche Warnung mit Option zur eigenen ChatGPT-Nachprüfung. Keine automatische Weitergabe privater Befunde. Bestehende Daten bleiben unverändert."
 }
