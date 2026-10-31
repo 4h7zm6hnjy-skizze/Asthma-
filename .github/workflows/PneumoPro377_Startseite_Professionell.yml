@@ -1,0 +1,107 @@
+name: PneumoPro 3.7.7 - Startseite professionell
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PneumoPro377_Startseite_Professionell.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pneumopro-377-startseite-professionell
+  cancel-in-progress: false
+
+jobs:
+  installieren:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: App laden
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Ein-Datei-Update installieren
+        shell: bash
+        run: |
+          python3 - <<'PY_377'
+          from pathlib import Path
+          import base64, json
+
+          target=Path('version.json')
+          current=json.loads(target.read_text(encoding='utf-8'))
+          if current.get('version') == '3.7.7':
+              print('PneumoPro 3.7.7 ist bereits installiert.')
+          elif current.get('version') != '3.7.6':
+              raise RuntimeError('Erwartete Version 3.7.6 fehlt. Zur Sicherheit keine Aenderungen.')
+          else:
+              def replace_once(filename, before, after):
+                  path=Path(filename)
+                  original=path.read_text(encoding='utf-8')
+                  count=original.count(before)
+                  if count != 1:
+                      raise RuntimeError(f'{filename}: erwarteter Marker nicht eindeutig: {count} Treffer.')
+                  path.write_text(original.replace(before, after, 1), encoding='utf-8')
+              def replace_version(filename):
+                  path=Path(filename)
+                  original=path.read_text(encoding='utf-8')
+                  if '3.7.6' not in original:
+                      raise RuntimeError(f'{filename}: Version 3.7.6 fehlt.')
+                  path.write_text(original.replace('3.7.6','3.7.7'), encoding='utf-8')
+              if Path('dashboard377.js').exists():
+                  raise RuntimeError('dashboard377.js existiert bereits, aber Version passt nicht.')
+              Path('dashboard377.js').write_bytes(base64.b64decode('J3VzZSBzdHJpY3QnOwovKiBQbmV1bW9Qcm8gMy43Ljc6IHByb2Zlc3Npb25lbGxlIFN0YXJ0c2VpdGUgYXVmcmFldW1lbi4KICAgRW50ZmVybnQgZGllIGFsdGUgQm94ICdIZXV0ZSBpbSBCbGljaycsIHNldHp0IGRpZSBNZXNzd2VydC1LYWNoZWxuIGdhbnogbmFjaCBvYmVuLAogICBlbnRmZXJudCBkZW4gWnVzYXR6ICdvaG5lIFNjaG5pY2tzY2huYWNrJyB1bmQgZnVlZ3QgZWluZW4gQ29weXJpZ2h0LUhpbndlaXMgaGluenUuICovCigoKT0+ewogIGNvbnN0IFM9d2luZG93LkFTVEhNQV9TRUNVUklUWTsKICBpZighUz8uc3RhdGU/LigpLnVubG9ja2VkKSByZXR1cm47CiAgaWYod2luZG93LlBORVVNT1BST19EQVNIQk9BUkQzNzcpIHJldHVybjsKCiAgZnVuY3Rpb24gZW5zdXJlU3R5bGUoKXsKICAgIGlmKGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdwcDM3Ny1zdHlsZScpKSByZXR1cm47CiAgICBjb25zdCBzdHlsZT1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCdzdHlsZScpOwogICAgc3R5bGUuaWQ9J3BwMzc3LXN0eWxlJzsKICAgIHN0eWxlLnRleHRDb250ZW50PWAKI3BwMzc2LWRhc2hib2FyZHttYXJnaW46NnB4IDAgMjRweH0KI3BwMzc2LWRhc2hib2FyZCAucHAzNzYtaGVhZHttYXJnaW4tYm90dG9tOjEycHh9CiNwcDM3Ni1kYXNoYm9hcmQgLnBwMzc2LXN1YnttYXJnaW4tdG9wOjhweH0KI3BwMzc3LWNvcHlyaWdodHttYXJnaW4tdG9wOjE0cHg7Y29sb3I6IzZhN2Y4ZDtmb250LXNpemU6LjlyZW07bGluZS1oZWlnaHQ6MS40O3RleHQtYWxpZ246cmlnaHR9CkBtZWRpYSAobWF4LXdpZHRoOjcyMHB4KXsjcHAzNzctY29weXJpZ2h0e3RleHQtYWxpZ246bGVmdDtmb250LXNpemU6Ljg1cmVtfX0KYDsKICAgIGRvY3VtZW50LmhlYWQuYXBwZW5kKHN0eWxlKTsKICB9CgogIGZ1bmN0aW9uIHJlbW92ZUxlZ2FjeU92ZXJ2aWV3KCl7CiAgICAvLyBPbmx5IHJlbW92ZSB0aGUgZXhhY3Qgb2xkIHF1aWNrLW92ZXJ2aWV3IGNhcmQsIG5ldmVyIGEgY29udGFpbmluZyBwYWdlLgogICAgLy8gQWxsIGRpYXJ5IGVudHJpZXMsIG1lYXN1cmVtZW50IGRhdGEgYW5kIHRoZWlyIGRlZGljYXRlZCB2aWV3cyByZW1haW4gdW50b3VjaGVkLgogICAgY29uc3Qgb2xkPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdhMjgtZGFpbHknKTsKICAgIGlmKCFvbGQpcmV0dXJuIGZhbHNlOwogICAgb2xkLnJlbW92ZSgpOwogICAgcmV0dXJuIHRydWU7CiAgfQoKICBmdW5jdGlvbiB0aWR5RGFzaGJvYXJkKCl7CiAgICBjb25zdCBob3N0PWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd1ZWJlcnNpY2h0JykgfHwgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3N0YXJ0Jyk7CiAgICBjb25zdCBkYXNoYm9hcmQ9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3BwMzc2LWRhc2hib2FyZCcpOwogICAgaWYoIWhvc3QgfHwgIWRhc2hib2FyZCkgcmV0dXJuIGZhbHNlOwoKICAgIGlmKGhvc3QuZmlyc3RFbGVtZW50Q2hpbGQgIT09IGRhc2hib2FyZCkgaG9zdC5wcmVwZW5kKGRhc2hib2FyZCk7CgogICAgY29uc3Qga2lja2VyPWRhc2hib2FyZC5xdWVyeVNlbGVjdG9yKCcucHAzNzYta2lja2VyJyk7CiAgICBpZihraWNrZXIpIGtpY2tlci5yZW1vdmUoKTsKCiAgICBsZXQgY29weT1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncHAzNzctY29weXJpZ2h0Jyk7CiAgICBpZighY29weSl7CiAgICAgIGNvcHk9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnZGl2Jyk7CiAgICAgIGNvcHkuaWQ9J3BwMzc3LWNvcHlyaWdodCc7CiAgICAgIGNvcHkudGV4dENvbnRlbnQ9J8KpIE1hcmNlbCBIZW50c2NoZWwgMjAyNic7CiAgICAgIGNvbnN0IGZvb3Rlcj1kb2N1bWVudC5xdWVyeVNlbGVjdG9yKCdmb290ZXIgLmZvb3Rlci1pbm5lcicpfHxkb2N1bWVudC5xdWVyeVNlbGVjdG9yKCdmb290ZXInKTsKICAgICAgaWYoZm9vdGVyKWZvb3Rlci5hcHBlbmQoY29weSk7CiAgICAgIGVsc2UgZGFzaGJvYXJkLmFwcGVuZChjb3B5KTsKICAgIH0KICAgIHJldHVybiB0cnVlOwogIH0KCiAgZW5zdXJlU3R5bGUoKTsKICBsZXQgb2JzZXJ2ZXJUaW1lcj0wOwogIGNvbnN0IHJlZnJlc2g9KCk9PnsKICAgIHJlbW92ZUxlZ2FjeU92ZXJ2aWV3KCk7CiAgICB0aWR5RGFzaGJvYXJkKCk7CiAgfTsKICBjb25zdCBzY2hlZHVsZT0oKT0+eyBjbGVhclRpbWVvdXQob2JzZXJ2ZXJUaW1lcik7IG9ic2VydmVyVGltZXI9c2V0VGltZW91dChyZWZyZXNoLDgwKTsgfTsKICBzY2hlZHVsZSgpOwoKICBjb25zdCBvYnNlcnZlcj1uZXcgTXV0YXRpb25PYnNlcnZlcihzY2hlZHVsZSk7CiAgb2JzZXJ2ZXIub2JzZXJ2ZShkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnc2VjdXJlLWFwcGxpY2F0aW9uJyl8fGRvY3VtZW50LmJvZHkse2NoaWxkTGlzdDp0cnVlLHN1YnRyZWU6dHJ1ZX0pOwogIHdpbmRvdy5hZGRFdmVudExpc3RlbmVyKCdhc3RobWE6c2VjdXJlLWNoYW5nZScsc2NoZWR1bGUpOwogIHdpbmRvdy5hZGRFdmVudExpc3RlbmVyKCdhc3RobWE6cHJvZmlsZS1yZXNldCcsc2NoZWR1bGUpOwogIHdpbmRvdy5hZGRFdmVudExpc3RlbmVyKCdhc3RobWE6cGVyc29uYWwtcHJvZmlsZS11cGRhdGVkJyxzY2hlZHVsZSk7CiAgd2luZG93LlBORVVNT1BST19EQVNIQk9BUkQzNzc9T2JqZWN0LmZyZWV6ZSh7dmVyc2lvbjonMy43LjcnLHJlZnJlc2g6c2NoZWR1bGV9KTsKfSkoKTsK'))
+              replace_once('secure17.js',
+                  "'lungsplit374.js','tidy375.js','dashboard376.js'];",
+                  "'lungsplit374.js','tidy375.js','dashboard376.js','dashboard377.js'];")
+              replace_version('secure17.js')
+              replace_version('index.html')
+              replace_once('sw.js',
+                  "const VERSION='3.7.6-start-dashboard';",
+                  "const VERSION='3.7.7-start-professional';")
+              replace_once('sw.js',
+                  "'./weight292.js','./tidy375.js','./dashboard376.js','./medpref25.js'",
+                  "'./weight292.js','./tidy375.js','./dashboard376.js','./dashboard377.js','./medpref25.js'")
+              current['version']='3.7.7'
+              current['released']='2026-10-31'
+              current['notes']='Startseite verfeinert: alte Box "Heute im Blick" entfernt, die Kacheln mit den letzten Messwerten an den Seitenanfang verschoben, der Zusatz "ohne Schnickschnack" entfernt und Copyright © Marcel Hentschel 2026 hinzugefuegt. Bestehende Daten und Diagramme bleiben unveraendert.'
+              target.write_text(json.dumps(current, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+              print('Update vorbereitet: Version 3.7.7; Startseite professionell aufgeraeumt.')
+          PY_377
+      - name: Dateien auf Syntax, Version und Funktionen pruefen
+        shell: bash
+        run: |
+          set -e
+          node --check dashboard376.js
+          node --check dashboard377.js
+          node --check tidy375.js
+          node --check secure17.js
+          node --check sw.js
+          python3 -m json.tool version.json > /dev/null
+          python3 - <<'PY_CHECK'
+          import json
+          from pathlib import Path
+          assert json.loads(Path('version.json').read_text())['version']=='3.7.7'
+          assert "'lungsplit374.js','tidy375.js','dashboard376.js','dashboard377.js'" in Path('secure17.js').read_text()
+          assert "'./weight292.js','./tidy375.js','./dashboard376.js','./dashboard377.js'" in Path('sw.js').read_text()
+          t=Path('dashboard377.js').read_text(encoding='utf-8')
+          for marker in ['a28-daily','pp377-copyright','© Marcel Hentschel 2026','PNEUMOPRO_DASHBOARD377']:
+              assert marker in t, marker
+          print('Alle Installations- und Syntaxkontrollen bestanden.')
+          PY_CHECK
+          git diff --check
+      - name: Update automatisch veroeffentlichen
+        shell: bash
+        run: |
+          set -e
+          git add dashboard377.js secure17.js sw.js index.html version.json
+          if git diff --cached --quiet; then
+            echo 'Update bereits installiert.'
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'PneumoPro 3.7.7: Startseite aufraeumen und professionalisieren'
+            git push origin HEAD:main
+          fi
